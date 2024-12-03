@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afzetting Berekening</title>
+    <script>
+        function berekenAfzettingIr192(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis) {
+            const afzetting = Math.sqrt((Ci * 37000 * 0.13 * Math.pow(0.5, (wanddikte_pb / 3)) * Math.pow(0.5, (wanddikte_fe / 13))) / gewenste_dosis);
+            const afstand_collimator = Math.sqrt((Ci * 37000 * 0.13 * 0.012) / gewenste_dosis);
+            return { afzetting, afstand_collimator };
+        }
+
+        function berekenAfzettingSe75(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis) {
+            const afzetting = Math.sqrt((Ci * 37000 * 0.054 * Math.pow(0.5, (wanddikte_pb / 2)) * Math.pow(0.5, (wanddikte_fe / 5))) / gewenste_dosis);
+            const afstand_collimator = Math.sqrt((Ci * 37000 * 0.054 * 0.05) / gewenste_dosis);
+            return { afzetting, afstand_collimator };
+        }
+
+        function bereken() {
+            const keuze = document.querySelector('input[name="bron"]:checked').value;
+            const Ci = parseFloat(document.getElementById("Ci").value);
+            const wanddikte_pb = parseFloat(document.getElementById("wanddikte_pb").value);
+            const wanddikte_fe = parseFloat(document.getElementById("wanddikte_fe").value);
+            const gewenste_dosis = parseFloat(document.getElementById("gewenste_dosis").value);
+            
+            let resultaat;
+            if (keuze === "Ir192") {
+                resultaat = berekenAfzettingIr192(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis);
+            } else if (keuze === "Se75") {
+                resultaat = berekenAfzettingSe75(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis);
+            }
+
+            document.getElementById("resultaat").innerHTML = 
+                "De benodigde afzetting is: " + resultaat.afzetting.toFixed(2) + " meter<br>" +
+                "De afstand achter de collimator is: " + resultaat.afstand_collimator.toFixed(2) + " meter";
+        }
+    </script>
+</head>
+<body>
+    <h1>Afzetting Berekening</h1>
+
+    <form>
+        <label>Kies een gamma bron:</label><br>
+        <input type="radio" id="Ir192" name="bron" value="Ir192" checked>
+        <label for="Ir192">Iridium-192 (Ir192)</label><br>
+        <input type="radio" id="Se75" name="bron" value="Se75">
+        <label for="Se75">Selenium-75 (Se75)</label><br><br>
+
+        <label for="Ci">Voer de hoeveelheid Ci in:</label><br>
+        <input type="number" id="Ci" step="any"><br><br>
+
+        <label for="wanddikte_pb">Voer de wanddikte lood (Pb) in (mm):</label><br>
+        <input type="number" id="wanddikte_pb" step="any"><br><br>
+
+        <label for="wanddikte_fe">Voer de wanddikte ijzer (Fe) in (mm):</label><br>
+        <input type="number" id="wanddikte_fe" step="any"><br><br>
+
+        <label for="gewenste_dosis">Voer de gewenste dosis in (μSv/h):</label><br>
+        <input type="number" id="gewenste_dosis" step="any"><br><br>
+
+        <button type="button" onclick="bereken()">Bereken</button>
+    </form>
+
+    <h2>Resultaat</h2>
+    <p id="resultaat"></p>
+</body>
+</html>

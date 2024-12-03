@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berekening D4, D5, D7</title>
+    <script>
+        // Functie om tijd (minuten:seconden) naar seconden om te zetten
+        function tijdNaarSeconden(tijd) {
+            const delen = tijd.split(':');
+            const minuten = parseInt(delen[0]);
+            const seconden = parseInt(delen[1]);
+            return (minuten * 60) + seconden;
+        }
+
+        // Functie om seconden om te zetten naar minuten:seconden
+        function secondenNaarTijd(seconden) {
+            const minuten = Math.floor(seconden / 60);
+            const restSeconden = Math.floor(seconden % 60);
+            return `${minuten}:${restSeconden < 10 ? '0' : ''}${restSeconden}`;
+        }
+
+        // Functies om D5 en D7 te berekenen van D4
+        function berekenD5D7VanD4(d4) {
+            const d5 = d4 / 1.6666;
+            const d7 = d4 / 2.44;
+            return { d5, d7 };
+        }
+
+        // Functies om D4 en D7 te berekenen van D5
+        function berekenD4D7VanD5(d5) {
+            const d4 = d5 * 1.6666;
+            const d7 = d4 / 2.44;
+            return { d4, d7 };
+        }
+
+        // Functies om D4 en D5 te berekenen van D7
+        function berekenD4D5VanD7(d7) {
+            const d4 = d7 * 2.44;
+            const d5 = d4 / 1.6666;
+            return { d4, d5 };
+        }
+
+        // Hoofdfunctie om te berekenen op basis van de keuze
+        function bereken() {
+            const keuze = document.querySelector('input[name="keuze"]:checked').value;
+            const tijdInvoer = document.getElementById("tijd").value;
+
+            // Controleer of de tijd geldig is
+            if (!tijdInvoer || !tijdInvoer.includes(':')) {
+                document.getElementById("resultaat").innerHTML = "Voer een geldige tijd in (MM:SS).";
+                return;
+            }
+
+            const tijdInSeconden = tijdNaarSeconden(tijdInvoer);
+            let resultaat;
+
+            if (keuze === "D4") {
+                resultaat = berekenD5D7VanD4(tijdInSeconden);
+                document.getElementById("resultaat").innerHTML = 
+                    `D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+            } else if (keuze === "D5") {
+                resultaat = berekenD4D7VanD5(tijdInSeconden);
+                document.getElementById("resultaat").innerHTML = 
+                    `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+            } else if (keuze === "D7") {
+                resultaat = berekenD4D5VanD7(tijdInSeconden);
+                document.getElementById("resultaat").innerHTML = 
+                    `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Bereken D4, D5 of D7</h1>
+
+    <form>
+        <p>Welke variabele ken je?</p>
+        <input type="radio" id="D4" name="keuze" value="D4" checked>
+        <label for="D4">D4</label><br>
+        <input type="radio" id="D5" name="keuze" value="D5">
+        <label for="D5">D5</label><br>
+        <input type="radio" id="D7" name="keuze" value="D7">
+        <label for="D7">D7</label><br><br>
+
+        <label for="tijd">Voer de tijd in (MM:SS):</label><br>
+        <input type="text" id="tijd" placeholder="Bijv. 02:30"><br><br>
+
+        <button type="button" onclick="bereken()">Bereken</button>
+    </form>
+
+    <h2>Resultaat</h2>
+    <p id="resultaat"></p>
+</body>
+</html>
