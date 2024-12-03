@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Film Focus Afstand Berekening</title>
+</head>
+<body>
+    <h1>Bereken de Film Focus Afstand (FFD)</h1>
+    <button onclick="berekenFFD()">Start Berekening</button>
+    <p id="output"></p>
+
+    <script>
+        function berekenFFD() {
+            let output = document.getElementById("output");
+            output.innerHTML = "Voer de volgende gegevens in:<br>";
+
+            // Gegevens invoer
+            let ofa = parseFloat(prompt("Object Film Afstand (OFA): "));
+            let brongrootte = parseFloat(prompt("Brongrootte: "));
+
+            // Kies de standaard
+            let keuze = prompt("Kies een standaard:\n1. EN-klasse A\n2. EN-klasse B\n3. ASME\nMaak je keuze (1, 2 of 3): ");
+
+            // Extra opties voor EN-klasse
+            let centraal = false;
+            let excentrisch = false;
+            if (keuze === '1' || keuze === '2') {
+                let optie = prompt("Kies een extra optie (optioneel):\n1. Centraal\n2. Excentrisch\nMaak je keuze (1 of 2, of laat leeg als geen keuze): ");
+                if (optie === '1') {
+                    centraal = true;
+                } else if (optie === '2') {
+                    excentrisch = true;
+                }
+            }
+
+            let ffd;
+            // Berekeningen op basis van keuze
+            if (keuze === '3') {  // ASME
+                let wt = parseFloat(prompt("Wanddikte (wt) in mm: "));
+
+                if (wt < 50) {
+                    var boa = (brongrootte * ofa) / 0.51;
+                } else if (wt >= 50 && wt < 75) {
+                    var boa = (brongrootte * ofa) / 0.76;
+                } else if (wt >= 75 && wt <= 100) {
+                    var boa = (brongrootte * ofa) / 1.02;
+                } else {
+                    output.innerHTML += "Ongeldige wanddikte. Voer een waarde tussen 0 en 100 mm in.<br>";
+                    return;
+                }
+
+                ffd = boa + ofa;
+
+            } else if (keuze === '2') {  // EN-klasse B
+                ffd = (brongrootte * 15 * Math.pow(ofa, 2 / 3)) + ofa;
+
+                // Pas aan voor Centraal of Excentrisch
+                if (centraal) {
+                    ffd *= 0.5;
+                } else if (excentrisch) {
+                    ffd *= 0.8;
+                }
+
+            } else if (keuze === '1') {  // EN-klasse A
+                ffd = (brongrootte * 7.5 * Math.pow(ofa, 2 / 3)) + ofa;
+
+                // Pas aan voor Centraal of Excentrisch
+                if (centraal) {
+                    ffd *= 0.5;
+                } else if (excentrisch) {
+                    ffd *= 0.8;
+                }
+
+            } else {
+                output.innerHTML += "Ongeldige keuze. Voer 1, 2 of 3 in.<br>";
+                return;
+            }
+
+            output.innerHTML += `De berekende Film Focus Afstand (FFD) is: ${ffd.toFixed(2)} mm<br>`;
+        }
+    </script>
+</body>
+</html>
+
