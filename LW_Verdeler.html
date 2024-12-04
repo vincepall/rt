@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Langsnaad verdeler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Langsnaad verdeler</h1>
+    <p>Voer de totale lengte in (in mm):</p>
+    <input type="number" id="totaleLengte" placeholder="Totale lengte in mm" required>
+    <button onclick="verdeelLengte()">Verdeel Lengte</button>
+    <p id="resultaat"></p>
+</div>
+
+<script>
+    function verdeelLengte() {
+        const totaleLengte = parseFloat(document.getElementById('totaleLengte').value);
+        const maxLengte = 400;
+        
+        if (isNaN(totaleLengte) || totaleLengte <= 400) {
+            document.getElementById('resultaat').innerText = "De totale lengte moet meer dan 400 mm zijn.";
+            return;
+        }
+
+        // Trek 400mm af van de totale lengte vanwege de uiteindes      
+        const resterendeLengte = totaleLengte - maxLengte;
+        
+        // Bereken hoeveel stukken we kunnen maken met een maximale lengte van 400mm
+        const aantalStukken = Math.ceil(resterendeLengte / maxLengte);
+        const stukLengte = resterendeLengte / aantalStukken;
+
+        // Tel 1 op bij het aantal stukken voor de uiteinde (eerste stuk)
+        const totaalAantalFilms = aantalStukken + 1;
+
+        // Resultaat weergeven
+        let resultaat = `De totale lengte van ${totaleLengte} mm wordt als volgt verdeeld:\n`;
+        resultaat += `- Uiteinde: 2 x 200 mm\n`;
+        resultaat += `- Totaal aantal films: ${totaalAantalFilms}\n`;
+        resultaat += `- Lengte per stuk: ${stukLengte.toFixed(2)} mm\n`;
+
+        document.getElementById('resultaat').innerText = resultaat;
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
