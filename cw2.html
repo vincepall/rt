@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effectieve Filmlengte Berekenen</title>
+    <script>
+        function berekenFilmlengte() {
+            // Haal de gebruikersinput op
+            var diameter = parseFloat(document.getElementById("diameter").value);
+            var rondnaadCentraal = document.getElementById("rondnaadCentraal").checked;
+
+            // Controleer of invoer geldig is
+            if (isNaN(diameter)) {
+                alert("Vul een geldige waarde in voor de diameter.");
+                return;
+            }
+
+            // Bereken de omtrek
+            var omtrek = diameter * Math.PI;
+
+            if (rondnaadCentraal) {
+                // Bereken het aantal films bij Rondnaad Centraal
+                var aantalFilms = Math.ceil(omtrek / 400);
+                var effectieveFilmlengte = omtrek / aantalFilms;
+
+                // Toon de omtrek, aantal films en effectieve filmlengte
+                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + omtrek.toFixed(2) + " mm";
+                document.getElementById("antwoordResultaat").innerText = "Aantal films dat nodig is: " + aantalFilms;
+                document.getElementById("filmlengteResultaat").innerText = "Effectieve filmlengte per film: " + effectieveFilmlengte.toFixed(2) + " mm";
+            } else {
+                // Haal het aantal opnames op
+                var opnames = parseFloat(document.getElementById("opnames").value);
+                if (isNaN(opnames) || opnames === 0) {
+                    alert("Vul een geldig aantal opnames in.");
+                    return;
+                }
+
+                // Bereken het antwoord door de omtrek te delen door het aantal opnames
+                var antwoord = omtrek / opnames;
+                
+                // Toon de omtrek en het resultaat per opname
+                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + omtrek.toFixed(2) + " mm";
+                document.getElementById("antwoordResultaat").innerText = "Het resultaat is: " + antwoord.toFixed(2) + " mm per opname";
+                document.getElementById("filmlengteResultaat").innerText = "";
+            }
+        }
+
+        function toggleOpnamesInput() {
+            var rondnaadCentraal = document.getElementById("rondnaadCentraal").checked;
+            document.getElementById("opnames").disabled = rondnaadCentraal;
+        }
+    </script>
+</head>
+<body>
+    <h1>Effectieve Filmlengte Berekenen</h1>
+    
+    <form onsubmit="event.preventDefault(); berekenFilmlengte();">
+        <label for="diameter">Diameter van de pijp (in mm):</label><br>
+        <input type="number" id="diameter" name="diameter" step="0.01" required><br><br>
+
+        <label for="opnames">Aantal opnames:</label><br>
+        <input type="number" id="opnames" name="opnames" required><br><br>
+
+        <label for="rondnaadCentraal">Rondnaad Centraal:</label>
+        <input type="checkbox" id="rondnaadCentraal" name="rondnaadCentraal" onclick="toggleOpnamesInput()"><br><br>
+
+        <input type="submit" value="Bereken">
+    </form>
+
+    <h2>Resultaat:</h2>
+    <p id="omtrekResultaat"></p>
+    <p id="antwoordResultaat"></p>
+    <p id="filmlengteResultaat"></p>
+
+
+ 
+
+</body>
+</html>
+
