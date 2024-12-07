@@ -26,7 +26,7 @@
             }
 
             // Toon het resultaat
-            document.getElementById("result").innerHTML = `De activiteit is nog ${ci2.toFixed(2)} Curie.`;
+            document.getElementById("result").innerHTML = `De activiteit is nog ${ci2.toFixed(2)} Curie op ${secondDate.toLocaleDateString('nl-NL')}.`;
         }
 
         // Functie om CSV-bestand in te laden en weer te geven als tabel met aanklikbare rijen
@@ -52,7 +52,7 @@
                             const activiteit = cols[2];
                             const datum = cols[3];
 
-                            table += `<tr onclick="fillForm('${bron}', '${type}', '${activiteit}', '${datum}')">`;
+                            table += `<tr onclick="fillFormAndCalculate('${bron}', '${type}', '${activiteit}', '${datum}')">`;
                             cols.forEach(col => {
                                 table += `<td>${col}</td>`;  // Voeg gegevens toe
                             });
@@ -67,8 +67,8 @@
                 .catch(error => console.error("Error loading CSV:", error));
         }
 
-        // Functie om de formuliervelden in te vullen op basis van de gekozen rij
-        function fillForm(bron, type, activiteit, datum) {
+        // Functie om de formuliervelden in te vullen en meteen de berekening uit te voeren
+        function fillFormAndCalculate(bron, type, activiteit, datum) {
             document.getElementById("isotope").value = type; // Zet het type isotoop
             document.getElementById("ci1").value = activiteit; // Vul de activiteit (Ci1) in
             document.getElementById("firstDate").value = datum.split('-').reverse().join('-'); // Formatteer de datum correct voor de input
@@ -76,8 +76,25 @@
             // Reset het tweede datumveld naar leeg zodat de gebruiker kan kiezen
             document.getElementById("secondDate").value = "";
 
-            // Bereken alvast op basis van de brongegevens
-            document.getElementById("result").innerHTML = `Gegevens van bron ${bron} geladen. Pas eventueel de velden aan en klik op "Bereken activiteit".`;
+            // Gebruik de huidige datum als standaard voor de tweede datum
+            const secondDate = new Date();
+            const firstDate = new Date(datum.split('-').reverse().join('-'));
+
+            // Bereken het aantal dagen tussen de twee datums
+            const timeDifference = secondDate - firstDate;
+            const days = timeDifference / (1000 * 3600 * 24);
+
+            let ci2 = 0;
+
+            // Bereken de activiteit
+            if (type === "Se75") {
+                ci2 = activiteit / Math.pow(2, days / 120);
+            } else if (type === "Ir192") {
+                ci2 = activiteit / Math.pow(2, days / 74);
+            }
+
+            // Toon direct het resultaat in het juiste formaat
+            document.getElementById("result").innerHTML = `Bron ${bron} heeft nog ${ci2.toFixed(2)} Ci op ${secondDate.toLocaleDateString('nl-NL')}.`;
         }
 
         // Laad de tabel als de pagina geladen is
