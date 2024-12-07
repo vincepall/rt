@@ -32,9 +32,9 @@
             fetch(file)
                 .then(response => response.text())
                 .then(data => {
-                    const rows = data.split("\n");
+                    const rows = data.split("\n").filter(row => row.trim() !== ''); // Verwijder lege rijen
                     let table = '<table border="1"><tr>';
-                    
+
                     // Verwerk de CSV-rijen en genereer de HTML-tabel
                     rows.forEach((row, index) => {
                         const cols = row.split(",");
@@ -51,7 +51,7 @@
                             const datum = cols[3];
 
                             // Voeg een onclick-event toe dat de berekening uitvoert bij klikken
-                            table += `<tr onclick="calculateActivity('${type}', ${activiteit}, '${datum.split('-').reverse().join('-')}', '${bron}')">`;
+                            table += `<tr style="cursor: pointer;" onclick="calculateActivity('${type}', ${activiteit}, '${datum.split('-').reverse().join('-')}', '${bron}')">`;
                             cols.forEach(col => {
                                 table += `<td>${col}</td>`;  // Voeg gegevens toe
                             });
@@ -59,7 +59,7 @@
                         }
                     });
                     table += '</table>';
-                    
+
                     // Plaats de tabel onderaan de pagina in de div met id="csvTable"
                     document.getElementById("csvTable").innerHTML = table;
                 })
