@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activiteitsberekening</title>
     <script>
-        // Functie om de activiteit te berekenen en het resultaat direct te tonen
+        // Bereken de activiteit direct na het invullen van het formulier
         function calculateActivity(isotope, ci1, firstDate, bron) {
-            const secondDate = new Date(); // Gebruik de huidige datum als tweede datum
-            firstDate = new Date(firstDate);
+            const secondDate = new Date();  // Gebruik de huidige datum als de tweede datum
+            const firstDateObj = new Date(firstDate);
 
             // Bereken het aantal dagen tussen de twee datums
-            const timeDifference = secondDate - firstDate;
+            const timeDifference = secondDate - firstDateObj;
             const days = timeDifference / (1000 * 3600 * 24);
 
             let ci2 = 0;
@@ -23,7 +23,7 @@
                 ci2 = ci1 / Math.pow(2, days / 74);
             }
 
-            // Toon het resultaat inclusief de naam van de bron
+            // Toon het resultaat met de naam van de bron
             document.getElementById("result").innerHTML = `De activiteit van bron ${bron} is nog ${ci2.toFixed(2)} Curie.`;
         }
 
@@ -32,9 +32,9 @@
             fetch(file)
                 .then(response => response.text())
                 .then(data => {
-                    const rows = data.split("\n").filter(row => row.trim() !== ''); // Verwijder lege rijen
+                    const rows = data.split("\n");
                     let table = '<table border="1"><tr>';
-
+                    
                     // Verwerk de CSV-rijen en genereer de HTML-tabel
                     rows.forEach((row, index) => {
                         const cols = row.split(",");
@@ -47,11 +47,10 @@
                         } else {
                             const bron = cols[0];
                             const type = cols[1];
-                            const activiteit = parseFloat(cols[2]);
+                            const activiteit = cols[2];
                             const datum = cols[3];
 
-                            // Voeg een onclick-event toe dat de berekening uitvoert bij klikken
-                            table += `<tr style="cursor: pointer;" onclick="calculateActivity('${type}', ${activiteit}, '${datum.split('-').reverse().join('-')}', '${bron}')">`;
+                            table += `<tr onclick="fillFormAndCalculate('${bron}', '${type}', '${activiteit}', '${datum}')">`;
                             cols.forEach(col => {
                                 table += `<td>${col}</td>`;  // Voeg gegevens toe
                             });
@@ -59,11 +58,21 @@
                         }
                     });
                     table += '</table>';
-
+                    
                     // Plaats de tabel onderaan de pagina in de div met id="csvTable"
                     document.getElementById("csvTable").innerHTML = table;
                 })
                 .catch(error => console.error("Error loading CSV:", error));
+        }
+
+        // Functie om de formuliervelden in te vullen en direct de berekening uit te voeren
+        function fillFormAndCalculate(bron, type, activiteit, datum) {
+            document.getElementById("isotope").value = type; // Zet het type isotoop
+            document.getElementById("ci1").value = activiteit; // Vul de activiteit (Ci1) in
+            document.getElementById("firstDate").value = datum.split('-').reverse().join('-'); // Formatteer de datum correct voor de input
+
+            // Roep direct de berekening aan met de juiste parameters
+            calculateActivity(type, parseFloat(activiteit), datum.split('-').reverse().join('-'), bron);
         }
 
         // Laad de tabel als de pagina geladen is
@@ -74,10 +83,22 @@
 </head>
 <body>
     <h1>Activiteitsberekening</h1>
+    
+    <label for="isotope">Kies een isotoop:</label>
+    <select id="isotope" disabled>
+        <option value="Se75">Se75</option>
+        <option value="Ir192">Ir192</option>
+    </select><br><br>
 
-    <h2 id="result">Klik op een bron om de activiteit te berekenen</h2>
+    <label for="ci1">Ci op eerste datum (Ci1):</label>
+    <input type="number" id="ci1" required disabled><br><br>
 
-    <h2>Bronnen Tabel (klik op een bron)</h2>
+    <label for="firstDate">Eerste datum:</label>
+    <input type="date" id="firstDate" required disabled><br><br>
+
+    <h2 id="result"></h2>
+
+    <h2>Bronnen Tabel</h2>
     <!-- Hier wordt de CSV-tabel weergegeven -->
     <div id="csvTable">De tabel wordt geladen...</div>
 
