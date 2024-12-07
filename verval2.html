@@ -9,8 +9,8 @@
             const isotope = document.getElementById("isotope").value;
             const ci1 = parseFloat(document.getElementById("ci1").value);
             const firstDate = new Date(document.getElementById("firstDate").value);
-            const secondDate = new Date(document.getElementById("secondDate").value);
-            
+            const secondDate = new Date(document.getElementById("secondDate").value || new Date());
+
             // Bereken het aantal dagen tussen de twee datums
             const timeDifference = secondDate - firstDate;
             const days = timeDifference / (1000 * 3600 * 24);
@@ -28,7 +28,7 @@
             document.getElementById("result").innerHTML = `De activiteit is nog ${ci2.toFixed(2)} Curie.`;
         }
 
-        // Functie om CSV-bestand in te laden en weer te geven als tabel
+        // Functie om CSV-bestand in te laden en weer te geven als tabel met aanklikbare rijen
         function loadCSV(file) {
             fetch(file)
                 .then(response => response.text())
@@ -39,15 +39,24 @@
                     // Verwerk de CSV-rijen en genereer de HTML-tabel
                     rows.forEach((row, index) => {
                         const cols = row.split(",");
-                        table += '<tr>';
-                        cols.forEach(col => {
-                            if (index === 0) {
+                        if (index === 0) {
+                            table += '<tr>';
+                            cols.forEach(col => {
                                 table += `<th>${col}</th>`;  // Voeg koptekst toe
-                            } else {
+                            });
+                            table += '</tr>';
+                        } else {
+                            const bron = cols[0];
+                            const type = cols[1];
+                            const activiteit = cols[2];
+                            const datum = cols[3];
+
+                            table += `<tr onclick="fillForm('${type}', '${activiteit}', '${datum}')">`;
+                            cols.forEach(col => {
                                 table += `<td>${col}</td>`;  // Voeg gegevens toe
-                            }
-                        });
-                        table += '</tr>';
+                            });
+                            table += '</tr>';
+                        }
                     });
                     table += '</table>';
                     
@@ -55,6 +64,13 @@
                     document.getElementById("csvTable").innerHTML = table;
                 })
                 .catch(error => console.error("Error loading CSV:", error));
+        }
+
+        // Functie om de formuliervelden in te vullen op basis van de gekozen rij
+        function fillForm(type, activiteit, datum) {
+            document.getElementById("isotope").value = type; // Zet het type isotoop
+            document.getElementById("ci1").value = activiteit; // Vul de activiteit (Ci1) in
+            document.getElementById("firstDate").value = datum.split('-').reverse().join('-'); // Formatteer de datum correct voor de input
         }
 
         // Laad de tabel als de pagina geladen is
