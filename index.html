@@ -4,53 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RT Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #0056b3;
+            --bg-color: #1e1e1e;
+            --text-color: #f4f4f4;
+            --button-color: #333;
+            --button-hover-color: #444;
+            --download-color: #666;
+            --download-hover-color: #888;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Roboto Condensed', sans-serif;
+            background-color: var(--bg-color);
             text-align: center;
             padding: 50px;
+            margin: 0;
+            color: var(--text-color);
         }
+
         h1 {
-            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
         }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
         .link-list {
             list-style: none;
             padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
+
         .link-list li {
-            margin: 25px 0;
+            margin: 15px;
         }
+
         .link-list a {
             text-decoration: none;
-            color: white;
-            background-color: #007BFF;
-            padding: 10px 20px;
-            border-radius: 7px;
+            color: var(--text-color);
+            background-color: var(--button-color);
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s;
+            display: inline-block;
         }
+
         .link-list a:hover {
-            background-color: #0056b3;
+            background-color: var(--button-hover-color);
+            transform: scale(1.05);
+        }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: var(--download-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .download-link:hover {
+            background-color: var(--download-hover-color);
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .link-list {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>RT hulpprogramma's</h1>
-    <p>maak een keuze:</p>
-    
+    <h1>RT Tools</h1>
+
     <ul class="link-list">
         <li><a href="focusverandering.html">Focusverandering</a></li>
         <li><a href="filmsoortverandering.html">D4 D5 D7</a></li>
         <li><a href="verval2.html">Bronsterkte</a></li>
         <li><a href="MinFFD.html">Minimale FFD</a></li>
-        <li><a href="Draadjesv2.html">Draadvereiste EN-B,ASME</a></li>
-        <li><a href="afzettinggamma.html">Afzetting gamma</a></li>
-        <li><a href="LW_Verdeler.html">Langsnaad verdeler</a></li>
-        <li><a href="cw2.html">CW / Effectieve film lengte</a></li>
+        <li><a href="Draadjesv2.html">Draadvereiste EN-B, ASME</a></li>
+        <li><a href="afzettinggamma.html">Afzetting Gamma</a></li>
+        <li><a href="LW_Verdeler.html">Langsnaad Verdeler</a></li>
+        <li><a href="cw2.html">CW / Effectieve Filmlengte</a></li>
     </ul>
 
-    <a href="https://drive.google.com/drive/folders/16HaslSax0-6OXtku0elDYHCblgKD8VN-?usp=drive_link">Download de Android apps hier</a>
-
+    <a class="download-link" href="https://drive.google.com/drive/folders/16HaslSax0-6OXtku0elDYHCblgKD8VN-?usp=drive_link">
+        Download de Android apps hier
+    </a>
 
 </body>
 </html>
+
