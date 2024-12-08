@@ -6,11 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focusverandering Berekening</title>
     <script>
-        // Functie om tijd (minuten:seconden) naar seconden om te zetten
-        function tijdNaarSeconden(tijd) {
-            const delen = tijd.split(':');
-            const minuten = parseInt(delen[0]);
-            const seconden = parseInt(delen[1]);
+        // Functie om minuten en seconden naar totale seconden om te zetten
+        function tijdNaarSeconden(minuten, seconden) {
             return (minuten * 60) + seconden;
         }
 
@@ -22,25 +19,26 @@
         }
 
         // Functie om de focusverandering te berekenen
-        function berekenFocusverandering(begintied, nuuje_focus, ouwe_focus) {
-            const resultaat = begintied * Math.pow(nuuje_focus / ouwe_focus, 2);
+        function berekenFocusverandering(begintijd, nuuje_focus, ouwe_focus) {
+            const resultaat = begintijd * Math.pow(nuuje_focus / ouwe_focus, 2);
             return resultaat;
         }
 
         // Hoofdfunctie om de berekening uit te voeren op basis van de invoer
         function bereken() {
-            const begintijd = document.getElementById("begintijd").value;
+            const minuten = parseInt(document.getElementById("minuten").value);
+            const seconden = parseInt(document.getElementById("seconden").value);
             const nuuje_focus = parseFloat(document.getElementById("nuuje_focus").value);
             const ouwe_focus = parseFloat(document.getElementById("ouwe_focus").value);
 
             // Controleer of de tijd en de focuswaarden geldig zijn
-            if (!begintijd || isNaN(nuuje_focus) || isNaN(ouwe_focus) || !begintijd.includes(':')) {
+            if (isNaN(minuten) || isNaN(seconden) || isNaN(nuuje_focus) || isNaN(ouwe_focus)) {
                 document.getElementById("resultaat").innerHTML = "Voer geldige waarden in.";
                 return;
             }
 
-            // Zet de begintijd om naar seconden
-            const begintijdInSeconden = tijdNaarSeconden(begintijd);
+            // Zet de minuten en seconden om naar totale seconden
+            const begintijdInSeconden = tijdNaarSeconden(minuten, seconden);
 
             // Voer de berekening uit
             const focusveranderingInSeconden = berekenFocusverandering(begintijdInSeconden, nuuje_focus, ouwe_focus);
@@ -55,8 +53,9 @@
     <h1>Bereken Focusverandering</h1>
 
     <form>
-        <label for="begintijd">Voer de begintijd in (MM:SS):</label><br>
-        <input type="text" id="begintijd" placeholder="Bijv. 02:30"><br><br>
+        <label for="minuten">Voer de begintijd in:</label><br>
+        Minuten: <input type="number" id="minuten" placeholder="Minuten" min="0"><br>
+        Seconden: <input type="number" id="seconden" placeholder="Seconden" min="0" max="59"><br><br>
 
         <label for="nuuje_focus">Voer de waarde van nieuwe focus in:</label><br>
         <input type="number" id="nuuje_focus" step="any" placeholder="Nieuwe focus"><br><br>
