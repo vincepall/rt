@@ -27,7 +27,7 @@
             }
 
             // Toon het resultaat
-            document.getElementById("result").innerHTML = `De activiteit is nog ${ci2.toFixed(2)} Curie op ${secondDate.toLocaleDateString('nl-NL')}.`;
+            document.getElementById("result").innerHTML = `De activiteit is nog <span style="color:red">${ci2.toFixed(2)} Curie</span> op <span style="color:red">${secondDate.toLocaleDateString('nl-NL')}</span>.`;
         }
 
         // Functie om CSV-bestand in te laden en weer te geven als tabel met aanklikbare rijen
@@ -94,8 +94,8 @@
                 ci2 = activiteit / Math.pow(2, days / 74);
             }
 
-            // Toon direct het resultaat in het juiste formaat
-            document.getElementById("result").innerHTML = `Bron ${bron} heeft nog ${ci2.toFixed(2)} Ci op ${secondDate.toLocaleDateString('nl-NL')}.`;
+            // Toon direct het resultaat in het juiste formaat met rode kleur voor bron, activiteit en datum
+            document.getElementById("result").innerHTML = `Bron <span style="color:red">${bron}</span> heeft nog <span style="color:red">${ci2.toFixed(2)} Ci</span> op <span style="color:red">${secondDate.toLocaleDateString('nl-NL')}</span>.`;
         }
 
         // Laad de tabel als de pagina geladen is
@@ -105,7 +105,7 @@
     </script>
 </head>
 <body>
-    <h1>Activiteitsberekening(klik op een bron)</h1>
+    <h1>Activiteitsberekening</h1>
     
     <label for="isotope">Kies een isotoop:</label>
     <select id="isotope">
@@ -126,7 +126,7 @@
 
     <h2 id="result"></h2>
 
-    <h2>Bronnen Tabel(klik op de bron)</h2>
+    <h2>Bronnen Tabel (klik op de bron)</h2>
     <!-- Hier wordt de CSV-tabel weergegeven -->
     <div id="csvTable">De tabel wordt geladen...</div>
 
