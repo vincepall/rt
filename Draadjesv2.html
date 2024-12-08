@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IQI Wire Calculator</title>
+</head>
+<body>
+    <h1>BKI vereiste draadje</h1>
+    <h3>Gebaseerd op nominale wanddikte</h3>
+    <h3>(DWDI = BKI bronzijde,DWSI = BKI Filmzijde)</h3>
+
+    <form id="iqiForm">
+        <label for="norm">Kies de norm:</label>
+        <select id="norm" name="norm" required>
+            <option value="" disabled selected>Selecteer norm</option>
+            <option value="EN">EN Klasse B</option>
+            <option value="ASME">ASME</option>
+        </select>
+        <br><br>
+
+        <label for="wanddikte">Wanddikte t (mm):</label>
+        <input type="number" id="wanddikte" name="wanddikte" step="0.1" placeholder="Vul wanddikte in" required>
+        <br><br>
+
+        <div id="enOptions" style="display:none;">
+            <label for="technique">Kies de techniek (EN Klasse B):</label>
+            <select id="technique" name="technique">
+                <option value="" disabled selected>Selecteer techniek</option>
+                <option value="SWSI">SWSI (Single-Wall Single Image)</option>
+                <option value="DWSI">DWSI (Double-Wall Single Image)</option>
+                <option value="DWDI">DWDI (Double-Wall Double Image)</option>
+            </select>
+            <br><br>
+
+            <label for="source">Kies de stralingsbron:</label>
+            <select id="source" name="source">
+                <option value="" disabled selected>Selecteer bron</option>
+                <option value="X-ray">X-ray</option>
+                <option value="Se75">Se-75</option>
+                <option value="Ir192">Ir-192</option>
+            </select>
+        </div>
+
+        <div id="asmeOptions" style="display:none;">
+            <label for="asmeTechnique">Kies de ASME techniek:</label>
+            <select id="asmeTechnique" name="asmeTechnique">
+                <option value="" disabled selected>Selecteer techniek</option>
+                <option value="Sourceside">BKI bronzijde</option>
+                <option value="Filmside">BKI Filmzijde</option>
+            </select>
+        </div>
+        <br><br>
+
+        <button type="submit">bekijk het vereiste draadje</button>
+    </form>
+
+    <h2>Resultaat</h2>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById("norm").addEventListener("change", function() {
+            var norm = document.getElementById("norm").value;
+            if (norm === "EN") {
+                document.getElementById("enOptions").style.display = "block";
+                document.getElementById("asmeOptions").style.display = "none";
+            } else {
+                document.getElementById("enOptions").style.display = "none";
+                document.getElementById("asmeOptions").style.display = "block";
+            }
+        });
+
+        document.getElementById("iqiForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var norm = document.getElementById("norm").value;
+            var wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            var wire = "Onbekend";
+
+            if (norm === "EN") {
+                var technique = document.getElementById("technique").value;
+                var source = document.getElementById("source").value;
+                var doorstraaldeDikte = 2 * wanddikte; // Voor w = 2 * t
+
+                if (technique === "SWSI") {
+                    if (wanddikte <= 1.5) wire = "W19";
+                    else if (wanddikte <= 2.5) wire = "W18";
+                    else if (wanddikte <= 4) wire = "W17";
+                    else if (wanddikte <= 6) wire = "W16";
+                    else if (wanddikte <= 8) wire = "W15";
+                    else if (wanddikte <= 12) wire = "W14";
+                    else if (wanddikte <= 20) wire = "W13";
+                    else if (wanddikte <= 30) wire = "W12";
+                    else if (wanddikte <= 35) wire = "W11";
+                    else if (wanddikte <= 45) wire = "W10";
+                    else if (wanddikte <= 65) wire = "W9";
+                } else if (technique === "DWDI") {
+                    if (doorstraaldeDikte <= 1.5) wire = "W19";
+                    else if (doorstraaldeDikte <= 2.5) wire = "W18";
+                    else if (doorstraaldeDikte <= 4) wire = "W17";
+                    else if (doorstraaldeDikte <= 6) wire = "W16";
+                    else if (doorstraaldeDikte <= 8) wire = "W15";
+                    else if (doorstraaldeDikte <= 15) wire = "W14";
+                    else if (doorstraaldeDikte <= 25) wire = "W13";
+                    else if (doorstraaldeDikte <= 38) wire = "W12";
+                    else if (doorstraaldeDikte <= 45) wire = "W11";
+                    else if (doorstraaldeDikte <= 55) wire = "W10";
+                    else if (doorstraaldeDikte <= 70) wire = "W9";
+                } else if (technique === "DWSI") {
+                    if (doorstraaldeDikte <= 1.5) wire = "W19";
+                    else if (doorstraaldeDikte <= 2.5) wire = "W18";
+                    else if (doorstraaldeDikte <= 4) wire = "W17";
+                    else if (doorstraaldeDikte <= 6) wire = "W16";
+                    else if (doorstraaldeDikte <= 12) wire = "W15";
+                    else if (doorstraaldeDikte <= 18) wire = "W14";
+                    else if (doorstraaldeDikte <= 30) wire = "W13";
+                    else if (doorstraaldeDikte <= 45) wire = "W12";
+                    else if (doorstraaldeDikte <= 55) wire = "W11";
+                    else if (doorstraaldeDikte <= 70) wire = "W10";
+                }
+
+                if (source === "Se75") {
+                    if ((technique === "SWSI" || technique === "DWSI") && wanddikte <= 20) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWDI" && doorstraaldeDikte <= 12) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    }
+                } else if (source === "Ir192") {
+                    if ((technique === "SWSI" || technique === "DWSI") && doorstraaldeDikte >= 10 && doorstraaldeDikte <= 40) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWDI" && doorstraaldeDikte > 10 && doorstraaldeDikte <= 25) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    }
+                }
+
+            } else if (norm === "ASME") {
+                var asmeTechnique = document.getElementById("asmeTechnique").value;
+
+                if (asmeTechnique === "Sourceside") {
+                    if (wanddikte <= 6.4) wire = "EN W13,ASME 5";
+                    else if (wanddikte <= 9.5) wire = "EN W12, ASME 6";
+                    else if (wanddikte <= 12.7) wire = "EN W11, ASME 7";
+                    else if (wanddikte <= 19) wire = "EN W10, ASME 8";
+                    else if (wanddikte <= 25.4) wire = "EN W9, ASME 9";
+                    else if (wanddikte <= 38.1) wire = "EN W8, ASME 10";
+                    else if (wanddikte <= 50.8) wire = "EN W7, ASME 11";
+                    else if (wanddikte <= 63.5) wire = "EN W6, ASME 12";
+                    else wire = "EN W5, ASME 13";
+                } else if (asmeTechnique === "Filmside") {
+                    if (wanddikte <= 6.4) wire = "EN W14,ASME 4";
+                    else if (wanddikte <= 9.5) wire = "EN W13, ASME 5";
+                    else if (wanddikte <= 12.7) wire = "EN W12, ASME 6";
+                    else if (wanddikte <= 19) wire = "EN W11, ASME 7";
+                    else if (wanddikte <= 25.4) wire = "EN W10, ASME 8";
+                    else if (wanddikte <= 38.1) wire = "EN W9, ASME 9";
+                    else if (wanddikte <= 50.8) wire = "EN W8, ASME 10";
+                    else if (wanddikte <= 63.5) wire = "EN W7, ASME 11";
+                    else wire = "EN W6 , ASME 12";
+                }
+            }
+
+            document.getElementById("result").textContent = "Het vereiste draadje is: " + wire;
+        });
+    </script>
+</body>
+</html>
