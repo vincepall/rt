@@ -37,14 +37,14 @@ p {
 }
 
 .link-list li {
-    margin: 15px;
+    margin: 10px; /* Verminder de marge tussen de links */
 }
 
 .link-list a {
     text-decoration: none;
     color: var(--text-color);
     background-color: var(--button-color);
-    padding: 15px 25px;
+    padding: 12px 20px; /* Iets kleinere padding voor compactheid */
     border-radius: 50px;
     font-size: 1rem;
     font-weight: bold;
@@ -78,5 +78,12 @@ p {
     .link-list {
         flex-direction: column;
     }
-}
 
+    .link-list li {
+        margin: 8px 0; /* Verminder verticale marge op kleinere schermen */
+    }
+
+    .link-list a {
+        padding: 10px 18px; /* Iets kleinere padding voor kleine schermen */
+    }
+}
