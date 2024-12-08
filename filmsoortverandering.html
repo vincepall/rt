@@ -6,11 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Berekening D4, D5, D7</title>
     <script>
-        // Functie om tijd (minuten:seconden) naar seconden om te zetten
-        function tijdNaarSeconden(tijd) {
-            const delen = tijd.split(':');
-            const minuten = parseInt(delen[0]);
-            const seconden = parseInt(delen[1]);
+        // Functie om minuten en seconden naar totale seconden om te zetten
+        function tijdNaarSeconden(minuten, seconden) {
             return (minuten * 60) + seconden;
         }
 
@@ -45,15 +42,16 @@
         // Hoofdfunctie om te berekenen op basis van de keuze
         function bereken() {
             const keuze = document.querySelector('input[name="keuze"]:checked').value;
-            const tijdInvoer = document.getElementById("tijd").value;
+            const minuten = parseInt(document.getElementById("minuten").value);
+            const seconden = parseInt(document.getElementById("seconden").value);
 
-            // Controleer of de tijd geldig is
-            if (!tijdInvoer || !tijdInvoer.includes(':')) {
-                document.getElementById("resultaat").innerHTML = "Voer een geldige tijd in (MM:SS).";
+            // Controleer of de minuten en seconden geldig zijn
+            if (isNaN(minuten) || isNaN(seconden)) {
+                document.getElementById("resultaat").innerHTML = "Voer geldige waarden in.";
                 return;
             }
 
-            const tijdInSeconden = tijdNaarSeconden(tijdInvoer);
+            const tijdInSeconden = tijdNaarSeconden(minuten, seconden);
             let resultaat;
 
             if (keuze === "D4") {
@@ -84,8 +82,9 @@
         <input type="radio" id="D7" name="keuze" value="D7">
         <label for="D7">D7</label><br><br>
 
-        <label for="tijd">Voer de tijd in (MM:SS):</label><br>
-        <input type="text" id="tijd" placeholder="Bijv. 02:30"><br><br>
+        <label for="minuten">Voer de tijd in:</label><br>
+        Minuten: <input type="number" id="minuten" placeholder="Minuten" min="0"><br>
+        Seconden: <input type="number" id="seconden" placeholder="Seconden" min="0" max="59"><br><br>
 
         <button type="button" onclick="bereken()">Bereken</button>
     </form>
