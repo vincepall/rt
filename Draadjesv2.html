@@ -239,6 +239,24 @@
 
             document.getElementById("result").innerText = "Het vereiste draadje is: " + wire;
         });
+
+        document.getElementById("norm").addEventListener("change", function() {
+    var norm = document.getElementById("norm").value;
+    var asmeImage = document.getElementById("asmeImage");
+
+    if (norm === "EN") {
+        document.getElementById("enOptions").style.display = "block";
+        document.getElementById("asmeOptions").style.display = "none";
+        asmeImage.style.display = "none";  // Verberg de afbeelding
+    } else if (norm === "ASME") {
+        document.getElementById("enOptions").style.display = "none";
+        document.getElementById("asmeOptions").style.display = "block";
+        asmeImage.style.display = "block";  // Toon de afbeelding
+    } else {
+        asmeImage.style.display = "none";  // Verberg de afbeelding voor andere keuzes
+    }
+});
+
     </script>
 </body>
 </html>
