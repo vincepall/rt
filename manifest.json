@@ -1,7 +1,7 @@
 {
   "name": "RT Tools",
   "short_name": "RT Tools",
-  "start_url": "/index.html",
+  "start_url": "/rt/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
