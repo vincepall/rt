@@ -50,14 +50,30 @@
                 <option value="Sourceside">BKI bronzijde</option>
                 <option value="Filmside">BKI Filmzijde</option>
             </select>
+            <br><br>
+
+            <label for="weldType">Kies de las type (A, B, C, D):</label>
+            <select id="weldType" name="weldType">
+                <option value="" disabled selected>Selecteer las type</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+            </select>
+            <br><br>
+
+            <label for="lasoverdikte">Lasoverdikte (mm):</label>
+            <input type="number" id="lasoverdikte" name="lasoverdikte" step="0.1" placeholder="Lasoverdikte wordt berekend" readonly>
         </div>
         <br><br>
 
-        <button type="submit">bekijk het vereiste draadje</button>
+        <button type="submit">Bekijk het vereiste draadje</button>
     </form>
 
     <h2>Resultaat</h2>
     <p id="result"></p>
+    
+    <img id="asmeImage" src="Lascategorie.webp" alt="ASME Lastype" style="display:none;">
 
     <script>
         document.getElementById("norm").addEventListener("change", function() {
@@ -70,6 +86,62 @@
                 document.getElementById("asmeOptions").style.display = "block";
             }
         });
+
+        document.getElementById("wanddikte").addEventListener("input", updateLasoverdikte);
+        document.getElementById("weldType").addEventListener("change", updateLasoverdikte);
+
+        function getMaxOverdikte(weldType, wanddikte) {
+            var maxOverdikte = 0;
+
+            if (weldType === "A") {
+                if (wanddikte < 2.5) maxOverdikte = 0.8;
+                else if (wanddikte < 5) maxOverdikte = 1.5;
+                else if (wanddikte < 13) maxOverdikte = 2.5;
+                else if (wanddikte < 25) maxOverdikte = 3;
+                else if (wanddikte < 50) maxOverdikte = 4;
+                else if (wanddikte < 76) maxOverdikte = 5.5;
+                else if (wanddikte < 100) maxOverdikte = 6;
+                else maxOverdikte = 8;
+            } else if (weldType === "B" || weldType === "C") {
+                if (wanddikte < 2.5) maxOverdikte = 2.5;
+                else if (wanddikte < 5) maxOverdikte = 2.5;
+                else if (wanddikte < 13) maxOverdikte = 3;
+                else if (wanddikte < 25) maxOverdikte = 4;
+                else if (wanddikte < 50) maxOverdikte = 4;
+                else if (wanddikte < 76) maxOverdikte = 4;
+                else if (wanddikte < 100) maxOverdikte = 5.5;
+                else if (wanddikte < 125) maxOverdikte = 6;
+                else maxOverdikte = 8;
+            } else if (weldType === "D") {
+                if (wanddikte < 2.5) maxOverdikte = 0.8;
+                else if (wanddikte < 5) maxOverdikte = 1.5;
+                else if (wanddikte < 13) maxOverdikte = 2.5;
+                else if (wanddikte < 25) maxOverdikte = 3;
+                else if (wanddikte < 50) maxOverdikte = 4;
+                else if (wanddikte < 76) maxOverdikte = 5.5;
+                else if (wanddikte < 100) maxOverdikte = 6;
+                else maxOverdikte = 8;
+            }
+
+            return maxOverdikte;
+        }
+
+        function updateLasoverdikte() {
+            var wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            var weldType = document.getElementById("weldType").value;
+            var lasoverdikteField = document.getElementById("lasoverdikte");
+
+            if (wanddikte && weldType) {
+                var maxOverdikte = getMaxOverdikte(weldType, wanddikte);
+                lasoverdikteField.value = maxOverdikte.toFixed(1); // Toon de lasoverdikte in het veld
+                lasoverdikteField.readOnly = false; // Maak het veld bewerkbaar
+                lasoverdikteField.max = maxOverdikte.toFixed(1); // Stel de max in op de berekende waarde
+            } else {
+                lasoverdikteField.value = ''; // Leeg het veld als de benodigde info ontbreekt
+                lasoverdikteField.readOnly = true; // Maak het veld weer readonly
+                lasoverdikteField.max = ''; // Verwijder de max
+            }
+        }
 
         document.getElementById("iqiForm").addEventListener("submit", function(event) {
             event.preventDefault();
@@ -136,6 +208,11 @@
 
             } else if (norm === "ASME") {
                 var asmeTechnique = document.getElementById("asmeTechnique").value;
+                var weldType = document.getElementById("weldType").value;
+                var lasoverdikte = parseFloat(document.getElementById("lasoverdikte").value);
+
+                // Voeg de lasoverdikte toe aan de wanddikte voordat je het draadje berekent
+                wanddikte += lasoverdikte;
 
                 if (asmeTechnique === "Sourceside") {
                     if (wanddikte <= 6.4) wire = "EN W13,ASME 5";
@@ -156,11 +233,11 @@
                     else if (wanddikte <= 38.1) wire = "EN W9, ASME 9";
                     else if (wanddikte <= 50.8) wire = "EN W8, ASME 10";
                     else if (wanddikte <= 63.5) wire = "EN W7, ASME 11";
-                    else wire = "EN W6 , ASME 12";
+                    else wire = "EN W6, ASME 12";
                 }
             }
 
-            document.getElementById("result").textContent = "Het vereiste draadje is: " + wire;
+            document.getElementById("result").innerText = "Het vereiste draadje is: " + wire;
         });
     </script>
 </body>
