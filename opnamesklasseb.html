@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Aantal opnames klasse B</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .flex-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .image-container {
+            position: relative;
+            width: 488px;
+            height: 819px;
+            background-size: cover;
+            border: 1px solid black;
+            margin-bottom: 20px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        h2 {
+            color: blue;
+        }
+
+        #container1 h2, #container2 h2 {
+            color: red; /* Zet de kleur van de headers in beide containers op rood */
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Aantal opnames klasse B</h1>
+
+    <!-- Formulier voor invoer van gegevens -->
+    <form id="coordinates-form">
+        <label for="wanddikte">Wanddikte (t in mm):</label>
+        <input type="number" id="wanddikte" name="wanddikte" step="0.001" required>
+        
+        <label for="diameter">Diameter (De in mm):</label>
+        <input type="number" id="diameter" name="diameter" step="0.001" required>
+        
+        <label for="sfd">Bron Film Afstand (SFD in mm):</label>
+        <input type="number" id="sfd" name="sfd" step="0.001" required>
+        
+        <button type="submit">Bekijk</button>
+    </form>
+
+    <!-- Container voor Opstelling 5/8/13/14 -->
+    <div class="image-container" id="container1" style="background-image: url('klasseb2.png');">
+        <h2>Opstelling 5/8/13/14</h2>
+    </div>
+
+    <!-- Container voor Opstelling 2 -->
+    <div class="image-container" id="container2" style="background-image: url('klasseb1.png');">
+        <h2>Opstelling 2</h2>
+    </div>
+
+    <script>
+        document.getElementById('coordinates-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Haal de invoerwaarden op
+            const t = parseFloat(document.getElementById('wanddikte').value);
+            const De = parseFloat(document.getElementById('diameter').value);
+            const SFD = parseFloat(document.getElementById('sfd').value);
+
+            // Berekeningen voor de eerste afbeelding (Opstelling 5/8/13/14)
+            const x_value1 = t / De;
+            const y_value1 = De / SFD;
+
+            // Berekeningen voor de tweede afbeelding (Opstelling 2)
+            const x_value2 = t / De;
+            const y_value2 = De / (SFD - t);
+
+            // Bereken de coördinaten in pixels voor Opstelling 5/8/13/14
+            const x_pixel1 = (x_value1 / 0.25) * 488;
+            const y_pixel1 = (y_value1 / 2) * 819;
+
+            // Bereken de coördinaten in pixels voor Opstelling 2
+            const x_pixel2 = (x_value2 / 0.25) * 488;
+            const y_pixel2 = (y_value2 / 4) * 823;
+
+            // Maak het punt voor de eerste afbeelding (Opstelling 5/8/13/14)
+            const dot1 = document.createElement('div');
+            dot1.className = 'dot';
+            dot1.style.left = (x_pixel1 - 5) + 'px';
+            dot1.style.top = (819 - y_pixel1 - 5) + 'px';
+
+            // Maak het punt voor de tweede afbeelding (Opstelling 2)
+            const dot2 = document.createElement('div');
+            dot2.className = 'dot';
+            dot2.style.left = (x_pixel2 - 5) + 'px';
+            dot2.style.top = (823 - y_pixel2 - 5) + 'px';
+
+            // Voeg de punten toe aan de image-containers
+            const container1 = document.getElementById('container1');
+            container1.innerHTML = '<h2 style="color: red;">Opstelling 5/8/13/14</h2>';
+            container1.appendChild(dot1);
+
+            const container2 = document.getElementById('container2');
+            container2.innerHTML = '<h2 style="color: red;">Opstelling 2</h2>';
+            container2.appendChild(dot2);
+        });
+    </script>
+</body>
+</html>
+
