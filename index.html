@@ -66,7 +66,7 @@
             transform: scale(1.05);
         }
 
-        .download-link {
+        .install-button {
             display: inline-block;
             margin-top: 20px;
             padding: 8px 16px;
@@ -76,9 +76,10 @@
             border-radius: 30px;
             font-size: 0.9rem;
             transition: background-color 0.3s, transform 0.3s;
+            cursor: pointer;
         }
 
-        .download-link:hover {
+        .install-button:hover {
             background-color: var(--download-hover-color);
             transform: scale(1.02);
         }
@@ -90,17 +91,43 @@
         }
     </style>
     <script>
-     if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/rt/service-worker.js')
-        .then((registration) => {
-          console.log('Service Worker geregistreerd met scope:', registration.scope);
-        })
-        .catch((error) => {
-          console.log('Service Worker registratie mislukt:', error);
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Voorkom dat de standaard prompt wordt weergegeven
+            e.preventDefault();
+            // Sla het event op zodat het later kan worden gebruikt
+            deferredPrompt = e;
+            // Maak de install-knop zichtbaar
+            const installButton = document.querySelector('.install-button');
+            installButton.style.display = 'inline-block';
         });
-    });
-  }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Gebruiker accepteerde de installatie');
+                    } else {
+                        console.log('Gebruiker weigerde de installatie');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/rt/service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker geregistreerd met scope:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker registratie mislukt:', error);
+                    });
+            });
+        }
     </script>
 
 </head>
@@ -119,10 +146,9 @@
         <li><a href="cw2.html">CW / Effectieve Filmlengte</a></li>
     </ul>
 
-    <a class="download-link" href="https://drive.google.com/drive/folders/16HaslSax0-6OXtku0elDYHCblgKD8VN-?usp=drive_link">
-        Download de Android apps hier
-    </a>
+    <button class="install-button" onclick="installPWA()" style="display: none;">
+        Installeer RT Tools als app
+    </button>
 
 </body>
 </html>
-
