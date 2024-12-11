@@ -22,6 +22,9 @@ const FILES_TO_CACHE = [
   '/rt/focusverandering.html',
   '/rt/service-worker.js',
   '/rt/verval2.html',
+  '/rt/opnamesklasseb.html',
+  '/rt/klasseb1.png',
+  '/rt/klasseb2.png',
  
 ];
 
