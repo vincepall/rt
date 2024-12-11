@@ -9,7 +9,52 @@
         body {
             font-family: Arial, sans-serif;
         }
-        
+
+        /* Flexbox styling for the form */
+        .form-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .form-item label {
+            min-width: 150px; /* Define a minimum width for the labels */
+        }
+
+        .form-item input {
+            flex: 1;
+            padding: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .form-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-item label {
+                min-width: 100%; /* Make labels full width on mobile */
+                margin-bottom: 5px;
+            }
+
+            .form-item input {
+                width: 100%; /* Make input fields full width on mobile */
+            }
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 20px;
+        }
 
         .image-container {
             position: relative;
@@ -38,9 +83,8 @@
         }
 
         #container1 h2, #container2 h2 {
-            color: red; /* Zet de kleur van de headers in beide containers op rood */
+            color: red;
         }
-
     </style>
 </head>
 <body>
@@ -48,15 +92,20 @@
 
     <!-- Formulier voor invoer van gegevens -->
     <form id="coordinates-form">
-        <label for="wanddikte">Wanddikte (t in mm):</label>
-        <input type="number" id="wanddikte" name="wanddikte" step="0.001" required>
-        
-        <label for="diameter">Diameter (De in mm):</label>
-        <input type="number" id="diameter" name="diameter" step="0.001" required>
-        
-        <label for="sfd">Bron Film Afstand (SFD in mm):</label>
-        <input type="number" id="sfd" name="sfd" step="0.001" required>
-        
+        <div class="form-container">
+            <div class="form-item">
+                <label for="wanddikte">Wanddikte (t in mm):</label>
+                <input type="number" id="wanddikte" name="wanddikte" step="0.001" required>
+            </div>
+            <div class="form-item">
+                <label for="diameter">Diameter (De in mm):</label>
+                <input type="number" id="diameter" name="diameter" step="0.001" required>
+            </div>
+            <div class="form-item">
+                <label for="sfd">Bron Film Afstand (SFD in mm):</label>
+                <input type="number" id="sfd" name="sfd" step="0.001" required>
+            </div>
+        </div>
         <button type="submit">Bekijk</button>
     </form>
 
@@ -119,4 +168,3 @@
     </script>
 </body>
 </html>
-
