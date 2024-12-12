@@ -91,9 +91,9 @@ p {
 .home-icon {
     position: fixed;
     top: 10px; /* Afstand van de bovenkant van het scherm */
-    left: 10px; /* Afstand van de rechterkant van het scherm */
+    left: 10px; /* Afstand van de linkerkant van het scherm */
     font-size: 24px; /* Grootte van het icoontje */
-    color: #000; /* Kleur van het icoontje */
+    color: rgba(204, 204, 204, 0.8); /* Lichtgrijze kleur */
     text-decoration: none;
 }
 
