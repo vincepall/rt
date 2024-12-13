@@ -12,6 +12,21 @@
 <body>
     <h1>Bereken de Film Focus Afstand (FFD)</h1>
 
+     <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
+            Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD. </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+
     <form id="ffdForm">
         <label for="ofa">Object Film Afstand (OFA):</label>
         <input type="number" id="ofa" name="ofa" step="0.01" required><br><br>
