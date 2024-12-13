@@ -44,6 +44,22 @@
 <body>
     <h1>Afzetting Berekening</h1>
 
+      <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>De grootte van de afzetting wordt bepaald in de bundel en achter de collimator. 
+               Er wordt gebruikt gemaakt van de de collimatoren zoals in het veiligheidsboekje: Se75 1/20, Ir192 1/85.
+               Als de bundel door staal of lood heen moet kan de afzetting kleiner, door de juiste waardes in te voeren in die velden kun je zien hoe groot je afzetting moet zijn.
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
     <form>
         <label>Kies een gamma bron:</label><br>
         <input type="radio" id="Ir192" name="bron" value="Ir192" checked>
