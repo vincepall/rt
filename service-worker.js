@@ -25,6 +25,7 @@ const FILES_TO_CACHE = [
   '/rt/opnamesklasseb.html',
   '/rt/klasseb1.png',
   '/rt/klasseb2.png',
+  '/rt/script.js',
  
 ];
 
