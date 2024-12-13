@@ -12,6 +12,22 @@
 </head>
 <body>
 
+ <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Deze rekentool gaat ervan uit dat de gebruikte films een lengte hebben van 480mm en dat de maximale afstand tussen 2 opnames 400mm is.
+            Dit is om voor voldoende overlap te zorgen maar kan betekenen dat er bij bepaalde lengtes een korte afstand tussen de opnames wordt voorgesteld.
+            Als dat zo is zou het beter kunnen zijn dat je de lengte deelt door "aantal opnames" - 1.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+    
+    
 <div class="container">
     <h1>Langsnaad verdeler</h1>
     <p>Voer de totale lengte in (in mm):</p>
