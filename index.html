@@ -133,6 +133,23 @@
 </head>
 <body>
 
+     <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Door deze pagina als app te installeren is deze ook te gebruiken als er geen internetverbinding is. 
+            De app zal altijd eerst proberen via internetverbinding te werken, op die manier maak je zo vaak als mogelijk gebruik van de laatste versie.
+            Er kunnen fouten in de tools zitten die ik heb gemist, als je me er op wijst kan ik het misschien verhelpen, 
+            vincepall@gmail.com</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+
     <ul class="link-list">
         <li><a href="focusverandering.html">Focusverandering</a></li>
         <li><a href="filmsoortverandering.html">D4 D5 D7</a></li>
