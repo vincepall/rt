@@ -56,6 +56,20 @@
     <h1>Tijd na</h1>
     <h1>Focusverandering</h1>
 
+    
+    <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>De tijd na de verandering van bron-film afstand wordt berekent door de kwadratenwet toe te passen t2=t1*((A2/A1)^2)</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
     <form>
         <label for="minuten">Voer de begintijd in:</label><br>
         Minuten: <input type="number" id="minuten" placeholder="Minuten" min="0"><br>
