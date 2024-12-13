@@ -108,6 +108,20 @@
 </head>
 <body>
     <h1>Activiteit</h1>
+
+      <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Door op een bron te duwen krijg je de activiteit op dit moment. De waardes in de tabel zijn uit de vervoersdocumenten gehaald.
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
     
     <label for="isotope">Kies een isotoop:</label>
     <select id="isotope">
