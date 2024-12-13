@@ -118,6 +118,21 @@
 </head>
 <body>
     <h1>Effectieve Filmlengte Berekenen</h1>
+
+      <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>(Diameter * pi) / aantal opnames. 
+                Als "rondnaad centraal" wordt aangevinkt zal het programma kijken hoeveel films er nodig zijn gebaseerd op films met een lengte van 480mm met een maximale effectieve lengte van 400mm i.v.m. de overlap.
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
     
     <form onsubmit="event.preventDefault(); berekenFilmlengte();">
         <label for="diameter">Diameter van de pijp (in mm):</label><br>
