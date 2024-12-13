@@ -75,6 +75,20 @@
 </head>
 <body>
     <h1>Bereken D4, D5 of D7</h1>
+     <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Voer de tijd in voor een filmsoort en krijg de tijd voor de andere filmsoorten. 
+                Maakt gebruik van deze factoren: D7 =1 D5 =1.666 D4 = 2.44</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
 
     <form>
         <p>Welke variabele ken je?</p>
