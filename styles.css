@@ -157,7 +157,7 @@ p {
     top: 10px; /* Kleine ruimte vanaf de bovenkant van de pagina */
     left: 50%;
     transform: translateX(-50%);
-    background-color: #555;
+    background-color: rgba(204, 204, 204, 0.8);
     color: white;
     border: none;
     padding: 5px 10px;
