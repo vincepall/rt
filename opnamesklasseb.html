@@ -49,6 +49,17 @@
             .form-item input {
                 width: 100%; /* Make input fields full width on mobile */
             }
+
+            /* Zorg dat de afbeelding kleiner is op mobiele apparaten */
+            .image-container {
+                width: 100%; /* Zorg dat de afbeelding de volledige breedte inneemt */
+                height: auto; /* Laat de hoogte proportioneel aanpassen */
+            }
+
+            .image-container img {
+                width: 100%;
+                height: auto;
+            }
         }
 
         .flex-container {
@@ -87,10 +98,11 @@
         #container1 h2, #container2 h2 {
             color: red;
         }
+
         .btn {
             background-color: #666;
             border: none;
-            color: #black;
+            color: black;
             padding: 10px 20px;
             text-align: center;
             text-decoration: none;
@@ -100,7 +112,6 @@
             cursor: pointer;
             border-radius: 8px;
         }
-
     </style>
 </head>
 <body>
@@ -199,6 +210,11 @@
 
             // Scroll naar de eerste afbeelding
             container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Controleer of het een mobiel apparaat is en zoom uit indien nodig
+            if (window.innerWidth <= 600) {
+                document.body.style.zoom = "0.5"; // Uitzoomen op mobiele apparaten
+            }
         });
     </script>
 </body>
