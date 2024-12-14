@@ -106,7 +106,7 @@
 <body>
     <h1>Aantal opnames klasse B</h1>
 
-      <!-- De knop om het pop-up venster te openen -->
+    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
@@ -196,6 +196,9 @@
             const container2 = document.getElementById('container2');
             container2.innerHTML = '<h2 style="color: red;">Opstelling 2</h2>';
             container2.appendChild(dot2);
+
+            // Scroll naar de eerste afbeelding
+            container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     </script>
 </body>
