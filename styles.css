@@ -172,15 +172,10 @@ p {
     opacity: 1; /* Oplichten bij hover */
 }
 
-.container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-}
 
 label, select, input {
     display: block;
-    width: 100%;
+    width: 50%;
     margin-bottom: 10px;
 }
 
@@ -204,57 +199,3 @@ button:hover {
     background-color: #666;
 }
 
-.result {
-    margin-top: 20px;
-    padding: 10px;
-    color: black;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-}
-
-.hidden {
-    display: none;
-}
-.container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-label, select, input {
-    display: block;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-select, input {
-    padding: 8px;
-    font-size: 16px;
-}
-
-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #646464;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #666;
-}
-
-.result {
-    margin-top: 20px;
-    padding: 10px;
-    color: black;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-}
-
-.hidden {
-    display: none;
-}
