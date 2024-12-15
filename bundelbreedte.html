@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Bundelgrootte</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        label, select, input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        select, input {
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4a4a4a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #666;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Bundelgrootte te berekenen of de benodigde FFD. Deze tool gaat uit van een vlakke plaat en neemt de ronding van een vat niet mee in de berekening! De marge is er om theoretische waarden van de bundelhoek zoals de fabrikant heeft gegeven in de praktijk te kunnen gebruiken, standaard staat deze op 25% maar je kan deze verlagen als je van risico houdt. Gebruikte formule: Tan(bundelhoek/2) = (bundelbereik/2)/FFD
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <div class="container">
+        <h2>Bundelgrootte</h2>
+        <label for="tubeSelect">Kies een röntgenbuis:</label>
+        <select id="tubeSelect">
+            <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
+            <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
+            <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
+        </select>
+
+        <label for="calcType">Wat wil je weten:</label>
+        <select id="calcType">
+            <option value="" disabled selected>Kies een berekening</option>
+            <option value="size">Bundelgrootte op een bepaalde FFD</option>
+            <option value="distance">Benodigde FFD voor een bepaalde bundelgrootte</option>
+        </select>
+
+        <div id="ffdField" class="hidden">
+            <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
+            <input type="number" id="ffd" step="any">
+        </div>
+
+        <div id="beamSizeField" class="hidden">
+            <label for="beamSize">Gewenste bundelbereik in cm:</label>
+            <input type="number" id="beamSize" step="any">
+        </div>
+
+        <div id="marginField" class="hidden">
+            <label for="margin">Voer margepercentage in (%):</label>
+            <input type="number" id="margin" value="25" step="any" min="0">
+        </div>
+
+        <button onclick="calculate()">Bereken</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const tubeData = {
+            yxlon300: { narrow: 40, wide: 55 },
+            smartEvo300: { narrow: 30, wide: 60 },
+            balteauCeram300: { narrow: 40, wide: 50 }
+        };
+
+        document.getElementById('calcType').addEventListener('change', function() {
+            const calcType = this.value;
+            const ffdField = document.getElementById('ffdField');
+            const beamSizeField = document.getElementById('beamSizeField');
+            const marginField = document.getElementById('marginField');
+
+            if (calcType === 'size') {
+                ffdField.classList.remove('hidden');
+                beamSizeField.classList.add('hidden');
+                marginField.classList.add('hidden');
+            } else if (calcType === 'distance') {
+                ffdField.classList.add('hidden');
+                beamSizeField.classList.remove('hidden');
+                marginField.classList.remove('hidden');
+            }
+        });
+
+        function calculate() {
+            const tube = document.getElementById('tubeSelect').value;
+            const calcType = document.getElementById('calcType').value;
+
+            const angles = tubeData[tube];
+            const narrowAngle = angles.narrow * Math.PI / 180; // omzetten naar radialen
+            const wideAngle = angles.wide * Math.PI / 180; // omzetten naar radialen
+
+            const marginPercentage = parseFloat(document.getElementById('margin').value) / 100 + 1;
+
+            let resultText = '';
+
+            if (calcType === 'size') {
+                const ffd = parseFloat(document.getElementById('ffd').value);
+                if (isNaN(ffd) || ffd <= 0) {
+                    resultText = 'Voer een geldige FFD in.';
+                } else {
+                    const narrowBeam = 2 * ffd * Math.tan(narrowAngle / 2);
+                    const wideBeam = 2 * ffd * Math.tan(wideAngle / 2);
+                    resultText = `De bundel is:<br>Smal: ${narrowBeam.toFixed(2)} cm<br>Breed: ${wideBeam.toFixed(2)} cm`;
+                }
+            } else if (calcType === 'distance') {
+                const beamSize = parseFloat(document.getElementById('beamSize').value);
+                if (isNaN(beamSize) || beamSize <= 0) {
+                    resultText = 'Voer een geldig bundelbereik in.';
+                } else {
+                    const ffdNarrow = ((beamSize / 2) / Math.tan(narrowAngle / 2)) * marginPercentage;
+                    const ffdWide = ((beamSize / 2) / Math.tan(wideAngle / 2)) * marginPercentage;
+                    resultText = `De minimale FFD om het gewenste bundelbereik te krijgen is:<br>Smal: ${ffdNarrow.toFixed(2)} cm<br>Breed: ${ffdWide.toFixed(2)} cm`;
+                }
+            }
+
+            document.getElementById('result').innerHTML = resultText;
+        }
+    </script>
+</body>
+</html>
+
