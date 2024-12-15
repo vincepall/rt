@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="styles.css">
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Aantal opnames klasse B</title>
+    <title>Aantal opnames klasse A en B</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,7 +30,8 @@
             min-width: 150px; /* Define a minimum width for the labels */
         }
 
-        .form-item input {
+        .form-item input,
+        .form-item select {
             flex: 1;
             padding: 5px;
         }
@@ -71,8 +72,6 @@
 
         .image-container {
             position: relative;
-            width: 488px;
-            height: 819px;
             background-size: cover;
             border: 1px solid black;
             margin-bottom: 20px;
@@ -115,7 +114,7 @@
     </style>
 </head>
 <body>
-    <h1>Aantal opnames klasse B</h1>
+    <h1>Aantal opnames klasse A en B</h1>
 
     <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
@@ -135,6 +134,14 @@
     <form id="coordinates-form">
         <div class="form-container">
             <div class="form-item">
+                <label for="klasse">Kies de klasse:</label>
+                <select id="klasse" name="klasse" required>
+                    <option value="">Selecteer...</option>
+                    <option value="A">Klasse A</option>
+                    <option value="B">Klasse B</option>
+                </select>
+            </div>
+            <div class="form-item">
                 <label for="wanddikte">Wanddikte (t in mm):</label>
                 <input type="number" id="wanddikte" name="wanddikte" step="0.001" required>
             </div>
@@ -150,26 +157,38 @@
         <button type="submit">Bekijk</button>
     </form>
 
-    <!-- Container voor Opstelling 5/8/13/14 -->
-    <div class="image-container" id="container1" style="background-image: url('klasseb2.png');">
-        <h2>Opstelling 5/8/13/14</h2>
+    <!-- Aparte containers voor klasse B -->
+    <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
+        <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
     </div>
 
-    <!-- Container voor Opstelling 2 -->
-    <div class="image-container" id="container2" style="background-image: url('klasseb1.png');">
-        <h2>Opstelling 2</h2>
+    <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
+        <h2>Opstelling 2 (Klasse B)</h2>
     </div>
 
-    <li><a href="cw2.html">CW / Effectieve Filmlengte</a></li>
+    <!-- Aparte containers voor klasse A -->
+    <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
+        <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
+    </div>
+
+    <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
+        <h2>Opstelling 2 (Klasse A)</h2>
+    </div>
 
     <script>
         document.getElementById('coordinates-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
             // Haal de invoerwaarden op
+            const klasse = document.getElementById('klasse').value;
             const t = parseFloat(document.getElementById('wanddikte').value);
             const De = parseFloat(document.getElementById('diameter').value);
             const SFD = parseFloat(document.getElementById('sfd').value);
+
+            if (!klasse) {
+                alert("Selecteer een klasse");
+                return;
+            }
 
             // Berekeningen voor de eerste afbeelding (Opstelling 5/8/13/14)
             const x_value1 = t / De;
@@ -179,33 +198,62 @@
             const x_value2 = t / De;
             const y_value2 = De / (SFD - t);
 
-            // Bereken de coördinaten in pixels voor Opstelling 5/8/13/14
-            const x_pixel1 = (x_value1 / 0.25) * 488;
-            const y_pixel1 = (y_value1 / 2) * 819;
+            let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
 
-            // Bereken de coördinaten in pixels voor Opstelling 2
-            const x_pixel2 = (x_value2 / 0.25) * 488;
-            const y_pixel2 = (y_value2 / 4) * 823;
+            // Schaalverhoudingen voor klasse B en A
+            if (klasse === 'B') {
+                // Klasse B afbeeldingen
+                x_pixel1 = (x_value1 / 0.25) * 488;
+                y_pixel1 = (y_value1 / 2) * 819;
+                y_scale1 = 819;
 
-            // Maak het punt voor de eerste afbeelding (Opstelling 5/8/13/14)
+                x_pixel2 = (x_value2 / 0.25) * 488;
+                y_pixel2 = (y_value2 / 4) * 823;
+                y_scale2 = 823;
+
+                // Toon de juiste containers voor klasse B
+                document.getElementById('container1A').style.display = 'none';
+                document.getElementById('container2A').style.display = 'none';
+                document.getElementById('container1B').style.display = 'block';
+                document.getElementById('container2B').style.display = 'block';
+
+            } else if (klasse === 'A') {
+                // Klasse A afbeeldingen
+                x_pixel1 = (x_value1 / 0.25) * 487;
+                y_pixel1 = (y_value1 / 2) * 823;
+                y_scale1 = 823;
+
+                x_pixel2 = (x_value2 / 0.25) * 470;
+                y_pixel2 = (y_value2 / 4) * 796;
+                y_scale2 = 796;
+
+                // Toon de juiste containers voor klasse A
+                document.getElementById('container1B').style.display = 'none';
+                document.getElementById('container2B').style.display = 'none';
+                document.getElementById('container1A').style.display = 'block';
+                document.getElementById('container2A').style.display = 'block';
+            }
+
+            // Maak de punt voor de eerste afbeelding (Opstelling 5/8/13/14)
             const dot1 = document.createElement('div');
             dot1.className = 'dot';
             dot1.style.left = (x_pixel1 - 5) + 'px';
-            dot1.style.top = (819 - y_pixel1 - 5) + 'px';
+            dot1.style.top = (y_scale1 - y_pixel1 - 5) + 'px';
 
-            // Maak het punt voor de tweede afbeelding (Opstelling 2)
+            // Maak de punt voor de tweede afbeelding (Opstelling 2)
             const dot2 = document.createElement('div');
             dot2.className = 'dot';
             dot2.style.left = (x_pixel2 - 5) + 'px';
-            dot2.style.top = (823 - y_pixel2 - 5) + 'px';
+            dot2.style.top = (y_scale2 - y_pixel2 - 5) + 'px';
 
-            // Voeg de punten toe aan de image-containers
-            const container1 = document.getElementById('container1');
-            container1.innerHTML = '<h2 style="color: red;">Opstelling 5/8/13/14</h2>';
+            // Voeg de punten toe aan de juiste containers
+            const container1 = document.getElementById(`container1${klasse}`);
+            const container2 = document.getElementById(`container2${klasse}`);
+
+            container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
             container1.appendChild(dot1);
 
-            const container2 = document.getElementById('container2');
-            container2.innerHTML = '<h2 style="color: red;">Opstelling 2</h2>';
+            container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
             container2.appendChild(dot2);
 
             // Scroll naar de eerste afbeelding
