@@ -26,6 +26,7 @@ const FILES_TO_CACHE = [
   '/rt/klasseb1.png',
   '/rt/klasseb2.png',
   '/rt/script.js',
+  '/rt/bundelbreedte.html',
  
 ];
 
