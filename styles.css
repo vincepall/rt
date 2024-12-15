@@ -164,6 +164,7 @@ p {
     font-size: 12px;
     border-radius: 5px;
     cursor: pointer;
+    width: auto;
     opacity: 0.7; /* Onopvallend maken */
 }
 
