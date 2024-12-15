@@ -171,31 +171,3 @@ p {
 .info-btn:hover {
     opacity: 1; /* Oplichten bij hover */
 }
-
-
-label, select, input {
-    display: block;
-    width: 50%;
-    margin-bottom: 10px;
-}
-
-select, input {
-    padding: 8px;
-    font-size: 16px;
-}
-
-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #646464;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #666;
-}
-
