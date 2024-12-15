@@ -142,7 +142,7 @@
                 } else {
                     const narrowBeam = 2 * ffd * Math.tan(narrowAngle / 2);
                     const wideBeam = 2 * ffd * Math.tan(wideAngle / 2);
-                    resultText = `De bundel is:<br>Smal: ${narrowBeam.toFixed(2)} cm<br>Breed: ${wideBeam.toFixed(2)} cm`;
+                    resultText = `De bundel is:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
                 }
             } else if (calcType === 'distance') {
                 const beamSize = parseFloat(document.getElementById('beamSize').value);
@@ -151,7 +151,7 @@
                 } else {
                     const ffdNarrow = ((beamSize / 2) / Math.tan(narrowAngle / 2)) * marginPercentage;
                     const ffdWide = ((beamSize / 2) / Math.tan(wideAngle / 2)) * marginPercentage;
-                    resultText = `De minimale FFD om het gewenste bundelbereik te krijgen is:<br>Smal: ${ffdNarrow.toFixed(2)} cm<br>Breed: ${ffdWide.toFixed(2)} cm`;
+                    resultText = `De minimale FFD om het gewenste bundelbereik te krijgen is:<br>bij gebruik van de smalle bundel: ${ffdNarrow.toFixed(2)} cm<br>Bij gebruik van de brede bundel: ${ffdWide.toFixed(2)} cm`;
                 }
             }
 
