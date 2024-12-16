@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> "RT Tools" </title>
+    <title>"RT Tools"</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
     <link rel="manifest" href="/rt/manifest.json">
@@ -60,12 +60,13 @@
             font-size: 1rem;
             font-weight: bold;
             transition: background-color 0.3s, transform 0.3s;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .link-list a i {
-            margin-right: 20px;
-            margin-left: 20px;
+            margin: 0 10px;
         }
 
         .link-list a:hover {
@@ -140,7 +141,7 @@
 </head>
 <body>
 
-     <!-- De knop om het pop-up venster te openen -->
+    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
@@ -157,17 +158,16 @@
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
     <ul class="link-list">
-        <li><a href="focusverandering.html"><i class="fa-solid fa-up-down"></i>Focusverandering</a></li>
-        <li><a href="filmsoortverandering.html"><i class="fa-solid fa-repeat"></i>      D4 D5 D7</a></li>
-        <li><a href="verval2.html"><i class="fa-solid fa-radiation"></i>      Bronsterkte</a></li>
-        <li><a href="MinFFD.html"><i class="fa-solid fa-ruler"></i>      Minimale FFD</a></li>
-        <li><a href="Draadjesv2.html"><i class="fa-solid fa-grip-lines-vertical"></i>      Draadvereiste EN-B, ASME</a></li>
-        <li><a href="cw2.html"> <i class="fa-solid fa-circle-radiation"></i>      CW / Effectieve Filmlengte</a></li>
-        <li><a href="opnamesklasseb.html"><i class="fa-solid fa-star-of-life"></i>      Aantal opnames EN</a></li>
-        <li><a href="LW_Verdeler.html"><i class="fa-solid fa-tape"></i>      Langsnaad Verdeler</a></li>
-        <li><a href="bundelbreedte.html"><i class="fa-solid fa-less-than"></i>      Bundelgrootte</a></li>
-        <li><a href="afzettinggamma.html"><i class="fa-solid fa-road-barrier"></i>      Afzetting Gamma</a></li>
-        
+        <li><a href="focusverandering.html"><i class="fa-solid fa-up-down"></i>Focusverandering<i class="fa-solid fa-up-down"></i></a></li>
+        <li><a href="filmsoortverandering.html"><i class="fa-solid fa-repeat"></i>D4 D5 D7<i class="fa-solid fa-repeat"></i></a></li>
+        <li><a href="verval2.html"><i class="fa-solid fa-radiation"></i>Bronsterkte<i class="fa-solid fa-radiation"></i></a></li>
+        <li><a href="MinFFD.html"><i class="fa-solid fa-ruler"></i>Minimale FFD<i class="fa-solid fa-ruler"></i></a></li>
+        <li><a href="Draadjesv2.html"><i class="fa-solid fa-grip-lines-vertical"></i>Draadvereiste EN-B, ASME<i class="fa-solid fa-grip-lines-vertical"></i></a></li>
+        <li><a href="cw2.html"><i class="fa-solid fa-circle-radiation"></i>CW / Effectieve Filmlengte<i class="fa-solid fa-circle-radiation"></i></a></li>
+        <li><a href="opnamesklasseb.html"><i class="fa-solid fa-star-of-life"></i>Aantal opnames EN<i class="fa-solid fa-star-of-life"></i></a></li>
+        <li><a href="LW_Verdeler.html"><i class="fa-solid fa-tape"></i>Langsnaad Verdeler<i class="fa-solid fa-tape"></i></a></li>
+        <li><a href="bundelbreedte.html"><i class="fa-solid fa-less-than"></i>Bundelgrootte<i class="fa-solid fa-less-than"></i></a></li>
+        <li><a href="afzettinggamma.html"><i class="fa-solid fa-road-barrier"></i>Afzetting Gamma<i class="fa-solid fa-road-barrier"></i></a></li>
     </ul>
 
     <button class="install-button" onclick="installPWA()" style="display: none;">
