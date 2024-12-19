@@ -19,23 +19,35 @@
 
             var omtrek = diameter * Math.PI;
 
-            if (rondnaadCentraal) {
-                var aantalFilms = Math.ceil(omtrek / 400);
-                var effectieveFilmlengte = omtrek / aantalFilms;
-                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + omtrek.toFixed(2) + " mm";
-                document.getElementById("antwoordResultaat").innerText = "Aantal films dat nodig is: " + aantalFilms;
-                document.getElementById("filmlengteResultaat").innerText = "Effectieve filmlengte per film: " + effectieveFilmlengte.toFixed(2) + " mm";
-            } else {
+            // Als "Rondnaad Centraal" niet is aangevinkt
+            if (!rondnaadCentraal) {
                 var opnames = parseFloat(document.getElementById("opnames").value);
                 if (isNaN(opnames) || opnames === 0) {
                     alert("Vul een geldig aantal opnames in.");
                     return;
                 }
 
+                // Bereken de filmlengte per opname
                 var antwoord = omtrek / opnames;
                 document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + omtrek.toFixed(2) + " mm";
-                document.getElementById("antwoordResultaat").innerText = "Het resultaat is: " + antwoord.toFixed(2) + " mm per opname";
+                document.getElementById("antwoordResultaat").innerText = "Nuttige filmlengte: " + antwoord.toFixed(2) + " mm";
                 document.getElementById("filmlengteResultaat").innerText = "";
+
+                // Maak de lijst van filmlengtes (Film 1, Film 2, etc.)
+                var filmlengtesLijst = "";
+                var huidigFilmlengte = 0;
+                for (var i = 1; i <= opnames; i++) {
+                    filmlengtesLijst += "Film " + i + " = " + huidigFilmlengte.toFixed(2) + " mm<br>";
+                    huidigFilmlengte += antwoord;
+                }
+                document.getElementById("filmlengtesLijst").innerHTML = filmlengtesLijst;
+            } else {
+                var aantalFilms = Math.ceil(omtrek / 400);
+                var effectieveFilmlengte = omtrek / aantalFilms;
+                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + omtrek.toFixed(2) + " mm";
+                document.getElementById("antwoordResultaat").innerText = "Aantal films dat nodig is: " + aantalFilms;
+                document.getElementById("filmlengteResultaat").innerText = "Effectieve filmlengte per film: " + effectieveFilmlengte.toFixed(2) + " mm";
+                document.getElementById("filmlengtesLijst").innerHTML = ""; // Verwijder de filmlijst als rondnaad centraal is aangevinkt
             }
         }
 
@@ -120,7 +132,7 @@
 <body>
     <h1 style="color: #F5DF4D; text-align: center;">Rondnaad tool</h1>
 
-      <!-- De knop om het pop-up venster te openen -->
+    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
@@ -152,6 +164,7 @@
     <p id="omtrekResultaat" style="color: #F5DF4D;"></p>
     <p id="antwoordResultaat" style="color: #F5DF4D;"></p>
     <p id="filmlengteResultaat" style="color: #F5DF4D;"></p>
+    <div id="filmlengtesLijst" style="color: #F5DF4D;"></div>
 
     <li><a href="opnamesklasseb.html" class="btn">Aantal opnames EN</a></li>
 
