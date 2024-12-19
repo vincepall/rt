@@ -23,6 +23,16 @@
             return ci2.toFixed(2); // Geef de huidige activiteit terug
         }
 
+        // Functie om een datum in het formaat DD-MM-YYYY te parsen naar een geldige JavaScript Date
+        function parseDate(dateString) {
+            const parts = dateString.split("-");
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // Maanden zijn 0-gebaseerd in JavaScript
+            const year = parseInt(parts[2], 10);
+
+            return new Date(year, month, day);
+        }
+
         // Functie om CSV-bestand in te laden en weer te geven als tabel met een extra kolom voor huidige activiteit
         function loadCSV(file) {
             fetch(file)
@@ -44,7 +54,7 @@
                             const bron = cols[0];
                             const type = cols[1];
                             const activiteit = parseFloat(cols[2]);
-                            const datum = new Date(cols[3].split('-').reverse().join('-'));
+                            const datum = parseDate(cols[3]); // Parse de datum uit DD-MM-YYYY naar een geldige Date
 
                             // Bereken de huidige activiteit
                             const huidigeActiviteit = calculateActivity(activiteit, datum, type);
