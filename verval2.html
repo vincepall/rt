@@ -9,31 +9,27 @@
     <title>Activiteitsberekening</title>
     <script>
         // Functie om de activiteit te berekenen
-        function calculateActivity(ci1, firstDate, isotope) {
-            const secondDate = new Date();
-            const days = (secondDate - firstDate) / (1000 * 3600 * 24);
+        function calculateCurrentActivity(type, activiteit, datum) {
+            const firstDate = new Date(datum.split('-').reverse().join('-')); // Zet de datum om
+            const secondDate = new Date(); // Huidige datum
+
+            // Bereken het aantal dagen tussen de twee datums
+            const timeDifference = secondDate - firstDate;
+            const days = timeDifference / (1000 * 3600 * 24);
+
             let ci2 = 0;
 
-            if (isotope === "Se75") {
-                ci2 = ci1 / Math.pow(2, days / 120);
-            } else if (isotope === "Ir192") {
-                ci2 = ci1 / Math.pow(2, days / 74);
+            // Bereken de huidige activiteit
+            if (type === "Se75") {
+                ci2 = activiteit / Math.pow(2, days / 120);
+            } else if (type === "Ir192") {
+                ci2 = activiteit / Math.pow(2, days / 74);
             }
 
-            return ci2.toFixed(2); // Geef de huidige activiteit terug
+            return ci2.toFixed(2); // Retourneer de activiteit met 2 decimalen
         }
 
-        // Functie om een datum in het formaat DD-MM-YYYY te parsen naar een geldige JavaScript Date
-        function parseDate(dateString) {
-            const parts = dateString.split("-");
-            const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // Maanden zijn 0-gebaseerd in JavaScript
-            const year = parseInt(parts[2], 10);
-
-            return new Date(year, month, day);
-        }
-
-        // Functie om CSV-bestand in te laden en weer te geven als tabel met een extra kolom voor huidige activiteit
+        // Functie om CSV-bestand in te laden en weer te geven als tabel met extra kolom "Huidige Activiteit"
         function loadCSV(file) {
             fetch(file)
                 .then(response => response.text())
@@ -41,35 +37,28 @@
                     const rows = data.split("\n");
                     let table = '<table border="1"><tr>';
 
+                    // Verwerk de CSV-rijen en genereer de HTML-tabel
                     rows.forEach((row, index) => {
                         const cols = row.split(",");
                         if (index === 0) {
-                            table += '<tr>';
-                            cols.forEach(col => {
-                                table += `<th>${col}</th>`;
-                            });
-                            table += '<th>Huidige Activiteit (Ci)</th>'; // Extra kolomkop
-                            table += '</tr>';
+                            // Kopteksten aanpassen en extra kolom toevoegen
+                            table += '<th>Bron</th><th>Type</th><th>Huidige Activiteit</th></tr>';
                         } else {
                             const bron = cols[0];
                             const type = cols[1];
                             const activiteit = parseFloat(cols[2]);
-                            const datum = parseDate(cols[3]); // Parse de datum uit DD-MM-YYYY naar een geldige Date
+                            const datum = cols[3];
 
                             // Bereken de huidige activiteit
-                            const huidigeActiviteit = calculateActivity(activiteit, datum, type);
+                            const currentActivity = calculateCurrentActivity(type, activiteit, datum);
 
-                            table += '<tr>';
-                            cols.forEach(col => {
-                                table += `<td>${col}</td>`;
-                            });
-                            table += `<td>${huidigeActiviteit}</td>`; // Voeg de berekende activiteit toe
-                            table += '</tr>';
+                            // Voeg een rij toe met de bron, type en huidige activiteit
+                            table += `<tr><td>${bron}</td><td>${type}</td><td style="color:#F5DF4D;">${currentActivity} Ci</td></tr>`;
                         }
                     });
                     table += '</table>';
 
-                    // Plaats de tabel bovenaan de pagina in de div met id="csvTable"
+                    // Plaats de tabel onderaan de pagina in de div met id="csvTable"
                     document.getElementById("csvTable").innerHTML = table;
                 })
                 .catch(error => console.error("Error loading CSV:", error));
@@ -77,37 +66,30 @@
 
         // Laad de tabel als de pagina geladen is
         window.onload = function() {
-            loadCSV('bronnen.csv');
+            loadCSV('bronnen.csv');  // Laadt gegevens uit bronnen.csv
         };
     </script>
 </head>
 <body>
     <h1 style="color: #F5DF4D; text-align: center;">Activiteit</h1>
 
-    <!-- Bronnen Tabel -->
-    <h2>Bronnen Tabel</h2>
-    <div id="csvTable">De tabel wordt geladen...</div>
+    <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
 
-    <!-- Formulier voor handmatige invoer -->
-    <label for="isotope">Kies een isotoop:</label>
-    <select id="isotope">
-        <option value="Se75">Se75</option>
-        <option value="Ir192">Ir192</option>
-    </select><br><br>
-
-    <label for="ci1">Ci op eerste datum (Ci1):</label>
-    <input type="number" id="ci1" required><br><br>
-
-    <label for="firstDate">Eerste datum:</label>
-    <input type="date" id="firstDate" required><br><br>
-
-    <label for="secondDate">Tweede datum (standaard is de huidige datum):</label>
-    <input type="date" id="secondDate"><br><br>
-
-    <button onclick="calculateActivity()">Bereken activiteit</button>
-
-    <h2 id="result"></h2>
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>De waardes in de tabel zijn uit de vervoersdocumenten gehaald.
+            </p>
+        </div>
+    </div>
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <h2>Bronnen Tabel</h2>
+    <!-- Hier wordt de CSV-tabel weergegeven -->
+    <div id="csvTable">De tabel wordt geladen...</div>
+
 </body>
 </html>
