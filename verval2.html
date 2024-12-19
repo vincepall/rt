@@ -8,27 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activiteitsberekening</title>
     <script>
-        // Functie om de huidige activiteit te berekenen
-        function calculateCurrentActivity(activiteit, type, datum) {
-            const firstDate = new Date(datum.split('-').reverse().join('-')); // Oorspronkelijke datum
-            const secondDate = new Date(); // Huidige datum
-
-            // Bereken het aantal dagen tussen de twee datums
-            const timeDifference = secondDate - firstDate;
-            const days = timeDifference / (1000 * 3600 * 24);
-
-            let ci2 = 0;
-            // Berekening afhankelijk van het isotoop type
-            if (type === "Se75") {
-                ci2 = activiteit / Math.pow(2, days / 120);
-            } else if (type === "Ir192") {
-                ci2 = activiteit / Math.pow(2, days / 74);
-            }
-
-            return ci2.toFixed(2); // Geeft de huidige activiteit terug
-        }
-
-        // Functie om handmatige invoer te berekenen
+        // Functie om de activiteit te berekenen
         function calculateActivity() {
             const isotope = document.getElementById("isotope").value;
             const ci1 = parseFloat(document.getElementById("ci1").value);
@@ -52,46 +32,81 @@
             document.getElementById("result").innerHTML = `De activiteit is nog <span style="color:#F5DF4D">${ci2.toFixed(2)} Curie</span> op <span style="color:#F5DF4D">${secondDate.toLocaleDateString('nl-NL')}</span>.`;
         }
 
-        // Functie om CSV-bestand in te laden en de tabel te genereren met de huidige activiteit
+        // Functie om CSV-bestand in te laden en weer te geven als tabel met aanklikbare rijen
         function loadCSV(file) {
             fetch(file)
                 .then(response => response.text())
                 .then(data => {
                     const rows = data.split("\n");
                     let table = '<table border="1"><tr>';
-
+                    
                     // Verwerk de CSV-rijen en genereer de HTML-tabel
                     rows.forEach((row, index) => {
-                        const cols = row.split(",");
-                        if (index === 0) {
-                            // Voeg kopteksten toe, zonder de 'activiteit' en 'datum' kolommen
-                            table += '<th>Bron</th><th>Type</th><th>Huidige Activiteit (Ci)</th></tr>';
-                        } else {
-                            const bron = cols[0];
-                            const type = cols[1];
-                            const activiteit = cols[2];
-                            const datum = cols[3];
+                        if (row.trim() !== "") {  // Controleer of de rij niet leeg is
+                            const cols = row.split(",");
+                            if (cols.length >= 4) {  // Zorg ervoor dat er ten minste 4 kolommen zijn
+                                if (index === 0) {
+                                    table += '<tr>';
+                                    cols.forEach(col => {
+                                        table += `<th>${col}</th>`;  // Voeg koptekst toe
+                                    });
+                                    table += '</tr>';
+                                } else {
+                                    const bron = cols[0];
+                                    const type = cols[1];
+                                    const activiteit = cols[2];
+                                    const datum = cols[3];
 
-                            // Bereken de huidige activiteit
-                            const currentActivity = calculateCurrentActivity(activiteit, type, datum);
-
-                            // Voeg rijen toe met de huidige activiteit
-                            table += `<tr>
-                                <td>${bron}</td>
-                                <td>${type}</td>
-                                <td style="color:#F5DF4D;">${currentActivity}</td>
-                            </tr>`;
+                                    if (bron && type && activiteit && datum) {  // Controleer of alle kolommen aanwezig zijn
+                                        table += `<tr onclick="fillFormAndCalculate('${bron}', '${type}', '${activiteit}', '${datum}')">`;
+                                        cols.forEach(col => {
+                                            table += `<td>${col}</td>`;  // Voeg gegevens toe
+                                        });
+                                        table += '</tr>';
+                                    }
+                                }
+                            }
                         }
                     });
                     table += '</table>';
-
-                    // Plaats de tabel op de pagina in de div met id="csvTable"
+                    
+                    // Plaats de tabel onderaan de pagina in de div met id="csvTable"
                     document.getElementById("csvTable").innerHTML = table;
                 })
                 .catch(error => console.error("Error loading CSV:", error));
         }
 
-        // Laad de tabel zodra de pagina geladen is
+        // Functie om de formuliervelden in te vullen en meteen de berekening uit te voeren
+        function fillFormAndCalculate(bron, type, activiteit, datum) {
+            document.getElementById("isotope").value = type; // Zet het type isotoop
+            document.getElementById("ci1").value = activiteit; // Vul de activiteit (Ci1) in
+            document.getElementById("firstDate").value = datum.split('-').reverse().join('-'); // Formatteer de datum correct voor de input
+
+            // Reset het tweede datumveld naar leeg zodat de gebruiker kan kiezen
+            document.getElementById("secondDate").value = "";
+
+            // Gebruik de huidige datum als standaard voor de tweede datum
+            const secondDate = new Date();
+            const firstDate = new Date(datum.split('-').reverse().join('-'));
+
+            // Bereken het aantal dagen tussen de twee datums
+            const timeDifference = secondDate - firstDate;
+            const days = timeDifference / (1000 * 3600 * 24);
+
+            let ci2 = 0;
+
+            // Bereken de activiteit
+            if (type === "Se75") {
+                ci2 = activiteit / Math.pow(2, days / 120);
+            } else if (type === "Ir192") {
+                ci2 = activiteit / Math.pow(2, days / 74);
+            }
+
+            // Toon direct het resultaat in het juiste formaat met gele kleur voor bron, activiteit en datum
+            document.getElementById("result").innerHTML = `Bron <span style="color:#F5DF4D">${bron}</span> heeft nog <span style="color:#F5DF4D">${ci2.toFixed(2)} Ci</span> op <span style="color:#F5DF4D">${secondDate.toLocaleDateString('nl-NL')}</span>.`;
+        }
+
+        // Laad de tabel als de pagina geladen is
         window.onload = function() {
             loadCSV('bronnen.csv');  // Laadt gegevens uit bronnen.csv
         };
@@ -100,19 +115,20 @@
 <body>
     <h1 style="color: #F5DF4D; text-align: center;">Activiteit</h1>
 
+      <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
+    <!-- Het pop-up venster -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>De weergegeven activiteit is de huidige activiteit berekend op basis van de oorspronkelijke activiteit en datum.</p>
+            <p>Door op een bron te duwen krijg je de activiteit op dit moment. De waardes in de tabel zijn uit de vervoersdocumenten gehaald.
+            </p>
         </div>
     </div>
 
-    <script src="script.js"></script>
-
-    <!-- Handmatig invoeren en berekenen -->
-    <h2>Handmatig Activiteit Berekenen</h2>
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+    
     <label for="isotope">Kies een isotoop:</label>
     <select id="isotope">
         <option value="Se75">Se75</option>
@@ -132,8 +148,8 @@
 
     <h2 id="result"></h2>
 
-    <!-- Tabel met bronnen en automatisch berekende activiteiten -->
-    <h2>Bronnen Tabel (Automatische Activiteit Berekening)</h2>
+    <h2>Bronnen Tabel (klik op de bron)</h2>
+    <!-- Hier wordt de CSV-tabel weergegeven -->
     <div id="csvTable">De tabel wordt geladen...</div>
 
 </body>
