@@ -29,6 +29,9 @@
         <p>Voer de totale lengte in (in mm):</p>
         <input type="number" id="totaleLengte" placeholder="Totale lengte in mm" required>
 
+        <button onclick="verdeelLengte()">Verdeel Lengte</button>
+        <p id="resultaat" style="color: #F5DF4D;"></p>
+
         <h2>Optioneel:</h2>        
 
 
@@ -38,8 +41,6 @@
         <p>Voer de lengte van de uiteindes in (in mm, standaard 200 mm, maximaal 230 mm):</p>
         <input type="number" id="uiteindeLengte" value="200" max="230" required>
         
-        <button onclick="verdeelLengte()">Verdeel Lengte</button>
-        <p id="resultaat" style="color: #F5DF4D;"></p>
     </div>
 
     <script>
