@@ -8,67 +8,84 @@
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
 </head>
 <body>
 
- <!-- De knop om het pop-up venster te openen -->
+    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Deze rekentool gaat ervan uit dat de gebruikte films een lengte hebben van 480mm en dat de maximale afstand tussen 2 opnames 400mm is.
-            Dit is om voor voldoende overlap te zorgen maar kan betekenen dat er bij bepaalde lengtes een korte afstand tussen de opnames wordt voorgesteld.
-            Als dat zo is zou het beter kunnen zijn dat je de lengte deelt door "aantal opnames" - 1.</p>
+            <p>Deze LW verdeler geeft je het aantal films en de afstanden waarop je de verdeelstrepen kunt zetten. Standaard is de afstand tussen 2 strepen maximaal 400mm en de uiteindes zijn standaard op 200mm ingesteld. Bij dunne wanddiktes kun je in sommige situaties deze afstanden veranderen zodat je met 1 film minder dezelfde lengte kunt behalen, Hou er rekening mee dat dit beter te vermijden is bij dikkere wanddiktes.</p>
         </div>
     </div>
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
     
-    
-<div class="container">
-    <h1 style="color: #F5DF4D; text-align: center;">Langsnaad Verdeler</h1>
-    <p>Voer de totale lengte in (in mm):</p>
-    <input type="number" id="totaleLengte" placeholder="Totale lengte in mm" required>
-    <button onclick="verdeelLengte()">Verdeel Lengte</button>
-    <p id="resultaat" style="color: #F5DF4D;"></p>
-</div>
+    <div class="container">
+        <h1 style="color: #F5DF4D; text-align: center;">Langsnaad Verdeler</h1>
+        <p>Voer de totale lengte in (in mm):</p>
+        <input type="number" id="totaleLengte" placeholder="Totale lengte in mm" required>
 
-<script>
-    function verdeelLengte() {
-        const totaleLengte = parseFloat(document.getElementById('totaleLengte').value);
-        const maxLengte = 400;
+        <h2>Optioneel:</h2>        
+
+
+        <p>Voer de maximale lengte per deel in (in mm, standaard 400 mm):</p>
+        <input type="number" id="maxLengte" value="400" required>
         
-        if (isNaN(totaleLengte) || totaleLengte <= 400) {
-            document.getElementById('resultaat').innerText = "De totale lengte moet meer dan 400 mm zijn.";
-            return;
+        <p>Voer de lengte van de uiteindes in (in mm, standaard 200 mm, maximaal 230 mm):</p>
+        <input type="number" id="uiteindeLengte" value="200" max="230" required>
+        
+        <button onclick="verdeelLengte()">Verdeel Lengte</button>
+        <p id="resultaat" style="color: #F5DF4D;"></p>
+    </div>
+
+    <script>
+        function verdeelLengte() {
+            const totaleLengte = parseFloat(document.getElementById('totaleLengte').value);
+            const maxLengte = parseFloat(document.getElementById('maxLengte').value);
+            let uiteindeLengte = parseFloat(document.getElementById('uiteindeLengte').value);
+            
+            // Validatie van de uiteindelengte
+            if (uiteindeLengte > 220) {
+                uiteindeLengte = 220;
+            } else if (uiteindeLengte < 0) {
+                document.getElementById('resultaat').innerText = "De uiteindelengte moet positief zijn.";
+                return;
+            }
+
+            if (isNaN(totaleLengte) || totaleLengte <= maxLengte || isNaN(uiteindeLengte)) {
+                document.getElementById('resultaat').innerText = `De totale lengte moet meer dan ${maxLengte} mm zijn en de uiteindelengte moet geldig zijn.`;
+                return;
+            }
+
+            // Trek de uiteindelengte (x2) af van de totale lengte
+            const resterendeLengte = totaleLengte - (uiteindeLengte * 2);
+
+            // Controleer of de resterende lengte voldoende is
+            if (resterendeLengte <= 0) {
+                document.getElementById('resultaat').innerText = `De totale lengte is te kort voor deze uiteindelengte.`;
+                return;
+            }
+
+            // Bereken het minimaal aantal stukken voor de opgegeven maximale lengte
+            const aantalStukken = Math.ceil(resterendeLengte / maxLengte);
+            const stukLengte = resterendeLengte / aantalStukken;
+
+            // Tel 1 op bij het aantal stukken voor de uiteinde (eerste stuk)
+            const totaalAantalFilms = aantalStukken + 1;
+
+            // Resultaat weergeven
+            let resultaat = `De totale lengte van ${totaleLengte} mm wordt als volgt verdeeld:\n`;
+            resultaat += `- Uiteinde: 2 x ${uiteindeLengte} mm\n`;
+            resultaat += `- Totaal aantal films: ${totaalAantalFilms}\n`;
+            resultaat += `- Lengte per stuk: ${stukLengte.toFixed(2)} mm\n`;
+
+            document.getElementById('resultaat').innerText = resultaat;
         }
-
-        // Trek 400mm af van de totale lengte vanwege de uiteindes      
-        const resterendeLengte = totaleLengte - maxLengte;
-        
-        // Bereken hoeveel stukken we kunnen maken met een maximale lengte van 400mm
-        const aantalStukken = Math.ceil(resterendeLengte / maxLengte);
-        const stukLengte = resterendeLengte / aantalStukken;
-
-        // Tel 1 op bij het aantal stukken voor de uiteinde (eerste stuk)
-        const totaalAantalFilms = aantalStukken + 1;
-
-        // Resultaat weergeven
-        let resultaat = `De totale lengte van ${totaleLengte} mm wordt als volgt verdeeld:\n`;
-        resultaat += `- Uiteinde: 2 x 200 mm\n`;
-        resultaat += `- Totaal aantal films: ${totaalAantalFilms}\n`;
-        resultaat += `- Lengte per stuk: ${stukLengte.toFixed(2)} mm\n`;
-
-        document.getElementById('resultaat').innerText = resultaat;
-    }
-</script>
+    </script>
 
 </body>
 </html>
-
-
-
-
