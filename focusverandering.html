@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focusverandering en Filmtype verandering </title>
+    <title>Focusverandering en Filmtype verandering</title>
     <script>
         // Functie om minuten en seconden naar totale seconden om te zetten
         function tijdNaarSeconden(minuten, seconden) {
@@ -32,6 +32,20 @@
             return { d5, d7 };
         }
 
+        // Functies om D4 en D7 te berekenen van D5
+        function berekenD4D7VanD5(d5) {
+            const d4 = d5 * 1.6666;
+            const d7 = d4 / 2.44;
+            return { d4, d7 };
+        }
+
+        // Functies om D4 en D5 te berekenen van D7
+        function berekenD4D5VanD7(d7) {
+            const d4 = d7 * 2.44;
+            const d5 = d4 / 1.6666;
+            return { d4, d5 };
+        }
+
         // Functie om te berekenen op basis van de invoer
         function bereken() {
             const minuten = parseInt(document.getElementById("minuten").value);
@@ -50,16 +64,19 @@
 
             if (filmtypeVeranderd) {
                 const filmtype = document.querySelector('input[name="filmtype"]:checked').value;
-                
+
                 if (filmtype === "D4") {
                     const resultaat = berekenD5D7VanD4(nieuweTijd);
                     document.getElementById("resultaat").innerHTML = 
                         `D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
                 } else if (filmtype === "D5") {
-                    nieuweTijd = nieuweTijd / 1.6666;
-                    const resultaat = berekenD5D7VanD4(nieuweTijd);
+                    const resultaat = berekenD4D7VanD5(nieuweTijd);
                     document.getElementById("resultaat").innerHTML = 
-                        `D4 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                        `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                } else if (filmtype === "D7") {
+                    const resultaat = berekenD4D5VanD7(nieuweTijd);
+                    document.getElementById("resultaat").innerHTML = 
+                        `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
                 }
             } else {
                 document.getElementById("resultaat").innerHTML = 
