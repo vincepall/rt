@@ -29,6 +29,8 @@ const FILES_TO_CACHE = [
   '/rt/bundelbreedte.html',
   '/rt/opstelling13klassea.png',
   '/rt/opstelling2klassea.png',
+  '/rt/alarm.wav',
+  '/rt/timer.html',
   
  
 ];
