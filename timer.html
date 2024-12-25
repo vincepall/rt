@@ -36,18 +36,12 @@
         }
         .timer button {
             flex: 1 1 100%;
-            padding: 20px; /* Verhoogde padding voor grotere knoppen */
+            padding: 10px;
             margin: 5px 0;
-            font-size: 1.2em; /* Grotere tekst op mobiele apparaten */
-            border-radius: 5px; /* Rondere hoeken voor een modernere uitstraling */
-            background-color: #F5DF4D; /* Geel als achtergrondkleur */
-            color: #333; /* Donkere tekstkleur voor contrast */
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        .timer button:hover {
-            background-color: #ffcc00; /* Lichtgele kleur bij hover */
+        .start-button {
+            padding: 20px; /* Vergroot de startknop */
+            font-size: 1.5em; /* Vergroot de tekst op de knop */
         }
         #recalculate-section {
             margin: 20px 0;
@@ -62,8 +56,6 @@
             }
             .timer button {
                 flex: 1 1 100%;
-                font-size: 1.5em; /* Nog grotere knoppen op mobiele apparaten */
-                padding: 25px; /* Verhoogde padding op mobiele apparaten */
             }
         }
         .info-btn {
@@ -86,7 +78,7 @@
             margin-top: 10px;
         }
         #countdownDisplay {
-            color: #F5DF4D;
+            color: #F5DF4D; /* Dezelfde kleur als de titel */
         }    
         
     </style>
@@ -173,7 +165,7 @@
             </select>
             <label for="activity-${index}">Activiteit (Ci):</label>
             <input type="number" id="activity-${index}" placeholder="Activiteit in Ci" min="0" value="${timerData ? timerData.activity : ''}">
-            <button onclick="startTimer(${index})">Start</button>
+            <button class="start-button" onclick="startTimer(${index})">Start</button>
             <button onclick="stopTimer(${index})" id="stop-button-${index}" disabled>Stop/Reset</button>
             <button onclick="saveTimer(${index})">Opslaan</button>
             <button id="delete-button-${index}" style="display:${timerData ? 'inline' : 'none'};" onclick="deleteTimer(${index})">Verwijder</button>
@@ -218,6 +210,7 @@
             const minutes = Math.floor(timers[index].timeRemaining / 60);
             const seconds = timers[index].timeRemaining % 60;
             countdownDisplay.textContent = `Resterende tijd: ${minutes} minuten en ${seconds} seconden`;
+            countdownDisplay.style.color = "#F5DF4D"; /* Zelfde kleur als de titel */
             timers[index].timeRemaining--;
 
             if (timers[index].timeRemaining < 0) {
