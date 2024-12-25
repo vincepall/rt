@@ -39,6 +39,10 @@
             padding: 10px;
             margin: 5px 0;
         }
+        .start-button {
+            padding: 20px; /* Vergroot de startknop */
+            font-size: 1.5em; /* Vergroot de tekst op de knop */
+        }
         #recalculate-section {
             margin: 20px 0;
         }
@@ -74,8 +78,9 @@
             margin-top: 10px;
         }
         #countdownDisplay {
-            color: #F5DF4D;
+            color: #F5DF4D; /* Dezelfde kleur als de titel */
         }    
+        
     </style>
 </head>
 <body>
@@ -89,7 +94,7 @@
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
-        <p>Je kunt zelf timers een naam geven en opslaan (lokaal geheugen). Als je een andere keer hetzelfde wil doen maar dan met een andere bronsterkte, kun je gebruik maken van de "tijd na Ci verandering" optie. Deze zal je de nieuwe tijd geven met de aangepaste Ci waarde.</p>
+        <p>LET OP! TIMER WERKT ALLEEN BETROUWBAAR ALS JE HET SCHERM OPEN HOUDT EN NIET VERVERST! Je kunt zelf timers een naam geven en opslaan (lokaal geheugen). Als je een andere keer hetzelfde wil doen maar dan met een andere bronsterkte, kun je gebruik maken van de "tijd na Ci verandering" optie. Deze zal je de nieuwe tijd geven met de aangepaste Ci waarde.</p>
     </div>
 </div>
 
@@ -160,7 +165,7 @@
             </select>
             <label for="activity-${index}">Activiteit (Ci):</label>
             <input type="number" id="activity-${index}" placeholder="Activiteit in Ci" min="0" value="${timerData ? timerData.activity : ''}">
-            <button onclick="startTimer(${index})">Start</button>
+            <button class="start-button" onclick="startTimer(${index})">Start</button>
             <button onclick="stopTimer(${index})" id="stop-button-${index}" disabled>Stop/Reset</button>
             <button onclick="saveTimer(${index})">Opslaan</button>
             <button id="delete-button-${index}" style="display:${timerData ? 'inline' : 'none'};" onclick="deleteTimer(${index})">Verwijder</button>
@@ -205,6 +210,7 @@
             const minutes = Math.floor(timers[index].timeRemaining / 60);
             const seconds = timers[index].timeRemaining % 60;
             countdownDisplay.textContent = `Resterende tijd: ${minutes} minuten en ${seconds} seconden`;
+            countdownDisplay.style.color = "#F5DF4D"; /* Zelfde kleur als de titel */
             timers[index].timeRemaining--;
 
             if (timers[index].timeRemaining < 0) {
@@ -265,44 +271,50 @@
     }
 
     function showRecalculateSection() {
-        const select = document.getElementById('saved-timers');
+        const selectedTimer = document.getElementById('saved-timers').value;
         const newActivitySection = document.getElementById('new-activity-section');
-        newActivitySection.style.display = select.value ? 'block' : 'none';
+        newActivitySection.style.display = selectedTimer ? 'block' : 'none';
+
+        if (selectedTimer) {
+            const timer = JSON.parse(localStorage.getItem(selectedTimer));
+            document.getElementById('new-activity').value = timer.activity;
+        }
     }
 
     function recalculateTime() {
-        const select = document.getElementById('saved-timers');
-        const timerData = JSON.parse(localStorage.getItem(select.value));
-        const newActivityInput = document.getElementById('new-activity');
-        const newActivity = parseFloat(newActivityInput.value);
+        const selectedTimer = document.getElementById('saved-timers').value;
+        const newActivity = parseFloat(document.getElementById('new-activity').value);
+        
+        if (selectedTimer && !isNaN(newActivity)) {
+            const timer = JSON.parse(localStorage.getItem(selectedTimer));
+            const originalTimeInSeconds = (timer.minutes * 60) + parseInt(timer.seconds); // Originele tijd in seconden
+            const originalActivity = parseFloat(timer.activity);
 
-        if (isNaN(newActivity) || newActivity <= 0) {
-            alert('Voer een geldige activiteit in.');
-            return;
-        }
+            // Nieuwe tijd berekenen volgens de juiste formule
+            const newTimeInSeconds = (originalTimeInSeconds * originalActivity) / newActivity;
+            const newMinutes = Math.floor(newTimeInSeconds / 60);
+            const newSeconds = newTimeInSeconds % 60;
 
-        const newTimeInSeconds = (timerData.minutes * 60 + timerData.seconds) * timerData.activity / newActivity;
-        const newMinutes = Math.floor(newTimeInSeconds / 60);
-        const newSeconds = newTimeInSeconds % 60;
-        const resultElement = document.getElementById('recalculate-result');
-        resultElement.textContent = `Nieuwe tijd: ${newMinutes} minuten en ${newSeconds} seconden`;
-
-        const currentTimer = timers.find(timer => timer.name === timerData.name);
-        if (currentTimer) {
-            currentTimer.timeRemaining = newTimeInSeconds;
+            document.getElementById('recalculate-result').textContent = `Nieuwe tijd: ${newMinutes} minuten en ${newSeconds} seconden`;
+        } else {
+            alert('Vul een geldige activiteit in!');
         }
     }
 
-    // Zorg ervoor dat de timer doorloopt wanneer de pagina wordt hervat
-    document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible') {
-            timers.forEach((timer, index) => {
-                if (timer.interval === null) {
-                    startTimer(index); // Start timer opnieuw als de pagina weer zichtbaar is
-                }
-            });
-        }
-    });
+    // Laad de opgeslagen timers bij het openen van de pagina
+    window.onload = function() {
+        updateSavedTimersDropdown();
+        loadSavedTimers(); // Laad opgeslagen timers
+    };
+
+    function loadSavedTimers() {
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('timer-')) {
+                const timerData = JSON.parse(localStorage.getItem(key));
+                addTimer(timerData); // Voeg de opgeslagen timer toe aan de lijst
+            }
+        });
+    }
 </script>
 
 </body>
