@@ -73,6 +73,10 @@
             text-align: center;
             margin-top: 10px;
         }
+        #countdownDisplay {
+            color: #F5DF4D;
+        }    
+        
     </style>
 </head>
 <body>
@@ -292,7 +296,20 @@
         }
     }
 
-    window.onload = updateSavedTimersDropdown;
+    // Laad de opgeslagen timers bij het openen van de pagina
+    window.onload = function() {
+        updateSavedTimersDropdown();
+        loadSavedTimers(); // Laad opgeslagen timers
+    };
+
+    function loadSavedTimers() {
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('timer-')) {
+                const timerData = JSON.parse(localStorage.getItem(key));
+                addTimer(timerData); // Voeg de opgeslagen timer toe aan de lijst
+            }
+        });
+    }
 </script>
 
 </body>
