@@ -36,8 +36,18 @@
         }
         .timer button {
             flex: 1 1 100%;
-            padding: 10px;
+            padding: 20px; /* Verhoogde padding voor grotere knoppen */
             margin: 5px 0;
+            font-size: 1.2em; /* Grotere tekst op mobiele apparaten */
+            border-radius: 5px; /* Rondere hoeken voor een modernere uitstraling */
+            background-color: #F5DF4D; /* Geel als achtergrondkleur */
+            color: #333; /* Donkere tekstkleur voor contrast */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .timer button:hover {
+            background-color: #ffcc00; /* Lichtgele kleur bij hover */
         }
         #recalculate-section {
             margin: 20px 0;
@@ -52,6 +62,8 @@
             }
             .timer button {
                 flex: 1 1 100%;
+                font-size: 1.5em; /* Nog grotere knoppen op mobiele apparaten */
+                padding: 25px; /* Verhoogde padding op mobiele apparaten */
             }
         }
         .info-btn {
