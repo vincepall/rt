@@ -10,121 +10,27 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
         }
-
-        h1 {
-            color: #F5DF4D;
-            text-align: center;
-            margin-top: 25px;
-        }
-
         .timer {
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-
-        .timer label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        .timer input, .timer select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        .timer button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .timer button:hover {
-            background-color: #e4c63d;
-        }
-
-        #recalculate-section {
-            margin: 20px 0;
-        }
-
-        #recalculate-result {
-            font-size: 1.2em;
-            text-align: center;
-            margin-top: 10px;
-            color: #F5DF4D;
-        }
-
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            padding: 20px;
-            border-radius: 8px;
-            width: 70%;
-            max-width: 500px;
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            cursor: pointer;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        @media (max-width: 600px) {
-            .timer {
-                padding: 10px;
-            }
-
-            .timer input,
-            .timer select,
-            .timer button {
-                font-size: 14px;
-            }
-        }
-
         .flashing {
             animation: flash 0.3s infinite alternate;
         }
-
         @keyframes flash {
             from { background-color: white; }
             to { background-color: red; }
         }
-
+        label {
+            margin-right: 10px;
+        }
+        #recalculate-result {
+            font-size: 1.2em;
+            color: #F5DF4D;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -134,22 +40,24 @@
 <!-- De knop om het pop-up venster te openen -->
 <button class="info-btn" onclick="openModal('myModal')">i</button>
 
-<!-- Het pop-up venster -->
+    <!-- Het pop-up venster -->
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
-        <p>Je kunt zelf timers een naam geven en opslaan (lokaal geheugen). Als je een andere keer hetzelfde wil doen maar dan met een andere bronsterkte, kun je gebruik maken van de "tijd na Ci verandering" optie. Deze zal je de nieuwe tijd geven met de aangepaste Ci waarde.</p>
+        <p>Je kunt zelf timers een naam geven en opslaan(lokaal geheugen), Als je een andere keer hetzelfde wil doen maar dan met een andere bronsterkte kun je gebruik maken van de "tijd na Ci verandering" optie, deze zal je de nieuwe tijd geven met de aangepaste Ci waarde.
+        </p>
     </div>
 </div>
 
 <script src="script.js"></script>    
-    
+
 <div id="timers">
     <!-- Timer containers worden hier toegevoegd -->
 </div>
 
 <button onclick="addTimer()">Voeg een nieuwe timer toe</button>
 
+<!-- Dropdown menu voor opgeslagen timers -->
 <div id="recalculate-section">
     <h3>Tijd na Ci verandering</h3>
     <label for="saved-timers">Selecteer een opgeslagen timer:</label>
@@ -161,7 +69,7 @@
         <input type="number" id="new-activity" min="0" placeholder="Vul nieuwe activiteit in">
         <button onclick="recalculateTime()">Nieuwe Tijd</button>
     </div>
-    <p id="recalculate-result"></p>
+    <p id="recalculate-result" style= "color: #F5DF4D; text-align: center;"></p>
 </div>
 
 <audio id="alarm-sound" src="alarm.wav" preload="auto"></audio>
@@ -287,60 +195,79 @@
         
         document.getElementById('alarm-sound').pause();
         document.getElementById('alarm-sound').currentTime = 0;
-        muteButton.style.display = 'none';
         timerContainer.classList.remove('flashing');
+        muteButton.style.display = 'none';
     }
 
     function deleteTimer(index) {
-        localStorage.removeItem(`timer-${index}`);
         const timerContainer = document.getElementById(`timer-container-${index}`);
         timerContainer.remove();
-        timers[index] = null;
+        localStorage.removeItem(`timer-${index}`);
+        alert('Timer verwijderd!');
+        updateSavedTimersDropdown();
+    }
+
+    function recalculateTime() {
+        const selectedTimerIndex = document.getElementById('saved-timers').value;
+        const newActivity = parseFloat(document.getElementById('new-activity').value);
+
+        if (isNaN(newActivity) || newActivity <= 0) {
+            alert('Voer een geldige activiteit in.');
+            return;
+        }
+
+        // Haal de opgeslagen timer uit localStorage
+        const savedTimer = JSON.parse(localStorage.getItem(`timer-${selectedTimerIndex}`));
+        const originalActivity = savedTimer.activity;
+        const originalTimeInSeconds = savedTimer.minutes * 60 + savedTimer.seconds;
+        const newTimeInSeconds = (originalTimeInSeconds * originalActivity) / newActivity;
+
+        const newMinutes = Math.floor(newTimeInSeconds / 60);
+        const newSeconds = newTimeInSeconds % 60;
+
+        // Toon het resultaat met de timernaam
+        document.getElementById('recalculate-result').textContent = 
+            `Timer "${savedTimer.name}" is met ${newActivity} Ci nog ${newMinutes} minuten en ${newSeconds} seconden stralen.`;
+        
+        // Werk de activiteit bij
+        savedTimer.activity = newActivity;
+        localStorage.setItem(`timer-${selectedTimerIndex}`, JSON.stringify(savedTimer));
     }
 
     function updateSavedTimersDropdown() {
-        const savedTimersDropdown = document.getElementById('saved-timers');
-        savedTimersDropdown.innerHTML = '<option value="">Kies een timer</option>';
-
-        Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('timer-')) {
-                const timer = JSON.parse(localStorage.getItem(key));
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = timer.name;
-                savedTimersDropdown.appendChild(option);
-            }
-        });
+        const dropdown = document.getElementById('saved-timers');
+        dropdown.innerHTML = '<option value="">Kies een timer</option>';
+        
+        let index = 0;
+        while (localStorage.getItem(`timer-${index}`)) {
+            const savedTimer = JSON.parse(localStorage.getItem(`timer-${index}`));
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = savedTimer.name;
+            dropdown.appendChild(option);
+            index++;
+        }
     }
 
     function showRecalculateSection() {
         const selectedTimer = document.getElementById('saved-timers').value;
-        const newActivitySection = document.getElementById('new-activity-section');
-        newActivitySection.style.display = selectedTimer ? 'block' : 'none';
-
         if (selectedTimer) {
-            const timer = JSON.parse(localStorage.getItem(selectedTimer));
-            document.getElementById('new-activity').value = timer.activity;
-        }
-    }
-
-    function recalculateTime() {
-        const selectedTimer = document.getElementById('saved-timers').value;
-        const newActivity = parseFloat(document.getElementById('new-activity').value);
-        
-        if (selectedTimer && !isNaN(newActivity)) {
-            const timer = JSON.parse(localStorage.getItem(selectedTimer));
-            const newTime = (timer.activity * (timer.minutes * 60 + timer.seconds)) / newActivity;
-            const newMinutes = Math.floor(newTime / 60);
-            const newSeconds = newTime % 60;
-
-            document.getElementById('recalculate-result').textContent = `Nieuwe tijd: ${newMinutes} minuten en ${newSeconds} seconden`;
+            document.getElementById('new-activity-section').style.display = 'block';
         } else {
-            alert('Vul een geldige activiteit in!');
+            document.getElementById('new-activity-section').style.display = 'none';
         }
     }
 
-    window.onload = updateSavedTimersDropdown;
+    // Opnieuw laden van opgeslagen timers bij het laden van de pagina
+    window.onload = function() {
+        let index = 0;
+        while (localStorage.getItem(`timer-${index}`)) {
+            const savedTimer = JSON.parse(localStorage.getItem(`timer-${index}`));
+            addTimer(savedTimer);
+            index++;
+        }
+        updateSavedTimersDropdown();
+    }
 </script>
 
 </body>
