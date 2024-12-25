@@ -12,72 +12,146 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
         }
+
         h1 {
             color: #F5DF4D;
             text-align: center;
+            margin-top: 20px;
         }
+
         .timer {
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 15px;
             border: 1px solid #ddd;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .timer label {
-            flex: 1 1 40%;
-            margin-bottom: 10px;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
+
         .timer input, .timer select {
-            flex: 1 1 50%;
+            width: 100%;
+            padding: 8px;
             margin-bottom: 10px;
-            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
         }
+
         .timer button {
-            flex: 1 1 100%;
-            padding: 10px;
-            margin: 5px 0;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            background-color: #F5DF4D;
+            color: #333;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
         }
+
+        .timer button:hover {
+            background-color: #e4c63d;
+        }
+
         #recalculate-section {
             margin: 20px 0;
         }
-        @media (max-width: 600px) {
-            .timer {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .timer label, .timer input, .timer select {
-                flex: 1 1 100%;
-            }
-            .timer button {
-                flex: 1 1 100%;
-            }
-        }
-        .info-btn {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .flashing {
-            animation: flash 0.3s infinite alternate;
-        }
-        @keyframes flash {
-            from { background-color: white; }
-            to { background-color: red; }
-        }
+
         #recalculate-result {
             font-size: 1.2em;
             color: #F5DF4D;
             text-align: center;
             margin-top: 10px;
         }
+
+        .info-btn {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            background-color: #F5DF4D;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .info-btn:hover {
+            background-color: #e4c63d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .timer {
+                padding: 10px;
+            }
+
+            .timer input,
+            .timer select,
+            .timer button {
+                font-size: 14px;
+            }
+        }
+
+        .flashing {
+            animation: flash 0.3s infinite alternate;
+        }
+
+        @keyframes flash {
+            from { background-color: white; }
+            to { background-color: red; }
+        }
+
     </style>
 </head>
 <body>
 
-<h1 style="color: #F5DF4D; text-align: center;">Gamma Timers</h1>
+<h1>Gamma Timers</h1>
 
 <!-- De knop om het pop-up venster te openen -->
 <button class="info-btn" onclick="openModal('myModal')">i</button>
