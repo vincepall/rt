@@ -329,7 +329,7 @@
         
         if (selectedTimer && !isNaN(newActivity)) {
             const timer = JSON.parse(localStorage.getItem(selectedTimer));
-            const newTime = (newActivity / timer.activity) * (timer.minutes * 60 + timer.seconds);
+            const newTime = (timer.activity * (timer.minutes * 60 + timer.seconds)) / newActivity;
             const newMinutes = Math.floor(newTime / 60);
             const newSeconds = newTime % 60;
 
