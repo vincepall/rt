@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handige Links</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <style>
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #0056b3;
+            --bg-color: #4a4a4a;
+            --text-color: #f4f4f4;
+            --button-color: #333;
+            --button-hover-color: #444;
+            --download-color: #666;
+            --download-hover-color: #888;
+        }
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background-color: var(--bg-color);
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .link-list li {
+            margin: 15px;
+        }
+
+        .link-list a {
+            text-decoration: none;
+            color: #F5DF4D;
+            background-color: var(--button-color);
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .link-list a i {
+            margin-right: 10px;
+        }
+
+        .link-list a:hover {
+            background-color: var(--button-hover-color);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .link-list {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+     <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Directe links, zeg het als je er nog eentje mist.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <h1>Handige Links</h1>
+
+    <ul class="link-list">
+        <li><a href="https://metis.applusrtd.com/metis_nl/Metis/Metis.jsp"><i class="fa-solid fa-file-alt"></i> Metis Rapportage</a></li>
+        <li><a href="https://applusglobal.sharepoint.com/sites/energyandindustry-neur/ctc/Technical%20procedures/Forms/AllItems.aspx"><i class="fa-solid fa-book"></i> Procedures</a></li>
+        <li><a href="https://dosimetrie.nl/Account/LogOn"><i class="fa-solid fa-user-shield"></i> Mirion Dosisoverzicht</a></li>
+        <li><a href="https://www.appsheet.com/start/5c339456-e64f-48e7-9a36-db13c95dd8a0#appName=AppTime-1320760&group=%5B%7B%22Column%22%3A%22Date%22%2C%22Order%22%3A%22Ascending%22%7D%5D&page=fastTable&sort=%5B%7B%22Column%22%3A%22Date%22%2C%22Order%22%3A%22Ascending%22%7D%2C%7B%22Column%22%3A%22Time_from%22%2C%22Order%22%3A%22Ascending%22%7D%5D&table=meTime_Open&view=Open+TS"><i class="fa-solid fa-clock"></i> Apptime</a></li>
+        <li><a href="https://portal.srxp.com/#/login"><i class="fa-solid fa-receipt"></i> SRXP Declaratie</a></li>
+    </ul>
+
+</body>
+</html>
+
