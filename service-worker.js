@@ -31,6 +31,7 @@ const FILES_TO_CACHE = [
   '/rt/opstelling2klassea.png',
   '/rt/alarm.wav',
   '/rt/timer.html',
+  '/rt/handigelinks.html',
   
  
 ];
