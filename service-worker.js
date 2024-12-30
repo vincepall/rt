@@ -32,6 +32,7 @@ const FILES_TO_CACHE = [
   '/rt/alarm.wav',
   '/rt/timer.html',
   '/rt/handigelinks.html',
+  '/rt/verzet.html',
   
  
 ];
