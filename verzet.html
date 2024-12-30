@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Verzet bij opstelling F / 11</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto; /* Centrerend */
+            text-align: center; /* Centreer tekst */
+        }
+
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%; /* Zorgt dat invoervelden de hele breedte nemen binnen de container */
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-family: 'Roboto Condensed',sans-serif;
+            font-size: 35px;
+            font-weight: bold;
+            color: #F5DF4D;
+        }
+
+        @media (max-width: 768px) {
+            .link-list {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: #F5DF4D;">Verzet bij opstelling F / 11</h1>
+
+        <!-- De knop om het pop-up venster te openen -->
+        <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+        <!-- Het pop-up venster -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('myModal')">&times;</span>
+                <p>Deze tool kijkt of het is toegestaan om opstelling 11/F te gebruiken en zal het verzet bereken als het toegestaan is.
+                </p>
+            </div>
+        </div>
+
+        <label for="diameter">Diameter (mm):</label>
+        <input type="number" id="diameter" min="0">
+
+        <label for="wanddikte">Wanddikte (mm):</label>
+        <input type="number" id="wanddikte" min="0">
+
+        <label for="lasbreedte">Lasbreedte (mm):</label>
+        <input type="number" id="lasbreedte" min="0">
+
+        <label for="ffd">FFD loodrecht op de las (mm):</label>
+        <input type="number" id="ffd" min="0">
+
+        <button onclick="berekenVerzet()">Bereken verzet</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <script>
+        function berekenVerzet() {
+            // Waarden ophalen
+            const diameter = parseFloat(document.getElementById('diameter').value);
+            const wanddikte = parseFloat(document.getElementById('wanddikte').value);
+            const lasbreedte = parseFloat(document.getElementById('lasbreedte').value);
+            const ffd = parseFloat(document.getElementById('ffd').value);
+
+            // Controle op voorwaarden voor opstelling F / 11
+            if (diameter > 100 || wanddikte > 8 || lasbreedte > (diameter / 4)) {
+                document.getElementById('result').innerText = "Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.";
+                return;
+            }
+
+            // Als de opstelling toegestaan is, verzet berekenen
+            const A = ffd - diameter;
+            const verzet = 1.5 * lasbreedte * (A / diameter);
+
+            // Resultaat tonen
+            document.getElementById('result').innerText = `Het benodigde verzet is: ${verzet.toFixed(2)} mm`;
+        }
+    </script>
+</body>
+</html>
+
