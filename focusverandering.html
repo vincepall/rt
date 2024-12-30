@@ -7,44 +7,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focusverandering en Filmtype verandering</title>
-    <style>
-        body {
-            font-family: 'Roboto Condensed', sans-serif;
-            padding: 50px;
-            margin: 0;
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto; /* Centrerend */
-            text-align: center; /* Centreer tekst */
-        }
-
-        label, input {
-            display: block;
-            margin-bottom: 10px;
-            width: 100%; /* Zorgt dat invoervelden de hele breedte nemen binnen de container */
-        }
-
-        input {
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        .result {
-            margin-top: 20px;
-            font-family: 'Roboto Condensed',sans-serif;
-            font-size: 35px;
-            font-weight: bold;
-            color: #F5DF4D;
-        }
-
-        @media (max-width: 768px) {
-            .link-list {
-                flex-direction: column;
-            }
-        }
-    </style>
     <script>
         // Functie om minuten en seconden naar totale seconden om te zetten
         function tijdNaarSeconden(minuten, seconden) {
