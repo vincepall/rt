@@ -33,6 +33,14 @@ const FILES_TO_CACHE = [
   '/rt/timer.html',
   '/rt/handigelinks.html',
   '/rt/verzet.html',
+  '/rt/buistabel.html',
+  '/rt/smart300.png',
+  '/rt/ceramrondstraler.png',
+  '/rt/d4balteau107.png',
+  '/rt/d4balteau119.png',
+  '/rt/d7balteau107.png',
+  '/rt/d7balteau119.png',
+
   
  
 ];
