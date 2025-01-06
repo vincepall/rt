@@ -75,7 +75,7 @@
         function drawLines(x, y) {
             // Wis het canvas en teken de afbeelding opnieuw
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, 0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
 
             // Teken het punt
             ctx.beginPath();
@@ -103,9 +103,17 @@
                     const maxWidth = window.innerWidth * 0.9; // 90% van de schermbreedte
                     const scale = maxWidth / currentImage.width;
 
-                    canvas.width = currentImage.width * scale;
-                    canvas.height = currentImage.height * scale;
-                    ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+                    // Pas canvasgrootte aan op basis van apparaat pixel ratio
+                    const devicePixelRatio = window.devicePixelRatio || 1;
+                    canvas.width = currentImage.width * devicePixelRatio;
+                    canvas.height = currentImage.height * devicePixelRatio;
+                    
+                    // Schaal voor weergave
+                    canvas.style.width = (currentImage.width * scale) + 'px';
+                    canvas.style.height = (currentImage.height * scale) + 'px';
+
+                    ctx.scale(devicePixelRatio, devicePixelRatio);
+                    ctx.drawImage(currentImage, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
                 }
             }
         });
@@ -154,4 +162,3 @@
     </script>
 </body>
 </html>
-
