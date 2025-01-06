@@ -9,7 +9,7 @@
     <title>Buis-tabellen</title>
     <style>
         body {
-            font-family: 'Roboto Condensed' , sans-serif;
+            font-family: 'Roboto Condensed', sans-serif;
             padding: 50px;
             display: flex;
             flex-direction: column;
@@ -20,11 +20,14 @@
         }
         #canvasContainer {
             display: flex;
-            flex-direction: column; /* Zorgt ervoor dat het dropdownmenu boven het canvas staat */
-            align-items: center; /* Centreert het dropdownmenu en canvas horizontaal */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
         }
         canvas {
             border: 1px solid #000;
+            max-width: 100%;
+            height: auto;
         }
         select {
             margin-bottom: 10px;
@@ -32,7 +35,7 @@
     </style>
 </head>
 <body>
- 
+
     <div id="canvasContainer">
         <h1 style="color: #F5DF4D;">Buis-tabellen</h1>
         <select id="imageSelect">
@@ -47,7 +50,7 @@
         <canvas id="imageCanvas"></canvas>
     </div>
 
-        <!-- De knop om het pop-up venster te openen -->
+    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
@@ -60,7 +63,6 @@
     </div>
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
-
 
     <script>
         const canvas = document.getElementById('imageCanvas');
@@ -87,7 +89,7 @@
             ctx.lineTo(x, canvas.height); // Verticale lijn naar beneden
             ctx.moveTo(x, y);
             ctx.lineTo(0, y); // Horizontale lijn naar links
-            ctx.strokeStyle = 'red'; // Maak de lijnen rood
+            ctx.strokeStyle = 'red';
             ctx.stroke();
         }
 
@@ -97,8 +99,12 @@
             if (selectedValue !== "none") {
                 currentImage.src = selectedValue;
                 currentImage.onload = function() {
-                    canvas.width = currentImage.width;
-                    canvas.height = currentImage.height;
+                    // Pas de canvasgrootte aan op basis van de schermbreedte
+                    const maxWidth = window.innerWidth * 0.9; // 90% van de schermbreedte
+                    const scale = maxWidth / currentImage.width;
+
+                    canvas.width = currentImage.width * scale;
+                    canvas.height = currentImage.height * scale;
                     ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
                 }
             }
