@@ -69,6 +69,7 @@
 
         let currentImage = new Image();
         let isDragging = false;
+        let scale = 1;
 
         function drawLines(x, y) {
             // Wis het canvas en teken de afbeelding opnieuw
@@ -102,7 +103,7 @@
                     canvas.height = currentImage.height;
 
                     // Pas de schaal van de HTML-pagina aan om de afbeelding passend weer te geven
-                    const scale = Math.min(window.innerWidth / currentImage.width, window.innerHeight / currentImage.height);
+                    scale = Math.min(window.innerWidth / currentImage.width, window.innerHeight / currentImage.height);
                     document.body.style.zoom = scale;
 
                     // Teken de afbeelding
@@ -111,19 +112,22 @@
             }
         });
 
-        canvas.addEventListener('mousedown', function(event) {
+        function getScaledCoordinates(clientX, clientY) {
             const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
+            const x = (clientX - rect.left) * (canvas.width / rect.width);
+            const y = (clientY - rect.top) * (canvas.height / rect.height);
+            return { x, y };
+        }
+
+        canvas.addEventListener('mousedown', function(event) {
+            const { x, y } = getScaledCoordinates(event.clientX, event.clientY);
             isDragging = true;
             drawLines(x, y);
         });
 
         canvas.addEventListener('mousemove', function(event) {
             if (isDragging) {
-                const rect = canvas.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
+                const { x, y } = getScaledCoordinates(event.clientX, event.clientY);
                 drawLines(x, y);
             }
         });
@@ -133,18 +137,14 @@
         });
 
         canvas.addEventListener('touchstart', function(event) {
-            const rect = canvas.getBoundingClientRect();
-            const x = event.touches[0].clientX - rect.left;
-            const y = event.touches[0].clientY - rect.top;
+            const { x, y } = getScaledCoordinates(event.touches[0].clientX, event.touches[0].clientY);
             isDragging = true;
             drawLines(x, y);
         });
 
         canvas.addEventListener('touchmove', function(event) {
             if (isDragging) {
-                const rect = canvas.getBoundingClientRect();
-                const x = event.touches[0].clientX - rect.left;
-                const y = event.touches[0].clientY - rect.top;
+                const { x, y } = getScaledCoordinates(event.touches[0].clientX, event.touches[0].clientY);
                 drawLines(x, y);
             }
         });
