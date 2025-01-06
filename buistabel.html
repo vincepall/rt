@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buis-tabellen</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed' , sans-serif;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        #canvasContainer {
+            display: flex;
+            flex-direction: column; /* Zorgt ervoor dat het dropdownmenu boven het canvas staat */
+            align-items: center; /* Centreert het dropdownmenu en canvas horizontaal */
+        }
+        canvas {
+            border: 1px solid #000;
+        }
+        select {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+ 
+    <div id="canvasContainer">
+        <h1 style="color: #F5DF4D;">Buis-tabellen</h1>
+        <select id="imageSelect">
+            <option value="none">Selecteer een afbeelding</option>
+            <option value="smart300.png">yxlon smart 300</option>
+            <option value="ceramrondstraler.png">Ceram rondstraler</option>
+            <option value="d4balteau107.png">Buis 107 D4 tabel</option>
+            <option value="d7balteau107.png">Buis 107 D7 tabel</option>
+            <option value="d4balteau119.png">Buis 119 D4 tabel</option>
+            <option value="d7balteau119.png">Buis 119 D7 tabel</option>
+        </select>
+        <canvas id="imageCanvas"></canvas>
+    </div>
+
+        <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>verzameling buistabellen met visuele hulp, als je er eentje hebt die hier niet tussen staat hoor ik het graag.
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+
+    <script>
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        const imageSelect = document.getElementById('imageSelect');
+
+        let currentImage = new Image();
+        let isDragging = false;
+
+        function drawLines(x, y) {
+            // Wis het canvas en teken de afbeelding opnieuw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+
+            // Teken het punt
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+
+            // Teken de lijnen
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, canvas.height); // Verticale lijn naar beneden
+            ctx.moveTo(x, y);
+            ctx.lineTo(0, y); // Horizontale lijn naar links
+            ctx.strokeStyle = 'red'; // Maak de lijnen rood
+            ctx.stroke();
+        }
+
+        imageSelect.addEventListener('change', function() {
+            const selectedValue = imageSelect.value;
+
+            if (selectedValue !== "none") {
+                currentImage.src = selectedValue;
+                currentImage.onload = function() {
+                    canvas.width = currentImage.width;
+                    canvas.height = currentImage.height;
+                    ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+                }
+            }
+        });
+
+        canvas.addEventListener('mousedown', function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            isDragging = true;
+            drawLines(x, y);
+        });
+
+        canvas.addEventListener('mousemove', function(event) {
+            if (isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                drawLines(x, y);
+            }
+        });
+
+        canvas.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('touchstart', function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.touches[0].clientX - rect.left;
+            const y = event.touches[0].clientY - rect.top;
+            isDragging = true;
+            drawLines(x, y);
+        });
+
+        canvas.addEventListener('touchmove', function(event) {
+            if (isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.touches[0].clientX - rect.left;
+                const y = event.touches[0].clientY - rect.top;
+                drawLines(x, y);
+            }
+        });
+
+        canvas.addEventListener('touchend', function() {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>
+
