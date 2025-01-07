@@ -24,9 +24,13 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
+            max-width: 100%; /* Zorgt ervoor dat de container niet buiten het scherm gaat */
+            overflow: auto;  /* Maakt de container scrollbaar */
         }
         canvas {
             border: 1px solid #000;
+            max-width: 100%; /* Zorgt ervoor dat de canvas wordt geschaald naar het scherm */
+            height: auto;  /* Zorgt ervoor dat de verhouding behouden blijft */
         }
         select {
             margin-bottom: 10px;
@@ -46,7 +50,9 @@
             <option value="d4balteau119.png">Buis 119 D4 tabel</option>
             <option value="d7balteau119.png">Buis 119 D7 tabel</option>
         </select>
-        <canvas id="imageCanvas"></canvas>
+        <div id="canvasWrapper" style="width: 100%; overflow: auto;">
+            <canvas id="imageCanvas"></canvas>
+        </div>
     </div>
 
     <!-- De knop om het pop-up venster te openen -->
@@ -99,7 +105,7 @@
             if (selectedValue !== "none") {
                 currentImage.src = selectedValue;
                 currentImage.onload = function() {
-                    // Toon de afbeelding op ware grootte
+                    // Stel de canvas grootte in op de afmetingen van de afbeelding
                     canvas.width = currentImage.width;
                     canvas.height = currentImage.height;
 
