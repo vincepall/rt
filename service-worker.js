@@ -40,6 +40,8 @@ const FILES_TO_CACHE = [
   '/rt/d4balteau119.png',
   '/rt/d7balteau107.png',
   '/rt/d7balteau119.png',
+  '/rt/balteaurondstraleroud.png',
+  '/rt/balteauspotgfd306.png',
 
   
  
