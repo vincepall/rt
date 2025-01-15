@@ -15,7 +15,7 @@ body {
     text-align: center;
     padding: 50px;
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: var(--text-color);
     text-shadow:
         -1px -1px 0 #000,
@@ -61,7 +61,7 @@ p {
     background-color: var(--button-color);
     padding: 12px 20px; /* Iets kleinere padding voor compactheid */
     border-radius: 50px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     transition: background-color 0.3s, transform 0.3s;
     display: inline-block;
