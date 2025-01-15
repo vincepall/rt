@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>"RT Tools"</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
     <link rel="manifest" href="/rt/manifest.json">
     <link rel="stylesheet" href="styles.css">
@@ -21,10 +22,10 @@
         }
 
         body {
-            font-family: 'Roboto Condensed', sans-serif;
+            font-family: 'Handlee', sans-serif;
             background-color: var(--bg-color);
             text-align: center;
-            padding: 50px;
+            padding: 60px;
             margin: 0;
             color: var(--text-color);
         }
@@ -48,31 +49,55 @@
         }
 
         .link-list li {
-            margin: 15px;
+            margin: 5px;
         }
 
         .link-list a {
             text-decoration: none;
-            color: #F5DF4D;
-            background-color: var(--button-color);
-            padding: 15px 25px;
-            border-radius: 50px;
-            font-size: 1rem;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
             font-weight: bold;
-            transition: background-color 0.3s, transform 0.3s;
+            transition: transform 0.3s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-        }
+            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+            background-position: center;
+            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
 
-        .link-list a i {
-            margin: 0 10px;
         }
 
         .link-list a:hover {
-            background-color: var(--button-hover-color);
             transform: scale(1.05);
+            background-color: transparent;
         }
+
+
+
+
+        /* Specifieke achtergrondafbeeldingen voor elke link */
+        .link1 {
+            background-image: url('tape1.PNG');
+        }
+
+        .link2 {
+            background-image: url('tape2.PNG');
+        }
+
+        .link3 {
+            background-image: url('tape3.PNG');
+        }
+
+        .link4 {
+            background-image: url('tape4.PNG');
+        }
+
 
         .install-button {
             display: inline-block;
@@ -148,9 +173,9 @@
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Door deze pagina als app te installeren is deze ook te gebruiken als er geen internetverbinding is. 
+            <p>Door deze pagina als app te installeren is deze ook te gebruiken als er geen internetverbinding is.
             De app zal altijd eerst proberen via internetverbinding te werken, op die manier maak je zo vaak als mogelijk gebruik van de laatste versie.
-            Er kunnen fouten in de tools zitten die ik heb gemist, als je me er op wijst kan ik het misschien verhelpen, 
+            Er kunnen fouten in de tools zitten die ik heb gemist, als je me er op wijst kan ik het misschien verhelpen,
             vincepall@gmail.com</p>
         </div>
     </div>
@@ -158,20 +183,20 @@
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
     <ul class="link-list">
-        <li><a href="focusverandering.html"><i class="fa-solid fa-up-down"></i>Focusverandering<i class="fa-solid fa-up-down"></i></a></li>
-        <li><a href="filmsoortverandering.html"><i class="fa-solid fa-repeat"></i>D4 D5 D7<i class="fa-solid fa-repeat"></i></a></li>
-        <li><a href="verval2.html"><i class="fa-solid fa-radiation"></i>Bronsterkte<i class="fa-solid fa-radiation"></i></a></li>
-        <li><a href="opnamesklasseb.html"><i class="fa-solid fa-star-of-life"></i>Aantal opnames EN<i class="fa-solid fa-star-of-life"></i></a></li>
-        <li><a href="cw2.html"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
-        <li><a href="LW_Verdeler.html"><i class="fa-solid fa-tape"></i>Langsnaad tool<i class="fa-solid fa-tape"></i></a></li>
-        <li><a href="MinFFD.html"><i class="fa-solid fa-ruler"></i>Minimale FFD<i class="fa-solid fa-ruler"></i></a></li>
-        <li><a href="Draadjesv2.html"><i class="fa-solid fa-grip-lines-vertical"></i>Draadvereiste EN-B, ASME<i class="fa-solid fa-grip-lines-vertical"></i></a></li>
-        <li><a href="bundelbreedte.html"><i class="fa-solid fa-less-than"></i>Bundelgrootte<i class="fa-solid fa-less-than"></i></a></li>
-        <li><a href="afzettinggamma.html"><i class="fa-solid fa-road-barrier"></i>Afzetting Gamma<i class="fa-solid fa-road-barrier"></i></a></li>
-        <li><a href="handigelinks.html"><i class="fa-solid fa-link"></i>Handige links<i class="fa-solid fa-link"></i></a></li>
-        <li><a href="buistabel.html"><i class="fa-solid fa-chart-line"></i>Buis-tabellen<i class="fa-solid fa-chart-line"></i></a></li>
-        <li><a href="verzet.html"><i class="fa-solid fa-ring"></i>Verzet van ovaaltje<i class="fa-solid fa-ring"></i></a></li>
-        <li><a href="timer.html"><i class="fa-solid fa-stopwatch"></i>Gamma Timers<i class="fa-solid fa-stopwatch"></i></a></li>
+        <li><a href="focusverandering.html" class="link1"><i class="fa-solid fa-up-down"></i>Focusverandering<i class="fa-solid fa-up-down"></i></a></li>
+        <li><a href="filmsoortverandering.html" class="link2"><i class="fa-solid fa-repeat"></i>D4 D5 D7<i class="fa-solid fa-repeat"></i></a></li>
+        <li><a href="verval2.html" class="link3"><i class="fa-solid fa-radiation"></i>Bronsterkte<i class="fa-solid fa-radiation"></i></a></li>
+        <li><a href="opnamesklasseb.html" class="link4"><i class="fa-solid fa-star-of-life"></i>Aantal opnames EN<i class="fa-solid fa-star-of-life"></i></a></li>
+        <li><a href="cw2.html" class= "link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
+        <li><a href="LW_Verdeler.html" class="link1"><i class="fa-solid fa-tape"></i>Langsnaad tool<i class="fa-solid fa-tape"></i></a></li>
+        <li><a href="MinFFD.html" class="link4"><i class="fa-solid fa-ruler"></i>Minimale FFD<i class="fa-solid fa-ruler"></i></a></li>
+        <li><a href="Draadjesv2.html" class= "link3"><i class="fa-solid fa-grip-lines-vertical"></i>Draadvereiste EN-B, ASME<i class="fa-solid fa-grip-lines-vertical"></i></a></li>
+        <li><a href="bundelbreedte.html" class= "link2"><i class="fa-solid fa-less-than"></i>Bundelgrootte<i class="fa-solid fa-less-than"></i></a></li>
+        <li><a href="afzettinggamma.html" class= "link1"><i class="fa-solid fa-road-barrier"></i>Afzetting Gamma<i class="fa-solid fa-road-barrier"></i></a></li>
+        <li><a href="handigelinks.html" class= "link4"><i class="fa-solid fa-link"></i>Handige links<i class="fa-solid fa-link"></i></a></li>
+        <li><a href="buistabel.html" class= "link2"><i class="fa-solid fa-chart-line"></i>Buis-tabellen<i class="fa-solid fa-chart-line"></i></a></li>
+        <li><a href="verzet.html" class= "link1"><i class="fa-solid fa-ring"></i>Verzet van ovaaltje<i class="fa-solid fa-ring"></i></a></li>
+        <li><a href="timer.html" class="link3"><i class="fa-solid fa-stopwatch"></i>Gamma Timers<i class="fa-solid fa-stopwatch"></i></a></li>
     </ul>
 
     <button class="install-button" onclick="installPWA()" style="display: none;">
