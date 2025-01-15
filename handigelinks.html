@@ -6,6 +6,7 @@
     <title>Handige Links</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
     <style>
@@ -21,7 +22,7 @@
         }
 
         body {
-            font-family: 'Roboto Condensed', sans-serif;
+            font-family: 'Handlee', sans-serif;
             background-color: var(--bg-color);
             text-align: center;
             padding: 50px;
@@ -43,30 +44,55 @@
         }
 
         .link-list li {
-            margin: 15px;
+            margin: 5px;
         }
 
-        .link-list a {
+         .link-list a {
             text-decoration: none;
-            color: #F5DF4D;
-            background-color: var(--button-color);
-            padding: 15px 25px;
-            border-radius: 50px;
-            font-size: 1rem;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
             font-weight: bold;
-            transition: background-color 0.3s, transform 0.3s;
+            transition: transform 0.3s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-        }
+            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+            background-position: center;
+            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
 
+        }
+        
         .link-list a i {
             margin-right: 10px;
         }
 
         .link-list a:hover {
-            background-color: var(--button-hover-color);
+            background-color: transparent;
             transform: scale(1.05);
+        }
+
+        
+        /* Specifieke achtergrondafbeeldingen voor elke link */
+        .link1 {
+            background-image: url('tape1.PNG');
+        }
+
+        .link2 {
+            background-image: url('tape2.PNG');
+        }
+
+        .link3 {
+            background-image: url('tape3.PNG');
+        }
+
+        .link4 {
+            background-image: url('tape4.PNG');
         }
 
         @media (max-width: 768px) {
@@ -94,15 +120,14 @@
     <h1>Handige Links</h1>
 
     <ul class="link-list">
-        <li><a href="https://metis.applusrtd.com/metis_nl/Metis/Metis.jsp"><i class="fa-solid fa-file-alt"></i> Metis Rapportage</a></li>
-        <li><a href="https://applusglobal.sharepoint.com/sites/energyandindustry-neur/ctc/Technical%20procedures/Forms/AllItems.aspx"><i class="fa-solid fa-book"></i> Procedures</a></li>
-        <li><a href="https://dosimetrie.nl/Account/LogOn"><i class="fa-solid fa-user-shield"></i> Mirion Dosisoverzicht</a></li>
-        <li><a href="https://www.appsheet.com/start/5c339456-e64f-48e7-9a36-db13c95dd8a0#appName=AppTime-1320760&group=%5B%7B%22Column%22%3A%22Date%22%2C%22Order%22%3A%22Ascending%22%7D%5D&page=fastTable&sort=%5B%7B%22Column%22%3A%22Date%22%2C%22Order%22%3A%22Ascending%22%7D%2C%7B%22Column%22%3A%22Time_from%22%2C%22Order%22%3A%22Ascending%22%7D%5D&table=meTime_Open&view=Open+TS"><i class="fa-solid fa-clock"></i> Apptime</a></li>
-        <li><a href="https://applusglobal-my.sharepoint.com/:x:/r/personal/l_korwinpiotrowski_applusglobal_com/Documents/Planning%202025/Planning%202025%20rev.2.xlsx?d=w560df1fe6d6845b4b2d1155fa47b7217&csf=1&web=1&e=hjOoBS&nav=MTVfezAwMDAwMDAwLTAwMDEtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMH0"><i class="fa-regular fa-calendar-days"></i> Planning </a></li>
-        <li><a href="https://portal.srxp.com/#/login"><i class="fa-solid fa-receipt"></i> SRXP Declaratie</a></li>
-        <li><a href="http://outlook.com/owa/assincoapplus.com"><i class="fa-regular fa-envelope"></i>Email</a></li>
+        <li><a href="https://metis.applusrtd.com/metis_nl/Metis/Metis.jsp" class= "link1"><i class="fa-solid fa-file-alt"></i> Metis Rapportage</a></li>
+        <li><a href="https://applusglobal.sharepoint.com/sites/energyandindustry-neur/ctc/Technical%20procedures/Forms/AllItems.aspx" class= "link2"><i class="fa-solid fa-book"></i> Procedures</a></li>
+        <li><a href="https://dosimetrie.nl/Account/LogOn" class= "link3"><i class="fa-solid fa-user-shield"></i> Mirion Dosisoverzicht</a></li>
+        <li><a href="https://www.appsheet.com/start/5c339456-e64f-48e7-9a36-db13c95dd8a0#appName=AppTime-1320760&group=%5B%7B%22Column%22%3A%22Date%22%2C%22Order%22%3A%22Ascending%22%7D%5D&page=fastTable&sort=%5B%7B%22Column%22%3A%22Date%22%2C%22Order%22%3A%22Ascending%22%7D%2C%7B%22Column%22%3A%22Time_from%22%2C%22Order%22%3A%22Ascending%22%7D%5D&table=meTime_Open&view=Open+TS" class= "link3"><i class="fa-solid fa-clock"></i> Apptime</a></li>
+        <li><a href="https://applusglobal-my.sharepoint.com/:x:/r/personal/l_korwinpiotrowski_applusglobal_com/Documents/Planning%202025/Planning%202025%20rev.2.xlsx?d=w560df1fe6d6845b4b2d1155fa47b7217&csf=1&web=1&e=hjOoBS&nav=MTVfezAwMDAwMDAwLTAwMDEtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMH0" class= "link4"><i class="fa-regular fa-calendar-days"></i> Planning </a></li>
+        <li><a href="https://portal.srxp.com/#/login" class= "link2"><i class="fa-solid fa-receipt"></i> SRXP Declaratie</a></li>
+        <li><a href="http://outlook.com/owa/assincoapplus.com" class= "link1"><i class="fa-regular fa-envelope"></i>Email</a></li>
     </ul>
 
 </body>
 </html>
-
