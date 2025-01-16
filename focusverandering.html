@@ -14,7 +14,20 @@
             margin: 0;
         }
 
-        
+        /* Style for the calculate button */
+        button.calculate-btn {
+            background-color: #F5DF4D;
+            color: black;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.calculate-btn:hover {
+            background-color: #e6c944;
+        }
     </style>
     <script>
         // Functie om minuten en seconden naar totale seconden om te zetten
@@ -76,27 +89,30 @@
 
                 if (filmtype === "D4") {
                     const resultaat = berekenD5D7VanD4(nieuweTijd);
-                    document.getElementById("resultaat").innerHTML = 
+                    document.getElementById("resultaat").innerHTML =
                         `D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
                 } else if (filmtype === "D5") {
                     const resultaat = berekenD4D7VanD5(nieuweTijd);
-                    document.getElementById("resultaat").innerHTML = 
+                    document.getElementById("resultaat").innerHTML =
                         `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
                 } else if (filmtype === "D7") {
                     const resultaat = berekenD4D5VanD7(nieuweTijd);
-                    document.getElementById("resultaat").innerHTML = 
+                    document.getElementById("resultaat").innerHTML =
                         `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
                 }
             } else {
-                document.getElementById("resultaat").innerHTML = 
+                document.getElementById("resultaat").innerHTML =
                     `De berekende tijd na focusverandering is: ${secondenNaarTijd(nieuweTijd)}`;
             }
+
+            // Scroll to the result
+            document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </head>
 <body>
-    <h1 style="color: #F5DF4D; text-align: center;">Focusverandering en Filmtype Berekening</h1>
-    
+    <h1 style="color: #F5DF4D; text-align: center;">Focusverandering</h1>
+
     <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
@@ -131,10 +147,11 @@
             <input type="radio" id="D7" name="filmtype" value="D7"> D7<br><br>
         </div>
 
-        <button type="button" onclick="bereken()">Bereken</button>
+        <!-- Modified calculate button -->
+        <button type="button" class="calculate-btn" onclick="bereken()">Bereken</button>
     </form>
 
     <h2>Resultaat</h2>
-    <p id="resultaat" style="color: #F5DF4D;"></p>
+    <h2 id="resultaat" style="color: #F5DF4D;"></h2>
 </body>
 </html>
