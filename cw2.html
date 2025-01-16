@@ -160,14 +160,14 @@
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
     <form onsubmit="event.preventDefault(); berekenFilmlengte();">
+        <label for="rondnaadCentraal">Rondnaad Centraal:</label>
+        <input type="checkbox" id="rondnaadCentraal" name="rondnaadCentraal" onclick="toggleOpnamesInput()"><br><br>
+        
         <label for="diameter">Diameter van de pijp (in mm):</label><br>
         <input type="number" id="diameter" name="diameter" step="0.01" required><br><br>
 
         <label for="opnames">Aantal opnames:</label><br>
         <input type="number" id="opnames" name="opnames" required><br><br>
-
-        <label for="rondnaadCentraal">Rondnaad Centraal:</label>
-        <input type="checkbox" id="rondnaadCentraal" name="rondnaadCentraal" onclick="toggleOpnamesInput()"><br><br>
 
         <input type="submit" class="btn" value="Bereken">
     </form>
