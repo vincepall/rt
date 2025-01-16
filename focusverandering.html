@@ -127,21 +127,21 @@
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
     <form>
-        <label for="minuten">Voer de begintijd in:</label><br>
+        <label for="minuten">Begintijd:</label><br>
         Minuten: <input type="number" id="minuten" placeholder="Minuten" min="0"><br>
         Seconden: <input type="number" id="seconden" placeholder="Seconden" min="0" max="59"><br><br>
 
-        <label for="nieuwe_focus">Voer de waarde van nieuwe focus in:</label><br>
+        <label for="nieuwe_focus">Nieuwe focus:</label><br>
         <input type="number" id="nieuwe_focus" step="any" placeholder="Nieuwe focus"><br><br>
 
-        <label for="oude_focus">Voer de waarde van oude focus in:</label><br>
+        <label for="oude_focus">Oude focus:</label><br>
         <input type="number" id="oude_focus" step="any" placeholder="Oude focus"><br><br>
 
-        <label for="filmtype_veranderd">Verandert het filmtype?</label>
+        <label for="filmtype_veranderd">Filmsoort verandert</label>
         <input type="checkbox" id="filmtype_veranderd" onchange="document.getElementById('filmtype_keuze').style.display = this.checked ? 'block' : 'none';"><br><br>
 
         <div id="filmtype_keuze" style="display: none;">
-            <label for="filmtype">Filmtype van de begintijd:</label><br>
+            <label for="filmtype">Filmsoort van de begintijd:</label><br>
             <input type="radio" id="D4" name="filmtype" value="D4" checked> D4<br>
             <input type="radio" id="D5" name="filmtype" value="D5"> D5<br>
             <input type="radio" id="D7" name="filmtype" value="D7"> D7<br><br>
