@@ -49,6 +49,12 @@
                 document.getElementById("filmlengteResultaat").innerText = "Effectieve filmlengte per film: " + effectieveFilmlengte.toFixed(2) + " mm";
                 document.getElementById("filmlengtesLijst").innerHTML = ""; // Verwijder de filmlijst als rondnaad centraal is aangevinkt
             }
+
+            // Scroll naar het antwoordgedeelte
+            window.scrollTo({
+                top: document.getElementById("antwoordResultaat").offsetTop,
+                behavior: 'smooth'
+            });
         }
 
         function toggleOpnamesInput() {
@@ -74,16 +80,16 @@
             margin: 0;
         }
 
-        /* knop naar link*/
+        /* Vergroot de bereken knop en geef het dezelfde gele kleur als de titel */
         .btn {
-            background-color: #666;
+            background-color: #F5DF4D; /* Gele kleur */
             border: none;
             color: black;
-            padding: 10px 20px;
+            padding: 15px 30px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 16px;
+            font-size: 18px;
             margin: 4px 2px;
             cursor: pointer;
             border-radius: 8px;
@@ -145,14 +151,14 @@
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>(Diameter * pi) / aantal opnames. 
+            <p>(Diameter * pi) / aantal opnames.
                 Als "rondnaad centraal" wordt aangevinkt zal het programma kijken hoeveel films er nodig zijn gebaseerd op films met een lengte van 480mm met een maximale effectieve lengte van 400mm i.v.m. de overlap.
             </p>
         </div>
     </div>
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
-    
+
     <form onsubmit="event.preventDefault(); berekenFilmlengte();">
         <label for="diameter">Diameter van de pijp (in mm):</label><br>
         <input type="number" id="diameter" name="diameter" step="0.01" required><br><br>
@@ -163,7 +169,7 @@
         <label for="rondnaadCentraal">Rondnaad Centraal:</label>
         <input type="checkbox" id="rondnaadCentraal" name="rondnaadCentraal" onclick="toggleOpnamesInput()"><br><br>
 
-        <input type="submit" value="Bereken">
+        <input type="submit" class="btn" value="Bereken">
     </form>
 
     <h2>Resultaat:</h2>
