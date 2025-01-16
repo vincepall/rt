@@ -39,6 +39,23 @@
             color: #F5DF4D;
         }
 
+
+
+        button {
+            font-size: 18px;
+            padding: 15px 30px;
+            background-color: #F5DF4D; /* Gelijk aan de kleur van de titel */
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #d4b20f; /* Donkerder geel voor hover-effect */
+        }
+
         @media (max-width: 768px) {
             .link-list {
                 flex-direction: column;
@@ -48,7 +65,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 style="color: #F5DF4D;">Verzet bij opstelling F / 11</h1>
+        <h1 style="color: #F5DF4D;">Verzet</h1>
 
         <!-- De knop om het pop-up venster te openen -->
         <button class="info-btn" onclick="openModal('myModal')">i</button>
@@ -74,7 +91,7 @@
         <label for="ffd">FFD loodrecht op de las (mm):</label>
         <input type="number" id="ffd" min="0">
 
-        <button onclick="berekenVerzet()">Bereken verzet</button>
+        <button onclick="berekenVerzet(); scrollToResult()">Bereken verzet</button>
 
         <div class="result" id="result"></div>
     </div>
@@ -102,7 +119,11 @@
             // Resultaat tonen
             document.getElementById('result').innerText = `Het benodigde verzet is: ${verzet.toFixed(2)} mm`;
         }
+
+        function scrollToResult() {
+            // Scroll naar het resultaatgedeelte
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>
-
