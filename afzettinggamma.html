@@ -15,7 +15,19 @@
             margin: 0;
         }
 
-        
+        /* Style for the calculate button */
+        button[type="button"] {
+            background-color: #F5DF4D; /* Yellow color like the header */
+            font-size: 20px; /* Increase font size */
+            padding: 10px 20px; /* Increase padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="button"]:hover {
+            background-color: #e0c944; /* Slightly darker yellow on hover */
+        }
     </style>
     <script>
         function berekenAfzettingIr192(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis) {
@@ -36,7 +48,7 @@
             const wanddikte_pb = parseFloat(document.getElementById("wanddikte_pb").value);
             const wanddikte_fe = parseFloat(document.getElementById("wanddikte_fe").value);
             const gewenste_dosis = parseFloat(document.getElementById("gewenste_dosis").value);
-            
+
             let resultaat;
             if (keuze === "Ir192") {
                 resultaat = berekenAfzettingIr192(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis);
@@ -44,23 +56,26 @@
                 resultaat = berekenAfzettingSe75(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis);
             }
 
-            document.getElementById("resultaat").innerHTML = 
+            document.getElementById("resultaat").innerHTML =
                 "De benodigde afzetting is: " + resultaat.afzetting.toFixed(2) + " meter<br>" +
                 "De afstand achter de collimator is: " + resultaat.afstand_collimator.toFixed(2) + " meter";
+
+            // Scroll to the result after calculation
+            document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </head>
 <body>
     <h1 style="color: #F5DF4D; text-align: center;">Afzetting gamma</h1>
 
-      <!-- De knop om het pop-up venster te openen -->
+    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>De grootte van de afzetting wordt bepaald in de bundel en achter de collimator. 
+            <p>De grootte van de afzetting wordt bepaald in de bundel en achter de collimator.
                Er wordt gebruikt gemaakt van de de collimatoren zoals in het veiligheidsboekje: Se75 1/20, Ir192 1/85.
                Als de bundel door staal of lood heen moet kan de afzetting kleiner, door de juiste waardes in te voeren in die velden kun je zien hoe groot je afzetting moet zijn.
             </p>
@@ -92,6 +107,6 @@
     </form>
 
     <h2>Resultaat</h2>
-    <p id="resultaat" style="color: #F5DF4D;"></p>
+    <h2 id="resultaat" style="color: #F5DF4D;"></h2>
 </body>
 </html>
