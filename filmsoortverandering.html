@@ -15,7 +15,19 @@
             margin: 0;
         }
 
-        
+        /* Style for the calculate button */
+        button[type="button"] {
+            background-color: #F5DF4D; /* Yellow color like the header */
+            font-size: 20px; /* Increase font size */
+            padding: 10px 20px; /* Increase padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="button"]:hover {
+            background-color: #e0c944; /* Slightly darker yellow on hover */
+        }
     </style>
     <script>
         // Functie om minuten en seconden naar totale seconden om te zetten
@@ -82,22 +94,25 @@
             let resultaat;
             if (keuze === "D4") {
                 resultaat = berekenD5D7VanD4(tijdInSeconden);
-                document.getElementById("resultaat").innerHTML = 
+                document.getElementById("resultaat").innerHTML =
                     `D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
             } else if (keuze === "D5") {
                 resultaat = berekenD4D7VanD5(tijdInSeconden);
-                document.getElementById("resultaat").innerHTML = 
+                document.getElementById("resultaat").innerHTML =
                     `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
             } else if (keuze === "D7") {
                 resultaat = berekenD4D5VanD7(tijdInSeconden);
-                document.getElementById("resultaat").innerHTML = 
+                document.getElementById("resultaat").innerHTML =
                     `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
             }
+
+            // Scroll to the result after calculation
+            document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </head>
 <body>
-    <h1 style="color: #F5DF4D; text-align: center;">Filmsoort (+FFD) Verandering</h1>
+    <h1 style="color: #F5DF4D; text-align: center;">Filmsoort Verandering</h1>
 
     <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
@@ -106,7 +121,7 @@
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Voer de tijd in voor een filmsoort en krijg de tijd voor de andere filmsoorten. 
+            <p>Voer de tijd in voor een filmsoort en krijg de tijd voor de andere filmsoorten.
                Bij verandering van de Film Focus Afstand wordt ook de nieuwe tijd voor D4, D5, en D7 berekend.</p>
         </div>
     </div>
@@ -141,7 +156,7 @@
     </form>
 
     <h2>Resultaat</h2>
-    <p id="resultaat" style="color: #F5DF4D;"></p>
+    <h2 id="resultaat" style="color: #F5DF4D;"></h2>
 
     <script>
         // Toon/verberg focusvelden wanneer FFD verandert wordt aangevinkt
