@@ -15,12 +15,31 @@
             margin: 0;
         }
 
+        /* Verander de knop naar groter met dezelfde kleur geel als de titel */
+        button {
+            background-color: #F5DF4D;
+            color: black;
+            font-size: 18px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 20px;
+            width: 60%;
+
+        }
+
+        button:hover {
+            background-color: #e4c233;
+        }
+
     </style>
 </head>
 <body>
-    <h1 style="color: #F5DF4D; text-align: center;">Bepaal de Minimale FFD</h1>
+    <h1 style="color: #F5DF4D; text-align: center;">Minimale FFD</h1>
 
-     <!-- De knop om het pop-up venster te openen -->
+    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
@@ -33,7 +52,6 @@
     </div>
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
-
 
     <form id="ffdForm">
         <label for="ofa">Object Film Afstand (OFA):</label>
@@ -63,7 +81,8 @@
             <input type="number" id="wt" name="wt" step="0.01"><br><br>
         </div>
 
-        <button type="button" onclick="berekenFFD()">Bereken FFD</button>
+        <!-- Aangepaste knop die naar het antwoord scrollt -->
+        <button type="button" onclick="berekenFFD(); scrollToAnswer()">Bereken FFD</button>
     </form>
 
     <p id="output" style="color: #F5DF4D;"></p>
@@ -139,6 +158,12 @@
             }
 
             output.innerHTML += `De berekende Film Focus Afstand (FFD) is: ${ffd.toFixed(2)} mm<br>`;
+        }
+
+        // Functie om automatisch naar het antwoord te scrollen
+        function scrollToAnswer() {
+            const output = document.getElementById("output");
+            output.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
