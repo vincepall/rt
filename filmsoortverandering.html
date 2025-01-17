@@ -95,15 +95,15 @@
             if (keuze === "D4") {
                 resultaat = berekenD5D7VanD4(tijdInSeconden);
                 document.getElementById("resultaat").innerHTML =
-                    `D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                    `De tijd op ${nieuweFocus} FFD is:<br>D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
             } else if (keuze === "D5") {
                 resultaat = berekenD4D7VanD5(tijdInSeconden);
                 document.getElementById("resultaat").innerHTML =
-                    `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                    `De tijd op ${nieuweFocus} FFD is:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
             } else if (keuze === "D7") {
                 resultaat = berekenD4D5VanD7(tijdInSeconden);
                 document.getElementById("resultaat").innerHTML =
-                    `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
+                    `De tijd op ${nieuweFocus} FFD is:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
             }
 
             // Scroll to the result after calculation
