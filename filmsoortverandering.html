@@ -77,7 +77,7 @@
             let nieuweFocus = parseFloat(document.getElementById("nieuweFocus").value);
 
             // Controleer of de nieuweFocus leeg is, en verander naar "onveranderde" als dat het geval is
-            if (ffdVerandert && isNaN(nieuweFocus)) {
+            if (ffdVerandert && (isNaN(nieuweFocus) || nieuweFocus === "")) {
                 nieuweFocus = "onveranderde";
             }
 
