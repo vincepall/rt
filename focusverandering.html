@@ -90,15 +90,15 @@
                 if (filmtype === "D4") {
                     const resultaat = berekenD5D7VanD4(nieuweTijd);
                     document.getElementById("resultaat").innerHTML =
-                        `D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                        `Op ${nieuweFocus} FFD is de tijd:<br>D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
                 } else if (filmtype === "D5") {
                     const resultaat = berekenD4D7VanD5(nieuweTijd);
                     document.getElementById("resultaat").innerHTML =
-                        `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                        `Op ${nieuweFocus} FFD is de tijd:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
                 } else if (filmtype === "D7") {
                     const resultaat = berekenD4D5VanD7(nieuweTijd);
                     document.getElementById("resultaat").innerHTML =
-                        `D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
+                        `Op ${nieuweFocus} FFD is de tijd:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
                 }
             } else {
                 document.getElementById("resultaat").innerHTML =
