@@ -76,15 +76,8 @@
             const oudeFocus = parseFloat(document.getElementById("oudeFocus").value);
             let nieuweFocus = parseFloat(document.getElementById("nieuweFocus").value);
 
-            // Controleer of de nieuweFocus leeg is, en verander naar "onveranderde" als dat het geval is
-            if (ffdVerandert && (isNaN(nieuweFocus) || nieuweFocus === "")) {
-                nieuweFocus = "onveranderde";
-            }
-
-            const keuze = document.querySelector('input[name="keuze"]:checked').value;
-
             // Controleer of de tijd en focuswaarden geldig zijn
-            if (isNaN(minuten) || isNaN(seconden) || (ffdVerandert && (isNaN(oudeFocus) || nieuweFocus === "onveranderde"))) {
+            if (isNaN(minuten) || isNaN(seconden) || (ffdVerandert && isNaN(oudeFocus))) {
                 document.getElementById("resultaat").innerHTML = "Voer geldige waarden in.";
                 return;
             }
@@ -92,37 +85,37 @@
             // Zet tijd om naar totale seconden
             let tijdInSeconden = tijdNaarSeconden(minuten, seconden);
 
-            // Als de Film Focus Afstand verandert, pas focusverandering toe (behalve als nieuweFocus "onveranderde" is)
-            if (ffdVerandert && nieuweFocus !== "onveranderde") {
-                tijdInSeconden = berekenFocusverandering(tijdInSeconden, nieuweFocus, oudeFocus);
+            // Als de Film Focus Afstand verandert, pas focusverandering toe (alleen als nieuweFocus geldig is)
+            if (ffdVerandert) {
+                if (!isNaN(nieuweFocus)) {
+                    tijdInSeconden = berekenFocusverandering(tijdInSeconden, nieuweFocus, oudeFocus);
+                } else {
+                    nieuweFocus = "onveranderde"; // Focus is niet veranderd
+                }
+            } else {
+                nieuweFocus = "onveranderde"; // FFD verandert niet, dus gebruik onveranderde focus
             }
 
+            const keuze = document.querySelector('input[name="keuze"]:checked').value;
             let resultaat;
+
             if (keuze === "D4") {
                 resultaat = berekenD5D7VanD4(tijdInSeconden);
                 document.getElementById("resultaat").innerHTML =
-                    `De tijd op ${nieuweFocus === "onveranderde" ? "dezelfde" : nieuweFocus} FFD is:<br>D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                    `De tijd op ${nieuweFocus} FFD is:<br>D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
             } else if (keuze === "D5") {
                 resultaat = berekenD4D7VanD5(tijdInSeconden);
                 document.getElementById("resultaat").innerHTML =
-                    `De tijd op ${nieuweFocus === "onveranderde" ? "dezelfde" : nieuweFocus} FFD is:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
+                    `De tijd op ${nieuweFocus} FFD is:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
             } else if (keuze === "D7") {
                 resultaat = berekenD4D5VanD7(tijdInSeconden);
                 document.getElementById("resultaat").innerHTML =
-                    `De tijd op ${nieuweFocus === "onveranderde" ? "dezelfde" : nieuweFocus} FFD is:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
+                    `De tijd op ${nieuweFocus} FFD is:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
             }
 
             // Scroll naar het resultaat na de berekening
             document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
         }
-
-        // Controleer of de waarde van nieuweFocus leeg is en verander deze naar "onveranderde"
-        document.getElementById("nieuweFocus").addEventListener('input', function() {
-            const nieuweFocus = document.getElementById("nieuweFocus").value;
-            if (nieuweFocus === "") {
-                document.getElementById("nieuweFocus").setAttribute("placeholder", "onveranderde");
-            }
-        });
     </script>
 </head>
 <body>
