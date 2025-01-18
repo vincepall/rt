@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
-    <!-- Aangepaste viewport meta-tag om inzoomen mogelijk te maken -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=1.0, user-scalable=yes">
     <title>Buis-tabellen</title>
     <style>
@@ -14,7 +13,6 @@
             padding: 50px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
@@ -24,16 +22,20 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 100%; /* Zorgt ervoor dat de container niet buiten het scherm gaat */
-            overflow: auto;  /* Maakt de container scrollbaar */
+            max-width: 100%;
+            overflow: auto;
+            margin-bottom: 30px; /* Extra ruimte tussen afbeelding en invoervelden */
         }
         canvas {
             border: 1px solid #000;
-            max-width: 100%; /* Zorgt ervoor dat de canvas wordt geschaald naar het scherm */
-            height: auto;  /* Zorgt ervoor dat de verhouding behouden blijft */
+            max-width: 100%;
+            height: auto;
         }
-        select {
+        select, input, button {
             margin-bottom: 10px;
+        }
+        #calculationSection {
+            margin-top: 20px; /* Optionele extra marge voor de invoervelden */
         }
     </style>
 </head>
@@ -55,6 +57,18 @@
         <div id="canvasWrapper" style="width: 100%; overflow: auto;">
             <canvas id="imageCanvas"></canvas>
         </div>
+    </div>
+
+    <!-- Nieuwe sectie voor invoervelden en resultaat -->
+    <div id="calculationSection">
+        <label for="maMinInput">mA*min:</label>
+        <input type="number" id="maMinInput" placeholder="Voer mA*min in">
+        <br>
+        <label for="maInput">mA:</label>
+        <input type="number" id="maInput" placeholder="Voer mA in">
+        <br>
+        <button onclick="calculateTime()">Bereken tijd</button>
+        <p id="result" style="color: #F5DF4D;"></p>
     </div>
 
     <!-- De knop om het pop-up venster te openen -->
@@ -81,37 +95,30 @@
         let scale = 1;
 
         function drawLines(x, y) {
-            // Wis het canvas en teken de afbeelding opnieuw
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(currentImage, 0, 0);
 
-            // Teken het punt
             ctx.beginPath();
             ctx.arc(x, y, 5, 0, Math.PI * 2);
             ctx.fillStyle = 'red';
             ctx.fill();
 
-            // Teken de lijnen
             ctx.beginPath();
             ctx.moveTo(x, y);
-            ctx.lineTo(x, canvas.height); // Verticale lijn naar beneden
+            ctx.lineTo(x, canvas.height);
             ctx.moveTo(x, y);
-            ctx.lineTo(0, y); // Horizontale lijn naar links
+            ctx.lineTo(0, y);
             ctx.strokeStyle = 'red';
             ctx.stroke();
         }
 
         imageSelect.addEventListener('change', function() {
             const selectedValue = imageSelect.value;
-
             if (selectedValue !== "none") {
                 currentImage.src = selectedValue;
                 currentImage.onload = function() {
-                    // Stel de canvas grootte in op de afmetingen van de afbeelding
                     canvas.width = currentImage.width;
                     canvas.height = currentImage.height;
-
-                    // Teken de afbeelding
                     ctx.drawImage(currentImage, 0, 0);
                 }
             }
@@ -157,6 +164,22 @@
         canvas.addEventListener('touchend', function() {
             isDragging = false;
         });
+
+        // Functie om de tijd te berekenen en weer te geven
+        function calculateTime() {
+            const maMin = parseFloat(document.getElementById('maMinInput').value);
+            const ma = parseFloat(document.getElementById('maInput').value);
+
+            if (!isNaN(maMin) && !isNaN(ma) && ma > 0) {
+                const totalMinutes = maMin / ma;
+                const minutes = Math.floor(totalMinutes);
+                const seconds = Math.round((totalMinutes - minutes) * 60);
+
+                document.getElementById('result').textContent = `Bij gebruik van ${ma} mA is de tijd: ${minutes} minuten en ${seconds} seconden.`;
+            } else {
+                document.getElementById('result').textContent = "Vul geldige waarden in voor mA*min en mA.";
+            }
+        }
     </script>
 </body>
 </html>
