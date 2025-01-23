@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sliding Ruler voor Stralingstijd</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .no-scroll {
+            overflow: hidden;
+        }
+        #ruler-container {
+            top: 280px;
+            width: 100%;
+            max-width: 1149px;
+            height: auto;
+            position: relative; /* Change from fixed to relative for scrolling */
+            touch-action: manipulation; /* Voorkomt standaard touchscreen-gedrag */
+        }
+        .ruler {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        #schuif1 {
+            z-index: 1;
+        }
+        #schuif2 {
+            z-index: 2;
+        }
+        #schuif3 {
+            z-index: 3;
+        }
+        #schuif4 {
+            z-index: 4;
+        }
+        #controls {
+            position: fixed;
+            top: 45px;
+            left: 5px;
+            z-index: 5;
+            color: yellow;
+            display: flex;
+            flex-wrap: wrap; 
+        }
+        input[type="radio"] {
+            margin: 5px;
+            margin-bottom: 30px;
+        }
+        label {
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Werkt op dezelfde manier als het fysieke schuifje.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> 
+
+    <div id="ruler-container">
+        <img id="schuif1" class="ruler" src="schuif1.png" alt="Schuif 1">
+        <img id="schuif2" class="ruler" src="schuif2.png" alt="Schuif 2">
+        <img id="schuif3" class="ruler" src="schuif3.png" alt="Schuif 3">
+        <img id="schuif4" class="ruler" src="schuif4.png" alt="Schuif 4">
+
+        <div id="controls">
+            <label><input type="radio" name="schuifSelect" value="schuif3"> Links</label>
+            <label><input type="radio" name="schuifSelect" value="schuif2"> Midden</label>
+            <label><input type="radio" name="schuifSelect" value="schuif4"> Rechts</label>
+            <label><input type="radio" name="schuifSelect" value="none" checked> Lock</label>
+        </div>
+    </div>
+
+    <script>
+        const body = document.body;
+        const rulerContainer = document.getElementById('ruler-container');
+        const schuif2 = document.getElementById('schuif2');
+        const schuif3 = document.getElementById('schuif3');
+        const schuif4 = document.getElementById('schuif4');
+        let activeImage = null;
+        let isDragging = false;
+        let startY = 0;
+        let startTop = 0;
+
+        // Selecteren van schuif of alles vastzetten
+        document.querySelectorAll('input[name="schuifSelect"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const selectedValue = document.querySelector('input[name="schuifSelect"]:checked').value;
+                switch (selectedValue) {
+                    case 'schuif3':
+                        activeImage = schuif3;
+                        break;
+                    case 'schuif2':
+                        activeImage = schuif2;
+                        break;
+                    case 'schuif4':
+                        activeImage = schuif4;
+                        break;
+                    case 'none':
+                        activeImage = null; // Alles vastzetten
+                        break;
+                }
+
+                // Toggle no-scroll class en scrollbaarheid instellen
+                if (selectedValue === 'none') {
+                    body.classList.remove('no-scroll'); // Scrollen toestaan als alles vergrendeld is
+                } else {
+                    body.classList.add('no-scroll'); // Scrollen voorkomen als een schuif geselecteerd is
+                }
+            });
+        });
+
+        function handleDragStart(e) {
+            if (!activeImage) return;
+            isDragging = true;
+            startY = e.touches ? e.touches[0].clientY : e.clientY;
+            startTop = parseInt(window.getComputedStyle(activeImage).top, 10) || 0;
+        }
+
+        function handleDrag(e) {
+            if (!isDragging || !activeImage) return;
+            const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+            const deltaY = currentY - startY;
+            activeImage.style.top = `${startTop + deltaY}px`;
+        }
+
+        function handleDragEnd() {
+            isDragging = false;
+        }
+
+        // Event listeners voor drag (alle afbeeldingen gebruiken dezelfde handlers)
+        document.getElementById('ruler-container').addEventListener('mousedown', handleDragStart);
+        document.getElementById('ruler-container').addEventListener('touchstart', handleDragStart);
+        document.getElementById('ruler-container').addEventListener('mousemove', handleDrag);
+        document.getElementById('ruler-container').addEventListener('touchmove', handleDrag);
+        document.getElementById('ruler-container').addEventListener('mouseup', handleDragEnd);
+        document.getElementById('ruler-container').addEventListener('touchend', handleDragEnd);
+    </script>
+</body>
+</html>
