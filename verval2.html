@@ -23,6 +23,53 @@
             padding: 8px;
             border: 1px solid black;
         }
+        
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .link-list li {
+            margin: 5px;
+        }
+
+        .link-list a {
+            text-decoration: none;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+            background-position: center;
+            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
+
+        }
+
+        .link-list a:hover {
+            transform: scale(1.05);
+            background-color: transparent;
+        }
+
+
+
+
+        /* Specifieke achtergrondafbeeldingen voor elke link */
+        .link1 {
+            background-image: url('tape1.PNG');
+        }
+
             
     </style>
     <script>
@@ -152,9 +199,8 @@
 <body>
     
 
-    <h1 style="color: #F5DF4D; text-align: center;">Bron Sterkte</h1>
+    <h1 style="color: #F5DF4D; text-align: center;">Bronnen Tabel</h1>
 
-    <h2>Bronnen Tabel</h2>
     <!-- Hier wordt de CSV-tabel weergegeven -->
     <div id="csvTable">De tabel wordt geladen...</div>
 
@@ -173,6 +219,10 @@
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
+    <ul class="link-list">
+    <li><a href="schuifje.html" class= "link1"><i class="fa-solid fa-ruler-horizontal"></i>Schuifje<i class="fa-solid fa-ruler-horizontal"></i></a></li>
+    </ul>
+    
     <!-- Handmatige invoersectie -->
     <h2>Handmatige Activiteitsberekening</h2>
     <label for="isotope">Kies een isotoop:</label>
