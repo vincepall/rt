@@ -37,6 +37,56 @@
         #calculationSection {
             margin-top: 20px; /* Optionele extra marge voor de invoervelden */
         }
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .link-list li {
+            margin: 5px;
+        }
+
+        .link-list a {
+            text-decoration: none;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+            background-position: center;
+            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
+
+        }
+
+        .link-list a:hover {
+            transform: scale(1.05);
+            background-color: transparent;
+        }
+
+
+
+
+        /* Specifieke achtergrondafbeeldingen voor elke link */
+        .link1 {
+            background-image: url('tape1.PNG');
+        }
+
+        .link2 {
+            background-image: url('tape2.PNG');
+        }
+        
     </style>
 </head>
 <body>
@@ -70,6 +120,11 @@
         <button onclick="calculateTime()">Bereken tijd</button>
         <p id="result" style="color: #F5DF4D;"></p>
     </div>
+
+     <ul class="link-list">
+        <li><a href="focusverandering.html" class="link1"><i class="fa-solid fa-up-down"></i>Focusverandering<i class="fa-solid fa-up-down"></i></a></li>
+        <li><a href="filmsoortverandering.html" class="link2"><i class="fa-solid fa-repeat"></i>D4 D5 D7<i class="fa-solid fa-repeat"></i></a></li>
+    </ul>
 
     <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
