@@ -111,7 +111,67 @@
             margin: 4px 2px;
             cursor: pointer;
             border-radius: 8px;
+        }        
+        
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
+
+        .link-list li {
+            margin: 5px;
+        }
+
+        .link-list a {
+            text-decoration: none;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+            background-position: center;
+            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
+
+        }
+
+        .link-list a:hover {
+            transform: scale(1.05);
+            background-color: transparent;
+        }
+
+
+
+
+        /* Specifieke achtergrondafbeeldingen voor elke link */
+        .link1 {
+            background-image: url('tape1.PNG');
+        }
+
+        .link2 {
+            background-image: url('tape2.PNG');
+        }
+
+        .link3 {
+            background-image: url('tape3.PNG');
+        }
+
+        .link4 {
+            background-image: url('tape4.PNG');
+        }
+
+        
     </style>
 </head>
 <body>
@@ -156,6 +216,11 @@
             </div>
         </div>
         <button type="submit">Bekijk</button>
+
+    <ul class="link-list">
+        <li><a href="cw2.html" class= "link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
+    </ul>
+
     </form>
 
     <!-- Aparte containers voor klasse B -->
