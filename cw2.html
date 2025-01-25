@@ -139,6 +139,53 @@
             text-decoration: none;
             cursor: pointer;
         }
+        
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .link-list li {
+            margin: 5px;
+        }
+
+        .link-list a {
+            text-decoration: none;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+            background-position: center;
+            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
+
+        }
+
+        .link-list a:hover {
+            transform: scale(1.05);
+            background-color: transparent;
+        }
+
+
+
+
+        /* Specifieke achtergrondafbeeldingen voor elke link */
+        .link1 {
+            background-image: url('tape1.PNG');
+        }
+        
     </style>
 </head>
 <body>
@@ -177,6 +224,10 @@
     <p id="antwoordResultaat" style="color: #F5DF4D;"></p>
     <p id="filmlengteResultaat" style="color: #F5DF4D;"></p>
     <div id="filmlengtesLijst" style="color: #F5DF4D;"></div>
+
+    <ul class="link-list">
+        <li><a href="opnamesklasseb.html" class="link4"><i class="fa-solid fa-star-of-life"></i>Aantal opnames EN<i class="fa-solid fa-star-of-life"></i></a></li>
+    </ul>    
 
     <img src="Schedulematen.png" alt="Ter info" onclick="showImageFullSize(this)">
 
