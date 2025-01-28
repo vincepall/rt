@@ -86,19 +86,19 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.match(event.request).then((cachedResponse) => {
-        // Start het netwerkverzoek op de achtergrond, zelfs als we een gecachete versie teruggeven
+        // Start een netwerkverzoek in de achtergrond
         const fetchPromise = fetch(event.request).then((networkResponse) => {
-          // Als er een goede respons is van het netwerk, update de cache
+          // Controleer of de netwerkrespons geldig is voordat we de cache bijwerken
           if (networkResponse && networkResponse.status === 200) {
             cache.put(event.request, networkResponse.clone());
           }
           return networkResponse;
         }).catch(() => {
-          // Als er geen netwerkverbinding is, geef de gecachete versie terug
+          // Als het netwerk faalt, gebruik dan de gecachete versie
           return cachedResponse;
         });
 
-        // Geef de gecachete versie terug, of wacht op de netwerkversie
+        // Geef de gecachete versie onmiddellijk terug, of wacht op de netwerkversie
         return cachedResponse || fetchPromise;
       });
     })
