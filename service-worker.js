@@ -1,6 +1,5 @@
 const CACHE_NAME = 'pwa-cache-v1';
 
-
 // Lijst van bestanden om te cachen bij installatie
 const FILES_TO_CACHE = [
   '/rt/',
@@ -52,8 +51,6 @@ const FILES_TO_CACHE = [
   '/rt/schuifje3.png',
   '/rt/schuifje4.png',
   '/rt/schuifje.html'
-
-   
 ];
 
 // Installeer de service worker en cache de essentiële bestanden
@@ -84,27 +81,26 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event: gebruik network-first strategie
+// Fetch event met Stale-While-Revalidate strategie zonder offline fallback
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Als de netwerkrespons goed is, sla die op in de cache
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, response.clone());
-          return response;
-        });
-      })
-      .catch(() => {
-        // Als het netwerk faalt, haal het uit de cache
-        return caches.match(event.request).then((response) => {
-          if (response) {
-            return response;
-          } else if (event.request.mode === 'navigate') {
-            // Als het een navigatieverzoek is en er is geen cache, toon de offline pagina
-            return caches.match(OFFLINE_URL);
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(event.request).then((cachedResponse) => {
+        // Start het netwerkverzoek op de achtergrond, zelfs als we een gecachete versie teruggeven
+        const fetchPromise = fetch(event.request).then((networkResponse) => {
+          // Als er een goede respons is van het netwerk, update de cache
+          if (networkResponse && networkResponse.status === 200) {
+            cache.put(event.request, networkResponse.clone());
           }
+          return networkResponse;
+        }).catch(() => {
+          // Als er geen netwerkverbinding is, geef de gecachete versie terug
+          return cachedResponse;
         });
-      })
+
+        // Geef de gecachete versie terug, of wacht op de netwerkversie
+        return cachedResponse || fetchPromise;
+      });
+    })
   );
 });
