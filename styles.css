@@ -189,3 +189,28 @@ p {
 .info-btn:hover {
     opacity: 1; /* Oplichten bij hover */
 }
+
+/* input veld */
+input {
+    border: 2px solid #F5DF4D;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); 
+    outline: none;
+    background-color: #99957a;
+}
+
+input:focus {
+    border-color: #b8a739;
+}
+
+/* dropdown menu */
+select {
+    border: 2px solid #F5DF4D;
+    border-radius: 5px;
+    background-color: #99957a;
+}
+
+select:focus {
+    border-color: #b8a739; /* Donkerdere rand bij focus */
+}
+
