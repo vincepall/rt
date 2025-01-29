@@ -197,6 +197,7 @@ input {
     box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.1); 
     outline: none;
     background-color: #d9d2a3;
+    text-align: center;
 }
 
 input:focus {
