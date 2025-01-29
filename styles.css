@@ -198,8 +198,8 @@ input {
     outline: none;
     background-color: #d9d2a3;
     text-align: center;
-    font-size: 1.1em; /* Increase font size */
-    padding: 5px; /* Add padding for easier touch interaction */
+    font-size: 1.05em; /* Increase font size */
+    padding: 4px; /* Add padding for easier touch interaction */
 }
 
 input:focus {
@@ -211,8 +211,8 @@ select {
     border: 2px solid #F5DF4D;
     border-radius: 8px;
     background-color: #d9d2a3;
-    font-size: 1.1em; /* Increase font size */
-    padding: 5px; /* Add padding for easier touch interaction */
+    font-size: 1.05em; /* Increase font size */
+    padding: 4px; /* Add padding for easier touch interaction */
 }
 
 select:focus {
