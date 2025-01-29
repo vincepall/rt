@@ -193,10 +193,10 @@ p {
 /* input veld */
 input {
     border: 2px solid #F5DF4D;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); 
+    border-radius: 8px;
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.1); 
     outline: none;
-    background-color: #e8de9b;
+    background-color: #d9d2a3;
 }
 
 input:focus {
@@ -206,8 +206,8 @@ input:focus {
 /* dropdown menu */
 select {
     border: 2px solid #F5DF4D;
-    border-radius: 5px;
-    background-color: #e8de9b;
+    border-radius: 8px;
+    background-color: #d9d2a3;
 }
 
 select:focus {
