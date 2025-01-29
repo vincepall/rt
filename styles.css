@@ -226,3 +226,17 @@ select:focus {
     border-color: #b8a739; /* Donkerdere rand bij focus */
 }
 
+/* Remove extra margin or padding around the radio buttons and checkboxes */
+input[type="radio"],
+input[type="checkbox"] {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    vertical-align: middle; /* Align the radio buttons/checkboxes with the label text */
+}
+
+/* Add a small margin between the button/checkbox and the label for better readability */
+input[type="radio"] + label,
+input[type="checkbox"] + label {
+    margin-left: 5px; /* Adjust this value to control the space between the button and label */
+    vertical-align: middle; /* Ensure the label aligns nicely with the input */
+}
