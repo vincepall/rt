@@ -238,3 +238,27 @@ select: focus {
     border-color: #051aff;
 }
 
+input[type="checkbox"] {
+  background-color: #f2da4e;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+}
+
+input[type="radio"] {
+  background-color: #f2da4e;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #1c59ff;
+}
+
+input[type="radio"]:checked {
+  background-color: #1c59ff;
+}
+
