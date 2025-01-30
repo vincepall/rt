@@ -239,6 +239,7 @@ select: focus {
 }
 
 input[type="checkbox"] {
+  appearance: none;
   background-color: #f2da4e;
   border: 2px solid #000000;
   border-radius: 4px;
@@ -247,6 +248,7 @@ input[type="checkbox"] {
 }
 
 input[type="radio"] {
+  appearance: none;
   background-color: #f2da4e;
   border: 2px solid #000000;
   border-radius: 50%;
