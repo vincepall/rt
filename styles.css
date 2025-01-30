@@ -242,16 +242,16 @@ input[type="checkbox"] {
   background-color: #f2da4e;
   border: 2px solid #000000;
   border-radius: 4px;
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
 }
 
 input[type="radio"] {
   background-color: #f2da4e;
   border: 2px solid #000000;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
 }
 
 input[type="checkbox"]:checked {
