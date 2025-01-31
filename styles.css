@@ -196,7 +196,7 @@ input[type="text"],
 input[type="password"],
 input[type="email"],
 input[type="number"] {
-    border: 4px solid #F5DF4D;
+    border: 5px solid #F5DF4D;
     border-radius: 1.05em;
     box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.1); 
     outline: none;
@@ -221,8 +221,8 @@ input:disabled {
 }
 
 select {
-    border: 2px solid #F5DF4D;
-    border-radius: 8px;
+    border: 5px solid #F5DF4D;
+    border-radius: 1.05em;
     box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.1); 
     outline: none;
     background-color: #d9d2a3;
