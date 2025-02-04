@@ -45,7 +45,7 @@ const FILES_TO_CACHE = [
   '/rt/tape2.PNG',
   '/rt/tape3.PNG',
   '/rt/tape4.PNG', 
-  '/rt/bg2.jpg',
+  '/rt/bglight.png',
   '/rt/schuifje1.png',
   '/rt/schuifje2.png',
   '/rt/schuifje3.png',
