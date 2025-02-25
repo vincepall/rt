@@ -134,33 +134,23 @@
             var maxOverdikte = 0;
 
             if (weldType === "A") {
-                if (wanddikte < 2.5) maxOverdikte = 0.8;
-                else if (wanddikte < 5) maxOverdikte = 1.5;
+                if (wanddikte < 2.4) maxOverdikte = 0.8;
+                else if (wanddikte < 4.8) maxOverdikte = 1.5;
                 else if (wanddikte < 13) maxOverdikte = 2.5;
-                else if (wanddikte < 25) maxOverdikte = 3;
-                else if (wanddikte < 50) maxOverdikte = 4;
-                else if (wanddikte < 76) maxOverdikte = 5.5;
-                else if (wanddikte < 100) maxOverdikte = 6;
-                else maxOverdikte = 8;
+                else if (wanddikte < 25) maxOverdikte = 2.5;
+                else maxOverdikte = 3;
             } else if (weldType === "B" || weldType === "C") {
-                if (wanddikte < 2.5) maxOverdikte = 2.5;
-                else if (wanddikte < 5) maxOverdikte = 2.5;
-                else if (wanddikte < 13) maxOverdikte = 3;
-                else if (wanddikte < 25) maxOverdikte = 4;
-                else if (wanddikte < 50) maxOverdikte = 4;
-                else if (wanddikte < 76) maxOverdikte = 4;
-                else if (wanddikte < 100) maxOverdikte = 5.5;
-                else if (wanddikte < 125) maxOverdikte = 6;
-                else maxOverdikte = 8;
+                if (wanddikte < 2.4) maxOverdikte = 2.5;
+                else if (wanddikte < 4.8) maxOverdikte = 3;
+                else if (wanddikte < 13) maxOverdikte = 4;
+                else if (wanddikte < 25) maxOverdikte = 5;
+                else maxOverdikte = 6;
             } else if (weldType === "D") {
-                if (wanddikte < 2.5) maxOverdikte = 0.8;
-                else if (wanddikte < 5) maxOverdikte = 1.5;
+                if (wanddikte < 2.4) maxOverdikte = 0.8;
+                else if (wanddikte < 4.8) maxOverdikte = 1.5;
                 else if (wanddikte < 13) maxOverdikte = 2.5;
-                else if (wanddikte < 25) maxOverdikte = 3;
-                else if (wanddikte < 50) maxOverdikte = 4;
-                else if (wanddikte < 76) maxOverdikte = 5.5;
-                else if (wanddikte < 100) maxOverdikte = 6;
-                else maxOverdikte = 8;
+                else if (wanddikte < 25) maxOverdikte = 2.5;
+                else maxOverdikte = 3;
             }
 
             return maxOverdikte;
@@ -175,7 +165,7 @@
                 var maxOverdikte = getMaxOverdikte(weldType, wanddikte);
                 lasoverdikteField.value = maxOverdikte.toFixed(1); // Toon de lasoverdikte in het veld
                 lasoverdikteField.readOnly = false; // Maak het veld bewerkbaar
-                lasoverdikteField.max = maxOverdikte.toFixed(1); // Stel de max in op de berekende waarde
+                lasoverdikteField.max = 2 * maxOverdikte.toFixed(1); // Stel de max in op de berekende waarde
             } else {
                 lasoverdikteField.value = ''; // Leeg het veld als de benodigde info ontbreekt
                 lasoverdikteField.readOnly = true; // Maak het veld weer readonly
