@@ -147,11 +147,11 @@ p {
     background-color: #fff;
     color: #000;
     margin: 15% auto;
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #888;
     width: 80%; /* Je kunt deze breedte aanpassen naar wens */
     text-shadow: none;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 /* Stijl voor de sluitknop (x) */
