@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KV regel</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+            min-height: 150vh;
+        }
+
+        /* Style for the calculate button */
+        button.calculate-btn {
+            background-color: #F5DF4D;
+            color: black;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.calculate-btn:hover {
+            background-color: #e6c944;
+        }
+    </style>
+
+<script>
+    function calculateKV() {
+        let wanddikte = parseFloat(document.getElementById('wanddikte').value);
+        let opstelling = document.getElementById('opstelling').value;
+        let materiaal = document.getElementById('materiaal').value;
+
+        if (isNaN(wanddikte)) {
+            alert('Voer een geldige wanddikte in.');
+            return;
+        }
+
+        let doorstraaldedikte = (opstelling === 'enkelwand') ? wanddikte : 2 * wanddikte;
+        let kv;
+
+        if (materiaal === 'Staal') {
+            kv = 100 + (8 * doorstraaldedikte);
+            document.getElementById('result').innerHTML = `${kv} kv volgens de KV-regel, maximaal ${kv + 50} kv.`;
+        } else if (materiaal === 'Aluminium') {
+            kv = 50 + (2 * doorstraaldedikte);
+            document.getElementById('result').innerHTML = `${kv} kv volgens de KV-regel, maximaal ${kv + 30} kv.`;
+        } else if (materiaal === 'HDPE') {
+            kv = 20 + (0.2 * doorstraaldedikte);
+            document.getElementById('result').innerHTML = `${kv} kv volgens de KV-regel.`;
+        }
+    }
+</script>
+
+</head>
+<body>
+    <h1 style="color: #F5DF4D; text-align: center;">KV Regel</h1>
+
+    <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Simpele calculator voor de kv regel.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+
+<div class="container">
+    <h1>KV regel</h1>
+    <label for="wanddikte">Wanddikte (mm):</label>
+    <input type="number" id="wanddikte" min="0" step="0.01">
+
+    <label for="opstelling">Opstelling:</label>
+    <select id="opstelling">
+        <option value="enkelwand">Enkelwand</option>
+        <option value="dubbelwand">Dubbelwand</option>
+    </select>
+
+    <label for="materiaal">Materiaal:</label>
+    <select id="materiaal">
+        <option value="Staal">Staal</option>
+        <option value="Aluminium">Aluminium</option>
+        <option value="HDPE">HDPE</option>
+    </select>
+
+    <button type="button" class ="calculate-btn" onclick="calculateKV()">Bereken KV</button>
+
+    <div id="result"></div>
+</div>
+    <h2>Resultaat</h2>
+    <h2 id="result" style="color: #F5DF4D;"></h2>
+
+</body>
+</html>
