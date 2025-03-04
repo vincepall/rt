@@ -10,13 +10,36 @@
     <style>
         body {
             font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
             margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
 
-        label, select, input, button {
-            margin: 10px 0;
-            display: block;
+        /* Style for the calculate button */
+        button.calculate-btn {
+            background-color: #F5DF4D;
+            color: black;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
+
+        button.calculate-btn:hover {
+            background-color: #e6c944;
+        }
+
+        label, select, input {
+            display: block;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
     </style>
 </head>
 <body>
@@ -55,7 +78,7 @@
     </select>
     <input type="number" id="customDensity" placeholder="Voer eigen dichtheid in" style="display:none;">
 
-    <button onclick="berekenDikte()">Bereken</button>
+    <button type="button" class ="calculate-btn" onclick="berekenDikte()">Bereken</button>
 
     <h2>Resultaat</h2>
     <h2 id="resultaat" style="color: #F5DF4D;"></h2>
