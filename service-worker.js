@@ -51,7 +51,9 @@ const FILES_TO_CACHE = [
   '/rt/schuifje3.png',
   '/rt/schuifje4.png',
   '/rt/schuifje.html',
-  '/rt/kvregel.html'
+  '/rt/kvregel.html',
+  '/rt/onstream.html',
+  '/rt/gevuldeleiding.html'
 ];
 
 // Installeer de service worker en cache de essentiële bestanden
