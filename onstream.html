@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onstream tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <style>
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #0056b3;
+            --bg-color: #4a4a4a;
+            --text-color: #f4f4f4;
+            --button-color: #333;
+            --button-hover-color: #444;
+            --download-color: #666;
+            --download-hover-color: #888;
+        }
+
+        body {
+            font-family: 'Handlee', sans-serif;
+            background-color: var(--bg-color);
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .link-list li {
+            margin: 5px;
+        }
+
+         .link-list a {
+            text-decoration: none;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+            background-position: center;
+            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
+
+        }
+        
+        .link-list a i {
+            margin-right: 10px;
+        }
+
+        .link-list a:hover {
+            background-color: transparent;
+            transform: scale(1.05);
+        }
+
+        
+        /* Specifieke achtergrondafbeeldingen voor elke link */
+        .link1 {
+            background-image: url('tape1.PNG');
+        }
+
+        .link2 {
+            background-image: url('tape2.PNG');
+        }
+
+        .link3 {
+            background-image: url('tape3.PNG');
+        }
+
+        .link4 {
+            background-image: url('tape4.PNG');
+        }
+
+        @media (max-width: 768px) {
+            .link-list {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+     <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Verzameling tools voor onstream onderzoek</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <h1>Onstream tools</h1>
+
+    <ul class="link-list">
+        <li><a href="gevuldeleiding.html" class= "link1"><i class="fa-brands fa-google-scholar"></i> Gevulde Leiding</a></li>
+    </ul>
+
+</body>
+</html>
