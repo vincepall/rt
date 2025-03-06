@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bronkeuze</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        /* Style for the calculate button */
+        button.calculate-btn {
+            background-color: #F5DF4D;
+            color: black;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.calculate-btn:hover {
+            background-color: #e6c944;
+        }
+
+        label, select, input {
+            display: block;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1 style="color: #F5DF4D; text-align: center;">Bronkeuze</h1>
+
+     <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Door Wmax te berekenen wordt de juiste bronkeuze voorgesteld volgens RT21021 of RT21022.
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <h1>Bepaal geschikte bron</h1>
+
+    <label for="diameter">Diameter (De) van de pijp (mm):</label>
+    <input type="number" id="diameter" min="0" step="any" required><br>
+
+    <label for="wanddikte">Wanddikte (t) van de pijp (mm):</label>
+    <input type="number" id="wanddikte" min="0" step="any" required><br>
+
+    <label for="techniek">Techniek:</label>
+    <select id="techniek">
+        <option value="tangentiaal">Tangentiaal</option>
+        <option value="dubbel_wand">Dubbel wand</option>
+    </select><br>
+
+    <label for="klasse">Klasse:</label>
+    <select id="klasse">
+        <option value="ta">TA</option>
+        <option value="tb">TB</option>
+    </select><br>
+
+    <button type="button" class ="calculate-btn" onclick="berekenBron()">Bronkeuze</button>
+
+
+    <h2>Resultaat</h2>
+    <h2 id="resultaat" style="color: #F5DF4D;"></h2>
+
+    <script>
+        function berekenWmax(De, t) {
+            return 2 * Math.sqrt(t * (De - t));
+        }
+
+        function berekenBron() {
+            const De = parseFloat(document.getElementById('diameter').value);
+            const t = parseFloat(document.getElementById('wanddikte').value);
+            const techniek = document.getElementById('techniek').value;
+            const klasse = document.getElementById('klasse').value;
+
+            if (isNaN(De) || isNaN(t) || De <= 0 || t <= 0 || t >= De) {
+                document.getElementById('resultaat').textContent = 'Voer geldige waarden in voor diameter en wanddikte.';
+                return;
+            }
+
+            const wmax = berekenWmax(De, t);
+            let resultaat = '';
+
+            if (techniek === 'tangentiaal') {
+                if (klasse === 'ta') {
+                    if (wmax < 55.1) {
+                        resultaat = 'Se-75 (referentiekogel minimaal 20mm)';
+                    } else if (wmax < 80.1) {
+                        resultaat = 'Ir-192 (referentiekogel minimaal 30mm)';
+                    } else if (wmax < 120.1) {
+                        resultaat = 'Co-60 (referentiekogel minimaal 40mm)';
+                    } else {
+                        resultaat = 'Geen geschikte bron.';
+                    }
+                } else if (klasse === 'tb') {
+                    if (wmax < 40.1) {
+                        resultaat = 'Se-75 (referentiekogel minimaal 20mm)';
+                    } else if (wmax < 60.1) {
+                        resultaat = 'Ir-192 (referentiekogel minimaal 30mm)';
+                    } else if (wmax < 85.1) {
+                        resultaat = 'Co-60 (referentiekogel minimaal 40mm)';
+                    } else {
+                        resultaat = 'Geen geschikte bron.';
+                    }
+                }
+            } else if (techniek === 'dubbel_wand') {
+                const bronnen = [];
+
+                if (klasse === 'ta') {
+                    if (wmax > 4.9 && wmax < 55.1) {
+                        bronnen.push('Se-75');
+                    }
+                    if (wmax > 9.9 && wmax < 100.1) {
+                        bronnen.push('Ir-192');
+                    }
+                    if (wmax > 39.1 && wmax < 200.1) {
+                        bronnen.push('Co-60');
+                    }
+                } else if (klasse === 'tb') {
+                    if (wmax > 9.9 && wmax < 40.1) {
+                        bronnen.push('Se-75');
+                    }
+                    if (wmax > 19.9 && wmax < 90.1) {
+                        bronnen.push('Ir-192');
+                    }
+                    if (wmax > 39.1 && wmax < 200.1) {
+                        bronnen.push('Co-60');
+                    }
+                }
+
+                if (bronnen.length > 0) {
+                    resultaat = 'Geschikte bron(nen): ' + bronnen.join(', ');
+                } else {
+                    resultaat = 'Geen geschikte bron.';
+                }
+            }
+
+            document.getElementById('resultaat').textContent = resultaat;
+        }
+    </script>
+
+
+</body>
+</html>
+
