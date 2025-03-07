@@ -59,8 +59,6 @@
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
-    <h1>Bepaal geschikte bron</h1>
-
     <label for="diameter">Diameter (De) van de pijp (mm):</label>
     <input type="number" id="diameter" min="0" step="any" required><br>
 
@@ -82,7 +80,8 @@
     <button type="button" class ="calculate-btn" onclick="berekenBron()">Bronkeuze</button>
 
 
-    <h2>Resultaat</h2>
+    <h2>Wmax en bronkeuze</h2>
+    <h2 id="wmax" style="color: #F5DF4D;"></h2>
     <h2 id="resultaat" style="color: #F5DF4D;"></h2>
 
     <script>
@@ -159,6 +158,8 @@
             }
 
             document.getElementById('resultaat').textContent = resultaat;
+
+            document.getElementById("wmax").textContent = wmax;
         }
     </script>
 
