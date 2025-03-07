@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimale FFD Berekening</title>
+    <style>
+       body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 150vh;
+        }
+
+        /* Style for the calculate button */
+        button.calculate-btn {
+            background-color: #F5DF4D;
+            color: black;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.calculate-btn:hover {
+            background-color: #e6c944;
+        }
+
+        label, select, input {
+            display: block;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="color: #F5DF4D; text-align: center;">Minimale FFD Onstream Opnames</h2>
+
+<!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>De Minimale FFD voor Onstream opnames zoals in RT 21021 / RT 21022.
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+
+<form id="ffdForm">
+    <label for="procedure">Selecteer de procedure:</label>
+    <select id="procedure">
+        <option value="tangentiaal">Tangentiaal (RT21021)</option>
+        <option value="dubbelwand">Dubbelwand (RT21022)</option>
+    </select>
+
+    <label for="klasse">Selecteer de klasse:</label>
+    <select id="klasse">
+        <option value="TA">TA (basic technique)</option>
+        <option value="TB">TB (improved technique)</option>
+    </select>
+
+    <label for="diameter">Diameter van de pijp (De) in mm:</label>
+    <input type="number" id="diameter" min="0" required>
+
+    <label for="bron">Brongrootte (b) in mm:</label>
+    <input type="number" id="bron" min="0" required>
+
+    <label for="isolatie">Isolatiedikte in mm:</label>
+    <input type="number" id="isolatie" value="0" min="0">
+
+    <button type="button" clas = "calculate-btn" onclick="berekenFFD()">Bereken Minimale FFD</button>
+</form>
+
+<h2 style="color: #F5DF4D;">Resultaat</h2>
+<h2 id="resultaat" style="color #F5DF4D"></h2>
+
+<script>
+function berekenFFD() {
+    const procedure = document.getElementById("procedure").value;
+    const klasse = document.getElementById("klasse").value;
+    const De = parseFloat(document.getElementById("diameter").value);
+    const b = parseFloat(document.getElementById("bron").value);
+    const Iso = parseFloat(document.getElementById("isolatie").value);
+
+    // PDD en OFD berekeningen
+    const PDD = (De / 2) + Iso;
+    const OFD = De + Iso;
+
+    let minimaleFFD = 0;
+
+    if (procedure === "tangentiaal") {
+        if (klasse === "TA") {
+            const ffd1 = PDD + 3.5 * De;
+            const ffd2 = (b * PDD) / 0.6;
+            minimaleFFD = Math.max(ffd1, ffd2);
+        } else if (klasse === "TB") {
+            const ffd1 = PDD + 3.5 * De;
+            const ffd2 = (b * PDD) / 0.3;
+            minimaleFFD = Math.max(ffd1, ffd2);
+        }
+    } else if (procedure === "dubbelwand") {
+        if (klasse === "TA") {
+            minimaleFFD = (b * OFD) / 0.6;
+        } else if (klasse === "TB") {
+            minimaleFFD = (b * OFD) / 0.3;
+        }
+    }
+
+    document.getElementById("resultaat").innerHTML = "Minimale FFD: " + minimaleFFD.toFixed(2) + " mm";
+
+    document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
+
