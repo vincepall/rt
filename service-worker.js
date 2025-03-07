@@ -54,7 +54,8 @@ const FILES_TO_CACHE = [
   '/rt/kvregel.html',
   '/rt/onstream.html',
   '/rt/gevuldeleiding.html',
-  '/rt/bronkeuze2.html'
+  '/rt/bronkeuze2.html',
+  '/rt/onstreamffd.html'
 ];
 
 // Installeer de service worker en cache de essentiële bestanden
