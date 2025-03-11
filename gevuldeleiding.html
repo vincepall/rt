@@ -115,6 +115,9 @@
             const totaleDikte = 2 * t + ((dichtheid / 7800) * (D - 2 * t));
 
             document.getElementById('resultaat').textContent = `De totale doorstraalde dikte is ${totaleDikte.toFixed(2)} mm.`;
+
+            document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
+
         }
     </script>
 
