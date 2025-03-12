@@ -3,7 +3,6 @@
 <head>
     <link rel="stylesheet" href="styles.css">
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +13,6 @@
             padding: 50px;
             margin: 0;
         }
-
     </style>
 </head>
 <body>
@@ -34,21 +32,22 @@
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
     <script>
-        function copyText() {
-            //tijdelijk textveld
+        function copyText(element) {
+            // Creëer een tijdelijk tekstveld om de tekst in op te slaan
             const tempInput = document.createElement("textarea");
-            tempInput.value = document.getElementById("copyText").innerText;
+            tempInput.value = element.innerText; // De tekst van het aangeklikte element
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand("copy");
             document.body.removeChild(tempInput);
-            alert("tekst gekopieerd!");
+            alert("Tekst gekopieerd: " + tempInput.value);
         }
     </script>
 
-    <p id="copyText" style="color: #f7e672;" style="font-size: 1.5rem;" onclick="copyText()">Double film technique used in order to get the correct density in the weld and parent materials.</p>
-    <p id="copyText" style="color: #f7e672;" style="font-size: 1.5rem;" onclick="copyText()">In consultancy with the client, Se75 used instead of X-ray due to the limited accessibility and/or radiation safety.</p>
-    <p id="copyText" style="color: #f7e672;" style="font-size: 1.5rem;" onclick="copyText()">2 films (D4 & D5) per exposure used to get the correct density in the parent material and the weld.</p>
+    <!-- Rapportage zinnen die gekopieerd kunnen worden -->
+    <p style="color: #f7e672; font-size: 1.5rem;" onclick="copyText(this)">Double film technique used in order to get the correct density in the weld and parent materials.</p>
+    <p style="color: #f7e672; font-size: 1.5rem;" onclick="copyText(this)">In consultancy with the client, Se75 used instead of X-ray due to the limited accessibility and/or radiation safety.</p>
+    <p style="color: #f7e672; font-size: 1.5rem;" onclick="copyText(this)">2 films (D4 & D5) per exposure used to get the correct density in the parent material and the weld.</p>
+
 </body>
-  
 </html>
