@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zinnen</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <h1 style="color: #F5DF4D; text-align: center;">Rapportage zinnen</h1>
+
+    <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Verschillende zinnen die handig kunnen zijn om toe te voegen aan de rapportage, klik erop om te kopieren </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <script>
+        function copyText() {
+            //tijdelijk textveld
+            const tempInput = document.createElement("textarea");
+            tempInput.value = document.getElementById("copyText").innerText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("tekst gekopieerd!");
+        }
+    </script>
+
+    <p id="copyText" style="color: #F5DF4D;" style="font-size: 1.5rem;" onclick="copyText()">Double film technique used in order to get the correct density in the weld and parent materials.</p>
+    <p id="copyText" style="color: #F5DF4D;" style="font-size: 1.5rem;" onclick="copyText()">In consultancy with the client, Se75 used instead of X-ray due to the limited accessibility and/or radiation safety.</p>
+</body>
+  
+</html>
