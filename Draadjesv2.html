@@ -134,22 +134,22 @@
             var maxOverdikte = 0;
 
             if (weldType === "A") {
-                if (wanddikte < 2.4) maxOverdikte = 0.8;
-                else if (wanddikte < 4.8) maxOverdikte = 1.5;
-                else if (wanddikte < 13) maxOverdikte = 2.5;
-                else if (wanddikte < 25) maxOverdikte = 2.5;
+                if (wanddikte <= 2.4) maxOverdikte = 0.8;
+                else if (wanddikte <= 4.8) maxOverdikte = 1.5;
+                else if (wanddikte <= 13) maxOverdikte = 2.5;
+                else if (wanddikte <= 25) maxOverdikte = 2.5;
                 else maxOverdikte = 3;
             } else if (weldType === "B" || weldType === "C") {
-                if (wanddikte < 2.4) maxOverdikte = 2.5;
-                else if (wanddikte < 4.8) maxOverdikte = 3;
-                else if (wanddikte < 13) maxOverdikte = 4;
-                else if (wanddikte < 25) maxOverdikte = 5;
+                if (wanddikte <= 2.4) maxOverdikte = 2.5;
+                else if (wanddikte <= 4.8) maxOverdikte = 3;
+                else if (wanddikte <= 13) maxOverdikte = 4;
+                else if (wanddikte <= 25) maxOverdikte = 5;
                 else maxOverdikte = 6;
             } else if (weldType === "D") {
-                if (wanddikte < 2.4) maxOverdikte = 0.8;
-                else if (wanddikte < 4.8) maxOverdikte = 1.5;
-                else if (wanddikte < 13) maxOverdikte = 2.5;
-                else if (wanddikte < 25) maxOverdikte = 2.5;
+                if (wanddikte <= 2.4) maxOverdikte = 0.8;
+                else if (wanddikte <= 4.8) maxOverdikte = 1.5;
+                else if (wanddikte <= 13) maxOverdikte = 2.5;
+                else if (wanddikte <= 25) maxOverdikte = 2.5;
                 else maxOverdikte = 3;
             }
 
