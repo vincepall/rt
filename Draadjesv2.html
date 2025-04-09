@@ -223,16 +223,21 @@
                 }
 
                 if (source === "Se75") {
-                    if ((technique === "SWSI" || technique === "DWSI") && wanddikte <= 20) {
+                    if (technique === "SWSI"  && wanddikte >5 && wanddikte <= 20) {
                         wire = "W" + (parseInt(wire.substring(1)) - 1);
-                    } else if (technique === "DWDI" && doorstraaldeDikte <= 12) {
+                    } else if (technique === "DWDI" && doorstraaldeDikte >5 &&  doorstraaldeDikte <= 12) {
                         wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWSI" && doorstraaldDikte >5 && doorstraaldeDikte <= 20) {
+                        wire = "W" + (parseInt(wire.substring(1))-1);
                     }
+                    
                 } else if (source === "Ir192") {
-                    if ((technique === "SWSI" || technique === "DWSI") && doorstraaldeDikte >= 10 && doorstraaldeDikte <= 40) {
+                    if (technique === "SWSI" && wanddikte >= 10 && wanddikte <= 40) {
                         wire = "W" + (parseInt(wire.substring(1)) - 1);
                     } else if (technique === "DWDI" && doorstraaldeDikte > 10 && doorstraaldeDikte <= 25) {
                         wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWSI" && doorstraaldeDikte >10 && doorstraaldeDikte <= 40) {
+                        wire = "W" + (parseInt(wire.subtring(1)) - 1 );
                     }
                 }
 
