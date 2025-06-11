@@ -138,20 +138,26 @@
                     return;
                 }
                 ffd = boa + ofa;
+            
             } else if (keuze === '2') {  // EN-klasse B
-                ffd = (brongrootte * 15 * Math.pow(ofa, 2 / 3)) + ofa;
+                let basis = (brongrootte * 15 * Math.pow(ofa, 2 / 3));
                 if (centraal) {
-                    ffd *= 0.5;
+                    basis *= 0.5;
                 } else if (excentrisch) {
-                    ffd *= 0.8;
+                    basis *= 0.8;
                 }
+                ffd = basis + ofa;
             } else if (keuze === '1') {  // EN-klasse A
-                ffd = (brongrootte * 7.5 * Math.pow(ofa, 2 / 3)) + ofa;
+                let basis = (brongrootte * 7.5 * Math.pow(ofa, 2 / 3));
                 if (centraal) {
-                    ffd *= 0.5;
+                    basis *= 0.5;
                 } else if (excentrisch) {
-                    ffd *= 0.8;
+                    basis *= 0.8;
                 }
+                ffd = basis + ofa;
+            }
+       
+        
             } else {
                 output.innerHTML += "Ongeldige keuze. Voer 1, 2 of 3 in.<br>";
                 return;
