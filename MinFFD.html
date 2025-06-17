@@ -3,7 +3,6 @@
 <head>
     <link rel="stylesheet" href="styles.css">
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,16 +35,15 @@
 <body>
     <h1 style="color: #F5DF4D; text-align: center;">Minimale FFD</h1>
 
-    <!-- Info knop -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
-    <!-- Pop-up -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
             <p>
                 De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
                 Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
+                Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
             </p>
         </div>
     </div>
@@ -97,16 +95,21 @@
         const diameterDiv = document.getElementById("diameterInput");
 
         standaardSelect.addEventListener("change", function () {
-            if (standaardSelect.value === '1' || standaardSelect.value === '2') {
+            if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
                 extraOptiesDiv.style.display = "block";
-                wanddikteDiv.style.display = "none";
-            } else if (standaardSelect.value === '3') {
-                extraOptiesDiv.style.display = "none";
-                wanddikteDiv.style.display = "block";
-                diameterDiv.style.display = "none";
             } else {
                 extraOptiesDiv.style.display = "none";
+            }
+
+            if (standaardSelect.value === '3') {
+                wanddikteDiv.style.display = "block";
+            } else {
                 wanddikteDiv.style.display = "none";
+            }
+
+            if (optieSelect.value === '1' || optieSelect.value === '2') {
+                diameterDiv.style.display = "block";
+            } else {
                 diameterDiv.style.display = "none";
             }
         });
