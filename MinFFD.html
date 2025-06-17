@@ -59,6 +59,7 @@
 
         <label for="standaard">Kies een standaard:</label>
         <select id="standaard" name="standaard" required>
+            <option value="" disabled selected>Kies een standaard</option>
             <option value="1">EN-klasse A</option>
             <option value="2">EN-klasse B</option>
             <option value="3">ASME</option>
@@ -132,6 +133,11 @@
 
             output.innerHTML = "";
 
+            if (keuze === "") {
+                output.innerHTML = "Maak een keuze in het veld 'Kies een standaard'.<br>";
+                return;
+            }
+
             if (optie === '1') {
                 centraal = true;
                 if (isNaN(diameter) || diameter <= 0) {
@@ -200,7 +206,6 @@
             output.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Optionele modalfuncties als je ze gebruikt
         function openModal(id) {
             document.getElementById(id).style.display = "block";
         }
