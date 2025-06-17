@@ -112,7 +112,7 @@
         });
 
         optieSelect.addEventListener("change", function () {
-            if (optieSelect.value === '1') {
+            if (optieSelect.value === '1' || optieSelect.value === '2') {
                 diameterDiv.style.display = "block";
             } else {
                 diameterDiv.style.display = "none";
@@ -146,6 +146,10 @@
                 }
             } else if (optie === '2') {
                 excentrisch = true;
+                if (isNaN(diameter) || diameter <= 0) {
+                    output.innerHTML = "Voer een geldige diameter in voor excentrische opstelling.<br>";
+                    return;
+                }
             }
 
             if (keuze === '3') {  // ASME
@@ -197,6 +201,15 @@
                     output.innerHTML += `✅ Centrale opstelling is toegestaan (FFD < ${maxFFD.toFixed(2)} mm)<br>`;
                 } else {
                     output.innerHTML += `❌ Centrale opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxFFD.toFixed(2)} mm)<br>`;
+                }
+            }
+
+            if (excentrisch) {
+                let maxExcentrischFFD = diameter - (ofa + 10);
+                if (ffd < maxExcentrischFFD) {
+                    output.innerHTML += `✅ Excentrische opstelling is toegestaan (FFD < ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
+                } else {
+                    output.innerHTML += `❌ Excentrische opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
                 }
             }
         }
