@@ -1,353 +1,345 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Aantal opnames klasse A en B</title>
-    <style>
-        body {
-            font-family: 'Roboto Condensed', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <title>Aantal opnames klasse A en B</title>
+  <style>
+    body {
+      font-family: 'Roboto Condensed', sans-serif;
+    }
 
-        /* Flexbox styling for the form */
-        .form-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 10px;
-        }
+    .form-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px;
+    }
 
-        .form-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+    .form-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
-        .form-item label {
-            min-width: 150px; /* Define a minimum width for the labels */
-        }
+    .form-item label {
+      min-width: 150px;
+    }
 
-        .form-item input,
-        .form-item select {
-            flex: 1;
-            padding: 5px;
-            width: 100%
-        }
+    .form-item input,
+    .form-item select {
+      flex: 1;
+      padding: 5px;
+      width: 100%;
+    }
 
-        @media (max-width: 600px) {
-            .form-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+    @media (max-width: 600px) {
+      .form-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
 
-            .form-item label {
-                min-width: 100%; /* Make labels full width on mobile */
-                margin-bottom: 5px;
-            }
+      .form-item label {
+        min-width: 100%;
+        margin-bottom: 5px;
+      }
 
-            .form-item input {
-                width: 100%; /* Make input fields full width on mobile */
-            }
+      .form-item input {
+        width: 100%;
+      }
 
-            /* Zorg dat de afbeelding kleiner is op mobiele apparaten */
-            .image-container {
-                width: 100%; /* Zorg dat de afbeelding de volledige breedte inneemt */
-                height: auto; /* Laat de hoogte proportioneel aanpassen */
-            }
+      .image-container {
+        width: 100%;
+        height: auto;
+      }
 
-            .image-container img {
-                width: 100%;
-                height: auto;
-            }
-        }
+      .image-container img {
+        width: 100%;
+        height: auto;
+      }
+    }
 
-        .flex-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            gap: 20px;
-        }
+    .flex-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      gap: 20px;
+    }
 
-        .image-container {
-            position: relative;
-            background-size: cover;
-            border: 1px solid black;
-            margin-bottom: 20px;
-        }
+    .image-container {
+      position: relative;
+      background-size: cover;
+      border: 1px solid black;
+      margin-bottom: 20px;
+    }
 
-        .image-container img {
-            width: 100%;
-            height: 100%;
-        }
+    .image-container img {
+      width: 100%;
+      height: 100%;
+    }
 
-        .dot {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
-            border-radius: 50%;
-        }
+    .crosshair {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+    }
 
-        h2 {
-            color: blue;
-        }
+    .crosshair::before,
+    .crosshair::after {
+      content: '';
+      position: absolute;
+      background-color: red;
+    }
 
-        #container1 h2, #container2 h2 {
-            color: red;
-        }
+    .crosshair::before {
+      top: 5px;
+      left: 0;
+      width: 10px;
+      height: 1px;
+    }
 
-        .btn {
-            background-color: #666;
-            border: none;
-            color: black;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 8px;
-        } 
+    .crosshair::after {
+      left: 5px;
+      top: 0;
+      width: 1px;
+      height: 10px;
+    }
 
-        button[type="submit"] {
-            background-color: #F5DF4D; /* Zelfde kleur als de titel */
-            color: black; /* Zwarte tekst voor contrast */
-            padding: 15px 30px; /* Grotere knop door meer padding */
-            font-size: 18px; /* Grotere tekst */
-            border: none;
-            border-radius: 10px; /* Rond de hoeken van de knop af */
-            cursor: pointer;
-            text-align: center;
-            display: inline-block;
-            margin: 10px 0; /* Ruimte rondom de knop */
-         }
+    h2 {
+      color: blue;
+    }
 
-         button[type="submit"]:hover {
-            background-color: #FFD700; /* Lichte kleurverandering bij hover */
-         }
-        
-        .link-list {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+    #container1 h2,
+    #container2 h2 {
+      color: red;
+    }
 
-        .link-list li {
-            margin: 5px;
-        }
+    .btn {
+      background-color: #666;
+      border: none;
+      color: black;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
 
-        .link-list a {
-            text-decoration: none;
-            color: #000000;
-            padding: 10px 30px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: transform 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
-            background-position: center;
-            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
-            width: 200px;
-            height: 50px;
-            background-color: transparent;
-            gap: 10px;
+    button[type="submit"] {
+      background-color: #F5DF4D;
+      color: black;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      display: inline-block;
+      margin: 10px 0;
+    }
 
-        }
+    button[type="submit"]:hover {
+      background-color: #FFD700;
+    }
 
-        .link-list a:hover {
-            transform: scale(1.05);
-            background-color: transparent;
-        }
+    .link-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
+    .link-list li {
+      margin: 5px;
+    }
 
+    .link-list a {
+      text-decoration: none;
+      color: #000000;
+      padding: 10px 30px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: transform 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 200px;
+      height: 50px;
+      background-color: transparent;
+      gap: 10px;
+    }
 
+    .link-list a:hover {
+      transform: scale(1.05);
+      background-color: transparent;
+    }
 
-        /* Specifieke achtergrondafbeeldingen voor elke link */
-        .link1 {
-            background-image: url('tape1.PNG');
-        }
+    .link1 {
+      background-image: url('tape1.PNG');
+    }
 
-        .link2 {
-            background-image: url('tape2.PNG');
-        }
+    .link2 {
+      background-image: url('tape2.PNG');
+    }
 
-        .link3 {
-            background-image: url('tape3.PNG');
-        }
+    .link3 {
+      background-image: url('tape3.PNG');
+    }
 
-        .link4 {
-            background-image: url('tape4.PNG');
-        }
-
-        
-    </style>
+    .link4 {
+      background-image: url('tape4.PNG');
+    }
+  </style>
 </head>
 <body>
-    <h1 style="color: #F5DF4D; text-align: center;">Aantal opnames volgens EN</h1>
+  <h1 style="color: #F5DF4D; text-align: center;">Aantal opnames volgens EN</h1>
 
-    <!-- De knop om het pop-up venster te openen -->
-    <button class="info-btn" onclick="openModal('myModal')">i</button>
+  <button class="info-btn" onclick="openModal('myModal')">i</button>
 
-    <!-- Het pop-up venster -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.                
-            </p>
-        </div>
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('myModal')">&times;</span>
+      <p>Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.</p>
     </div>
+  </div>
 
-    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+  <script src="script.js"></script>
 
-    <!-- Formulier voor invoer van gegevens -->
-    <form id="coordinates-form">
-        <div class="form-container">
-            <div class="form-item">
-                <label for="klasse">Kies de klasse:</label>
-                <select id="klasse" name="klasse" required>
-                    <option value="">Selecteer...</option>
-                    <option value="A">Klasse A</option>
-                    <option value="B">Klasse B</option>
-                </select>
-            </div>
-            <div class="form-item">
-                <label for="wanddikte">Wanddikte (t in mm):</label>
-                <input type="number" id="wanddikte" name="wanddikte" step="0.001" required>
-            </div>
-            <div class="form-item">
-                <label for="diameter">Diameter (De in mm):</label>
-                <input type="number" id="diameter" name="diameter" step="0.001" required>
-            </div>
-            <div class="form-item">
-                <label for="sfd">Bron Film Afstand (SFD in mm):</label>
-                <input type="number" id="sfd" name="sfd" step="0.001" required>
-            </div>
-        </div>
-        <button type="submit">Bekijk</button>
+  <form id="coordinates-form">
+    <div class="form-container">
+      <div class="form-item">
+        <label for="klasse">Kies de klasse:</label>
+        <select id="klasse" name="klasse" required>
+          <option value="">Selecteer...</option>
+          <option value="A">Klasse A</option>
+          <option value="B">Klasse B</option>
+        </select>
+      </div>
+      <div class="form-item">
+        <label for="wanddikte">Wanddikte (t in mm):</label>
+        <input type="number" id="wanddikte" name="wanddikte" step="0.001" required>
+      </div>
+      <div class="form-item">
+        <label for="diameter">Diameter (De in mm):</label>
+        <input type="number" id="diameter" name="diameter" step="0.001" required>
+      </div>
+      <div class="form-item">
+        <label for="sfd">Bron Film Afstand (SFD in mm):</label>
+        <input type="number" id="sfd" name="sfd" step="0.001" required>
+      </div>
+    </div>
+    <button type="submit">Bekijk</button>
 
     <ul class="link-list">
-        <li><a href="cw2.html" class= "link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
+      <li><a href="cw2.html" class="link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
     </ul>
+  </form>
 
-    </form>
+  <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
+    <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
+  </div>
 
-    <!-- Aparte containers voor klasse B -->
-    <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
-        <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
-    </div>
+  <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
+    <h2>Opstelling 2 (Klasse B)</h2>
+  </div>
 
-    <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
-        <h2>Opstelling 2 (Klasse B)</h2>
-    </div>
+  <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
+    <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
+  </div>
 
-    <!-- Aparte containers voor klasse A -->
-    <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
-        <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
-    </div>
+  <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
+    <h2>Opstelling 2 (Klasse A)</h2>
+  </div>
 
-    <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
-        <h2>Opstelling 2 (Klasse A)</h2>
-    </div>
+  <script>
+    document.getElementById('coordinates-form').addEventListener('submit', function(event) {
+      event.preventDefault();
 
-    <script>
-        document.getElementById('coordinates-form').addEventListener('submit', function(event) {
-            event.preventDefault();
+      const klasse = document.getElementById('klasse').value;
+      const t = parseFloat(document.getElementById('wanddikte').value);
+      const De = parseFloat(document.getElementById('diameter').value);
+      const SFD = parseFloat(document.getElementById('sfd').value);
 
-            // Haal de invoerwaarden op
-            const klasse = document.getElementById('klasse').value;
-            const t = parseFloat(document.getElementById('wanddikte').value);
-            const De = parseFloat(document.getElementById('diameter').value);
-            const SFD = parseFloat(document.getElementById('sfd').value);
+      if (!klasse) {
+        alert("Selecteer een klasse");
+        return;
+      }
 
-            if (!klasse) {
-                alert("Selecteer een klasse");
-                return;
-            }
+      const x_value1 = t / De;
+      const y_value1 = De / SFD;
 
-            // Berekeningen voor de eerste afbeelding (Opstelling 5/8/13/14)
-            const x_value1 = t / De;
-            const y_value1 = De / SFD;
+      const x_value2 = t / De;
+      const y_value2 = De / (SFD - t);
 
-            // Berekeningen voor de tweede afbeelding (Opstelling 2)
-            const x_value2 = t / De;
-            const y_value2 = De / (SFD - t);
+      let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
 
-            let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
+      if (klasse === 'B') {
+        x_pixel1 = (x_value1 / 0.25) * 488;
+        y_pixel1 = (y_value1 / 2) * 819;
+        y_scale1 = 819;
 
-            // Schaalverhoudingen voor klasse B en A
-            if (klasse === 'B') {
-                // Klasse B afbeeldingen
-                x_pixel1 = (x_value1 / 0.25) * 488;
-                y_pixel1 = (y_value1 / 2) * 819;
-                y_scale1 = 819;
+        x_pixel2 = (x_value2 / 0.25) * 488;
+        y_pixel2 = (y_value2 / 4) * 823;
+        y_scale2 = 823;
 
-                x_pixel2 = (x_value2 / 0.25) * 488;
-                y_pixel2 = (y_value2 / 4) * 823;
-                y_scale2 = 823;
+        document.getElementById('container1A').style.display = 'none';
+        document.getElementById('container2A').style.display = 'none';
+        document.getElementById('container1B').style.display = 'block';
+        document.getElementById('container2B').style.display = 'block';
 
-                // Toon de juiste containers voor klasse B
-                document.getElementById('container1A').style.display = 'none';
-                document.getElementById('container2A').style.display = 'none';
-                document.getElementById('container1B').style.display = 'block';
-                document.getElementById('container2B').style.display = 'block';
+      } else if (klasse === 'A') {
+        x_pixel1 = (x_value1 / 0.25) * 487;
+        y_pixel1 = (y_value1 / 2) * 823;
+        y_scale1 = 823;
 
-            } else if (klasse === 'A') {
-                // Klasse A afbeeldingen
-                x_pixel1 = (x_value1 / 0.25) * 487;
-                y_pixel1 = (y_value1 / 2) * 823;
-                y_scale1 = 823;
+        x_pixel2 = (x_value2 / 0.25) * 470;
+        y_pixel2 = (y_value2 / 4) * 796;
+        y_scale2 = 796;
 
-                x_pixel2 = (x_value2 / 0.25) * 470;
-                y_pixel2 = (y_value2 / 4) * 796;
-                y_scale2 = 796;
+        document.getElementById('container1B').style.display = 'none';
+        document.getElementById('container2B').style.display = 'none';
+        document.getElementById('container1A').style.display = 'block';
+        document.getElementById('container2A').style.display = 'block';
+      }
 
-                // Toon de juiste containers voor klasse A
-                document.getElementById('container1B').style.display = 'none';
-                document.getElementById('container2B').style.display = 'none';
-                document.getElementById('container1A').style.display = 'block';
-                document.getElementById('container2A').style.display = 'block';
-            }
+      function createCrosshair(x, y) {
+        const cross = document.createElement('div');
+        cross.className = 'crosshair';
+        cross.style.left = (x - 5) + 'px';
+        cross.style.top = (y - 5) + 'px';
+        return cross;
+      }
 
-            // Maak de punt voor de eerste afbeelding (Opstelling 5/8/13/14)
-            const dot1 = document.createElement('div');
-            dot1.className = 'dot';
-            dot1.style.left = (x_pixel1 - 5) + 'px';
-            dot1.style.top = (y_scale1 - y_pixel1 - 5) + 'px';
+      const container1 = document.getElementById(`container1${klasse}`);
+      const container2 = document.getElementById(`container2${klasse}`);
 
-            // Maak de punt voor de tweede afbeelding (Opstelling 2)
-            const dot2 = document.createElement('div');
-            dot2.className = 'dot';
-            dot2.style.left = (x_pixel2 - 5) + 'px';
-            dot2.style.top = (y_scale2 - y_pixel2 - 5) + 'px';
+      container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
+      container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
 
-            // Voeg de punten toe aan de juiste containers
-            const container1 = document.getElementById(`container1${klasse}`);
-            const container2 = document.getElementById(`container2${klasse}`);
+      container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
+      container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
 
-            container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
-            container1.appendChild(dot1);
+      container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
-            container2.appendChild(dot2);
-
-            // Scroll naar de eerste afbeelding
-            container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            // Controleer of het een mobiel apparaat is en zoom uit indien nodig
-            if (window.innerWidth <= 600) {
-                document.body.style.zoom = "0.7"; // Uitzoomen op mobiele apparaten
-            }
-        });
-    </script>
+      if (window.innerWidth <= 600) {
+        document.body.style.zoom = "0.7";
+      }
+    });
+  </script>
 </body>
 </html>
