@@ -82,13 +82,15 @@
       height: 100%;
     }
 
+    /* MINIMALE AANPASSING: rode lijnen boven cirkel */
     .crosshair {
-      position: absolute;
+      position: relative;  /* zorg dat z-index werkt */
       width: 30px;
       height: 30px;
       left: 0;
       top: 0;
       pointer-events: none;
+      z-index: 2;          /* rode lijnen boven de cirkel */
     }
 
     .crosshair::before,
@@ -121,6 +123,7 @@
       left: -10px;
       top: -10px;
       pointer-events: none;
+      z-index: 1;          /* cirkel achter rode lijnen */
     }
 
     h2 {
@@ -341,21 +344,25 @@
         return cross;
       }
 
-      const container1 = document.getElementById(`container1${klasse}`);
-      const container2 = document.getElementById(`container2${klasse}`);
+      const container1 = document.getElementById('container1' + klasse);
+      const container2 = document.getElementById('container2' + klasse);
 
-      container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
-      container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+      // Eerst alle bestaande crosshairs verwijderen
+      container1.querySelectorAll('.crosshair').forEach(el => el.remove());
+      container2.querySelectorAll('.crosshair').forEach(el => el.remove());
 
-      container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
-      container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
-
-      container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-      if (window.innerWidth <= 600) {
-        document.body.style.zoom = "0.7";
-      }
+      // Toevoegen van crosshairs op container1 en container2
+      container1.appendChild(createCrosshair(x_pixel1, y_pixel1));
+      container2.appendChild(createCrosshair(x_pixel2, y_pixel2));
     });
+
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
   </script>
 </body>
 </html>
