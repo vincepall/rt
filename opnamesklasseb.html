@@ -84,8 +84,8 @@
 
     .crosshair {
       position: absolute;
-      width: 10px;
-      height: 10px;
+      width: 30px;
+      height: 30px;
       left: 0;
       top: 0;
       pointer-events: none;
@@ -99,17 +99,17 @@
     }
 
     .crosshair::before {
-      top: 5px;
+      top: 14px;
       left: 0;
-      width: 10px;
-      height: 1px;
+      width: 30px;
+      height: 2px;
     }
 
     .crosshair::after {
-      left: 5px;
+      left: 14px;
       top: 0;
-      width: 1px;
-      height: 10px;
+      width: 2px;
+      height: 30px;
     }
 
     h2 {
@@ -320,8 +320,8 @@
       function createCrosshair(x, y) {
         const cross = document.createElement('div');
         cross.className = 'crosshair';
-        cross.style.left = (x - 5) + 'px';
-        cross.style.top = (y - 5) + 'px';
+        cross.style.left = (x - 15) + 'px';
+        cross.style.top = (y - 15) + 'px';
         return cross;
       }
 
