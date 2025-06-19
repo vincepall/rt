@@ -112,6 +112,17 @@
       height: 30px;
     }
 
+    .highlight-circle {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 0, 0.3);
+      left: -10px;
+      top: -10px;
+      pointer-events: none;
+    }
+
     h2 {
       color: blue;
     }
@@ -322,6 +333,11 @@
         cross.className = 'crosshair';
         cross.style.left = (x - 15) + 'px';
         cross.style.top = (y - 15) + 'px';
+
+        const circle = document.createElement('div');
+        circle.className = 'highlight-circle';
+        cross.appendChild(circle);
+
         return cross;
       }
 
