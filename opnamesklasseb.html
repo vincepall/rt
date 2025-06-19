@@ -83,8 +83,7 @@
     }
 
     .crosshair {
-      position: relative;
-      z-index: 2;
+      position: absolute;
       width: 30px;
       height: 30px;
       left: 0;
@@ -111,18 +110,6 @@
       top: 0;
       width: 2px;
       height: 30px;
-    }
-
-    .highlight-circle {
-      position: absolute;
-      z-index: 1;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background-color: rgba(0, 51, 102, 0.5);
-      left: -10px;
-      top: -10px;
-      pointer-events: none;
     }
 
     h2 {
@@ -335,11 +322,6 @@
         cross.className = 'crosshair';
         cross.style.left = (x - 15) + 'px';
         cross.style.top = (y - 15) + 'px';
-
-        const circle = document.createElement('div');
-        circle.className = 'highlight-circle';
-        cross.appendChild(circle);
-
         return cross;
       }
 
