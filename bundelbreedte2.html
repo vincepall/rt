@@ -38,12 +38,18 @@
     .result {
       margin-top: 20px;
       padding: 10px;
-      color: black;
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
+      color: #F5DF4D;
+      background-color: #222;
+      border: 1px solid #444;
     }
     .hidden {
       display: none;
+    }
+    .info-img {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 20px;
+      display: block;
     }
   </style>
 </head>
@@ -122,6 +128,10 @@ function closeModal(id) {
   </div>
 
   <button onclick="calculate()">Bereken</button>
+
+  <!-- Afbeelding ter illustratie -->
+  <img src="bundel_uitleg.png" alt="Uitleg bundel opstelling" class="info-img">
+
   <div id="result" class="result"></div>
 </div>
 
