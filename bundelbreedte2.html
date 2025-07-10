@@ -1,191 +1,219 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bundelgrootte</title>
-    <link rel="stylesheet" href="styles.css">
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        label, select, input {
-            display: block;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        select, input {
-            padding: 8px;
-            font-size: 16px;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #646464;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #666;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 10px;
-            color: black;
-            text-shadow: none;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bundelgrootte</title>
+  <link rel="stylesheet" href="styles.css" />
+  <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    label, select, input {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    select, input {
+      padding: 8px;
+      font-size: 16px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #646464;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #666;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      color: black;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Info knop -->
-    <button class="info-btn" onclick="openModal('myModal')">i</button>
+<!-- Info knop -->
+<button class="info-btn" onclick="openModal('myModal')">i</button>
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('myModal')">&times;</span>
+    <p>
+      Bundelgrootte of FFD berekenen bij vlakke of gebogen oppervlakken.<br>
+      <b>Vlakke plaat:</b> tan(hoek/2) = (bundelbreedte/2) / afstand<br>
+      <b>Gebogen plaat:</b> Booglengte = bundelhoek(in radialen) × radius<br>
+      <b>FFD berekening (concave):</b> FFD = booglengte / hoek(in radialen)
+    </p>
+  </div>
+</div>
 
-    <!-- Info pop-up -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Bundelgrootte te berekenen of de benodigde FFD. Deze tool gaat uit van een vlakke plaat en neemt de ronding van een vat niet mee in de berekening! De marge is er om theoretische waarden van de bundelhoek zoals de fabrikant heeft gegeven in de praktijk te kunnen gebruiken, standaard staat deze op 25% maar je kan deze verlagen als je van risico houdt. Gebruikte formule: Tan(bundelhoek/2) = (bundelbereik/2)/FFD</p>
-        </div>
-    </div>
+<script>
+function openModal(id) {
+  document.getElementById(id).style.display = "block";
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = "none";
+}
+</script>
 
-    <div class="container">
-        <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1>
+<div class="container">
+  <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1>
 
-        <label for="tubeSelect">Kies een röntgenbuis:</label>
-        <select id="tubeSelect">
-            <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
-            <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
-            <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
-        </select>
+  <label for="tubeSelect">Kies een röntgenbuis:</label>
+  <select id="tubeSelect">
+    <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
+    <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
+    <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
+  </select>
 
-        <label for="calcType">Wat wil je weten:</label>
-        <select id="calcType">
-            <option value="" disabled selected>Kies een berekening</option>
-            <option value="size">Bundelgrootte op een bepaalde FFD</option>
-            <option value="distance">Benodigde FFD voor een bepaalde bundelgrootte</option>
-            <option value="concave">Concave lengte op bekende radius</option>
-        </select>
+  <label for="calcType">Wat wil je weten:</label>
+  <select id="calcType">
+    <option value="" disabled selected>Kies een berekening</option>
+    <option value="size">Bundelgrootte op vlakke plaat</option>
+    <option value="distance">Benodigde FFD voor vlakke plaat</option>
+    <option value="concave">Bundelbereik op gebogen oppervlak</option>
+    <option value="concaveFFD">Benodigde FFD voor gebogen oppervlak</option>
+  </select>
 
-        <div id="ffdField" class="hidden">
-            <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
-            <input type="number" id="ffd" step="any">
-        </div>
+  <div id="ffdField" class="hidden">
+    <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
+    <input type="number" id="ffd" step="any" />
+  </div>
 
-        <div id="beamSizeField" class="hidden">
-            <label for="beamSize">Gewenste bundelbereik in cm:</label>
-            <input type="number" id="beamSize" step="any">
-        </div>
+  <div id="beamSizeField" class="hidden">
+    <label for="beamSize">Gewenste bundelbereik in cm:</label>
+    <input type="number" id="beamSize" step="any" />
+  </div>
 
-        <div id="marginField" class="hidden">
-            <label for="margin">Voer margepercentage in (%):</label>
-            <input type="number" id="margin" value="25" step="any" min="0">
-        </div>
+  <div id="marginField" class="hidden">
+    <label for="margin">Voer margepercentage in (%):</label>
+    <input type="number" id="margin" value="25" step="any" min="0" />
+  </div>
 
-        <div id="radiusField" class="hidden">
-            <label for="radius">Radius van het oppervlak (in cm):</label>
-            <input type="number" id="radius" step="any">
-        </div>
+  <div id="radiusField" class="hidden">
+    <label for="radius">Radius van gebogen oppervlak (cm):</label>
+    <input type="number" id="radius" step="any" />
+  </div>
 
-        <button onclick="calculate()">Bereken</button>
+  <div id="ffdConcaveField" class="hidden">
+    <label for="ffdConcave">FFD (afstand bron tot middelpunt vat) in cm:</label>
+    <input type="number" id="ffdConcave" step="any" />
+  </div>
 
-        <div id="result" class="result"></div>
-    </div>
+  <div id="arcLengthField" class="hidden">
+    <label for="arcLength">Gewenste booglengte (cm):</label>
+    <input type="number" id="arcLength" step="any" />
+  </div>
 
-    <script>
-        const tubeData = {
-            yxlon300: { narrow: 40, wide: 55 },
-            smartEvo300: { narrow: 30, wide: 60 },
-            balteauCeram300: { narrow: 40, wide: 50 }
-        };
+  <button onclick="calculate()">Bereken</button>
+  <div id="result" class="result"></div>
+</div>
 
-        document.getElementById('calcType').addEventListener('change', function () {
-            const calcType = this.value;
-            const ffdField = document.getElementById('ffdField');
-            const beamSizeField = document.getElementById('beamSizeField');
-            const marginField = document.getElementById('marginField');
-            const radiusField = document.getElementById('radiusField');
+<script>
+const tubeData = {
+  yxlon300: { narrow: 40, wide: 55 },
+  smartEvo300: { narrow: 30, wide: 60 },
+  balteauCeram300: { narrow: 40, wide: 50 }
+};
 
-            ffdField.classList.add('hidden');
-            beamSizeField.classList.add('hidden');
-            marginField.classList.add('hidden');
-            radiusField.classList.add('hidden');
+document.getElementById('calcType').addEventListener('change', function () {
+  const value = this.value;
+  const ffdField = document.getElementById('ffdField');
+  const beamSizeField = document.getElementById('beamSizeField');
+  const marginField = document.getElementById('marginField');
+  const radiusField = document.getElementById('radiusField');
+  const ffdConcaveField = document.getElementById('ffdConcaveField');
+  const arcLengthField = document.getElementById('arcLengthField');
 
-            if (calcType === 'size') {
-                ffdField.classList.remove('hidden');
-            } else if (calcType === 'distance') {
-                beamSizeField.classList.remove('hidden');
-                marginField.classList.remove('hidden');
-            } else if (calcType === 'concave') {
-                radiusField.classList.remove('hidden');
-            }
-        });
+  ffdField.classList.add('hidden');
+  beamSizeField.classList.add('hidden');
+  marginField.classList.add('hidden');
+  radiusField.classList.add('hidden');
+  ffdConcaveField.classList.add('hidden');
+  arcLengthField.classList.add('hidden');
 
-        function calculate() {
-            const tube = document.getElementById('tubeSelect').value;
-            const calcType = document.getElementById('calcType').value;
-            const angles = tubeData[tube];
-            const narrowAngle = angles.narrow * Math.PI / 180;
-            const wideAngle = angles.wide * Math.PI / 180;
-            const marginPercentage = parseFloat(document.getElementById('margin').value) / 100 + 1;
-            let resultText = '';
+  if (value === 'size') ffdField.classList.remove('hidden');
+  else if (value === 'distance') {
+    beamSizeField.classList.remove('hidden');
+    marginField.classList.remove('hidden');
+  } else if (value === 'concave') {
+    radiusField.classList.remove('hidden');
+    ffdConcaveField.classList.remove('hidden');
+  } else if (value === 'concaveFFD') {
+    radiusField.classList.remove('hidden');
+    arcLengthField.classList.remove('hidden');
+  }
+});
 
-            if (calcType === 'size') {
-                const ffd = parseFloat(document.getElementById('ffd').value);
-                if (isNaN(ffd) || ffd <= 0) {
-                    resultText = 'Voer een geldige FFD in.';
-                } else {
-                    const narrowBeam = 2 * ffd * Math.tan(narrowAngle / 2);
-                    const wideBeam = 2 * ffd * Math.tan(wideAngle / 2);
-                    resultText = `De bundel is:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
-                }
-            } else if (calcType === 'distance') {
-                const beamSize = parseFloat(document.getElementById('beamSize').value);
-                if (isNaN(beamSize) || beamSize <= 0) {
-                    resultText = 'Voer een geldig bundelbereik in.';
-                } else {
-                    const ffdNarrow = ((beamSize / 2) / Math.tan(narrowAngle / 2)) * marginPercentage;
-                    const ffdWide = ((beamSize / 2) / Math.tan(wideAngle / 2)) * marginPercentage;
-                    resultText = `De minimale FFD om het gewenste bundelbereik te krijgen is:<br>
-                    bij gebruik van de smalle bundel: ${ffdNarrow.toFixed(2)} cm<br>
-                    bij gebruik van de brede bundel: ${ffdWide.toFixed(2)} cm`;
-                }
-            } else if (calcType === 'concave') {
-                const radius = parseFloat(document.getElementById('radius').value);
-                if (isNaN(radius) || radius <= 0) {
-                    resultText = 'Voer een geldige radius in.';
-                } else {
-                    const narrowArc = 2 * radius * Math.tan(narrowAngle / 2);
-                    const wideArc = 2 * radius * Math.tan(wideAngle / 2);
-                    resultText = `De bundelgrootte over een gebogen oppervlak is:<br>
-                    Aan de smalle kant: ${narrowArc.toFixed(2)} cm<br>
-                    Aan de brede kant: ${wideArc.toFixed(2)} cm`;
-                }
-            }
+function calculate() {
+  const tube = document.getElementById('tubeSelect').value;
+  const calcType = document.getElementById('calcType').value;
+  const angles = tubeData[tube];
+  const narrowRad = angles.narrow * Math.PI / 180;
+  const wideRad = angles.wide * Math.PI / 180;
+  const margin = parseFloat(document.getElementById('margin').value) / 100 + 1;
 
-            document.getElementById('result').innerHTML = resultText;
-        }
+  let resultText = '';
 
-        // Info modal functies
-        function openModal(id) {
-            document.getElementById(id).style.display = 'block';
-        }
+  if (calcType === 'size') {
+    const ffd = parseFloat(document.getElementById('ffd').value);
+    if (!ffd || ffd <= 0) {
+      resultText = 'Voer een geldige FFD in.';
+    } else {
+      const narrow = 2 * ffd * Math.tan(narrowRad / 2);
+      const wide = 2 * ffd * Math.tan(wideRad / 2);
+      resultText = `Bundel op vlakke plaat:<br>Smalle kant: ${narrow.toFixed(2)} cm<br>Brede kant: ${wide.toFixed(2)} cm`;
+    }
+  } else if (calcType === 'distance') {
+    const beam = parseFloat(document.getElementById('beamSize').value);
+    if (!beam || beam <= 0) {
+      resultText = 'Voer een geldig bundelbereik in.';
+    } else {
+      const ffdNarrow = ((beam / 2) / Math.tan(narrowRad / 2)) * margin;
+      const ffdWide = ((beam / 2) / Math.tan(wideRad / 2)) * margin;
+      resultText = `Benodigde FFD:<br>Smalle bundel: ${ffdNarrow.toFixed(2)} cm<br>Brede bundel: ${ffdWide.toFixed(2)} cm`;
+    }
+  } else if (calcType === 'concave') {
+    const radius = parseFloat(document.getElementById('radius').value);
+    const ffd = parseFloat(document.getElementById('ffdConcave').value);
+    if (!radius || !ffd || radius <= 0 || ffd <= 0) {
+      resultText = 'Voer geldige waarden in voor radius en FFD.';
+    } else {
+      const arcNarrow = radius * narrowRad;
+      const arcWide = radius * wideRad;
+      resultText = `Booglengte op oppervlak:<br>Smalle kant: ${arcNarrow.toFixed(2)} cm<br>Brede kant: ${arcWide.toFixed(2)} cm`;
+    }
+  } else if (calcType === 'concaveFFD') {
+    const radius = parseFloat(document.getElementById('radius').value);
+    const arcLength = parseFloat(document.getElementById('arcLength').value);
+    if (!radius || !arcLength || radius <= 0 || arcLength <= 0) {
+      resultText = 'Voer geldige waarden in voor radius en booglengte.';
+    } else {
+      const ffdNarrow = arcLength / narrowRad;
+      const ffdWide = arcLength / wideRad;
+      resultText = `Benodigde afstand (FFD) voor gegeven booglengte:<br>Smalle bundel: ${ffdNarrow.toFixed(2)} cm<br>Brede bundel: ${ffdWide.toFixed(2)} cm`;
+    }
+  }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-    </script>
+  document.getElementById('result').innerHTML = resultText;
+}
+</script>
+
 </body>
 </html>
