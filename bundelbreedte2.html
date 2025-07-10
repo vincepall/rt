@@ -106,9 +106,9 @@ function closeModal(id) {
     <input type="number" id="margin" value="25" step="any" min="0" />
   </div>
 
-  <div id="radiusField" class="hidden">
-    <label for="radius">Radius van gebogen oppervlak (cm):</label>
-    <input type="number" id="radius" step="any" />
+  <div id="diameterField" class="hidden">
+    <label for="diameter">Diameter van gebogen oppervlak (cm):</label>
+    <input type="number" id="diameter" step="any" />
   </div>
 
   <div id="ffdConcaveField" class="hidden">
@@ -134,30 +134,24 @@ const tubeData = {
 
 document.getElementById('calcType').addEventListener('change', function () {
   const value = this.value;
-  const ffdField = document.getElementById('ffdField');
-  const beamSizeField = document.getElementById('beamSizeField');
-  const marginField = document.getElementById('marginField');
-  const radiusField = document.getElementById('radiusField');
-  const ffdConcaveField = document.getElementById('ffdConcaveField');
-  const arcLengthField = document.getElementById('arcLengthField');
+  document.getElementById('ffdField').classList.add('hidden');
+  document.getElementById('beamSizeField').classList.add('hidden');
+  document.getElementById('marginField').classList.add('hidden');
+  document.getElementById('diameterField').classList.add('hidden');
+  document.getElementById('ffdConcaveField').classList.add('hidden');
+  document.getElementById('arcLengthField').classList.add('hidden');
 
-  ffdField.classList.add('hidden');
-  beamSizeField.classList.add('hidden');
-  marginField.classList.add('hidden');
-  radiusField.classList.add('hidden');
-  ffdConcaveField.classList.add('hidden');
-  arcLengthField.classList.add('hidden');
-
-  if (value === 'size') ffdField.classList.remove('hidden');
-  else if (value === 'distance') {
-    beamSizeField.classList.remove('hidden');
-    marginField.classList.remove('hidden');
+  if (value === 'size') {
+    document.getElementById('ffdField').classList.remove('hidden');
+  } else if (value === 'distance') {
+    document.getElementById('beamSizeField').classList.remove('hidden');
+    document.getElementById('marginField').classList.remove('hidden');
   } else if (value === 'concave') {
-    radiusField.classList.remove('hidden');
-    ffdConcaveField.classList.remove('hidden');
+    document.getElementById('diameterField').classList.remove('hidden');
+    document.getElementById('ffdConcaveField').classList.remove('hidden');
   } else if (value === 'concaveFFD') {
-    radiusField.classList.remove('hidden');
-    arcLengthField.classList.remove('hidden');
+    document.getElementById('diameterField').classList.remove('hidden');
+    document.getElementById('arcLengthField').classList.remove('hidden');
   }
 });
 
@@ -190,21 +184,23 @@ function calculate() {
       resultText = `Benodigde FFD:<br>Smalle bundel: ${ffdNarrow.toFixed(2)} cm<br>Brede bundel: ${ffdWide.toFixed(2)} cm`;
     }
   } else if (calcType === 'concave') {
-    const radius = parseFloat(document.getElementById('radius').value);
+    const diameter = parseFloat(document.getElementById('diameter').value);
     const ffd = parseFloat(document.getElementById('ffdConcave').value);
-    if (!radius || !ffd || radius <= 0 || ffd <= 0) {
-      resultText = 'Voer geldige waarden in voor radius en FFD.';
+    if (!diameter || !ffd || diameter <= 0 || ffd <= 0) {
+      resultText = 'Voer geldige waarden in voor diameter en FFD.';
     } else {
+      const radius = diameter / 2;
       const arcNarrow = radius * narrowRad;
       const arcWide = radius * wideRad;
       resultText = `Booglengte op oppervlak:<br>Smalle kant: ${arcNarrow.toFixed(2)} cm<br>Brede kant: ${arcWide.toFixed(2)} cm`;
     }
   } else if (calcType === 'concaveFFD') {
-    const radius = parseFloat(document.getElementById('radius').value);
+    const diameter = parseFloat(document.getElementById('diameter').value);
     const arcLength = parseFloat(document.getElementById('arcLength').value);
-    if (!radius || !arcLength || radius <= 0 || arcLength <= 0) {
-      resultText = 'Voer geldige waarden in voor radius en booglengte.';
+    if (!diameter || !arcLength || diameter <= 0 || arcLength <= 0) {
+      resultText = 'Voer geldige waarden in voor diameter en booglengte.';
     } else {
+      const radius = diameter / 2;
       const ffdNarrow = arcLength / narrowRad;
       const ffdWide = arcLength / wideRad;
       resultText = `Benodigde afstand (FFD) voor gegeven booglengte:<br>Smalle bundel: ${ffdNarrow.toFixed(2)} cm<br>Brede bundel: ${ffdWide.toFixed(2)} cm`;
