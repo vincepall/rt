@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="nl">
+<!DOCTYPE html><html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,18 +47,14 @@
         }
     </style>
 </head>
-<body>
-
-<button class="info-btn" onclick="openModal('myModal')">i</button>
+<body><button class="info-btn" onclick="openModal('myModal')">i</button>
 
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
         <p>Bundelgrootte berekenen of de benodigde FFD. Deze tool ondersteunt zowel vlakke platen als vaten (van binnen naar buiten, EN-8/ASME-B). Formule voor gebogen plaat: ((alpha - 2 * arcsin(((diameter - 2 * FFD) / diameter) * sin(alpha / 2))) / 360) * pi * diameter.</p>
     </div>
-</div>
-
-<script>
+</div><script>
     function openModal(id) {
         document.getElementById(id).style.display = 'block';
     }
@@ -67,54 +62,49 @@
     function closeModal(id) {
         document.getElementById(id).style.display = 'none';
     }
-</script>
+</script><div class="container">
+    <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1><label for="tubeSelect">Kies een bron:</label>
+<select id="tubeSelect">
+    <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
+    <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
+    <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
+    <option value="Se75breed">Selenium 75 met brede collimator: 90° x 90°</option>
+    <option value="Se75smal">Selenium 75 met smalle collimator: 60° x 60°</option>
+</select>
 
-<div class="container">
-    <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1>
+<label for="plateType">Opstelling:</label>
+<select id="plateType">
+    <option value="vlak">Vlakke plaat</option>
+    <option value="gebogen">Vat, opstelling EN-8 / ASME-B</option>
+</select>
 
-    <label for="tubeSelect">Kies een bron:</label>
-    <select id="tubeSelect">
-        <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
-        <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
-        <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
-        <option value="Se75breed">Selenium 75 met brede collimator: 90° x 90°</option>
-        <option value="Se75smal">Selenium 75 met smalle collimator: 60° x 60°</option>
-    </select>
+<label for="calcType">Wat wil je weten:</label>
+<select id="calcType">
+    <option value="" disabled selected>Kies een berekening</option>
+    <option value="size">Bundelgrootte op een bepaalde FFD</option>
+    <option value="ffd">Benodigde FFD</option>
+</select>
 
-    <label for="plateType">Opstelling:</label>
-    <select id="plateType">
-        <option value="vlak">Vlakke plaat</option>
-        <option value="gebogen">Vat, opstelling EN-8 / ASME-B</option>
-    </select>
-
-    <label for="calcType">Wat wil je weten:</label>
-    <select id="calcType">
-        <option value="" disabled selected>Kies een berekening</option>
-        <option value="size">Bundelgrootte op een bepaalde FFD</option>
-        <option value="ffd">Benodigde FFD</option>
-    </select>
-
-    <div id="ffdField" class="hidden">
-        <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
-        <input type="number" id="ffd" step="any">
-    </div>
-
-    <div id="beamSizeField" class="hidden">
-        <label for="beamSize">Gewenste bundelgrootte in cm:</label>
-        <input type="number" id="beamSize" step="any">
-    </div>
-
-    <div id="diameterField" class="hidden">
-        <label for="diameter">Diameter van het vat in cm:</label>
-        <input type="number" id="diameter" step="any">
-    </div>
-
-    <button onclick="calculate()">Bereken</button>
-
-    <div id="result" class="result"></div>
+<div id="ffdField" class="hidden">
+    <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
+    <input type="number" id="ffd" step="any">
 </div>
 
-<script>
+<div id="beamSizeField" class="hidden">
+    <label for="beamSize">Gewenste bundelgrootte in cm:</label>
+    <input type="number" id="beamSize" step="any">
+</div>
+
+<div id="diameterField" class="hidden">
+    <label for="diameter">Diameter van het vat in cm:</label>
+    <input type="number" id="diameter" step="any">
+</div>
+
+<button onclick="calculate()">Bereken</button>
+
+<div id="result" class="result"></div>
+
+</div><script>
     const tubeData = {
         yxlon300: { narrow: 40, wide: 55 },
         smartEvo300: { narrow: 30, wide: 60 },
@@ -186,7 +176,9 @@
                 const narrowFFD = findCurvedFFDAlways(narrowAngleDeg, diameter, beamSize);
                 const wideFFD = findCurvedFFDAlways(wideAngleDeg, diameter, beamSize);
 
-                resultText = `Gebogen plaat:<br>Benodigde FFD voor smalle kant: ${narrowFFD.toFixed(2)} cm<br>Benodigde FFD voor brede kant: ${wideFFD.toFixed(2)} cm`;
+                resultText = `Gebogen plaat:<br>`;
+                resultText += `Benodigde FFD voor smalle kant: ${narrowFFD !== null ? narrowFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}<br>`;
+                resultText += `Benodigde FFD voor brede kant: ${wideFFD !== null ? wideFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}`;
             }
         }
 
@@ -209,9 +201,10 @@
             if (beam > targetBeam) high = mid;
             else low = mid;
         }
+        if (Math.abs(mid - diameter) < 0.05) {
+            return null;
+        }
         return mid;
     }
-</script>
-
-</body>
+</script></body>
 </html>
