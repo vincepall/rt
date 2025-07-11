@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="styles.css">
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Bundelgrootte & FFD</title>
+    <title>Bundelgrootte</title>
     <style>
         .container {
             max-width: 400px;
@@ -55,7 +55,7 @@
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
-        <p>Bundelgrootte berekenen of de benodigde FFD. Deze tool ondersteunt zowel vlakke platen als gebogen platen (EN-8/ASME-B). Voor gebogen platen wordt de diameter meegenomen in de berekening. Formule voor gebogen plaat: ((alpha - 2 * arcsin(((diameter - 2 * FFD) / diameter) * sin(alpha / 2))) / 360) * pi * diameter. De bundel wordt altijd weergegeven, ook als deze theoretisch niet mogelijk zou zijn.</p>
+        <p>Bundelgrootte berekenen of de benodigde FFD. Deze tool ondersteunt zowel vlakke platen als vaten (van binnen naar buiten, EN-8/ASME-B). Formule voor gebogen plaat: ((alpha - 2 * arcsin(((diameter - 2 * FFD) / diameter) * sin(alpha / 2))) / 360) * pi * diameter.</p>
     </div>
 </div>
 
@@ -72,11 +72,13 @@
 <div class="container">
     <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte & FFD</h1>
 
-    <label for="tubeSelect">Kies een röntgenbuis:</label>
+    <label for="tubeSelect">Kies een bron:</label>
     <select id="tubeSelect">
         <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
         <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
         <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
+        <option value="Se75breed">Selenium 75 met brede collimator: 90° x 90°</option>
+        <option value="Se75smal">Selenium 75 met smalle collimator: 60° x 60°</option>
     </select>
 
     <label for="plateType">Opstelling:</label>
@@ -89,7 +91,7 @@
     <select id="calcType">
         <option value="" disabled selected>Kies een berekening</option>
         <option value="size">Bundelgrootte op een bepaalde FFD</option>
-        <option value="ffd">Benodigde FFD voor een bundelgrootte</option>
+        <option value="ffd">Benodigde FFD</option>
     </select>
 
     <div id="ffdField" class="hidden">
@@ -116,7 +118,9 @@
     const tubeData = {
         yxlon300: { narrow: 40, wide: 55 },
         smartEvo300: { narrow: 30, wide: 60 },
-        balteauCeram300: { narrow: 40, wide: 50 }
+        balteauCeram300: { narrow: 40, wide: 50 },
+        Se75breed: { narrow: 90, wide 90 },
+        Se75smal: { narrow: 60, wide 60 }
     };
 
     document.getElementById('calcType').addEventListener('change', updateFields);
