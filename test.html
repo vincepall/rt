@@ -147,7 +147,7 @@
                 resultText = `Vlakke plaat:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
             } else if (plateType === 'gebogen') {
                 const diameter = parseFloat(document.getElementById('diameter').value);
-                if (isNaN(diameter) || diameter <= 0 || diameter <= 2 * ffd) {
+                if (isNaN(diameter) || diameter <= 0) {
                     document.getElementById('result').innerHTML = 'Voer een geldige diameter in (moet groter zijn dan 2 x FFD).';
                     return;
                 }
