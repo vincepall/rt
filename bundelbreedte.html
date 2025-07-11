@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="nl">
+<!DOCTYPE html><html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Bundelgrootte</title>
     <style>
-        
         .container {
             max-width: 400px;
             margin: 0 auto;
@@ -49,116 +47,164 @@
         }
     </style>
 </head>
-<body>
-<!-- De knop om het pop-up venster te openen -->
-    <button class="info-btn" onclick="openModal('myModal')">i</button>
+<body><button class="info-btn" onclick="openModal('myModal')">i</button>
 
-    <!-- Het pop-up venster -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Bundelgrootte te berekenen of de benodigde FFD. Deze tool gaat uit van een vlakke plaat en neemt de ronding van een vat niet mee in de berekening! De marge is er om theoretische waarden van de bundelhoek zoals de fabrikant heeft gegeven in de praktijk te kunnen gebruiken, standaard staat deze op 25% maar je kan deze verlagen als je van risico houdt. Gebruikte formule: Tan(bundelhoek/2) = (bundelbereik/2)/FFD
-            </p>
-        </div>
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('myModal')">&times;</span>
+        <p>Bundelgrootte berekenen of de benodigde FFD. Deze tool ondersteunt zowel vlakke platen als vaten (van binnen naar buiten, EN-8/ASME-B). Formule voor gebogen plaat: ((alpha - 2 * arcsin(((diameter - 2 * FFD) / diameter) * sin(alpha / 2))) / 360) * pi * diameter.</p>
     </div>
+</div><script>
+    function openModal(id) {
+        document.getElementById(id).style.display = 'block';
+    }
 
-    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+</script><div class="container">
+    <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1><label for="tubeSelect">Kies een bron:</label>
+<select id="tubeSelect">
+    <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
+    <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
+    <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
+    <option value="Se75breed">Selenium 75 met brede collimator: 90° x 90°</option>
+    <option value="Se75smal">Selenium 75 met smalle collimator: 60° x 60°</option>
+</select>
 
-    <div class="container">
-        <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1>
-        <label for="tubeSelect">Kies een röntgenbuis:</label>
-        <select id="tubeSelect">
-            <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
-            <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
-            <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
-        </select>
+<label for="plateType">Opstelling:</label>
+<select id="plateType">
+    <option value="vlak">Vlakke plaat</option>
+    <option value="gebogen">Vat, opstelling EN-8 / ASME-B</option>
+</select>
 
-        <label for="calcType">Wat wil je weten:</label>
-        <select id="calcType">
-            <option value="" disabled selected>Kies een berekening</option>
-            <option value="size">Bundelgrootte op een bepaalde FFD</option>
-            <option value="distance">Benodigde FFD voor een bepaalde bundelgrootte</option>
-        </select>
+<label for="calcType">Wat wil je weten:</label>
+<select id="calcType">
+    <option value="" disabled selected>Kies een berekening</option>
+    <option value="size">Bundelgrootte op een bepaalde FFD</option>
+    <option value="ffd">Benodigde FFD</option>
+</select>
 
-        <div id="ffdField" class="hidden">
-            <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
-            <input type="number" id="ffd" step="any">
-        </div>
+<div id="ffdField" class="hidden">
+    <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
+    <input type="number" id="ffd" step="any">
+</div>
 
-        <div id="beamSizeField" class="hidden">
-            <label for="beamSize">Gewenste bundelbereik in cm:</label>
-            <input type="number" id="beamSize" step="any">
-        </div>
+<div id="beamSizeField" class="hidden">
+    <label for="beamSize">Gewenste bundelgrootte in cm:</label>
+    <input type="number" id="beamSize" step="any">
+</div>
 
-        <div id="marginField" class="hidden">
-            <label for="margin">Voer margepercentage in (%):</label>
-            <input type="number" id="margin" value="25" step="any" min="0">
-        </div>
+<div id="diameterField" class="hidden">
+    <label for="diameter">Diameter van het vat in cm:</label>
+    <input type="number" id="diameter" step="any">
+</div>
 
-        <button onclick="calculate()">Bereken</button>
+<button onclick="calculate()">Bereken</button>
 
-        <div id="result" class="result"></div>
-    </div>
+<div id="result" class="result"></div>
 
-    <script>
-        const tubeData = {
-            yxlon300: { narrow: 40, wide: 55 },
-            smartEvo300: { narrow: 30, wide: 60 },
-            balteauCeram300: { narrow: 40, wide: 50 }
-        };
+</div><script>
+    const tubeData = {
+        yxlon300: { narrow: 40, wide: 55 },
+        smartEvo300: { narrow: 30, wide: 60 },
+        balteauCeram300: { narrow: 40, wide: 50 },
+        Se75breed: { narrow: 90, wide: 90 },
+        Se75smal: { narrow: 60, wide: 60 }
+    };
 
-        document.getElementById('calcType').addEventListener('change', function() {
-            const calcType = this.value;
-            const ffdField = document.getElementById('ffdField');
-            const beamSizeField = document.getElementById('beamSizeField');
-            const marginField = document.getElementById('marginField');
+    document.getElementById('calcType').addEventListener('change', updateFields);
+    document.getElementById('plateType').addEventListener('change', updateFields);
 
-            if (calcType === 'size') {
-                ffdField.classList.remove('hidden');
-                beamSizeField.classList.add('hidden');
-                marginField.classList.add('hidden');
-            } else if (calcType === 'distance') {
-                ffdField.classList.add('hidden');
-                beamSizeField.classList.remove('hidden');
-                marginField.classList.remove('hidden');
-            }
-        });
+    function updateFields() {
+        const calcType = document.getElementById('calcType').value;
+        const plateType = document.getElementById('plateType').value;
 
-        function calculate() {
-            const tube = document.getElementById('tubeSelect').value;
-            const calcType = document.getElementById('calcType').value;
+        document.getElementById('ffdField').classList.toggle('hidden', calcType !== 'size');
+        document.getElementById('beamSizeField').classList.toggle('hidden', calcType !== 'ffd');
+        document.getElementById('diameterField').classList.toggle('hidden', plateType !== 'gebogen');
+    }
 
-            const angles = tubeData[tube];
-            const narrowAngle = angles.narrow * Math.PI / 180; // omzetten naar radialen
-            const wideAngle = angles.wide * Math.PI / 180; // omzetten naar radialen
+    function calculate() {
+        const tube = document.getElementById('tubeSelect').value;
+        const calcType = document.getElementById('calcType').value;
+        const plateType = document.getElementById('plateType').value;
+        const angles = tubeData[tube];
+        const narrowAngleDeg = angles.narrow;
+        const wideAngleDeg = angles.wide;
 
-            const marginPercentage = parseFloat(document.getElementById('margin').value) / 100 + 1;
+        const ffd = parseFloat(document.getElementById('ffd').value);
+        const beamSize = parseFloat(document.getElementById('beamSize').value);
+        const diameter = parseFloat(document.getElementById('diameter').value);
 
-            let resultText = '';
+        let resultText = '';
 
-            if (calcType === 'size') {
-                const ffd = parseFloat(document.getElementById('ffd').value);
-                if (isNaN(ffd) || ffd <= 0) {
-                    resultText = 'Voer een geldige FFD in.';
-                } else {
-                    const narrowBeam = 2 * ffd * Math.tan(narrowAngle / 2);
-                    const wideBeam = 2 * ffd * Math.tan(wideAngle / 2);
-                    resultText = `De bundel is:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
-                }
-            } else if (calcType === 'distance') {
-                const beamSize = parseFloat(document.getElementById('beamSize').value);
-                if (isNaN(beamSize) || beamSize <= 0) {
-                    resultText = 'Voer een geldig bundelbereik in.';
-                } else {
-                    const ffdNarrow = ((beamSize / 2) / Math.tan(narrowAngle / 2)) * marginPercentage;
-                    const ffdWide = ((beamSize / 2) / Math.tan(wideAngle / 2)) * marginPercentage;
-                    resultText = `De minimale FFD om het gewenste bundelbereik te krijgen is:<br>bij gebruik van de smalle bundel: ${ffdNarrow.toFixed(2)} cm<br>Bij gebruik van de brede bundel: ${ffdWide.toFixed(2)} cm`;
-                }
-            }
-
-            document.getElementById('result').innerHTML = resultText;
+        if (calcType === 'size' && (isNaN(ffd) || ffd <= 0)) {
+            document.getElementById('result').innerHTML = 'Voer een geldige FFD in.';
+            return;
         }
-    </script>
-</body>
-</html>
 
+        if (calcType === 'ffd' && (isNaN(beamSize) || beamSize <= 0)) {
+            document.getElementById('result').innerHTML = 'Voer een geldige bundelgrootte in.';
+            return;
+        }
+
+        if (plateType === 'gebogen' && (isNaN(diameter) || diameter <= 0)) {
+            document.getElementById('result').innerHTML = 'Voer een geldige diameter in.';
+            return;
+        }
+
+        if (calcType === 'size') {
+            if (plateType === 'vlak') {
+                const narrowBeam = 2 * ffd * Math.tan(narrowAngleDeg * Math.PI / 360);
+                const wideBeam = 2 * ffd * Math.tan(wideAngleDeg * Math.PI / 360);
+                resultText = `Vlakke plaat:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
+            } else {
+                const narrowBeam = curvedBeamSizeAlways(narrowAngleDeg, diameter, ffd);
+                const wideBeam = curvedBeamSizeAlways(wideAngleDeg, diameter, ffd);
+
+                resultText = `Gebogen plaat:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
+            }
+        }
+
+        if (calcType === 'ffd') {
+            if (plateType === 'vlak') {
+                const narrowFFD = beamSize / (2 * Math.tan(narrowAngleDeg * Math.PI / 360));
+                const wideFFD = beamSize / (2 * Math.tan(wideAngleDeg * Math.PI / 360));
+                resultText = `Vlakke plaat:<br>Benodigde FFD voor smalle kant: ${narrowFFD.toFixed(2)} cm<br>Benodigde FFD voor brede kant: ${wideFFD.toFixed(2)} cm`;
+            } else {
+                const narrowFFD = findCurvedFFDAlways(narrowAngleDeg, diameter, beamSize);
+                const wideFFD = findCurvedFFDAlways(wideAngleDeg, diameter, beamSize);
+
+                resultText = `Gebogen plaat:<br>`;
+                resultText += `Benodigde FFD voor smalle kant: ${narrowFFD !== null ? narrowFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}<br>`;
+                resultText += `Benodigde FFD voor brede kant: ${wideFFD !== null ? wideFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}`;
+            }
+        }
+
+        document.getElementById('result').innerHTML = resultText;
+    }
+
+    function curvedBeamSizeAlways(angleDeg, diameter, ffd) {
+        const alpha = angleDeg * Math.PI / 180;
+        const sinHalfAlpha = Math.sin(alpha / 2);
+        const inner = ((diameter - 2 * ffd) / diameter) * sinHalfAlpha;
+        const correctedAlpha = alpha - 2 * Math.asin(Math.max(Math.min(inner, 1), -1));
+        return (correctedAlpha / (2 * Math.PI)) * Math.PI * diameter;
+    }
+
+    function findCurvedFFDAlways(angleDeg, diameter, targetBeam) {
+        let low = 0.1, high = diameter, mid;
+        while (high - low > 0.01) {
+            mid = (low + high) / 2;
+            const beam = curvedBeamSizeAlways(angleDeg, diameter, mid);
+            if (beam > targetBeam) high = mid;
+            else low = mid;
+        }
+        if (Math.abs(mid - diameter) < 0.05) {
+            return null;
+        }
+        return mid;
+    }
+</script></body>
+</html>
