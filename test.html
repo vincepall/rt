@@ -202,7 +202,7 @@
     }
 
     function findCurvedFFDAlways(angleDeg, diameter, targetBeam) {
-        let low = 0.1, high = diameter / 2, mid;
+        let low = 0.1, high = diameter, mid;
         while (high - low > 0.01) {
             mid = (low + high) / 2;
             const beam = curvedBeamSizeAlways(angleDeg, diameter, mid);
