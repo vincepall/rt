@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="nl">
+<!DOCTYPE html>
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Bundelgrootte</title>
     <style>
+        /* Bestaande CSS-stijlen */
         .container {
             max-width: 400px;
             margin: 0 auto;
@@ -47,14 +49,17 @@
         }
     </style>
 </head>
-<body><button class="info-btn" onclick="openModal('myModal')">i</button>
+<body>
+<button class="info-btn" onclick="openModal('myModal')">i</button>
 
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
-        <p>Bundelgrootte berekenen of de benodigde FFD. Deze tool ondersteunt zowel vlakke platen als vaten (van binnen naar buiten, EN-8/ASME-B). Formule voor gebogen plaat: ((alpha - 2 * arcsin(((diameter - 2 * FFD) / diameter) * sin(alpha / 2))) / 360) * pi * diameter.</p>
+        <p>Bundelgrootte berekenen of de benodigde FFD. Deze tool ondersteunt zowel vlakke platen als vaten (van binnen naar buiten, EN-8/ASME-B). Formule voor gebogen plaat: ((alpha - 2 * arcsin(((diameter - 2 * FFD) / diameter) * sin(alpha / 2))) / 360) * pi * diameter. Let op: "FFD" in de context van de gebogen plaat verwijst naar de afstand van de bron tot de belichte wand. Nuttig bereik is het gedeelte waar de doorstraalde dikte niet meer dan de opgegeven limiet toeneemt.</p>
     </div>
-</div><script>
+</div>
+
+<script>
     function openModal(id) {
         document.getElementById(id).style.display = 'block';
     }
@@ -62,49 +67,65 @@
     function closeModal(id) {
         document.getElementById(id).style.display = 'none';
     }
-</script><div class="container">
-    <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1><label for="tubeSelect">Kies een bron:</label>
-<select id="tubeSelect">
-    <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
-    <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
-    <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
-    <option value="Se75breed">Selenium 75 met brede collimator: 90° x 90°</option>
-    <option value="Se75smal">Selenium 75 met smalle collimator: 60° x 60°</option>
-</select>
+</script>
 
-<label for="plateType">Opstelling:</label>
-<select id="plateType">
-    <option value="vlak">Vlakke plaat</option>
-    <option value="gebogen">Vat, opstelling EN-8 / ASME-B</option>
-</select>
+<div class="container">
+    <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1>
 
-<label for="calcType">Wat wil je weten:</label>
-<select id="calcType">
-    <option value="" disabled selected>Kies een berekening</option>
-    <option value="size">Bundelgrootte op een bepaalde FFD</option>
-    <option value="ffd">Benodigde FFD</option>
-</select>
+    <label for="tubeSelect">Kies een bron:</label>
+    <select id="tubeSelect">
+        <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
+        <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
+        <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
+        <option value="Se75breed">Selenium 75 met brede collimator: 90° x 90°</option>
+        <option value="Se75smal">Selenium 75 met smalle collimator: 60° x 60°</option>
+    </select>
 
-<div id="ffdField" class="hidden">
-    <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
-    <input type="number" id="ffd" step="any">
+    <label for="plateType">Opstelling:</label>
+    <select id="plateType">
+        <option value="vlak">Vlakke plaat</option>
+        <option value="gebogen">Vat, opstelling EN-8 / ASME-B (van binnen naar buiten)</option>
+    </select>
+
+    <label for="calcType">Wat wil je weten:</label>
+    <select id="calcType">
+        <option value="" disabled selected>Kies een berekening</option>
+        <option value="size">Bundelgrootte op een bepaalde FFD</option>
+        <option value="ffd">Benodigde FFD</option>
+        <option value="useful">Nuttig bereik (incl. wanddikte en toename)</option>
+    </select>
+
+    <div id="ffdField" class="hidden">
+        <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
+        <input type="number" id="ffd" step="any">
+    </div>
+
+    <div id="beamSizeField" class="hidden">
+        <label for="beamSize">Gewenste bundelgrootte in cm:</label>
+        <input type="number" id="beamSize" step="any">
+    </div>
+
+    <div id="diameterField" class="hidden">
+        <label for="diameter">Diameter van het vat in cm:</label>
+        <input type="number" id="diameter" step="any">
+    </div>
+
+    <div id="wallThicknessField" class="hidden">
+        <label for="wallThickness">Wanddikte van het vat in cm:</label>
+        <input type="number" id="wallThickness" step="any">
+    </div>
+
+    <div id="maxThicknessIncreaseField" class="hidden">
+        <label for="maxThicknessIncrease">Max. toegestane dikte-toename (percentage, bijv. 10 voor 10%):</label>
+        <input type="number" id="maxThicknessIncrease" step="any">
+    </div>
+
+    <button onclick="calculate()">Bereken</button>
+
+    <div id="result" class="result"></div>
 </div>
 
-<div id="beamSizeField" class="hidden">
-    <label for="beamSize">Gewenste bundelgrootte in cm:</label>
-    <input type="number" id="beamSize" step="any">
-</div>
-
-<div id="diameterField" class="hidden">
-    <label for="diameter">Diameter van het vat in cm:</label>
-    <input type="number" id="diameter" step="any">
-</div>
-
-<button onclick="calculate()">Bereken</button>
-
-<div id="result" class="result"></div>
-
-</div><script>
+<script>
     const tubeData = {
         yxlon300: { narrow: 40, wide: 55 },
         smartEvo300: { narrow: 30, wide: 60 },
@@ -120,9 +141,11 @@
         const calcType = document.getElementById('calcType').value;
         const plateType = document.getElementById('plateType').value;
 
-        document.getElementById('ffdField').classList.toggle('hidden', calcType !== 'size');
+        document.getElementById('ffdField').classList.toggle('hidden', calcType !== 'size' && calcType !== 'useful');
         document.getElementById('beamSizeField').classList.toggle('hidden', calcType !== 'ffd');
         document.getElementById('diameterField').classList.toggle('hidden', plateType !== 'gebogen');
+        document.getElementById('wallThicknessField').classList.toggle('hidden', calcType !== 'useful' || plateType !== 'gebogen');
+        document.getElementById('maxThicknessIncreaseField').classList.toggle('hidden', calcType !== 'useful' || plateType !== 'gebogen');
     }
 
     function calculate() {
@@ -136,34 +159,39 @@
         const ffd = parseFloat(document.getElementById('ffd').value);
         const beamSize = parseFloat(document.getElementById('beamSize').value);
         const diameter = parseFloat(document.getElementById('diameter').value);
+        const wallThickness = parseFloat(document.getElementById('wallThickness').value);
+        const maxThicknessIncrease = parseFloat(document.getElementById('maxThicknessIncrease').value); // In percentage
 
         let resultText = '';
 
+        // Input validatie
         if (calcType === 'size' && (isNaN(ffd) || ffd <= 0)) {
             document.getElementById('result').innerHTML = 'Voer een geldige FFD in.';
             return;
         }
-
         if (calcType === 'ffd' && (isNaN(beamSize) || beamSize <= 0)) {
             document.getElementById('result').innerHTML = 'Voer een geldige bundelgrootte in.';
             return;
         }
-
         if (plateType === 'gebogen' && (isNaN(diameter) || diameter <= 0)) {
             document.getElementById('result').innerHTML = 'Voer een geldige diameter in.';
             return;
         }
+        if (calcType === 'useful' && (isNaN(wallThickness) || wallThickness <= 0 || isNaN(maxThicknessIncrease) || maxThicknessIncrease <= 0 || isNaN(diameter) || diameter <= 0 || isNaN(ffd) || ffd <= 0)) {
+             document.getElementById('result').innerHTML = 'Voer geldige waarden in voor FFD, Diameter, Wanddikte en Max. dikte-toename.';
+             return;
+        }
+
 
         if (calcType === 'size') {
             if (plateType === 'vlak') {
                 const narrowBeam = 2 * ffd * Math.tan(narrowAngleDeg * Math.PI / 360);
                 const wideBeam = 2 * ffd * Math.tan(wideAngleDeg * Math.PI / 360);
                 resultText = `Vlakke plaat:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
-            } else {
+            } else { // Gebogen plaat
                 const narrowBeam = curvedBeamSizeAlways(narrowAngleDeg, diameter, ffd);
                 const wideBeam = curvedBeamSizeAlways(wideAngleDeg, diameter, ffd);
-
-                resultText = `Gebogen plaat:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
+                resultText = `Gebogen plaat (totale belichte lengte):<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
             }
         }
 
@@ -172,39 +200,226 @@
                 const narrowFFD = beamSize / (2 * Math.tan(narrowAngleDeg * Math.PI / 360));
                 const wideFFD = beamSize / (2 * Math.tan(wideAngleDeg * Math.PI / 360));
                 resultText = `Vlakke plaat:<br>Benodigde FFD voor smalle kant: ${narrowFFD.toFixed(2)} cm<br>Benodigde FFD voor brede kant: ${wideFFD.toFixed(2)} cm`;
-            } else {
+            } else { // Gebogen plaat
                 const narrowFFD = findCurvedFFDAlways(narrowAngleDeg, diameter, beamSize);
                 const wideFFD = findCurvedFFDAlways(wideAngleDeg, diameter, beamSize);
 
                 resultText = `Gebogen plaat:<br>`;
-                resultText += `Benodigde FFD voor smalle kant: ${narrowFFD !== null ? narrowFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}<br>`;
-                resultText += `Benodigde FFD voor brede kant: ${wideFFD !== null ? wideFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}`;
+                resultText += `Benodigde FFD voor smalle kant: ${narrowFFD !== null ? narrowFFD.toFixed(2) + ' cm' : 'Niet mogelijk (FFD te groot)'}<br>`;
+                resultText += `Benodigde FFD voor brede kant: ${wideFFD !== null ? wideFFD.toFixed(2) + ' cm' : 'Niet mogelijk (FFD te groot)'}`;
+            }
+        }
+
+        if (calcType === 'useful') {
+            if (plateType === 'vlak') {
+                resultText = `Nuttig bereik is alleen van toepassing op gebogen platen.`;
+            } else { // Gebogen plaat
+                const usefulNarrow = calculateUsefulBeamSize(narrowAngleDeg, diameter, ffd, wallThickness, maxThicknessIncrease);
+                const usefulWide = calculateUsefulBeamSize(wideAngleDeg, diameter, ffd, wallThickness, maxThicknessIncrease);
+
+                if (usefulNarrow === null) {
+                    resultText = `Gebogen plaat (nuttig bereik):<br>Smalle kant: De condities (FFD/bronpositie) laten geen nuttig bereik toe binnen de bundel of de max. toename is te streng.`;
+                } else {
+                    resultText = `Gebogen plaat (nuttig bereik):<br>Aan de smalle kant: ${usefulNarrow.toFixed(2)} cm`;
+                }
+                if (usefulWide === null) {
+                    resultText += `<br>Brede kant: De condities (FFD/bronpositie) laten geen nuttig bereik toe binnen de bundel of de max. toename is te streng.`;
+                } else {
+                    resultText += `<br>Aan de brede kant: ${usefulWide.toFixed(2)} cm`;
+                }
             }
         }
 
         document.getElementById('result').innerHTML = resultText;
     }
 
+    // Bestaande functie voor totale bundelgrootte op gebogen plaat
     function curvedBeamSizeAlways(angleDeg, diameter, ffd) {
-        const alpha = angleDeg * Math.PI / 180;
+        const alpha = angleDeg * Math.PI / 180; // Hele bundelhoek in radialen
         const sinHalfAlpha = Math.sin(alpha / 2);
+        // De term (diameter - 2 * ffd) / diameter bepaalt de positie van de bron
+        // tov het midden en de richting van de bundel.
+        // Als FFD = R + d (bron L op d van O, bundel naar verste wand), dan is (2R - 2(R+d))/2R = -d/R
+        // Als FFD = R - d (bron L op d van O, bundel naar dichtste wand), dan is (2R - 2(R-d))/2R = d/R
         const inner = ((diameter - 2 * ffd) / diameter) * sinHalfAlpha;
-        const correctedAlpha = alpha - 2 * Math.asin(Math.max(Math.min(inner, 1), -1));
-        return (correctedAlpha / (2 * Math.PI)) * Math.PI * diameter;
+        const correctedAlpha = alpha - 2 * Math.asin(Math.max(Math.min(inner, 1), -1)); // De hoek zoals gezien vanuit het midden
+        return (correctedAlpha / (2 * Math.PI)) * Math.PI * diameter; // Booglengte
     }
 
+    // Bestaande functie voor het vinden van FFD op gebogen plaat
     function findCurvedFFDAlways(angleDeg, diameter, targetBeam) {
-        let low = 0.1, high = diameter, mid;
-        while (high - low > 0.01) {
+        let low = 0.1, high = diameter * 2; // FFD kan tot 2*Diameter zijn (bron buiten pijp)
+        let mid;
+        let iterations = 0;
+        const maxIterations = 100; // Voorkomen van oneindige lussen
+        const tolerance = 0.01; // Gewenste precisie
+
+        // Edge case: als bundelgrootte 0 is, FFD is oneindig
+        if (targetBeam <= 0) return Infinity;
+        // Edge case: maximale mogelijke bundelgrootte is pi * diameter
+        if (targetBeam > Math.PI * diameter) return null; // Niet mogelijk
+
+        while (high - low > tolerance && iterations < maxIterations) {
             mid = (low + high) / 2;
             const beam = curvedBeamSizeAlways(angleDeg, diameter, mid);
-            if (beam > targetBeam) high = mid;
-            else low = mid;
+            if (beam > targetBeam) {
+                low = mid; // Zoek een grotere FFD voor een kleinere bundel
+            } else {
+                high = mid; // Zoek een kleinere FFD voor een grotere bundel
+            }
+            iterations++;
         }
-        if (Math.abs(mid - diameter) < 0.05) {
-            return null;
+        // Controleer of er een redelijke oplossing is gevonden
+        if (iterations >= maxIterations -1 || Math.abs(curvedBeamSizeAlways(angleDeg, diameter, mid) - targetBeam) > tolerance * 2) {
+             return null; // Geen convergente oplossing of buiten bereik
         }
+
         return mid;
     }
-</script></body>
+
+
+    /**
+     * Berekent de hoek tussen de stralingsrichting (LP) en de normaal op de wand (OP).
+     * @param {number} wallRadius - Straal van het vat (R).
+     * @param {number} sourceToCenterDist - Afstand van de bron tot het middelpunt van het vat (d).
+     * @param {number} pointAngleRad - Hoek van het punt op de wand t.o.v. de x-as (radiaal).
+     * @returns {number} De hoek van instraling ten opzichte van de normaal op de wand (in radialen).
+     */
+    function calculateWallAngle(wallRadius, sourceToCenterDist, pointAngleRad) {
+        const sourceX = sourceToCenterDist; // Bron is op (d, 0)
+        const sourceY = 0;
+        const pointX = wallRadius * Math.cos(pointAngleRad);
+        const pointY = wallRadius * Math.sin(pointAngleRad);
+
+        // Vector van middelpunt naar punt op wand (normaalvector)
+        const vecNormalX = pointX;
+        const vecNormalY = pointY;
+
+        // Vector van lichtbron naar punt op wand (stralingsrichting)
+        const vecBeamX = pointX - sourceX;
+        const vecBeamY = pointY - sourceY;
+
+        // Dot product
+        const dotProduct = vecNormalX * vecBeamX + vecNormalY * vecBeamY;
+
+        // Magnitudes
+        const magNormal = Math.sqrt(vecNormalX * vecNormalX + vecNormalY * vecNormalY); // Dit is R
+        const magBeam = Math.sqrt(vecBeamX * vecBeamX + vecBeamY * vecBeamY);
+
+        if (magNormal === 0 || magBeam === 0) return Math.PI / 2; // Voorkom delen door nul
+
+        // Cosinus van de hoek tussen de twee vectoren
+        const cosAngle = dotProduct / (magNormal * magBeam);
+
+        // Arccosinus geeft de hoek in radialen. Clamp voor numerieke stabiliteit.
+        return Math.acos(Math.max(-1, Math.min(1, cosAngle)));
+    }
+
+
+    /**
+     * Berekent het nuttige bereik op een gebogen plaat.
+     * @param {number} angleDeg - De totale bundelhoek van de bron (graden).
+     * @param {number} diameter - Diameter van het vat (cm).
+     * @param {number} ffd - Film Focus Afstand (cm), afstand bron tot belichte wand.
+     * @param {number} wallThickness - Wanddikte van het vat (cm).
+     * @param {number} maxThicknessIncreasePerc - Max. toegestane dikte-toename in percentage (bijv. 10 voor 10%).
+     * @returns {number | null} Het nuttige bereik in cm, of null als niet mogelijk.
+     */
+    function calculateUsefulBeamSize(angleDeg, diameter, ffd, wallThickness, maxThicknessIncreasePerc) {
+        const R = diameter / 2; // Straal van het vat
+
+        // 1. Bereken de maximale toegestane hoek van instraling t.o.v. de normaal (theta_w_max)
+        const maxThicknessIncreaseRatio = maxThicknessIncreasePerc / 100;
+        const cosThetaWMax = 1 / (1 + maxThicknessIncreaseRatio);
+        // Clamp om Math.acos fouten te voorkomen (kan > 1 zijn door floating point)
+        const thetaWMax = Math.acos(Math.max(-1, Math.min(1, cosThetaWMax))); // In radialen
+
+        // 2. Bepaal de afstand van de bron tot het middelpunt (d)
+        // Als FFD de afstand tot de dichtstbijzijnde wand is (FFD = R - d), dan d = R - FFD
+        // Als FFD de afstand tot de verste wand is (FFD = R + d), dan d = FFD - R
+        // De 'curvedBeamSizeAlways' formule handelt dit intern af via de 'inner' term.
+        // We moeten d hier expliciet bepalen voor calculateWallAngle
+        let sourceToCenterDist;
+        if (ffd <= R) { // Bron zit aan de 'FFD'-kant, dus dichterbij (FFD = R - d)
+             sourceToCenterDist = R - ffd; // d = R - FFD
+        } else { // Bron zit aan de 'verre' kant (FFD = R + d)
+             sourceToCenterDist = ffd - R; // d = FFD - R
+        }
+
+        // De bron ligt nu op (sourceToCenterDist, 0) of (-sourceToCenterDist, 0)
+        // Voor de consistentie met onze atan2 / asin berekeningen, nemen we aan dat de bron op (d,0) ligt.
+        // De 'middellijn' van de bundel is afhankelijk van de FFD.
+        // Als FFD > R (bron aan de 'verre' kant), dan is de middellijn naar -x gericht (hoek PI)
+        // Als FFD < R (bron aan de 'dichte' kant), dan is de middellijn naar +x gericht (hoek 0)
+
+        // 3. Vind de centrale hoek die het nuttige bereik omspant
+        // Dit doen we door numeriek te zoeken naar de hoeken waar calculateWallAngle gelijk is aan thetaWMax.
+        // De hoofd-hoek van de bundel ligt meestal rond 0 of PI.
+        // We zoeken de uiterste hoeken (in radialen) die nog voldoen aan de eis.
+        let usefulStartAngle = null;
+        let usefulEndAngle = null;
+        let totalUsefulAngleRad = 0;
+
+        // Stapgrootte voor het itereren
+        const angleStep = 0.001 * Math.PI / 180; // 0.001 graden in radialen
+
+        // We zoeken in het bereik van de totale belichte bundel.
+        // Eerst bepalen we de start- en eindhoeken van de totale belichte bundel.
+        const alphaRad = angleDeg * Math.PI / 180; // Bundelhoek in radialen
+
+        // Bereken de 'inner' term die de hoek van de stralen t.o.v. het midden bepaalt.
+        const sinHalfAlpha = Math.sin(alphaRad / 2);
+        const innerTerm = ((diameter - 2 * ffd) / diameter) * sinHalfAlpha;
+        const correctedAlphaTotal = alphaRad - 2 * Math.asin(Math.max(Math.min(innerTerm, 1), -1));
+
+        // Startpunt van de totale belichte bundel (relatief t.o.v. de 'middellijn' die door de bron en middelpunt gaat)
+        // De middellijn van de bundel gaat door (sourceToCenterDist, 0) en is gericht naar (0,0) of (-R,0) of (R,0).
+        // Als FFD > R, bundel naar -x. Middenpunt van de boog is bij (-R,0). Start/eind relative to -PI.
+        // Als FFD < R, bundel naar +x. Middenpunt van de boog is bij (R,0). Start/eind relative to 0.
+
+        // De FFD logica in `curvedBeamSizeAlways` impliceert dat:
+        // Als ffd < R (bron aan 'dichtbij' kant, 60cm), dan is de bundel naar de positieve X-as gericht.
+        // De centrale hoek is dan symmetrisch rond 0 rad (0 graden).
+        let nominalCenterAngle = 0; // Voor FFD < R
+        if (ffd > R) { // Bron aan 'verre' kant, bundel naar negatieve X-as gericht
+            nominalCenterAngle = Math.PI; // Voor FFD > R
+        }
+
+        const halfTotalAngle = correctedAlphaTotal / 2;
+        const totalBeamStartRad = nominalCenterAngle - halfTotalAngle;
+        const totalBeamEndRad = nominalCenterAngle + halfTotalAngle;
+
+        // Nu itereren we door dit bereik om de nuttige hoek te vinden
+        for (let angle = totalBeamStartRad; angle <= totalBeamEndRad; angle += angleStep) {
+            const currentWallAngle = calculateWallAngle(R, sourceToCenterDist, angle);
+
+            if (currentWallAngle <= thetaWMax) {
+                if (usefulStartAngle === null) {
+                    usefulStartAngle = angle;
+                }
+                usefulEndAngle = angle;
+            } else if (usefulStartAngle !== null) {
+                // We zijn buiten het nuttige bereik gekomen
+                break;
+            }
+        }
+
+        if (usefulStartAngle === null || usefulEndAngle === null) {
+            return null; // Geen nuttig bereik gevonden dat voldoet
+        }
+
+        totalUsefulAngleRad = usefulEndAngle - usefulStartAngle;
+        // Zorg ervoor dat de hoek positief is en binnen [0, 2PI]
+        totalUsefulAngleRad = Math.abs(totalUsefulAngleRad);
+        if (totalUsefulAngleRad > 2 * Math.PI) { // Kan gebeuren door afronding of als 0 in het midden van het interval ligt
+            totalUsefulAngleRad = 2 * Math.PI - totalUsefulAngleRad;
+        }
+
+        // 4. Bereken het nuttige bereik (booglengte)
+        const usefulBeamLength = R * totalUsefulAngleRad;
+
+        return usefulBeamLength;
+    }
+</script>
+</body>
 </html>
