@@ -159,13 +159,11 @@
         const ffd = parseFloat(document.getElementById('ffd').value);
         const beamSize = parseFloat(document.getElementById('beamSize').value);
         const diameter = parseFloat(document.getElementById('diameter').value);
-        let wallThickness = parseFloat(document.getElementById('wallThickness').value); // Nu in mm
+        let wallThickness_mm = parseFloat(document.getElementById('wallThickness').value); // In mm
         const maxThicknessIncrease = parseFloat(document.getElementById('maxThicknessIncrease').value); // In percentage
 
         // Converteer wanddikte van mm naar cm
-        if (!isNaN(wallThickness)) {
-            wallThickness /= 10; // 1 cm = 10 mm
-        }
+        const wallThickness_cm = wallThickness_mm / 10;
 
         let resultText = '';
 
@@ -182,7 +180,7 @@
             document.getElementById('result').innerHTML = 'Voer een geldige diameter in.';
             return;
         }
-        if (calcType === 'useful' && (isNaN(wallThickness) || wallThickness <= 0 || isNaN(maxThicknessIncrease) || maxThicknessIncrease <= 0 || isNaN(diameter) || diameter <= 0 || isNaN(ffd) || ffd <= 0)) {
+        if (calcType === 'useful' && (isNaN(wallThickness_mm) || wallThickness_mm <= 0 || isNaN(maxThicknessIncrease) || maxThicknessIncrease <= 0 || isNaN(diameter) || diameter <= 0 || isNaN(ffd) || ffd <= 0)) {
              document.getElementById('result').innerHTML = 'Voer geldige waarden in voor FFD, Diameter, Wanddikte (mm) en Max. dikte-toename.';
              return;
         }
@@ -219,8 +217,8 @@
             if (plateType === 'vlak') {
                 resultText = `Nuttig bereik is alleen van toepassing op gebogen platen.`;
             } else { // Gebogen plaat
-                const usefulNarrow = calculateUsefulBeamSize(narrowAngleDeg, diameter, ffd, wallThickness, maxThicknessIncrease);
-                const usefulWide = calculateUsefulBeamSize(wideAngleDeg, diameter, ffd, wallThickness, maxThicknessIncrease);
+                const usefulNarrow = calculateUsefulBeamSize(narrowAngleDeg, diameter, ffd, wallThickness_cm, maxThicknessIncrease);
+                const usefulWide = calculateUsefulBeamSize(wideAngleDeg, diameter, ffd, wallThickness_cm, maxThicknessIncrease);
 
                 if (usefulNarrow === null) {
                     resultText = `Gebogen plaat (nuttig bereik):<br>Smalle kant: De condities (FFD/bronpositie) laten geen nuttig bereik toe binnen de bundel of de max. toename is te streng.`;
@@ -280,35 +278,35 @@
      * Berekent de hoek tussen de stralingsrichting (LP) en de normaal op de wand (OP).
      * @param {number} wallRadius - Straal van het vat (R).
      * @param {number} sourceX - X-coördinaat van de lichtbron.
-     * @param {number} sourceY - Y-coördinaat van de lichtbron (meestal 0).
      * @param {number} pointAngleRad - Hoek van het punt op de wand t.o.v. de x-as (radiaal).
      * @returns {number} De hoek van instraling ten opzichte van de normaal op de wand (in radialen).
      */
-    function calculateWallAngle(wallRadius, sourceX, sourceY, pointAngleRad) {
+    function calculateWallAngle(wallRadius, sourceX, pointAngleRad) {
+        // Coördinaten van het punt op de wand
         const pointX = wallRadius * Math.cos(pointAngleRad);
         const pointY = wallRadius * Math.sin(pointAngleRad);
 
-        // Vector van middelpunt naar punt op wand (normaalvector)
+        // Vector van middelpunt naar punt op wand (dit is de normaal op de wand)
         const vecNormalX = pointX;
         const vecNormalY = pointY;
 
         // Vector van lichtbron naar punt op wand (stralingsrichting)
         const vecBeamX = pointX - sourceX;
-        const vecBeamY = pointY - sourceY;
+        const vecBeamY = pointY - 0; // Bron ligt op de x-as
 
         // Dot product
         const dotProduct = vecNormalX * vecBeamX + vecNormalY * vecBeamY;
 
         // Magnitudes
-        const magNormal = wallRadius; // Dit is R
+        const magNormal = wallRadius; // Magnitude van de normaal vector is R
         const magBeam = Math.sqrt(vecBeamX * vecBeamX + vecBeamY * vecBeamY);
 
-        if (magNormal === 0 || magBeam === 0) return Math.PI / 2; // Voorkom delen door nul
+        if (magNormal === 0 || magBeam === 0) return Math.PI / 2; // Voorkom delen door nul (of een heel kleine hoek, near 0)
 
         // Cosinus van de hoek tussen de twee vectoren
         const cosAngle = dotProduct / (magNormal * magBeam);
 
-        // Arccosinus geeft de hoek in radialen. Clamp voor numerieke stabiliteit.
+        // Arccosinus geeft de hoek in radialen. Clamp om numerieke stabiliteit te garanderen.
         return Math.acos(Math.max(-1, Math.min(1, cosAngle)));
     }
 
@@ -330,71 +328,52 @@
         const cosThetaWMax = 1 / (1 + maxThicknessIncreaseRatio);
         const thetaWMax = Math.acos(Math.max(-1, Math.min(1, cosThetaWMax))); // In radialen
 
-        // 2. Bepaal de afstand van de bron tot het middelpunt (d)
-        // En de absolute X-coördinaat van de bron (sourceXPos)
-        // En de nominale middenhoek van het belichte segment (nominalCenterAngleForIteration)
+        // 2. Bepaal de X-coördinaat van de lichtbron
+        // De belichte wand is op (R, 0). FFD is afstand van bron tot (R,0).
+        // sourceX = R - FFD
+        const sourceX = R - ffd;
 
-        let d; // Afstand van bron tot middelpunt
-        let sourceXPos; // X-coördinaat van de bron
-        let nominalCenterAngleForIteration; // Midden van de boog voor iteratie (0 of PI)
-
-        if (ffd > R) { // Bron belicht de 'verre' kant (FFD = R + d)
-            d = ffd - R;
-            sourceXPos = d; // Bron op (d, 0)
-            nominalCenterAngleForIteration = Math.PI; // Belichte boog rond (-R, 0)
-        } else if (ffd < R) { // Bron belicht de 'dichte' kant (FFD = R - d)
-            d = R - ffd;
-            sourceXPos = -d; // Bron op (-d, 0)
-            nominalCenterAngleForIteration = 0; // Belichte boog rond (R, 0)
-        } else { // ffd == R, bron is in het middelpunt (d=0)
-            d = 0;
-            sourceXPos = 0;
-            nominalCenterAngleForIteration = 0; // Maakt niet uit, is symmetrisch
-            // Als de bron in het midden is, is de instralingshoek altijd 0,
-            // tenzij de maxThicknessIncreasePerc dit toelaat.
-            // Als er geen toename is toegestaan, is thetaWMax 0.
-            // Als de bundel een hoek heeft, is de instralingshoek ook 0 voor alle punten.
-            // Dus, de hele belichte bundel is nuttig.
-            // Echter, als maxThicknessIncreasePerc > 0, en d=0, dan is de hele bundel nuttig,
-            // want de hoek van instraling is overal 0.
-            if (maxThicknessIncreasePerc === 0 && thetaWMax > 0.0001) { // Als er strikt geen toename mag, en thetaWMax is niet 0, dan is er geen nuttig bereik (behalve het middenpunt)
-                return null;
+        // Validatie: Bron moet binnen de pijp zijn voor de 'inside-out' opstelling (EN-8/ASME-B)
+        // Een bron binnen de pijp betekent dat zijn afstand tot het middelpunt (|sourceX|) kleiner is dan R.
+        // Echter, 'inside-out' zoals EN-8/ASME-B betekent dat de bron binnenin de pijp is,
+        // maar de film aan de buitenkant ligt. Dit betekent dat FFD de afstand is van de bron
+        // tot de buitenkant van de pijp.
+        // Dus, R - sourceX = FFD. Als sourceX positief is (tussen 0 en R), is FFD < R.
+        // Als sourceX negatief is (tussen -R en 0), is FFD > R.
+        // Als FFD > 2R (bron is aan de andere kant en verder dan de diameter), dan is sourceX < -R.
+        // Dat scenario valt buiten de typische 'inside-out' belichting waarbij de bron binnen de pijp blijft.
+        // Bron buiten de pijp is niet covered door deze functie voor nuttig bereik.
+        if (Math.abs(sourceX) >= R + 0.001) { // Controleer of bron realistisch binnen de pijp is
+            // Als bron exact op -R of R, dan zou sourceX = +/- R.
+            // Dit model gaat uit van een bron ergens tussen -R en R.
+            if (sourceX === 0) { // Special case: bron in het midden
+                if (maxThicknessIncreasePerc === 0 && thetaWMax > 0.0001) return null; // Mag niet toenemen, maar thetaWMax is niet 0
+                return curvedBeamSizeAlways(angleDeg, diameter, ffd); // Hele bundel nuttig als in midden
             }
-            // Anders, als d=0, is de hele belichte bundel nuttig (want overal loodrecht)
-            return curvedBeamSizeAlways(angleDeg, diameter, ffd);
-        }
-
-        // Controle of de berekende 'd' realistisch is
-        // Als d >= R, betekent dit dat de bron buiten de pijp ligt of precies op de wand
-        // in het geval van de 'dichte' kant. Dit model is voor 'inside-out'.
-        // Voor FFD < R: als R - FFD >= R, dan FFD <= 0, wat niet kan.
-        // Voor FFD > R: als FFD - R >= R, dan FFD >= 2R (bron op of buiten de overkant)
-        // De 'curvedBeamSizeAlways' kan FFD's aan waarbij de bron buiten de pijp is.
-        // Echter, voor 'nuttig bereik' met wanddikte, is een inside-out aanname vaak het geval.
-        // We gaan hier uit van bron binnenin de pijp: d < R.
-        if (d >= R) { // Bron op of buiten de diameter, dan is de FFD-logica niet meer 'binnen naar buiten'.
-            // Dit kan een scenario zijn waarbij de hele boog nutteloos is of het model niet past.
-            return null;
+            return null; // Bron buiten de pijp of onrealistische FFD
         }
 
         // 3. Bepaal het bereik van de totale belichte bundel (hoeken)
         const alphaRad = angleDeg * Math.PI / 180; // Bundelhoek in radialen
-        const sinHalfAlpha = Math.sin(alphaRad / 2);
-        const innerTerm = ((diameter - 2 * ffd) / diameter) * sinHalfAlpha;
-        const correctedAlphaTotal = alphaRad - 2 * Math.asin(Math.max(Math.min(innerTerm, 1), -1));
+
+        // Bereken de werkelijke hoeken die belicht worden aan de buitenkant van de pijp
+        // De curvedBeamSizeAlways berekent de booglengte, we zetten die terug naar een hoek
+        const totalBeamLength = curvedBeamSizeAlways(angleDeg, diameter, ffd);
+        const correctedAlphaTotal = totalBeamLength / R; // Dit is de totale hoek van de belichte boog
 
         const halfTotalAngle = correctedAlphaTotal / 2;
-        let totalBeamStartRad = nominalCenterAngleForIteration - halfTotalAngle;
-        let totalBeamEndRad = nominalCenterAngleForIteration + halfTotalAngle;
+        // De belichte boog is gecentreerd rond de X-as die door het middelpunt en de belichte wand gaat (0 radialen)
+        let totalBeamStartRad = 0 - halfTotalAngle;
+        let totalBeamEndRad = 0 + halfTotalAngle;
 
-        // Normaliseer start- en eindhoeken om iteratie makkelijker te maken
+        // Normaliseer hoeken en zorg voor correcte iteratie richting
         totalBeamStartRad = (totalBeamStartRad % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
         totalBeamEndRad = (totalBeamEndRad % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
         
-        // Zorg ervoor dat de iteratie van start naar eind altijd 'vooruit' gaat
         if (totalBeamStartRad > totalBeamEndRad) {
-            totalBeamEndRad += 2 * Math.PI; // Overschrijd 2PI voor iteratie als de bundel over de 0/360 grens gaat
+            totalBeamEndRad += 2 * Math.PI; // Als de bundel over de 0/360 grens gaat
         }
+
 
         // 4. Zoek de grenzen van het nuttige bereik
         let usefulStartAngle = null;
@@ -402,16 +381,9 @@
         const angleStep = 0.001 * Math.PI / 180; // Kleine stap voor precisie (0.001 graden)
 
         for (let angle = totalBeamStartRad; angle <= totalBeamEndRad; angle += angleStep) {
-            // Pas de broncoördinaat aan om consistent te zijn met de hoek van de iteratie
-            // Als nominalCenterAngleForIteration == Math.PI, ligt de belichte boog aan de negatieve x-kant.
-            // Dan moet de bron X-coördinaat negatief zijn om consistent te blijven met de vector richting.
-            // Of we draaien de hoek om, maar dit is eenvoudiger:
-            let currentSourceX = sourceXPos;
-            if (nominalCenterAngleForIteration === Math.PI) {
-                currentSourceX = -sourceXPos; // Bron ligt dan aan de 'negatieve' kant voor deze hoek.
-            }
-            
-            const currentWallAngle = calculateWallAngle(R, currentSourceX, 0, angle);
+            // De `calculateWallAngle` functie heeft de R, sourceX, en de hoek van het punt op de wand nodig.
+            // sourceX is al correct berekend als de X-coördinaat van de bron.
+            const currentWallAngle = calculateWallAngle(R, sourceX, angle);
 
             if (currentWallAngle <= thetaWMax + 0.0001) { // Kleine tolerantie voor floating point vergelijking
                 if (usefulStartAngle === null) {
@@ -434,10 +406,9 @@
         const usefulBeamLength = R * totalUsefulAngleRad;
 
         // Extra controle: het nuttige bereik kan nooit groter zijn dan de totale belichte lengte
-        const totalBeamLength = curvedBeamSizeAlways(angleDeg, diameter, ffd);
-        if (usefulBeamLength > totalBeamLength + 0.01) { // Kleine tolerantie voor floating point
-            // Dit kan voorkomen als thetaWMax heel groot is (bijna pi/2) en de hele bundel nuttig is
-            return totalBeamLength;
+        // (of slechts minimaal door afrondingsfouten).
+        if (usefulBeamLength > totalBeamLength + 0.01) {
+            return totalBeamLength; // Als het nuttige bereik de hele bundel omvat
         }
 
         return usefulBeamLength;
