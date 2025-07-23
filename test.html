@@ -343,75 +343,83 @@
         // Als FFD > 2R (bron is aan de andere kant en verder dan de diameter), dan is sourceX < -R.
         // Dat scenario valt buiten de typische 'inside-out' belichting waarbij de bron binnen de pijp blijft.
         // Bron buiten de pijp is niet covered door deze functie voor nuttig bereik.
-        if (Math.abs(sourceX) >= R + 0.001) { // Controleer of bron realistisch binnen de pijp is
-            // Als bron exact op -R of R, dan zou sourceX = +/- R.
-            // Dit model gaat uit van een bron ergens tussen -R en R.
-            if (sourceX === 0) { // Special case: bron in het midden
-                if (maxThicknessIncreasePerc === 0 && thetaWMax > 0.0001) return null; // Mag niet toenemen, maar thetaWMax is niet 0
-                return curvedBeamSizeAlways(angleDeg, diameter, ffd); // Hele bundel nuttig als in midden
+        if (Math.abs(sourceX) >= R + 0.001) { // Controleer of bron realistisch binnen de pijp is (kleine tolerantie)
+            if (Math.abs(sourceX) < R) { // Bron zit precies op of heel dichtbij de rand van de pijp
+                // Dit is een randgeval. Als sourceX exact 0 is (bron in het midden), is de hele bundel loodrecht.
+                if (sourceX === 0) {
+                    if (maxThicknessIncreasePerc === 0 && thetaWMax > 0.0001) return null;
+                    return curvedBeamSizeAlways(angleDeg, diameter, ffd);
+                }
             }
             return null; // Bron buiten de pijp of onrealistische FFD
         }
-
-        // 3. Bepaal het bereik van de totale belichte bundel (hoeken)
-        const alphaRad = angleDeg * Math.PI / 180; // Bundelhoek in radialen
-
-        // Bereken de werkelijke hoeken die belicht worden aan de buitenkant van de pijp
-        // De curvedBeamSizeAlways berekent de booglengte, we zetten die terug naar een hoek
-        const totalBeamLength = curvedBeamSizeAlways(angleDeg, diameter, ffd);
-        const correctedAlphaTotal = totalBeamLength / R; // Dit is de totale hoek van de belichte boog
-
-        const halfTotalAngle = correctedAlphaTotal / 2;
-        // De belichte boog is gecentreerd rond de X-as die door het middelpunt en de belichte wand gaat (0 radialen)
-        let totalBeamStartRad = 0 - halfTotalAngle;
-        let totalBeamEndRad = 0 + halfTotalAngle;
-
-        // Normaliseer hoeken en zorg voor correcte iteratie richting
-        totalBeamStartRad = (totalBeamStartRad % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-        totalBeamEndRad = (totalBeamEndRad % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
         
-        if (totalBeamStartRad > totalBeamEndRad) {
-            totalBeamEndRad += 2 * Math.PI; // Als de bundel over de 0/360 grens gaat
-        }
+        // Nu bepalen we de *totale* belichte hoek van de bron
+        const totalBeamLength = curvedBeamSizeAlways(angleDeg, diameter, ffd);
+        const totalBeamAngleRad = totalBeamLength / R;
+        const halfTotalBeamAngle = totalBeamAngleRad / 2;
 
+        // De centrale as van de bundel is altijd gericht op de (R,0) positie van de wand
+        const beamCenterAngle = 0; // In radialen
 
-        // 4. Zoek de grenzen van het nuttige bereik
+        // De minimale en maximale hoeken van de *totale* bundel ten opzichte van de +X as
+        const minBeamAngle = beamCenterAngle - halfTotalBeamAngle;
+        const maxBeamAngle = beamCenterAngle + halfTotalBeamAngle;
+
         let usefulStartAngle = null;
         let usefulEndAngle = null;
-        const angleStep = 0.001 * Math.PI / 180; // Kleine stap voor precisie (0.001 graden)
 
-        for (let angle = totalBeamStartRad; angle <= totalBeamEndRad; angle += angleStep) {
-            // De `calculateWallAngle` functie heeft de R, sourceX, en de hoek van het punt op de wand nodig.
-            // sourceX is al correct berekend als de X-coördinaat van de bron.
-            const currentWallAngle = calculateWallAngle(R, sourceX, angle);
+        // We moeten de wortels vinden van de functie f(angle) = calculateWallAngle(R, sourceX, angle) - thetaWMax = 0
+        // We doen dit door van het midden van de bundel naar buiten te zoeken
+        // Omdat calculateWallAngle(R, sourceX, angle) een U-vormige curve is met een minimum op de centrale as,
+        // kunnen er twee punten zijn waar het gelijk is aan thetaWMax (één aan elke kant).
 
-            if (currentWallAngle <= thetaWMax + 0.0001) { // Kleine tolerantie voor floating point vergelijking
-                if (usefulStartAngle === null) {
-                    usefulStartAngle = angle;
-                }
-                usefulEndAngle = angle;
-            } else if (usefulStartAngle !== null) {
-                // We zijn buiten het nuttige bereik gekomen na erin te zijn geweest
+        const tolerance = 0.0001; // Tolerantie voor hoekvergelijking
+        const searchStep = 0.0001 * Math.PI / 180; // Zeer kleine stap (0.0001 graden)
+
+        // Zoek de rechtergrens (vanaf 0 naar positieve hoeken)
+        let currentAngle = 0; // Start bij het midden van de belichte boog
+        let foundRightEdge = false;
+        while (currentAngle <= maxBeamAngle + searchStep) {
+            const wallAngle = calculateWallAngle(R, sourceX, currentAngle);
+            if (wallAngle <= thetaWMax + tolerance) {
+                usefulEndAngle = currentAngle;
+                foundRightEdge = true;
+            } else if (foundRightEdge) {
+                // We zijn net buiten het nuttige bereik gekomen
                 break;
             }
+            currentAngle += searchStep;
         }
-        
+
+        // Zoek de linkergrens (vanaf 0 naar negatieve hoeken)
+        currentAngle = 0; // Start weer bij het midden
+        let foundLeftEdge = false;
+        while (currentAngle >= minBeamAngle - searchStep) {
+            const wallAngle = calculateWallAngle(R, sourceX, currentAngle);
+            if (wallAngle <= thetaWMax + tolerance) {
+                usefulStartAngle = currentAngle;
+                foundLeftEdge = true;
+            } else if (foundLeftEdge) {
+                // We zijn net buiten het nuttige bereik gekomen
+                break;
+            }
+            currentAngle -= searchStep;
+        }
+
         if (usefulStartAngle === null || usefulEndAngle === null || usefulStartAngle > usefulEndAngle) {
             return null; // Geen nuttig bereik gevonden dat voldoet aan de eisen
         }
 
-        const totalUsefulAngleRad = usefulEndAngle - usefulStartAngle;
-
-        // 5. Bereken het nuttige bereik (booglengte)
-        const usefulBeamLength = R * totalUsefulAngleRad;
-
-        // Extra controle: het nuttige bereik kan nooit groter zijn dan de totale belichte lengte
-        // (of slechts minimaal door afrondingsfouten).
-        if (usefulBeamLength > totalBeamLength + 0.01) {
-            return totalBeamLength; // Als het nuttige bereik de hele bundel omvat
+        const usefulAngleRad = usefulEndAngle - usefulStartAngle;
+        
+        // Het nuttige bereik kan niet groter zijn dan de totale belichte bundel
+        // Dit checken we door de hoek te vergelijken.
+        if (usefulAngleRad > totalBeamAngleRad + tolerance) {
+            return totalBeamLength; // Als het hele belichte gebied nuttig is
         }
 
-        return usefulBeamLength;
+        return R * usefulAngleRad;
     }
 </script>
 </body>
