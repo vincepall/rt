@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tekens</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: #F5DF4D; text-align: center;">Rapportage Speciale Tekens</h1>
+    <h2 style="color: #f5eaa2; text-align: center;">(klik om te kopieëren)</h2>
+    <!-- De knop om het pop-up venster te openen -->
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <!-- Het pop-up venster -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Verschillende Tekens die handig kunnen zijn om toe te voegen aan de rapportage, klik erop om te kopieren </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+
+    <script>
+        function copyText(element) {
+            // Creëer een tijdelijk tekstveld om de tekst in op te slaan
+            const tempInput = document.createElement("textarea");
+            tempInput.value = element.innerText; // De tekst van het aangeklikte element
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Tekst gekopieerd: " + tempInput.value);
+        }
+    </script>
+
+    <!-- Rapportage zinnen die gekopieerd kunnen worden -->
+    <p style="color: #f7e672; font-size: 1.5rem;" onclick="copyText(this)">Ø</p>
+    <p style="color: #fcf1a4; font-size: 1.5rem;" onclick="copyText(this)">°</p>
+    <p style="color: #f7e672; font-size: 1.5rem;" onclick="copyText(this)">≈</p>
+    <p style="color: #fcf1a4; font-size: 1.5rem;" onclick="copyText(this)">ß</p>
+    <p style="color: #f7e672; font-size: 1.5rem;" onclick="copyText(this)">γ</p>
+    <p style="color: #fcf1a4; font-size: 1.5rem;" onclick="copyText(this)">∑</p>
+
+</body>
+</html>
