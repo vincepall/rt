@@ -19,7 +19,6 @@
             min-height: 150vh;
         }
 
-        /* Style for the calculate button */
         button.calculate-btn {
             background-color: #F5DF4D;
             color: black;
@@ -41,24 +40,38 @@
             margin-bottom: 15px;
         }
 
+        /* styling voor bron-tekst */
+        .bron {
+            color: #F5DF4D; /* standaard geel */
+            font-weight: 600;
+        }
+        .bron.over {
+            color: orange; /* oranje als grens overschreden */
+        }
+
+        /* waarschuwingstekst */
+        #waarschuwing {
+            font-size: 18px;
+            font-weight: bold;
+            color: orange;
+            margin-top: 12px;
+            display: none; /* standaard verborgen */
+        }
     </style>
 </head>
 <body>
     <h1 style="color: #F5DF4D; text-align: center;">Bronkeuze</h1>
 
-     <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
-    <!-- Het pop-up venster -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Door Wmax te berekenen wordt de juiste bronkeuze voorgesteld volgens RT21021 of RT21022.
-            </p>
+            <p>Door Wmax te berekenen wordt de juiste bronkeuze voorgesteld volgens RT21021 of RT21022.</p>
         </div>
     </div>
 
-    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+    <script src="script.js"></script> 
 
     <label for="diameter">Diameter (De) van de pijp (mm):</label>
     <input type="number" id="diameter" min="0" step="any" required><br>
@@ -80,14 +93,28 @@
 
     <button type="button" class ="calculate-btn" onclick="berekenBron()">Bronkeuze</button>
 
-
     <h2 style="color: #F5DF4D;">Wmax en bronkeuze</h2>
     <h2 id="wmax" style="color: #F5DF4D;"></h2>
-    <h2 id="resultaat" style="color: #F5DF4D;"></h2>
+    <div id="resultaat" style="color: #F5DF4D; font-weight:600;"></div>
+    <div id="waarschuwing"></div>
 
     <script>
+        // waarschuwing-grenswaarden (precies zoals opgegeven)
+        const warningThresholds = {
+            "Se-75": 41,
+            "Ir-192": 64,
+            "Co-60": 100
+        };
+
         function berekenWmax(De, t) {
             return 2 * Math.sqrt(t * (De - t));
+        }
+
+        // maakt voor een bron een span; voegt class 'over' toe als wmax > threshold
+        function formatBronSpan(bron, wmax) {
+            const over = (warningThresholds[bron] !== undefined) && (wmax > warningThresholds[bron]);
+            const cls = over ? 'bron over' : 'bron';
+            return `<span class="${cls}">${bron}</span>`;
         }
 
         function berekenBron() {
@@ -96,75 +123,63 @@
             const techniek = document.getElementById('techniek').value;
             const klasse = document.getElementById('klasse').value;
 
+            const waarschuwingDiv = document.getElementById("waarschuwing");
+            const resultaatEl = document.getElementById("resultaat");
+
             if (isNaN(De) || isNaN(t) || De <= 0 || t <= 0 || t >= De) {
-                document.getElementById('resultaat').textContent = 'Voer geldige waarden in voor diameter en wanddikte.';
+                resultaatEl.textContent = 'Voer geldige waarden in voor diameter en wanddikte.';
+                waarschuwingDiv.style.display = "none";
+                document.getElementById('wmax').textContent = '';
                 return;
             }
 
             const wmax = berekenWmax(De, t);
-            let resultaat = '';
+            let bronnen = [];
 
+            // selectie regels zoals eerder (ongewijzigd)
             if (techniek === 'tangentiaal') {
                 if (klasse === 'ta') {
-                    if (wmax < 55.1) {
-                        resultaat = 'Se-75 (referentiekogel minimaal 20mm)';
-                    } else if (wmax < 80.1) {
-                        resultaat = 'Ir-192 (referentiekogel minimaal 30mm)';
-                    } else if (wmax < 120.1) {
-                        resultaat = 'Co-60 (referentiekogel minimaal 40mm)';
-                    } else {
-                        resultaat = 'Geen geschikte bron.';
-                    }
+                    if (wmax < 55.1) bronnen.push("Se-75");
+                    else if (wmax < 80.1) bronnen.push("Ir-192");
+                    else if (wmax < 120.1) bronnen.push("Co-60");
                 } else if (klasse === 'tb') {
-                    if (wmax < 40.1) {
-                        resultaat = 'Se-75 (referentiekogel minimaal 20mm)';
-                    } else if (wmax < 60.1) {
-                        resultaat = 'Ir-192 (referentiekogel minimaal 30mm)';
-                    } else if (wmax < 85.1) {
-                        resultaat = 'Co-60 (referentiekogel minimaal 40mm)';
-                    } else {
-                        resultaat = 'Geen geschikte bron.';
-                    }
+                    if (wmax < 40.1) bronnen.push("Se-75");
+                    else if (wmax < 60.1) bronnen.push("Ir-192");
+                    else if (wmax < 85.1) bronnen.push("Co-60");
                 }
             } else if (techniek === 'dubbel_wand') {
-                const bronnen = [];
-
                 if (klasse === 'ta') {
-                    if (wmax > 4.9 && wmax < 55.1) {
-                        bronnen.push('Se-75');
-                    }
-                    if (wmax > 9.9 && wmax < 100.1) {
-                        bronnen.push('Ir-192');
-                    }
-                    if (wmax > 39.1 && wmax < 200.1) {
-                        bronnen.push('Co-60');
-                    }
+                    if (wmax > 4.9 && wmax < 55.1) bronnen.push("Se-75");
+                    if (wmax > 9.9 && wmax < 100.1) bronnen.push("Ir-192");
+                    if (wmax > 39.1 && wmax < 200.1) bronnen.push("Co-60");
                 } else if (klasse === 'tb') {
-                    if (wmax > 9.9 && wmax < 40.1) {
-                        bronnen.push('Se-75');
-                    }
-                    if (wmax > 19.9 && wmax < 90.1) {
-                        bronnen.push('Ir-192');
-                    }
-                    if (wmax > 39.1 && wmax < 200.1) {
-                        bronnen.push('Co-60');
-                    }
-                }
-
-                if (bronnen.length > 0) {
-                    resultaat = 'Geschikte bron(nen): ' + bronnen.join(', ');
-                } else {
-                    resultaat = 'Geen geschikte bron.';
+                    if (wmax > 9.9 && wmax < 40.1) bronnen.push("Se-75");
+                    if (wmax > 19.9 && wmax < 90.1) bronnen.push("Ir-192");
+                    if (wmax > 39.1 && wmax < 200.1) bronnen.push("Co-60");
                 }
             }
 
-            document.getElementById('resultaat').textContent = resultaat;
+            // samenstellen resultaat (alleen de bron-teksten worden individueel gekleurd)
+            if (bronnen.length > 0) {
+                const formatted = bronnen.map(b => formatBronSpan(b, wmax)).join(', ');
+                resultaatEl.innerHTML = 'Geschikte bron(nen): ' + formatted;
+            } else {
+                resultaatEl.textContent = 'Geen geschikte bron.';
+            }
 
-            document.getElementById("wmax").textContent = wmax;
+            document.getElementById('wmax').textContent = "Wmax = " + wmax.toFixed(1);
 
-            document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
+            // waarschuwing tonen als minstens één bron over **de opgegeven** grenswaarde gaat
+            const anyOver = bronnen.some(b => (warningThresholds[b] !== undefined) && (wmax > warningThresholds[b]));
+            if (anyOver) {
+                waarschuwingDiv.textContent = "Opletten: Bron kan gebruikt worden maar het zit tegen de grens!";
+                waarschuwingDiv.style.display = "block";
+            } else {
+                waarschuwingDiv.style.display = "none";
+            }
+
+            resultaatEl.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
-
 </body>
 </html>
