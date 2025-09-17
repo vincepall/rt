@@ -172,7 +172,7 @@
             // waarschuwing tonen als minstens één bron over **de opgegeven** grenswaarde gaat
             const anyOver = bronnen.some(b => (warningThresholds[b] !== undefined) && (wmax > warningThresholds[b]));
             if (anyOver) {
-                waarschuwingDiv.textContent = "Opletten: Bron kan gebruikt maar het zit tegen de grens!";
+                waarschuwingDiv.textContent = "Opletten: Bron kan gebruikt worden maar het zit tegen de grens!";
                 waarschuwingDiv.style.display = "block";
             } else {
                 waarschuwingDiv.style.display = "none";
