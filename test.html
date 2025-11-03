@@ -10,15 +10,13 @@
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
 
     <style>
-        /* --- Gecombineerde Stijlen --- */
-        /* De meeste 'body' stijlen komen nu uit styles.css */
+        /* --- Gecombineerde Stijlen (Ongewijzigd) --- */
         body {
             font-family: 'Roboto Condensed', sans-serif;
             padding: 20px;
             margin: 0;
         }
 
-        /* Stijlen voor de info-knop (i) */
         .info-btn {
             background-color: #ddd;
             color: black;
@@ -32,7 +30,6 @@
             margin-top: 0;
         }
 
-        /* Stijlen voor de hoofd-berekenknop */
         .submit-btn {
             background-color: #F5DF4D;
             color: black;
@@ -42,10 +39,10 @@
             border-radius: 10px;
             cursor: pointer;
             text-align: center;
-            display: block; /* Maakt het mogelijk om margin auto te gebruiken */
-            margin: 20px auto; /* Centeert de knop */
-            width: 100%; /* Maakt knop responsief */
-            max-width: 400px; /* Voorkomt dat knop te breed wordt */
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 400px;
         }
 
         .submit-btn:hover {
@@ -89,40 +86,50 @@
         /* Stijlen voor het formulier */
         .form-container {
             display: flex;
-            flex-direction: column; /* Alles onder elkaar */
+            flex-direction: column;
             gap: 15px;
             margin: 10px auto;
-            max-width: 600px; /* Limiteert de breedte voor leesbaarheid */
+            max-width: 600px;
         }
 
         .form-item {
             display: flex;
             flex-direction: row;
             align-items: center;
-            flex-wrap: wrap; /* Zorgt dat label op mobiel boven input springt */
+            flex-wrap: wrap;
         }
 
         .form-item label {
-            min-width: 200px; /* Zorgt voor nette uitlijning */
+            min-width: 200px;
             margin-bottom: 5px;
             font-weight: bold;
         }
 
         .form-item input,
         .form-item select {
-            flex: 1; /* Vult de beschikbare ruimte */
+            flex: 1;
             padding: 8px;
             width: 100%;
-            min-width: 200px; /* Zorgt dat input niet te smal wordt */
-            box-sizing: border-box; /* Zorgt dat padding de breedte niet beïnvloedt */
+            min-width: 200px;
+            box-sizing: border-box;
         }
+        
+        /* Specifieke styling voor de datalist input (indien nodig) */
+        #brongrootteInput {
+            flex: 1;
+            padding: 8px;
+            width: 100%;
+            min-width: 200px;
+            box-sizing: border-box;
+        }
+
 
         /* Stijlen voor de plot-afbeeldingen */
         .image-container {
             position: relative;
             background-size: cover;
             border: 1px solid black;
-            margin: 20px auto; /* Centeert de containers */
+            margin: 20px auto;
         }
 
         .image-container img {
@@ -193,6 +200,7 @@
             .form-item { flex-direction: column; align-items: flex-start; }
             .form-item label { min-width: 100%; margin-bottom: 5px; }
             .form-item input, .form-item select { width: 100%; min-width: 0; }
+            #brongrootteInput { width: 100%; min-width: 0; } /* Zorg dat de datalist-input ook goed schaalt */
             .image-container { width: 100%; height: auto; }
             .image-container img { width: 100%; height: auto; }
         }
@@ -229,15 +237,21 @@
         <div class="form-container">
             
             <div class="form-item">
-                <label for="brongrootte">Brongrootte in mm:</label>
-                <input type="number" id="brongrootte" name="brongrootte" step="0.01" required oninput="updateMinFFD()">
+                <label for="brongrootteInput">Brongrootte in mm:</label>
+                <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required oninput="updateMinFFD()">
+                
+                <datalist id="bronKeuzes">
+                    <option value="2.5" label="Balteau (2.5 mm)"></option>
+                    <option value="3" label="Yxlon (3 mm)"></option>
+                    <option value="1" label="Yxlon Smart (1 mm)"></option>
+                    </datalist>
             </div>
-    
+            
             <div class="form-item">
                 <label for="ofa">Object Film Afstand in mm:</label>
                 <input type="number" id="ofa" name="ofa" step="0.01" required oninput="updateMinFFD()">
             </div>
-    
+            
             <div class="form-item">
                 <label for="standaard">Kies een standaard:</label>
                 <select id="standaard" name="standaard" required onchange="updateMinFFD()">
@@ -247,12 +261,12 @@
                     <option value="3">ASME</option>
                 </select>
             </div>
-    
+            
             <div id="wanddikteInput" class="form-item" style="display:none;">
                 <label for="wanddikte">Wanddikte (wt) in mm (voor ASME):</label>
                 <input type="number" id="wanddikte" name="wanddikte" step="0.01" oninput="updateMinFFD()">
             </div>
-    
+            
             <div id="extraOpties" class="form-item" style="display:none;">
                 <label for="optie">Centraal of Excentrisch:</label>
                 <select id="optie" name="optie" onchange="updateMinFFD()">
@@ -261,12 +275,12 @@
                     <option value="2">Excentrisch</option>
                 </select>
             </div>
-    
+            
             <div id="diameterInput" class="form-item">
                 <label for="diameter">Diameter (De) in mm:</label>
                 <input type="number" id="diameter" name="diameter" step="0.01" required oninput="updateMinFFD()">
             </div>
-    
+            
             <div class="form-item">
                 <label for="sfd">Bron Film Afstand in mm:</label>
                 <input type="number" id="sfd" name="sfd" step="0.001" required>
@@ -313,8 +327,54 @@
         const extraOptiesDiv = document.getElementById("extraOpties");
         const wanddikteDiv = document.getElementById("wanddikteInput");
         const optieSelect = document.getElementById("optie");
+        
+        // **NIEUW: Referentie naar de nieuwe input en datalist**
+        const brongrootteInput = document.getElementById("brongrootteInput");
+        const bronKeuzesDatalist = document.getElementById("bronKeuzes");
 
-        // --- Event Listener voor 'standaard' om velden te tonen/verbergen ---
+
+        // **NIEUWE FUNCTIE: Laadt gegevens uit bronnen.csv**
+        async function laadBronnenCSV() {
+            try {
+                // Probeer het CSV bestand te laden
+                const response = await fetch('bronnen.csv');
+                if (!response.ok) {
+                    throw new Error(`Fout bij laden CSV: ${response.statusText}`);
+                }
+                const csvText = await response.text();
+                
+                // Splits in regels en negeer de header (eerste regel)
+                const rows = csvText.trim().split('\n').slice(1); 
+                
+                rows.forEach(row => {
+                    // Split de regel op komma (of puntkomma, afhankelijk van hoe het CSV is opgemaakt. Comma is standaard)
+                    // We gaan uit van komma's als scheidingsteken
+                    const columns = row.split(','); 
+                    
+                    // Controleer of de benodigde kolommen bestaan
+                    if (columns.length >= 5) {
+                        const bronNaam = columns[0].trim(); // Naam in de eerste kolom (index 0)
+                        const bronGrootte = columns[4].trim(); // Grootte in de vijfde kolom (index 4)
+                        
+                        // Maak een nieuwe <option> aan voor de datalist
+                        if (bronNaam && bronGrootte) {
+                            const option = document.createElement('option');
+                            option.value = bronGrootte; // Dit is de waarde die in het inputveld komt
+                            option.label = `${bronNaam} (${bronGrootte} mm)`; // Dit is de tekst die de gebruiker ziet
+                            bronKeuzesDatalist.appendChild(option);
+                        }
+                    }
+                });
+                
+                // Pas de placeholder aan om aan te geven dat het laden gelukt is
+                brongrootteInput.placeholder = "Kies of vul in (mm)";
+            } catch (error) {
+                console.error("Kon bronnen.csv niet laden of verwerken. Zorg ervoor dat het bestand op de juiste plek staat en toegankelijk is (fout:", error, ")");
+                brongrootteInput.placeholder = "Geen dynamische bronnen geladen";
+            }
+        }
+        
+        // --- Event Listener voor 'standaard' om velden te tonen/verbergen (Ongewijzigd) ---
         standaardSelect.addEventListener("change", function () {
             // Toon Centraal/Excentrisch optie
             if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
@@ -331,10 +391,11 @@
             }
         });
 
-        // --- Functie om Min FFD live bij te werken ---
+        // --- Functie om Min FFD live bij te werken (Aangepast om de nieuwe input-ID te gebruiken) ---
         function updateMinFFD() {
             let ofa = parseFloat(document.getElementById("ofa").value);
-            let brongrootte = parseFloat(document.getElementById("brongrootte").value);
+            // **GEWIJZIGD:** Gebruikt de nieuwe ID
+            let brongrootte = parseFloat(brongrootteInput.value); 
             let standaard = document.getElementById("standaard").value;
             let optie = document.getElementById("optie").value;
             let diameter = parseFloat(document.getElementById("diameter").value);
@@ -403,7 +464,7 @@
             }
         }
 
-        // --- Hoofdfunctie voor de "Bekijk opnames" knop ---
+        // --- Hoofdfunctie voor de "Bekijk opnames" knop (Ongewijzigd) ---
         function berekenEnPlot() {
             // --- Deel 1: Waarden verzamelen ---
             let sfd_invoer = parseFloat(document.getElementById("sfd").value);
@@ -495,7 +556,7 @@
             container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // --- Hulpfuncties ---
+        // --- Hulpfuncties (Ongewijzigd) ---
         function createCrosshair(x, y) {
             const cross = document.createElement('div');
             cross.className = 'crosshair';
@@ -510,8 +571,11 @@
         function openModal(id) { document.getElementById(id).style.display = "block"; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; }
         
-        // Roep 'updateMinFFD' eenmalig aan bij laden 
-        document.addEventListener('DOMContentLoaded', updateMinFFD);
+        // Roep 'laadBronnenCSV' en 'updateMinFFD' aan bij laden 
+        document.addEventListener('DOMContentLoaded', function() {
+            laadBronnenCSV(); // Laad de dynamische keuzes
+            updateMinFFD(); // Voer initiële FFD berekening uit
+        });
 
     </script>
 </body>
