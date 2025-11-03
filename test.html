@@ -14,6 +14,20 @@
             margin: 0;
         }
 
+        .info-btn { /* Stijl overgenomen voor de info-knop */
+            background-color: #ddd;
+            color: black;
+            padding: 5px 12px;
+            font-size: 16px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            width: auto;
+            margin-top: 0;
+            display: inline-block;
+        }
+
         button {
             background-color: #F5DF4D;
             color: black;
@@ -25,26 +39,12 @@
             display: inline-block;
             margin-top: 20px;
             width: 60%;
-            max-width: 400px; /* Toegevoegd voor betere lay-out */
+            max-width: 400px;
         }
 
         button:hover {
             background-color: #e4c233;
         }
-
-        /* Stijlen voor de modal knop */
-        .info-btn {
-            background-color: #ddd;
-            color: black;
-            padding: 5px 12px;
-            font-size: 16px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            margin: 5px;
-            width: auto;
-            margin-top: 0;
-        }
 
         /* Stijlen voor de modals (pop-ups) */
         .modal {
@@ -80,33 +80,28 @@
             cursor: pointer;
         }
 
-        #ffdForm { /* Zorg ervoor dat het formulier er beter uitziet */
+        /* Centering van het formulier en de knop */
+        #ffdForm {
             max-width: 600px;
             margin: 20px auto;
-            padding: 20px;
-            display: flex; /* Zorg voor een flexibele indeling */
-            flex-direction: column;
-            gap: 10px;
-            align-items: center; /* Centreer items in de kolom */
+            text-align: left; /* Zorgt ervoor dat labels/inputs links beginnen */
         }
-
         #ffdForm > * {
-            width: 100%; /* Zorg ervoor dat alle elementen de volledige breedte van de form-container innemen */
-            max-width: 400px; /* Beperk de maximale breedte */
+            display: block; /* Zorgt ervoor dat elk element op een nieuwe regel begint */
+            margin-bottom: 5px; /* Creëert ruimte tussen de regels */
         }
-
         #ffdForm input[type="number"], #ffdForm select {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
-            margin-top: 5px;
             margin-bottom: 10px;
+            max-width: 400px; /* Beperk de breedte voor leesbaarheid */
         }
 
-        #ffdForm label {
+        /* Specifieke herstel voor de knop in het formulier */
+        #ffdForm button {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin: 20px auto 0 auto; /* Centreer de knop onder het formulier */
         }
 
     </style>
@@ -131,10 +126,10 @@
 
     <form id="ffdForm">
         <label for="ofa">Object Film Afstand (OFA):</label>
-        <input type="number" id="ofa" name="ofa" step="0.01" required>
+        <input type="number" id="ofa" name="ofa" step="0.01" required><br>
 
                 <label for="brongrootteInput">Brongrootte in mm:</label>
-        <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)">
+        <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)"><br>
 
         <datalist id="bronKeuzes">
             <option value="2.5" label="Balteau (2.5 mm)"></option>
@@ -147,7 +142,7 @@
             <option value="1">EN-klasse A</option>
             <option value="2">EN-klasse B</option>
             <option value="3">ASME</option>
-        </select>
+        </select><br>
 
         <div id="extraOpties" style="display:none;">
             <label for="optie">Centraal of Excentrisch:</label>
@@ -155,17 +150,17 @@
                 <option value="">Nee</option>
                 <option value="1">Centraal</option>
                 <option value="2">Excentrisch</option>
-            </select>
+            </select><br>
         </div>
 
         <div id="diameterInput" style="display:none;">
             <label for="diameter">Diameter in mm:</label>
-            <input type="number" id="diameter" name="diameter" step="0.01">
+            <input type="number" id="diameter" name="diameter" step="0.01"><br>
         </div>
 
         <div id="wanddikteInput" style="display:none;">
             <label for="wt">Wanddikte (wt) in mm:</label>
-            <input type="number" id="wt" name="wt" step="0.01">
+            <input type="number" id="wt" name="wt" step="0.01"><br>
         </div>
 
         <button type="button" onclick="berekenFFD(); scrollToAnswer()">Bereken FFD</button>
