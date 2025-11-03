@@ -1,22 +1,38 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aantal Opnames</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css"> 
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Film Focus Afstand Berekening</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+        }
 
-    <style>
-        /* --- Gecombineerde Stijlen (Ongewijzigd) --- */
-        body {
-            font-family: 'Roboto Condensed', sans-serif;
-            padding: 20px;
-            margin: 0;
-        }
+        button {
+            background-color: #F5DF4D;
+            color: black;
+            font-size: 18px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 20px;
+            width: 60%;
+            max-width: 400px; /* Toegevoegd voor betere lay-out */
+        }
 
+        button:hover {
+            background-color: #e4c233;
+        }
+
+        /* Stijlen voor de modal knop */
         .info-btn {
             background-color: #ddd;
             color: black;
@@ -26,48 +42,29 @@
             border: none;
             cursor: pointer;
             margin: 5px;
-            width: auto; 
+            width: auto;
             margin-top: 0;
-        }
-
-        .submit-btn {
-            background-color: #F5DF4D;
-            color: black;
-            padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .submit-btn:hover {
-            background-color: #FFD700;
         }
 
         /* Stijlen voor de modals (pop-ups) */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
         }
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; 
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; 
+            width: 80%;
             max-width: 600px;
         }
         .close {
@@ -83,257 +80,112 @@
             cursor: pointer;
         }
 
-        /* Stijlen voor het formulier */
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin: 10px auto;
+        #ffdForm { /* Zorg ervoor dat het formulier er beter uitziet */
             max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            display: flex; /* Zorg voor een flexibele indeling */
+            flex-direction: column;
+            gap: 10px;
+            align-items: center; /* Centreer items in de kolom */
         }
 
-        .form-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            flex-wrap: wrap;
+        #ffdForm > * {
+            width: 100%; /* Zorg ervoor dat alle elementen de volledige breedte van de form-container innemen */
+            max-width: 400px; /* Beperk de maximale breedte */
         }
 
-        .form-item label {
-            min-width: 200px;
+        #ffdForm input[type="number"], #ffdForm select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        #ffdForm label {
+            display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
 
-        .form-item input,
-        .form-item select {
-            flex: 1;
-            padding: 8px;
-            width: 100%;
-            min-width: 200px;
-            box-sizing: border-box;
-        }
-        
-        /* Specifieke styling voor de datalist input (indien nodig) */
-        #brongrootteInput {
-            flex: 1;
-            padding: 8px;
-            width: 100%;
-            min-width: 200px;
-            box-sizing: border-box;
-        }
-
-
-        /* Stijlen voor de plot-afbeeldingen */
-        .image-container {
-            position: relative;
-            background-size: cover;
-            border: 1px solid black;
-            margin: 20px auto;
-        }
-
-        .image-container img {
-            width: 100%;
-            height: 100%;
-        }
-
-        .crosshair {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            left: 0;
-            top: 0;
-            pointer-events: none;
-        }
-
-        .crosshair::before,
-        .crosshair::after {
-            content: '';
-            position: absolute;
-            background-color: rgb(255, 49, 49);
-        }
-
-        .crosshair::before { top: 14px; left: 0; width: 30px; height: 2px; }
-        .crosshair::after { left: 14px; top: 0; width: 2px; height: 30px; }
-
-        .highlight-circle {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: rgba(0, 0, 128, 0.2);
-            left: -10px;
-            top: -10px;
-            pointer-events: none;
-        }
-
-        h1 {
-             color: #F5DF4D; 
-             text-align: center;
-        }
-        
-        h2 {
-            color: blue;
-        }
-
-        #container1A h2,
-        #container2A h2,
-        #container1B h2,
-        #container2B h2 {
-            color: red;
-        }
-
-        /* Stijlen voor de "Rondnaad tool" link */
-        .link-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
-        .link-list li { margin: 5px; }
-        .link-list a {
-            text-decoration: none; color: #000000; padding: 10px 30px; border-radius: 15px;
-            font-size: 0.9rem; font-weight: bold; transition: transform 0.3s;
-            display: inline-flex; align-items: center; justify-content: center;
-            background-size: contain; background-position: center; background-repeat: no-repeat;
-            width: 200px; height: 50px; background-color: transparent; gap: 10px;
-        }
-        .link-list a:hover { transform: scale(1.05); background-color: transparent; }
-        .link2 { background-image: url('tape2.PNG'); }
-        
-        @media (max-width: 600px) {
-            .form-item { flex-direction: column; align-items: flex-start; }
-            .form-item label { min-width: 100%; margin-bottom: 5px; }
-            .form-item input, .form-item select { width: 100%; min-width: 0; }
-            #brongrootteInput { width: 100%; min-width: 0; } /* Zorg dat de datalist-input ook goed schaalt */
-            .image-container { width: 100%; height: auto; }
-            .image-container img { width: 100%; height: auto; }
-        }
-    </style>
+    </style>
 </head>
 <body>
+    <h1 style="color: #F5DF4D; text-align: center;">Minimale FFD</h1>
 
-    <h1>Aantal opnames</h1>
-    
     <div style="text-align: center;">
-        <button class="info-btn" onclick="openModal('myModal')">i</button>
+        <button class="info-btn" onclick="openModal('myModal')">i</button>
     </div>
 
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>
-                <b>Werking FFD Controle</b>
-                De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
-                Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
-                Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
-            </p>
-            <hr>
-            <p>
-                <b>Aantal opnames</b>
-                Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn. Voor ASME wordt het aantal opnames van klasse A aangehouden.
-                <br><br>
-                <b>Let op:</b> Bij een diameter kleiner of gelijk aan 100mm is het antwoord altijd "2 bij opstelling 11/F , 3 bij opstelling 12/G".
-            </p>
-        </div>
-    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>
+                De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
+                Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
+                Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
+            </p>
+        </div>
+    </div>
 
-    <form id="combinedForm">
-        <div class="form-container">
-            
-            <div class="form-item">
-                <label for="brongrootteInput">Brongrootte in mm:</label>
-                <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required oninput="updateMinFFD()">
-                
-                <datalist id="bronKeuzes">
-                    <option value="2.5" label="Balteau (2.5 mm)"></option>
-                    <option value="3" label="Yxlon (3 mm)"></option>
-                    <option value="1" label="Yxlon Smart (1 mm)"></option>
-                    </datalist>
-            </div>
-            
-            <div class="form-item">
-                <label for="ofa">Object Film Afstand in mm:</label>
-                <input type="number" id="ofa" name="ofa" step="0.01" required oninput="updateMinFFD()">
-            </div>
-            
-            <div class="form-item">
-                <label for="standaard">Kies een standaard:</label>
-                <select id="standaard" name="standaard" required onchange="updateMinFFD()">
-                    <option value="" disabled selected>Kies een standaard</option>
-                    <option value="1">EN-klasse A</option>
-                    <option value="2">EN-klasse B</option>
-                    <option value="3">ASME</option>
-                </select>
-            </div>
-            
-            <div id="wanddikteInput" class="form-item" style="display:none;">
-                <label for="wanddikte">Wanddikte (wt) in mm (voor ASME):</label>
-                <input type="number" id="wanddikte" name="wanddikte" step="0.01" oninput="updateMinFFD()">
-            </div>
-            
-            <div id="extraOpties" class="form-item" style="display:none;">
-                <label for="optie">Centraal of Excentrisch:</label>
-                <select id="optie" name="optie" onchange="updateMinFFD()">
-                    <option value="">Nee</option>
-                    <option value="1">Centraal</option>
-                    <option value="2">Excentrisch</option>
-                </select>
-            </div>
-            
-            <div id="diameterInput" class="form-item">
-                <label for="diameter">Diameter (De) in mm:</label>
-                <input type="number" id="diameter" name="diameter" step="0.01" required oninput="updateMinFFD()">
-            </div>
-            
-            <div class="form-item">
-                <label for="sfd">Bron Film Afstand in mm:</label>
-                <input type="number" id="sfd" name="sfd" step="0.001" required>
-                <span id="min_ffd_output" style="margin-left: 10px; font-weight: bold; flex-basis: 100%;"></span>
-            </div>
+    <form id="ffdForm">
+        <label for="ofa">Object Film Afstand (OFA):</label>
+        <input type="number" id="ofa" name="ofa" step="0.01" required>
 
-        </div> <button type="button" class="submit-btn" onclick="berekenEnPlot()">Bekijk opnames</button>
-    </form>
-    
-    <p id="output" style="color: #F5DF4D; text-align: center; font-weight: bold;"></p>
+                <label for="brongrootteInput">Brongrootte in mm:</label>
+        <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)">
 
-    <ul class="link-list">
-        <li><a href="cw2.html" class="link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
-    </ul>
+        <datalist id="bronKeuzes">
+            <option value="2.5" label="Balteau (2.5 mm)"></option>
+            <option value="3" label="Yxlon (3 mm)"></option>
+            <option value="1" label="Yxlon Smart (1 mm)"></option>
+        </datalist>
+                <label for="standaard">Kies een standaard:</label>
+        <select id="standaard" name="standaard" required>
+            <option value="" disabled selected>Kies een standaard</option>
+            <option value="1">EN-klasse A</option>
+            <option value="2">EN-klasse B</option>
+            <option value="3">ASME</option>
+        </select>
 
-    <hr style="margin: 40px 0; border: 1px solid #F5DF4D;">
+        <div id="extraOpties" style="display:none;">
+            <label for="optie">Centraal of Excentrisch:</label>
+            <select id="optie" name="optie">
+                <option value="">Nee</option>
+                <option value="1">Centraal</option>
+                <option value="2">Excentrisch</option>
+            </select>
+        </div>
 
-    <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
-        <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
-            Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
-        </strong>
-    </div>
+        <div id="diameterInput" style="display:none;">
+            <label for="diameter">Diameter in mm:</label>
+            <input type="number" id="diameter" name="diameter" step="0.01">
+        </div>
 
-    <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
-      <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
-    </div>
-    <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
-      <h2>Opstelling 2 (Klasse B)</h2>
-    </div>
-    <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
-      <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
-    </div>
-    <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
-      <h2>Opstelling 2 (Klasse A)</h2>
-    </div>
+        <div id="wanddikteInput" style="display:none;">
+            <label for="wt">Wanddikte (wt) in mm:</label>
+            <input type="number" id="wt" name="wt" step="0.01">
+        </div>
 
+        <button type="button" onclick="berekenFFD(); scrollToAnswer()">Bereken FFD</button>
+    </form>
 
-    <script>
-        // --- Globale variabele om de berekende min FFD op te slaan ---
-        let global_min_ffd = 0;
+    <p id="output" style="color: #F5DF4D; text-align: center;"></p>
 
-        // --- Variabelen voor de dynamische velden ---
-        const standaardSelect = document.getElementById("standaard");
-        const extraOptiesDiv = document.getElementById("extraOpties");
-        const wanddikteDiv = document.getElementById("wanddikteInput");
-        const optieSelect = document.getElementById("optie");
-        
-        // **NIEUW: Referentie naar de nieuwe input en datalist**
+    <script>
+        const standaardSelect = document.getElementById("standaard");
+        const extraOptiesDiv = document.getElementById("extraOpties");
+        const wanddikteDiv = document.getElementById("wanddikteInput");
+        const optieSelect = document.getElementById("optie");
+        const diameterDiv = document.getElementById("diameterInput");
+
+        // NIEUWE JS REFERENTIES voor de brongrootte datalist
         const brongrootteInput = document.getElementById("brongrootteInput");
         const bronKeuzesDatalist = document.getElementById("bronKeuzes");
 
 
-        // **NIEUWE FUNCTIE: Laadt gegevens uit bronnen.csv**
+        // NIEUWE FUNCTIE: Laadt gegevens uit bronnen.csv
         async function laadBronnenCSV() {
             try {
                 // Probeer het CSV bestand te laden
@@ -342,20 +194,19 @@
                     throw new Error(`Fout bij laden CSV: ${response.statusText}`);
                 }
                 const csvText = await response.text();
-                
+
                 // Splits in regels en negeer de header (eerste regel)
-                const rows = csvText.trim().split('\n').slice(1); 
-                
+                const rows = csvText.trim().split('\n').slice(1);
+
                 rows.forEach(row => {
-                    // Split de regel op komma (of puntkomma, afhankelijk van hoe het CSV is opgemaakt. Comma is standaard)
-                    // We gaan uit van komma's als scheidingsteken
-                    const columns = row.split(','); 
-                    
+                    // Split de regel op komma (of puntkomma)
+                    const columns = row.split(',');
+
                     // Controleer of de benodigde kolommen bestaan
                     if (columns.length >= 5) {
                         const bronNaam = columns[0].trim(); // Naam in de eerste kolom (index 0)
                         const bronGrootte = columns[4].trim(); // Grootte in de vijfde kolom (index 4)
-                        
+
                         // Maak een nieuwe <option> aan voor de datalist
                         if (bronNaam && bronGrootte) {
                             const option = document.createElement('option');
@@ -365,7 +216,7 @@
                         }
                     }
                 });
-                
+
                 // Pas de placeholder aan om aan te geven dat het laden gelukt is
                 brongrootteInput.placeholder = "Kies of vul in (mm)";
             } catch (error) {
@@ -373,210 +224,150 @@
                 brongrootteInput.placeholder = "Geen dynamische bronnen geladen";
             }
         }
-        
-        // --- Event Listener voor 'standaard' om velden te tonen/verbergen (Ongewijzigd) ---
-        standaardSelect.addEventListener("change", function () {
-            // Toon Centraal/Excentrisch optie
-            if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
-                extraOptiesDiv.style.display = "flex"; 
-            } else {
-                extraOptiesDiv.style.display = "none";
-            }
-
-            // Toon wanddikte (wt) alleen voor ASME
-            if (standaardSelect.value === '3') {
-                wanddikteDiv.style.display = "flex";
-            } else {
-                wanddikteDiv.style.display = "none";
-            }
-        });
-
-        // --- Functie om Min FFD live bij te werken (Aangepast om de nieuwe input-ID te gebruiken) ---
-        function updateMinFFD() {
-            let ofa = parseFloat(document.getElementById("ofa").value);
-            // **GEWIJZIGD:** Gebruikt de nieuwe ID
-            let brongrootte = parseFloat(brongrootteInput.value); 
-            let standaard = document.getElementById("standaard").value;
-            let optie = document.getElementById("optie").value;
-            let diameter = parseFloat(document.getElementById("diameter").value);
-            let wt = parseFloat(document.getElementById("wanddikte").value);
-            let output = document.getElementById("output");
-            output.innerHTML = ""; // Reset meldingen
-
-            // Stop als basiswaarden ontbreken
-            if (isNaN(ofa) || isNaN(brongrootte) || standaard === "") {
-                // Leeg SFD veld als de input incompleet is
-                document.getElementById("sfd").value = ""; 
-                return; 
-            }
-
-            let centraal = (optie === '1');
-            let excentrisch = (optie === '2');
-            let ffd_min;
-
-            // --- FFD Berekening ---
-            if (standaard === '3') {  // ASME
-                if (isNaN(wt)) { return; } // Wacht op wanddikte
-                if (wt < 50) { var boa = (brongrootte * ofa) / 0.51; }
-                else if (wt < 75) { var boa = (brongrootte * ofa) / 0.76; }
-                else if (wt <= 100) { var boa = (brongrootte * ofa) / 1.02; }
-                else {
-                    output.innerHTML = "Ongeldige wanddikte (ASME). Voer een waarde tussen 0 en 100 mm in.";
-                    return;
-                }
-                ffd_min = boa + ofa;
-            } else if (standaard === '2') {  // EN-klasse B
-                let basis = brongrootte * 15 * Math.pow(ofa, 2 / 3);
-                if (centraal || excentrisch) { 
-                    if (isNaN(diameter)) { return; } // Wacht op diameter
-                    if (centraal) { basis *= 0.5; }
-                    else if (excentrisch) { basis *= 0.8; }
-                }
-                ffd_min = basis + ofa;
-            } else if (standaard === '1') {  // EN-klasse A
-                let basis = brongrootte * 7.5 * Math.pow(ofa, 2 / 3);
-                if (centraal || excentrisch) { 
-                    if (isNaN(diameter)) { return; } // Wacht op diameter
-                    if (centraal) { basis *= 0.5; }
-                    else if (excentrisch) { basis *= 0.8; }
-                }
-                ffd_min = basis + ofa;
-            } else {
-                return; // Geen geldige standaard
-            }
-
-            // --- Invullen met +1 Logica ---
-            global_min_ffd = ffd_min; // De correct berekende minimale FFD
-            const prefilled_ffd = ffd_min + 1; // De waarde die we invullen
-
-            document.getElementById("sfd").value = prefilled_ffd.toFixed(2);
-
-            // Toon centraal/excentrisch checks (als diameter is ingevuld)
-            if (centraal && !isNaN(diameter)) {
-                let maxFFD = diameter / 2;
-                if (ffd_min < maxFFD) { output.innerHTML += `✅ Centrale opstelling is toegestaan<br>`; }
-                else { output.innerHTML += `❌ Centrale opstelling <strong>niet</strong> toegestaan<br>`; }
-            }
-            if (excentrisch && !isNaN(diameter)) {
-                let maxExcentrischFFD = diameter - (ofa + 10);
-                if (ffd_min < maxExcentrischFFD) { output.innerHTML += `✅ Excentrische opstelling is toegestaan<br>`; }
-                else { output.innerHTML += `❌ Excentrische opstelling <strong>niet</strong> toegestaan<br>`; }
-            }
-        }
-
-        // --- Hoofdfunctie voor de "Bekijk opnames" knop (Ongewijzigd) ---
-        function berekenEnPlot() {
-            // --- Deel 1: Waarden verzamelen ---
-            let sfd_invoer = parseFloat(document.getElementById("sfd").value);
-            let diameter = parseFloat(document.getElementById("diameter").value);
-            let ofa = parseFloat(document.getElementById("ofa").value);
-            let standaard = document.getElementById("standaard").value;
-            
-            let ffd_output_span = document.getElementById("min_ffd_output");
-            let diameterAntwoordDiv = document.getElementById("diameterAntwoord");
-            let output = document.getElementById("output");
-            
-            // Reset meldingen en verberg resultaten
-            ffd_output_span.innerHTML = ""; 
-            diameterAntwoordDiv.style.display = "none";
-            document.getElementById('container1A').style.display = 'none';
-            document.getElementById('container2A').style.display = 'none';
-            document.getElementById('container1B').style.display = 'none';
-            document.getElementById('container2B').style.display = 'none';
-            
-            // --- Deel 2: Validatie & FFD Waarschuwing ---
-            if (isNaN(sfd_invoer)) {
-                output.innerHTML = "Voer een geldige Bron Film Afstand (SFD) in.";
-                return;
-            }
-            if (isNaN(diameter) || isNaN(ofa) || standaard === "") {
-                output.innerHTML = "Controleer of OFA, Standaard en Diameter correct zijn ingevuld.";
-                return;
-            }
-
-            // Toon de FFD waarschuwing
-            if(global_min_ffd > 0) { // Zorg ervoor dat de berekening is uitgevoerd
-                ffd_output_span.innerHTML = `(Minimaal vereiste FFD: ${global_min_ffd.toFixed(2)} mm)`;
-                if (sfd_invoer < global_min_ffd) {
-                    ffd_output_span.style.color = "red";
-                    ffd_output_span.innerHTML += " - Gekozen FFD is te laag!";
-                } else {
-                    ffd_output_span.style.color = "green";
-                    ffd_output_span.innerHTML += " - OK";
-                }
-            }
 
 
-            // --- Deel 3: Plot de opnames ---
-            
-            // Bepaal de klasse
-            let klasse = (standaard === '1' || standaard === '3') ? 'A' : 'B';
+        standaardSelect.addEventListener("change", function () {
+            if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
+                extraOptiesDiv.style.display = "block";
+            } else {
+                extraOptiesDiv.style.display = "none";
+            }
 
-            // Check diameter voor plot-logica
-            if (diameter <= 100) {
-                diameterAntwoordDiv.style.display = "block";
-                diameterAntwoordDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return; // Stop hier
-            } 
-            
-            // Als diameter > 100, gebruik OFA als 't'
-            const t_plot = ofa; 
-            const De_plot = diameter; 
-            const SFD = sfd_invoer; 
+            if (standaardSelect.value === '3') {
+                wanddikteDiv.style.display = "block";
+            } else {
+                wanddikteDiv.style.display = "none";
+            }
 
-            // De plotwaarden (uit de nomogrammen)
-            const x_value1 = t_plot / De_plot;
-            const y_value1 = De_plot / SFD;
-            const x_value2 = t_plot / De_plot;
-            const y_value2 = De_plot / (SFD - t_plot);
+            if (optieSelect.value === '1' || optieSelect.value === '2') {
+                diameterDiv.style.display = "block";
+            } else {
+                diameterDiv.style.display = "none";
+            }
+        });
 
-            let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
+        optieSelect.addEventListener("change", function () {
+            if (optieSelect.value === '1' || optieSelect.value === '2') {
+                diameterDiv.style.display = "block";
+            } else {
+                diameterDiv.style.display = "none";
+            }
+        });
 
-            if (klasse === 'B') {
-                x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
-                x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
-                document.getElementById('container1B').style.display = 'block';
-                document.getElementById('container2B').style.display = 'block';
-            } else if (klasse === 'A') {
-                x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
-                x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
-                document.getElementById('container1A').style.display = 'block';
-                document.getElementById('container2A').style.display = 'block';
-            }
+        function berekenFFD() {
+            let ofa = parseFloat(document.getElementById("ofa").value);
+            // GEWIJZIGD: Gebruik de nieuwe ID brongrootteInput
+            let brongrootte = parseFloat(document.getElementById("brongrootteInput").value);
+            let keuze = document.getElementById("standaard").value;
+            let optie = document.getElementById("optie").value;
+            let diameter = parseFloat(document.getElementById("diameter").value);
+            let wt = parseFloat(document.getElementById("wt").value);
+            let output = document.getElementById("output");
+            let centraal = false;
+            let excentrisch = false;
+            let ffd;
 
-            const container1 = document.getElementById(`container1${klasse}`);
-            const container2 = document.getElementById(`container2${klasse}`);
+            output.innerHTML = "";
 
-            // Maak de plots schoon en voeg de nieuwe kruizen toe
-            container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
-            container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
-            container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
-            container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+            if (keuze === "") {
+                output.innerHTML = "Maak een keuze in het veld 'Kies een standaard'.<br>";
+                return;
+            }
 
-            container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+            if (optie === '1') {
+                centraal = true;
+                if (isNaN(diameter) || diameter <= 0) {
+                    output.innerHTML = "Voer een geldige diameter in voor centrale opstelling.<br>";
+                    return;
+                }
+            } else if (optie === '2') {
+                excentrisch = true;
+                if (isNaN(diameter) || diameter <= 0) {
+                    output.innerHTML = "Voer een geldige diameter in voor excentrische opstelling.<br>";
+                    return;
+                }
+            }
 
-        // --- Hulpfuncties (Ongewijzigd) ---
-        function createCrosshair(x, y) {
-            const cross = document.createElement('div');
-            cross.className = 'crosshair';
-            cross.style.left = (x - 15) + 'px';
-            cross.style.top = (y - 15) + 'px';
-            const circle = document.createElement('div');
-            circle.className = 'highlight-circle';
-            cross.appendChild(circle);
-            return cross;
-        }
+            if (keuze === '3') {  // ASME
+                if (isNaN(wt)) {
+                    output.innerHTML = "Voer een geldige wanddikte in.<br>";
+                    return;
+                }
 
-        function openModal(id) { document.getElementById(id).style.display = "block"; }
-        function closeModal(id) { document.getElementById(id).style.display = "none"; }
-        
-        // Roep 'laadBronnenCSV' en 'updateMinFFD' aan bij laden 
+                if (wt < 50) {
+                    var boa = (brongrootte * ofa) / 0.51;
+                } else if (wt < 75) {
+                    var boa = (brongrootte * ofa) / 0.76;
+                } else if (wt <= 100) {
+                    var boa = (brongrootte * ofa) / 1.02;
+                } else {
+                    output.innerHTML = "Ongeldige wanddikte. Voer een waarde tussen 0 en 100 mm in.<br>";
+                    return;
+                }
+                ffd = boa + ofa;
+
+            } else if (keuze === '2') {  // EN-klasse B
+                let basis = brongrootte * 15 * Math.pow(ofa, 2 / 3);
+                if (centraal) {
+                    basis *= 0.5;
+                } else if (excentrisch) {
+                    basis *= 0.8;
+                }
+                ffd = basis + ofa;
+
+            } else if (keuze === '1') {  // EN-klasse A
+                let basis = brongrootte * 7.5 * Math.pow(ofa, 2 / 3);
+                if (centraal) {
+                    basis *= 0.5;
+                } else if (excentrisch) {
+                    basis *= 0.8;
+                }
+                ffd = basis + ofa;
+
+            } else {
+                output.innerHTML = "Ongeldige keuze. Voer 1, 2 of 3 in.<br>";
+                return;
+            }
+
+            output.innerHTML += `De minimale Film Focus Afstand (FFD) is: ${ffd.toFixed(2)} mm<br>`;
+
+            if (centraal) {
+                let maxFFD = diameter / 2;
+                if (ffd < maxFFD) {
+                    output.innerHTML += `✅ Centrale opstelling is toegestaan (FFD < ${maxFFD.toFixed(2)} mm)<br>`;
+                } else {
+                    output.innerHTML += `❌ Centrale opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxFFD.toFixed(2)} mm)<br>`;
+                }
+            }
+
+            if (excentrisch) {
+                let maxExcentrischFFD = diameter - (ofa + 10);
+                if (ffd < maxExcentrischFFD) {
+                    output.innerHTML += `✅ Excentrische opstelling is toegestaan (FFD < ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
+                } else {
+                    output.innerHTML += `❌ Excentrische opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
+                }
+            }
+        }
+
+        function scrollToAnswer() {
+            const output = document.getElementById("output");
+            output.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // NIEUW: Roep laadBronnenCSV() aan bij laden
         document.addEventListener('DOMContentLoaded', function() {
-            laadBronnenCSV(); // Laad de dynamische keuzes
-            updateMinFFD(); // Voer initiële FFD berekening uit
+            laadBronnenCSV();
         });
 
-    </script>
+    </script>
 </body>
 </html>
