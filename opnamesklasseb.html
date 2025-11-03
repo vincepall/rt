@@ -1,361 +1,582 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="styles.css" />
-  <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
-  <title>Aantal opnames klasse A en B</title>
-  <style>
-    body {
-      font-family: 'Roboto Condensed', sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aantal Opnames</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css"> 
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
 
-    .form-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 10px;
-    }
+    <style>
+        /* --- Gecombineerde Stijlen (Ongewijzigd) --- */
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
 
-    .form-item {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      margin-bottom: 10px;
-    }
+        .info-btn {
+            background-color: #ddd;
+            color: black;
+            padding: 5px 12px;
+            font-size: 16px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            width: auto; 
+            margin-top: 0;
+        }
 
-    .form-item label {
-      min-width: 150px;
-    }
+        .submit-btn {
+            background-color: #F5DF4D;
+            color: black;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 400px;
+        }
 
-    .form-item input,
-    .form-item select {
-      flex: 1;
-      padding: 5px;
-      width: 100%;
-    }
+        .submit-btn:hover {
+            background-color: #FFD700;
+        }
 
-    @media (max-width: 600px) {
-      .form-item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+        /* Stijlen voor de modals (pop-ups) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
 
-      .form-item label {
-        min-width: 100%;
-        margin-bottom: 5px;
-      }
+        /* Stijlen voor het formulier */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 10px auto;
+            max-width: 600px;
+        }
 
-      .form-item input {
-        width: 100%;
-      }
+        .form-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-      .image-container {
-        width: 100%;
-        height: auto;
-      }
+        .form-item label {
+            min-width: 200px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-      .image-container img {
-        width: 100%;
-        height: auto;
-      }
-    }
+        .form-item input,
+        .form-item select {
+            flex: 1;
+            padding: 8px;
+            width: 100%;
+            min-width: 200px;
+            box-sizing: border-box;
+        }
+        
+        /* Specifieke styling voor de datalist input (indien nodig) */
+        #brongrootteInput {
+            flex: 1;
+            padding: 8px;
+            width: 100%;
+            min-width: 200px;
+            box-sizing: border-box;
+        }
 
-    .flex-container {
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-start;
-      gap: 20px;
-    }
 
-    .image-container {
-      position: relative;
-      background-size: cover;
-      border: 1px solid black;
-      margin-bottom: 20px;
-    }
+        /* Stijlen voor de plot-afbeeldingen */
+        .image-container {
+            position: relative;
+            background-size: cover;
+            border: 1px solid black;
+            margin: 20px auto;
+        }
 
-    .image-container img {
-      width: 100%;
-      height: 100%;
-    }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+        }
 
-    .crosshair {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      left: 0;
-      top: 0;
-      pointer-events: none;
-    }
+        .crosshair {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+        }
 
-    .crosshair::before,
-    .crosshair::after {
-      content: '';
-      position: absolute;
-      background-color: rgb(255, 49, 49);
-    }
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: rgb(255, 49, 49);
+        }
 
-    .crosshair::before {
-      top: 14px;
-      left: 0;
-      width: 30px;
-      height: 2px;
-    }
+        .crosshair::before { top: 14px; left: 0; width: 30px; height: 2px; }
+        .crosshair::after { left: 14px; top: 0; width: 2px; height: 30px; }
 
-    .crosshair::after {
-      left: 14px;
-      top: 0;
-      width: 2px;
-      height: 30px;
-    }
+        .highlight-circle {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 128, 0.2);
+            left: -10px;
+            top: -10px;
+            pointer-events: none;
+        }
 
-    .highlight-circle {
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 128, 0.2);
-      left: -10px;
-      top: -10px;
-      pointer-events: none;
-    }
+        h1 {
+             color: #F5DF4D; 
+             text-align: center;
+        }
+        
+        h2 {
+            color: blue;
+        }
 
-    h2 {
-      color: blue;
-    }
+        #container1A h2,
+        #container2A h2,
+        #container1B h2,
+        #container2B h2 {
+            color: red;
+        }
 
-    #container1 h2,
-    #container2 h2 {
-      color: red;
-    }
-
-    .btn {
-      background-color: #666;
-      border: none;
-      color: black;
-      padding: 10px 20px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      margin: 4px 2px;
-      cursor: pointer;
-      border-radius: 8px;
-    }
-
-    button[type="submit"] {
-      background-color: #F5DF4D;
-      color: black;
-      padding: 15px 30px;
-      font-size: 18px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      text-align: center;
-      display: inline-block;
-      margin: 10px 0;
-    }
-
-    button[type="submit"]:hover {
-      background-color: #FFD700;
-    }
-
-    .link-list {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .link-list li {
-      margin: 5px;
-    }
-
-    .link-list a {
-      text-decoration: none;
-      color: #000000;
-      padding: 10px 30px;
-      border-radius: 15px;
-      font-size: 0.9rem;
-      font-weight: bold;
-      transition: transform 0.3s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      width: 200px;
-      height: 50px;
-      background-color: transparent;
-      gap: 10px;
-    }
-
-    .link-list a:hover {
-      transform: scale(1.05);
-      background-color: transparent;
-    }
-
-    .link1 {
-      background-image: url('tape1.PNG');
-    }
-
-    .link2 {
-      background-image: url('tape2.PNG');
-    }
-
-    .link3 {
-      background-image: url('tape3.PNG');
-    }
-
-    .link4 {
-      background-image: url('tape4.PNG');
-    }
-  </style>
+        /* Stijlen voor de "Rondnaad tool" link */
+        .link-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+        .link-list li { margin: 5px; }
+        .link-list a {
+            text-decoration: none; color: #000000; padding: 10px 30px; border-radius: 15px;
+            font-size: 0.9rem; font-weight: bold; transition: transform 0.3s;
+            display: inline-flex; align-items: center; justify-content: center;
+            background-size: contain; background-position: center; background-repeat: no-repeat;
+            width: 200px; height: 50px; background-color: transparent; gap: 10px;
+        }
+        .link-list a:hover { transform: scale(1.05); background-color: transparent; }
+        .link2 { background-image: url('tape2.PNG'); }
+        
+        @media (max-width: 600px) {
+            .form-item { flex-direction: column; align-items: flex-start; }
+            .form-item label { min-width: 100%; margin-bottom: 5px; }
+            .form-item input, .form-item select { width: 100%; min-width: 0; }
+            #brongrootteInput { width: 100%; min-width: 0; } /* Zorg dat de datalist-input ook goed schaalt */
+            .image-container { width: 100%; height: auto; }
+            .image-container img { width: 100%; height: auto; }
+        }
+    </style>
 </head>
 <body>
-  <h1 style="color: #F5DF4D; text-align: center;">Aantal opnames volgens EN</h1>
 
-  <button class="info-btn" onclick="openModal('myModal')">i</button>
-
-  <div id="myModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('myModal')">&times;</span>
-      <p>Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.</p>
+    <h1>Aantal opnames</h1>
+    
+    <div style="text-align: center;">
+        <button class="info-btn" onclick="openModal('myModal')">i</button>
     </div>
-  </div>
 
-  <script src="script.js"></script>
-
-  <form id="coordinates-form">
-    <div class="form-container">
-      <div class="form-item">
-        <label for="klasse">Kies de klasse:</label>
-        <select id="klasse" name="klasse" required>
-          <option value="">Selecteer...</option>
-          <option value="A">Klasse A</option>
-          <option value="B">Klasse B</option>
-        </select>
-      </div>
-      <div class="form-item">
-        <label for="wanddikte">Wanddikte (t in mm):</label>
-        <input type="number" id="wanddikte" name="wanddikte" step="0.001" required>
-      </div>
-      <div class="form-item">
-        <label for="diameter">Diameter (De in mm):</label>
-        <input type="number" id="diameter" name="diameter" step="0.001" required>
-      </div>
-      <div class="form-item">
-        <label for="sfd">Bron Film Afstand (SFD in mm):</label>
-        <input type="number" id="sfd" name="sfd" step="0.001" required>
-      </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>
+                <b>Werking FFD Controle</b>
+                De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
+                Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
+                Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
+            </p>
+            <hr>
+            <p>
+                <b>Aantal opnames</b>
+                Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn. Voor ASME wordt het aantal opnames van klasse A aangehouden.
+                <br><br>
+                <b>Let op:</b> Bij een diameter kleiner of gelijk aan 100mm is het antwoord altijd "2 bij opstelling 11/F , 3 bij opstelling 12/G".
+            </p>
+        </div>
     </div>
-    <button type="submit">Bekijk</button>
+
+    <form id="combinedForm">
+        <div class="form-container">
+            
+            <div class="form-item">
+                <label for="brongrootteInput">Brongrootte in mm:</label>
+                <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required oninput="updateMinFFD()">
+                
+                <datalist id="bronKeuzes">
+                    <option value="2.5" label="Balteau (2.5 mm)"></option>
+                    <option value="3" label="Yxlon (3 mm)"></option>
+                    <option value="1" label="Yxlon Smart (1 mm)"></option>
+                    </datalist>
+            </div>
+            
+            <div class="form-item">
+                <label for="ofa">Object Film Afstand in mm:</label>
+                <input type="number" id="ofa" name="ofa" step="0.01" required oninput="updateMinFFD()">
+            </div>
+            
+            <div class="form-item">
+                <label for="standaard">Kies een standaard:</label>
+                <select id="standaard" name="standaard" required onchange="updateMinFFD()">
+                    <option value="" disabled selected>Kies een standaard</option>
+                    <option value="1">EN-klasse A</option>
+                    <option value="2">EN-klasse B</option>
+                    <option value="3">ASME</option>
+                </select>
+            </div>
+            
+            <div id="wanddikteInput" class="form-item" style="display:none;">
+                <label for="wanddikte">Wanddikte (wt) in mm (voor ASME):</label>
+                <input type="number" id="wanddikte" name="wanddikte" step="0.01" oninput="updateMinFFD()">
+            </div>
+            
+            <div id="extraOpties" class="form-item" style="display:none;">
+                <label for="optie">Centraal of Excentrisch:</label>
+                <select id="optie" name="optie" onchange="updateMinFFD()">
+                    <option value="">Nee</option>
+                    <option value="1">Centraal</option>
+                    <option value="2">Excentrisch</option>
+                </select>
+            </div>
+            
+            <div id="diameterInput" class="form-item">
+                <label for="diameter">Diameter (De) in mm:</label>
+                <input type="number" id="diameter" name="diameter" step="0.01" required oninput="updateMinFFD()">
+            </div>
+            
+            <div class="form-item">
+                <label for="sfd">Bron Film Afstand in mm:</label>
+                <input type="number" id="sfd" name="sfd" step="0.001" required>
+                <span id="min_ffd_output" style="margin-left: 10px; font-weight: bold; flex-basis: 100%;"></span>
+            </div>
+
+        </div> <button type="button" class="submit-btn" onclick="berekenEnPlot()">Bekijk opnames</button>
+    </form>
+    
+    <p id="output" style="color: #F5DF4D; text-align: center; font-weight: bold;"></p>
 
     <ul class="link-list">
-      <li><a href="cw2.html" class="link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
+        <li><a href="cw2.html" class="link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
     </ul>
-  </form>
 
-  <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
-    <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
-  </div>
+    <hr style="margin: 40px 0; border: 1px solid #F5DF4D;">
 
-  <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
-    <h2>Opstelling 2 (Klasse B)</h2>
-  </div>
+    <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
+        <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
+            Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
+        </strong>
+    </div>
 
-  <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
-    <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
-  </div>
+    <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
+      <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
+    </div>
+    <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
+      <h2>Opstelling 2 (Klasse B)</h2>
+    </div>
+    <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
+      <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
+    </div>
+    <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
+      <h2>Opstelling 2 (Klasse A)</h2>
+    </div>
 
-  <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
-    <h2>Opstelling 2 (Klasse A)</h2>
-  </div>
 
-  <script>
-    document.getElementById('coordinates-form').addEventListener('submit', function(event) {
-      event.preventDefault();
+    <script>
+        // --- Globale variabele om de berekende min FFD op te slaan ---
+        let global_min_ffd = 0;
 
-      const klasse = document.getElementById('klasse').value;
-      const t = parseFloat(document.getElementById('wanddikte').value);
-      const De = parseFloat(document.getElementById('diameter').value);
-      const SFD = parseFloat(document.getElementById('sfd').value);
+        // --- Variabelen voor de dynamische velden ---
+        const standaardSelect = document.getElementById("standaard");
+        const extraOptiesDiv = document.getElementById("extraOpties");
+        const wanddikteDiv = document.getElementById("wanddikteInput");
+        const optieSelect = document.getElementById("optie");
+        
+        // **NIEUW: Referentie naar de nieuwe input en datalist**
+        const brongrootteInput = document.getElementById("brongrootteInput");
+        const bronKeuzesDatalist = document.getElementById("bronKeuzes");
 
-      if (!klasse) {
-        alert("Selecteer een klasse");
-        return;
-      }
 
-      const x_value1 = t / De;
-      const y_value1 = De / SFD;
+        // **NIEUWE FUNCTIE: Laadt gegevens uit bronnen.csv**
+        async function laadBronnenCSV() {
+            try {
+                // Probeer het CSV bestand te laden
+                const response = await fetch('bronnen.csv');
+                if (!response.ok) {
+                    throw new Error(`Fout bij laden CSV: ${response.statusText}`);
+                }
+                const csvText = await response.text();
+                
+                // Splits in regels en negeer de header (eerste regel)
+                const rows = csvText.trim().split('\n').slice(1); 
+                
+                rows.forEach(row => {
+                    // Split de regel op komma (of puntkomma, afhankelijk van hoe het CSV is opgemaakt. Comma is standaard)
+                    // We gaan uit van komma's als scheidingsteken
+                    const columns = row.split(','); 
+                    
+                    // Controleer of de benodigde kolommen bestaan
+                    if (columns.length >= 5) {
+                        const bronNaam = columns[0].trim(); // Naam in de eerste kolom (index 0)
+                        const bronGrootte = columns[4].trim(); // Grootte in de vijfde kolom (index 4)
+                        
+                        // Maak een nieuwe <option> aan voor de datalist
+                        if (bronNaam && bronGrootte) {
+                            const option = document.createElement('option');
+                            option.value = bronGrootte; // Dit is de waarde die in het inputveld komt
+                            option.label = `${bronNaam} (${bronGrootte} mm)`; // Dit is de tekst die de gebruiker ziet
+                            bronKeuzesDatalist.appendChild(option);
+                        }
+                    }
+                });
+                
+                // Pas de placeholder aan om aan te geven dat het laden gelukt is
+                brongrootteInput.placeholder = "Kies of vul in (mm)";
+            } catch (error) {
+                console.error("Kon bronnen.csv niet laden of verwerken. Zorg ervoor dat het bestand op de juiste plek staat en toegankelijk is (fout:", error, ")");
+                brongrootteInput.placeholder = "Geen dynamische bronnen geladen";
+            }
+        }
+        
+        // --- Event Listener voor 'standaard' om velden te tonen/verbergen (Ongewijzigd) ---
+        standaardSelect.addEventListener("change", function () {
+            // Toon Centraal/Excentrisch optie
+            if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
+                extraOptiesDiv.style.display = "flex"; 
+            } else {
+                extraOptiesDiv.style.display = "none";
+            }
 
-      const x_value2 = t / De;
-      const y_value2 = De / (SFD - t);
+            // Toon wanddikte (wt) alleen voor ASME
+            if (standaardSelect.value === '3') {
+                wanddikteDiv.style.display = "flex";
+            } else {
+                wanddikteDiv.style.display = "none";
+            }
+        });
 
-      let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
+        // --- Functie om Min FFD live bij te werken (Aangepast om de nieuwe input-ID te gebruiken) ---
+        function updateMinFFD() {
+            let ofa = parseFloat(document.getElementById("ofa").value);
+            // **GEWIJZIGD:** Gebruikt de nieuwe ID
+            let brongrootte = parseFloat(brongrootteInput.value); 
+            let standaard = document.getElementById("standaard").value;
+            let optie = document.getElementById("optie").value;
+            let diameter = parseFloat(document.getElementById("diameter").value);
+            let wt = parseFloat(document.getElementById("wanddikte").value);
+            let output = document.getElementById("output");
+            output.innerHTML = ""; // Reset meldingen
 
-      if (klasse === 'B') {
-        x_pixel1 = (x_value1 / 0.25) * 488;
-        y_pixel1 = (y_value1 / 2) * 819;
-        y_scale1 = 819;
+            // Stop als basiswaarden ontbreken
+            if (isNaN(ofa) || isNaN(brongrootte) || standaard === "") {
+                // Leeg SFD veld als de input incompleet is
+                document.getElementById("sfd").value = ""; 
+                return; 
+            }
 
-        x_pixel2 = (x_value2 / 0.25) * 488;
-        y_pixel2 = (y_value2 / 4) * 823;
-        y_scale2 = 823;
+            let centraal = (optie === '1');
+            let excentrisch = (optie === '2');
+            let ffd_min;
 
-        document.getElementById('container1A').style.display = 'none';
-        document.getElementById('container2A').style.display = 'none';
-        document.getElementById('container1B').style.display = 'block';
-        document.getElementById('container2B').style.display = 'block';
+            // --- FFD Berekening ---
+            if (standaard === '3') {  // ASME
+                if (isNaN(wt)) { return; } // Wacht op wanddikte
+                if (wt < 50) { var boa = (brongrootte * ofa) / 0.51; }
+                else if (wt < 75) { var boa = (brongrootte * ofa) / 0.76; }
+                else if (wt <= 100) { var boa = (brongrootte * ofa) / 1.02; }
+                else {
+                    output.innerHTML = "Ongeldige wanddikte (ASME). Voer een waarde tussen 0 en 100 mm in.";
+                    return;
+                }
+                ffd_min = boa + ofa;
+            } else if (standaard === '2') {  // EN-klasse B
+                let basis = brongrootte * 15 * Math.pow(ofa, 2 / 3);
+                if (centraal || excentrisch) { 
+                    if (isNaN(diameter)) { return; } // Wacht op diameter
+                    if (centraal) { basis *= 0.5; }
+                    else if (excentrisch) { basis *= 0.8; }
+                }
+                ffd_min = basis + ofa;
+            } else if (standaard === '1') {  // EN-klasse A
+                let basis = brongrootte * 7.5 * Math.pow(ofa, 2 / 3);
+                if (centraal || excentrisch) { 
+                    if (isNaN(diameter)) { return; } // Wacht op diameter
+                    if (centraal) { basis *= 0.5; }
+                    else if (excentrisch) { basis *= 0.8; }
+                }
+                ffd_min = basis + ofa;
+            } else {
+                return; // Geen geldige standaard
+            }
 
-      } else if (klasse === 'A') {
-        x_pixel1 = (x_value1 / 0.25) * 487;
-        y_pixel1 = (y_value1 / 2) * 823;
-        y_scale1 = 823;
+            // --- Invullen met +1 Logica ---
+            global_min_ffd = ffd_min; // De correct berekende minimale FFD
+            const prefilled_ffd = ffd_min + 1; // De waarde die we invullen
 
-        x_pixel2 = (x_value2 / 0.25) * 470;
-        y_pixel2 = (y_value2 / 4) * 796;
-        y_scale2 = 796;
+            document.getElementById("sfd").value = prefilled_ffd.toFixed(2);
 
-        document.getElementById('container1B').style.display = 'none';
-        document.getElementById('container2B').style.display = 'none';
-        document.getElementById('container1A').style.display = 'block';
-        document.getElementById('container2A').style.display = 'block';
-      }
+            // Toon centraal/excentrisch checks (als diameter is ingevuld)
+            if (centraal && !isNaN(diameter)) {
+                let maxFFD = diameter / 2;
+                if (ffd_min < maxFFD) { output.innerHTML += `✅ Centrale opstelling is toegestaan<br>`; }
+                else { output.innerHTML += `❌ Centrale opstelling <strong>niet</strong> toegestaan<br>`; }
+            }
+            if (excentrisch && !isNaN(diameter)) {
+                let maxExcentrischFFD = diameter - (ofa + 10);
+                if (ffd_min < maxExcentrischFFD) { output.innerHTML += `✅ Excentrische opstelling is toegestaan<br>`; }
+                else { output.innerHTML += `❌ Excentrische opstelling <strong>niet</strong> toegestaan<br>`; }
+            }
+        }
 
-      function createCrosshair(x, y) {
-        const cross = document.createElement('div');
-        cross.className = 'crosshair';
-        cross.style.left = (x - 15) + 'px';
-        cross.style.top = (y - 15) + 'px';
+        // --- Hoofdfunctie voor de "Bekijk opnames" knop (Ongewijzigd) ---
+        function berekenEnPlot() {
+            // --- Deel 1: Waarden verzamelen ---
+            let sfd_invoer = parseFloat(document.getElementById("sfd").value);
+            let diameter = parseFloat(document.getElementById("diameter").value);
+            let ofa = parseFloat(document.getElementById("ofa").value);
+            let standaard = document.getElementById("standaard").value;
+            
+            let ffd_output_span = document.getElementById("min_ffd_output");
+            let diameterAntwoordDiv = document.getElementById("diameterAntwoord");
+            let output = document.getElementById("output");
+            
+            // Reset meldingen en verberg resultaten
+            ffd_output_span.innerHTML = ""; 
+            diameterAntwoordDiv.style.display = "none";
+            document.getElementById('container1A').style.display = 'none';
+            document.getElementById('container2A').style.display = 'none';
+            document.getElementById('container1B').style.display = 'none';
+            document.getElementById('container2B').style.display = 'none';
+            
+            // --- Deel 2: Validatie & FFD Waarschuwing ---
+            if (isNaN(sfd_invoer)) {
+                output.innerHTML = "Voer een geldige Bron Film Afstand (SFD) in.";
+                return;
+            }
+            if (isNaN(diameter) || isNaN(ofa) || standaard === "") {
+                output.innerHTML = "Controleer of OFA, Standaard en Diameter correct zijn ingevuld.";
+                return;
+            }
 
-        const circle = document.createElement('div');
-        circle.className = 'highlight-circle';
-        cross.appendChild(circle);
+            // Toon de FFD waarschuwing
+            if(global_min_ffd > 0) { // Zorg ervoor dat de berekening is uitgevoerd
+                ffd_output_span.innerHTML = `(Minimaal vereiste FFD: ${global_min_ffd.toFixed(2)} mm)`;
+                if (sfd_invoer < global_min_ffd) {
+                    ffd_output_span.style.color = "red";
+                    ffd_output_span.innerHTML += " - Gekozen FFD is te laag!";
+                } else {
+                    ffd_output_span.style.color = "green";
+                    ffd_output_span.innerHTML += " - OK";
+                }
+            }
 
-        return cross;
-      }
 
-      const container1 = document.getElementById(`container1${klasse}`);
-      const container2 = document.getElementById(`container2${klasse}`);
+            // --- Deel 3: Plot de opnames ---
+            
+            // Bepaal de klasse
+            let klasse = (standaard === '1' || standaard === '3') ? 'A' : 'B';
 
-      container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
-      container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+            // Check diameter voor plot-logica
+            if (diameter <= 100) {
+                diameterAntwoordDiv.style.display = "block";
+                diameterAntwoordDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return; // Stop hier
+            } 
+            
+            // Als diameter > 100, gebruik OFA als 't'
+            const t_plot = ofa; 
+            const De_plot = diameter; 
+            const SFD = sfd_invoer; 
 
-      container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
-      container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+            // De plotwaarden (uit de nomogrammen)
+            const x_value1 = t_plot / De_plot;
+            const y_value1 = De_plot / SFD;
+            const x_value2 = t_plot / De_plot;
+            const y_value2 = De_plot / (SFD - t_plot);
 
-      container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
 
-      if (window.innerWidth <= 600) {
-        document.body.style.zoom = "0.7";
-      }
-    });
-  </script>
+            if (klasse === 'B') {
+                x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
+                x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
+                document.getElementById('container1B').style.display = 'block';
+                document.getElementById('container2B').style.display = 'block';
+            } else if (klasse === 'A') {
+                x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
+                x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
+                document.getElementById('container1A').style.display = 'block';
+                document.getElementById('container2A').style.display = 'block';
+            }
+
+            const container1 = document.getElementById(`container1${klasse}`);
+            const container2 = document.getElementById(`container2${klasse}`);
+
+            // Maak de plots schoon en voeg de nieuwe kruizen toe
+            container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
+            container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+            container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
+            container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+
+            container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // --- Hulpfuncties (Ongewijzigd) ---
+        function createCrosshair(x, y) {
+            const cross = document.createElement('div');
+            cross.className = 'crosshair';
+            cross.style.left = (x - 15) + 'px';
+            cross.style.top = (y - 15) + 'px';
+            const circle = document.createElement('div');
+            circle.className = 'highlight-circle';
+            cross.appendChild(circle);
+            return cross;
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = "block"; }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; }
+        
+        // Roep 'laadBronnenCSV' en 'updateMinFFD' aan bij laden 
+        document.addEventListener('DOMContentLoaded', function() {
+            laadBronnenCSV(); // Laad de dynamische keuzes
+            updateMinFFD(); // Voer initiële FFD berekening uit
+        });
+
+    </script>
 </body>
 </html>
