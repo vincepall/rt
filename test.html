@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gecombineerde FFD en Opname Calculator</title>
+    <title>Aantal Opnames</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css"> 
@@ -200,7 +200,7 @@
 </head>
 <body>
 
-    <h1>Gecombineerde FFD en Opname Calculator</h1>
+    <h1>Aantal opnames</h1>
     
     <div style="text-align: center;">
         <button class="info-btn" onclick="openModal('myModal')">i</button>
@@ -210,15 +210,15 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
             <p>
-                <b>[TEKST VOOR FFD]</b>
+                <b>Werking FFD Controle</b>
                 De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
                 Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
                 Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
             </p>
             <hr>
             <p>
-                <b>[TEKST VOOR OPNAME]</b>
-                Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.
+                <b>Aantal opnames</b>
+                Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn. Voor ASME wordt het aantal opnames van klasse A aangehouden.
                 <br><br>
                 <b>Let op:</b> Bij een diameter kleiner of gelijk aan 100mm is het antwoord altijd "2 bij opstelling 11/F , 3 bij opstelling 12/G".
             </p>
@@ -285,8 +285,8 @@
     <hr style="margin: 40px 0; border: 1px solid #F5DF4D;">
 
     <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
-        <strong style="font-size: 1.3em; color: white; background-color: #007bff; padding: 15px; border-radius: 8px;">
-            Antwoord: 2 bij opstelling 11/F , 3 bij opstelling 12/G
+        <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
+            Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
         </strong>
     </div>
 
@@ -438,7 +438,7 @@
                 ffd_output_span.innerHTML = `(Minimaal vereiste FFD: ${global_min_ffd.toFixed(2)} mm)`;
                 if (sfd_invoer < global_min_ffd) {
                     ffd_output_span.style.color = "red";
-                    ffd_output_span.innerHTML += " - Uw invoer is te laag!";
+                    ffd_output_span.innerHTML += " - Gekozen FFD is te laag!";
                 } else {
                     ffd_output_span.style.color = "green";
                     ffd_output_span.innerHTML += " - OK";
