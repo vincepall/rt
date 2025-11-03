@@ -1,185 +1,642 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bronkeuze</title>
+    <title>Gecombineerde FFD en Opname Calculator</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+
     <style>
+        /* --- Stijlen van Bestand 1 --- */
         body {
             font-family: 'Roboto Condensed', sans-serif;
-            padding: 50px;
+            padding: 20px; /* Iets minder padding voor overzicht */
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            min-height: 150vh;
         }
 
-        button.calculate-btn {
+        button {
+            background-color: #F5DF4D;
+            color: black;
+            font-size: 18px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 20px;
+            width: 60%;
+        }
+
+        button:hover {
+            background-color: #e4c233;
+        }
+
+        /* Stijlen voor modal (gedeeld) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .info-btn { /* Zorg dat de info knop een class heeft */
+             width: auto; 
+             padding: 5px 10px;
+             font-size: 14px;
+             margin-top: 0;
+        }
+
+        /* --- Stijlen van Bestand 2 --- */
+        .form-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .form-item label {
+            min-width: 150px;
+        }
+
+        .form-item input,
+        .form-item select {
+            flex: 1;
+            padding: 5px;
+            width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .form-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-item label {
+                min-width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .form-item input {
+                width: 100%;
+            }
+
+            .image-container {
+                width: 100%;
+                height: auto;
+            }
+
+            .image-container img {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .image-container {
+            position: relative;
+            background-size: cover;
+            border: 1px solid black;
+            margin-bottom: 20px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .crosshair {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+        }
+
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: rgb(255, 49, 49);
+        }
+
+        .crosshair::before {
+            top: 14px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+        }
+
+        .crosshair::after {
+            left: 14px;
+            top: 0;
+            width: 2px;
+            height: 30px;
+        }
+
+        .highlight-circle {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 128, 0.2);
+            left: -10px;
+            top: -10px;
+            pointer-events: none;
+        }
+
+        h2 {
+            color: blue;
+        }
+
+        #container1A h2,
+        #container2A h2,
+        #container1B h2,
+        #container2B h2 {
+            color: red;
+        }
+
+        .btn {
+            background-color: #666;
+            border: none;
+            color: black;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: auto; /* override eerdere button style */
+        }
+
+        /* Hernoemd naar .submit-btn om conflict te vermijden */
+        .submit-btn { 
             background-color: #F5DF4D;
             color: black;
             padding: 15px 30px;
-            font-size: 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button.calculate-btn:hover {
-            background-color: #e6c944;
-        }
-
-        label, select, input {
-            display: block;
-            width: 100%;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        /* styling voor bron-tekst */
-        .bron {
-            color: #F5DF4D; /* standaard geel */
-            font-weight: 600;
-        }
-        .bron.over {
-            color: orange; /* oranje als grens overschreden */
-        }
-
-        /* waarschuwingstekst */
-        #waarschuwing {
             font-size: 18px;
-            font-weight: bold;
-            color: orange;
-            margin-top: 12px;
-            display: none; /* standaard verborgen */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+            margin: 10px 0;
+            width: auto; /* override eerdere button style */
         }
+
+        .submit-btn:hover {
+            background-color: #FFD700;
+        }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .link-list li {
+            margin: 5px;
+        }
+
+        .link-list a {
+            text-decoration: none;
+            color: #000000;
+            padding: 10px 30px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 200px;
+            height: 50px;
+            background-color: transparent;
+            gap: 10px;
+        }
+
+        .link-list a:hover {
+            transform: scale(1.05);
+            background-color: transparent;
+        }
+
+        .link1 { background-image: url('tape1.PNG'); }
+        .link2 { background-image: url('tape2.PNG'); }
+        .link3 { background-image: url('tape3.PNG'); }
+        .link4 { background-image: url('tape4.PNG'); }
     </style>
 </head>
 <body>
-    <h1 style="color: #F5DF4D; text-align: center;">Bronkeuze</h1>
+    <h1 style="color: #F5DF4D; text-align: center;">1. Minimale FFD Berekenen</h1>
 
-    <button class="info-btn" onclick="openModal('myModal')">i</button>
+    <button class="info-btn" onclick="openModal('myModal1')">i</button>
 
-    <div id="myModal" class="modal">
+    <div id="myModal1" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Door Wmax te berekenen wordt de juiste bronkeuze voorgesteld volgens RT21021 of RT21022.</p>
+            <span class="close" onclick="closeModal('myModal1')">&times;</span>
+            <p>
+                De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
+                Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
+                Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
+            </p>
         </div>
     </div>
 
-    <script src="script.js"></script> 
+    <form id="ffdForm">
+        <label for="ofa">Object Film Afstand (OFA):</label>
+        <input type="number" id="ofa" name="ofa" step="0.01" required><br><br>
 
-    <label for="diameter">Diameter (De) van de pijp (mm):</label>
-    <input type="number" id="diameter" min="0" step="any" required><br>
+        <label for="brongrootte">Brongrootte:</label>
+        <input type="number" id="brongrootte" name="brongrootte" step="0.01" required><br><br>
 
-    <label for="wanddikte">Wanddikte (t) van de pijp (mm):</label>
-    <input type="number" id="wanddikte" min="0" step="any" required><br>
+        <label for="standaard">Kies een standaard:</label>
+        <select id="standaard" name="standaard" required>
+            <option value="" disabled selected>Kies een standaard</option>
+            <option value="1">EN-klasse A</option>
+            <option value="2">EN-klasse B</option>
+            <option value="3">ASME</option>
+        </select><br><br>
 
-    <label for="techniek">Techniek:</label>
-    <select id="techniek">
-        <option value="tangentiaal">Tangentiaal(RT21021)</option>
-        <option value="dubbel_wand">Dubbel wand(RT21022)</option>
-    </select><br>
+        <div id="extraOpties" style="display:none;">
+            <label for="optie">Centraal of Excentrisch:</label>
+            <select id="optie" name="optie">
+                <option value="">Nee</option>
+                <option value="1">Centraal</option>
+                <option value="2">Excentrisch</option>
+            </select><br><br>
+        </div>
 
-    <label for="klasse">Klasse:</label>
-    <select id="klasse">
-        <option value="ta">TA (basic technique)</option>
-        <option value="tb">TB (improved technique)</option>
-    </select><br>
+        <div id="diameterInput" style="display:none;">
+            <label for="ffd_diameter">Diameter in mm:</label>
+            <input type="number" id="ffd_diameter" name="ffd_diameter" step="0.01"><br><br>
+        </div>
 
-    <button type="button" class ="calculate-btn" onclick="berekenBron()">Bronkeuze</button>
+        <div id="wanddikteInput" style="display:none;">
+            <label for="ffd_wt">Wanddikte (wt) in mm:</label>
+            <input type="number" id="ffd_wt" name="ffd_wt" step="0.01"><br><br>
+        </div>
 
-    <h2 style="color: #F5DF4D;">Wmax en bronkeuze</h2>
-    <h2 id="wmax" style="color: #F5DF4D;"></h2>
-    <div id="resultaat" style="color: #F5DF4D; font-weight:600;"></div>
-    <div id="waarschuwing"></div>
+        <button type="button" onclick="berekenFFD(); scrollToAnswer()">Bereken FFD en vul in bij deel 2</button>
+    </form>
+
+    <p id="output" style="color: #F5DF4D;"></p>
+
+    <hr style="margin: 40px 0; border: 1px solid #F5DF4D;">
+
+    <h1 style="color: #F5DF4D; text-align: center;">2. Aantal opnames bepalen</h1>
+
+    <button class="info-btn" onclick="openModal('myModal2')">i</button>
+
+    <div id="myModal2" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('myModal2')">&times;</span>
+        <p>Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.</p>
+      </div>
+    </div>
+
+    <form id="coordinates-form">
+      <div class="form-container">
+        <div class="form-item">
+          <label for="plot_klasse">Kies de klasse:</label>
+          <select id="plot_klasse" name="plot_klasse" required>
+            <option value="">Selecteer...</option>
+            <option value="A">Klasse A</option>
+            <option value="B">Klasse B</option>
+          </select>
+        </div>
+        <div class="form-item">
+          <label for="plot_wanddikte">Wanddikte (t in mm):</label>
+          <input type="number" id="plot_wanddikte" name="plot_wanddikte" step="0.001" required>
+        </div>
+        <div class="form-item">
+          <label for="plot_diameter">Diameter (De in mm):</label>
+          <input type="number" id="plot_diameter" name="plot_diameter" step="0.001" required>
+        </div>
+        <div class="form-item">
+          <label for="plot_sfd">Bron Film Afstand (SFD in mm):</label>
+          <input type="number" id="plot_sfd" name="plot_sfd" step="0.001" required>
+        </div>
+      </div>
+      <button type="submit" class="submit-btn">Bekijk</button>
+
+      <ul class="link-list">
+        <li><a href="cw2.html" class="link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
+      </ul>
+    </form>
+
+    <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
+      <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
+    </div>
+
+    <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
+      <h2>Opstelling 2 (Klasse B)</h2>
+    </div>
+
+    <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
+      <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
+    </div>
+
+    <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
+      <h2>Opstelling 2 (Klasse A)</h2>
+    </div>
+
 
     <script>
-        // waarschuwing-grenswaarden (precies zoals opgegeven)
-        const warningThresholds = {
-            "Se-75": 41,
-            "Ir-192": 64,
-            "Co-60": 100
-        };
+        // --- Variabelen en Logica van Deel 1 ---
+        const standaardSelect = document.getElementById("standaard");
+        const extraOptiesDiv = document.getElementById("extraOpties");
+        const wanddikteDiv = document.getElementById("wanddikteInput");
+        const optieSelect = document.getElementById("optie");
+        const diameterDiv = document.getElementById("diameterInput");
 
-        function berekenWmax(De, t) {
-            return 2 * Math.sqrt(t * (De - t));
-        }
+        standaardSelect.addEventListener("change", function () {
+            if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
+                extraOptiesDiv.style.display = "block";
+            } else {
+                extraOptiesDiv.style.display = "none";
+            }
 
-        // maakt voor een bron een span; voegt class 'over' toe als wmax > threshold
-        function formatBronSpan(bron, wmax) {
-            const over = (warningThresholds[bron] !== undefined) && (wmax > warningThresholds[bron]);
-            const cls = over ? 'bron over' : 'bron';
-            return `<span class="${cls}">${bron}</span>`;
-        }
+            if (standaardSelect.value === '3') {
+                wanddikteDiv.style.display = "block";
+            } else {
+                wanddikteDiv.style.display = "none";
+            }
 
-        function berekenBron() {
-            const De = parseFloat(document.getElementById('diameter').value);
-            const t = parseFloat(document.getElementById('wanddikte').value);
-            const techniek = document.getElementById('techniek').value;
-            const klasse = document.getElementById('klasse').value;
+            if (optieSelect.value === '1' || optieSelect.value === '2') {
+                diameterDiv.style.display = "block";
+            } else {
+                diameterDiv.style.display = "none";
+            }
+        });
 
-            const waarschuwingDiv = document.getElementById("waarschuwing");
-            const resultaatEl = document.getElementById("resultaat");
+        optieSelect.addEventListener("change", function () {
+            if (optieSelect.value === '1' || optieSelect.value === '2') {
+                diameterDiv.style.display = "block";
+            } else {
+                diameterDiv.style.display = "none";
+            }
+        });
 
-            if (isNaN(De) || isNaN(t) || De <= 0 || t <= 0 || t >= De) {
-                resultaatEl.textContent = 'Voer geldige waarden in voor diameter en wanddikte.';
-                waarschuwingDiv.style.display = "none";
-                document.getElementById('wmax').textContent = '';
+        function berekenFFD() {
+            let ofa = parseFloat(document.getElementById("ofa").value);
+            let brongrootte = parseFloat(document.getElementById("brongrootte").value);
+            let keuze = document.getElementById("standaard").value;
+            let optie = document.getElementById("optie").value;
+            let diameter = parseFloat(document.getElementById("ffd_diameter").value); // Aangepaste ID
+            let wt = parseFloat(document.getElementById("ffd_wt").value); // Aangepaste ID
+            let output = document.getElementById("output");
+            let centraal = false;
+            let excentrisch = false;
+            let ffd;
+
+            output.innerHTML = "";
+
+            if (keuze === "") {
+                output.innerHTML = "Maak een keuze in het veld 'Kies een standaard'.<br>";
                 return;
             }
 
-            const wmax = berekenWmax(De, t);
-            let bronnen = [];
-
-            // selectie regels zoals eerder (ongewijzigd)
-            if (techniek === 'tangentiaal') {
-                if (klasse === 'ta') {
-                    if (wmax < 55.1) bronnen.push("Se-75");
-                    else if (wmax < 80.1) bronnen.push("Ir-192");
-                    else if (wmax < 120.1) bronnen.push("Co-60");
-                } else if (klasse === 'tb') {
-                    if (wmax < 40.1) bronnen.push("Se-75");
-                    else if (wmax < 60.1) bronnen.push("Ir-192");
-                    else if (wmax < 85.1) bronnen.push("Co-60");
+            if (optie === '1') {
+                centraal = true;
+                if (isNaN(diameter) || diameter <= 0) {
+                    output.innerHTML = "Voer een geldige diameter in voor centrale opstelling.<br>";
+                    return;
                 }
-            } else if (techniek === 'dubbel_wand') {
-                if (klasse === 'ta') {
-                    if (wmax > 4.9 && wmax < 55.1) bronnen.push("Se-75");
-                    if (wmax > 9.9 && wmax < 100.1) bronnen.push("Ir-192");
-                    if (wmax > 39.1 && wmax < 200.1) bronnen.push("Co-60");
-                } else if (klasse === 'tb') {
-                    if (wmax > 9.9 && wmax < 40.1) bronnen.push("Se-75");
-                    if (wmax > 19.9 && wmax < 90.1) bronnen.push("Ir-192");
-                    if (wmax > 39.1 && wmax < 200.1) bronnen.push("Co-60");
+            } else if (optie === '2') {
+                excentrisch = true;
+                if (isNaN(diameter) || diameter <= 0) {
+                    output.innerHTML = "Voer een geldige diameter in voor excentrische opstelling.<br>";
+                    return;
                 }
             }
 
-            // samenstellen resultaat (alleen de bron-teksten worden individueel gekleurd)
-            if (bronnen.length > 0) {
-                const formatted = bronnen.map(b => formatBronSpan(b, wmax)).join(', ');
-                resultaatEl.innerHTML = 'Geschikte bron(nen): ' + formatted;
+            if (keuze === '3') {  // ASME
+                if (isNaN(wt)) {
+                    output.innerHTML = "Voer een geldige wanddikte in.<br>";
+                    return;
+                }
+
+                if (wt < 50) {
+                    var boa = (brongrootte * ofa) / 0.51;
+                } else if (wt < 75) {
+                    var boa = (brongrootte * ofa) / 0.76;
+                } else if (wt <= 100) {
+                    var boa = (brongrootte * ofa) / 1.02;
+                } else {
+                    output.innerHTML = "Ongeldige wanddikte. Voer een waarde tussen 0 en 100 mm in.<br>";
+                    return;
+                }
+                ffd = boa + ofa;
+
+            } else if (keuze === '2') {  // EN-klasse B
+                let basis = brongrootte * 15 * Math.pow(ofa, 2 / 3);
+                if (centraal) {
+                    basis *= 0.5;
+                } else if (excentrisch) {
+                    basis *= 0.8;
+                }
+                ffd = basis + ofa;
+
+            } else if (keuze === '1') {  // EN-klasse A
+                let basis = brongrootte * 7.5 * Math.pow(ofa, 2 / 3);
+                if (centraal) {
+                    basis *= 0.5;
+                } else if (excentrisch) {
+                    basis *= 0.8;
+                }
+                ffd = basis + ofa;
+
             } else {
-                resultaatEl.textContent = 'Geen geschikte bron.';
+                output.innerHTML = "Ongeldige keuze. Voer 1, 2 of 3 in.<br>";
+                return;
             }
 
-            document.getElementById('wmax').textContent = "Wmax = " + wmax.toFixed(1);
+            output.innerHTML += `De minimale Film Focus Afstand (FFD) is: ${ffd.toFixed(2)} mm<br>`;
 
-            // waarschuwing tonen als minstens één bron over **de opgegeven** grenswaarde gaat
-            const anyOver = bronnen.some(b => (warningThresholds[b] !== undefined) && (wmax > warningThresholds[b]));
-            if (anyOver) {
-                waarschuwingDiv.textContent = "Opletten: Bron kan gebruikt worden maar het zit tegen de grens!";
-                waarschuwingDiv.style.display = "block";
-            } else {
-                waarschuwingDiv.style.display = "none";
+            if (centraal) {
+                let maxFFD = diameter / 2;
+                if (ffd < maxFFD) {
+                    output.innerHTML += `✅ Centrale opstelling is toegestaan (FFD < ${maxFFD.toFixed(2)} mm)<br>`;
+                } else {
+                    output.innerHTML += `❌ Centrale opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxFFD.toFixed(2)} mm)<br>`;
+                }
             }
 
-            resultaatEl.scrollIntoView({ behavior: 'smooth' });
+            if (excentrisch) {
+                let maxExcentrischFFD = diameter - (ofa + 10);
+                if (ffd < maxExcentrischFFD) {
+                    output.innerHTML += `✅ Excentrische opstelling is toegestaan (FFD < ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
+                } else {
+                    output.innerHTML += `❌ Excentrische opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
+                }
+            }
+
+            // --- START INTEGRATIE LOGICA ---
+            // Vul de berekende FFD in bij het veld 'plot_sfd' in het tweede formulier
+            document.getElementById("plot_sfd").value = ffd.toFixed(2);
+    
+            // Vul diameter en wanddikte in (indien ingevoerd)
+            if (!isNaN(diameter)) {
+                document.getElementById("plot_diameter").value = diameter.toFixed(2);
+            }
+            if (!isNaN(wt)) {
+                document.getElementById("plot_wanddikte").value = wt.toFixed(2);
+            }
+
+            // Stel de klasse in het tweede formulier in
+            if (keuze === '1') { // EN-A
+                document.getElementById("plot_klasse").value = "A";
+            } else if (keuze === '2') { // EN-B
+                document.getElementById("plot_klasse").value = "B";
+            } else if (keuze === '3') { // ASME
+                document.getElementById("plot_klasse").value = "A";
+            }
+            // --- EINDE INTEGRATIE LOGICA ---
         }
+
+        function scrollToAnswer() {
+            const output = document.getElementById("output");
+            output.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Gedeelde Modal Functies ---
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // --- Logica van Deel 2 ---
+        document.getElementById('coordinates-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Gebruik de 'plot_' ID's
+            const klasse = document.getElementById('plot_klasse').value;
+            const t = parseFloat(document.getElementById('plot_wanddikte').value);
+            const De = parseFloat(document.getElementById('plot_diameter').value);
+            const SFD = parseFloat(document.getElementById('plot_sfd').value);
+
+            if (!klasse) {
+                alert("Selecteer een klasse");
+                return;
+            }
+
+            // Deze berekeningen zijn ONGEWIJZIGD gebleven
+            const x_value1 = t / De;
+            const y_value1 = De / SFD;
+
+            const x_value2 = t / De;
+            const y_value2 = De / (SFD - t);
+
+            let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
+
+            if (klasse === 'B') {
+                // Exacte waarden van origineel script
+                x_pixel1 = (x_value1 / 0.25) * 488;
+                y_pixel1 = (y_value1 / 2) * 819;
+                y_scale1 = 819;
+
+                x_pixel2 = (x_value2 / 0.25) * 488;
+                y_pixel2 = (y_value2 / 4) * 823;
+                y_scale2 = 823;
+
+                document.getElementById('container1A').style.display = 'none';
+                document.getElementById('container2A').style.display = 'none';
+                document.getElementById('container1B').style.display = 'block';
+                document.getElementById('container2B').style.display = 'block';
+
+            } else if (klasse === 'A') {
+                // Exacte waarden van origineel script
+                x_pixel1 = (x_value1 / 0.25) * 487;
+                y_pixel1 = (y_value1 / 2) * 823;
+                y_scale1 = 823;
+
+                x_pixel2 = (x_value2 / 0.25) * 470;
+                y_pixel2 = (y_value2 / 4) * 796;
+                y_scale2 = 796;
+
+                document.getElementById('container1B').style.display = 'none';
+                document.getElementById('container2B').style.display = 'none';
+                document.getElementById('container1A').style.display = 'block';
+                document.getElementById('container2A').style.display = 'block';
+            }
+
+            function createCrosshair(x, y) {
+                const cross = document.createElement('div');
+                cross.className = 'crosshair';
+                cross.style.left = (x - 15) + 'px';
+                cross.style.top = (y - 15) + 'px';
+
+                const circle = document.createElement('div');
+                circle.className = 'highlight-circle';
+                cross.appendChild(circle);
+
+                return cross;
+            }
+
+            const container1 = document.getElementById(`container1${klasse}`);
+            const container2 = document.getElementById(`container2${klasse}`);
+
+            container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
+            container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+
+            container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
+            container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+
+            container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            if (window.innerWidth <= 600) {
+                document.body.style.zoom = "0.7";
+            }
+        });
     </script>
 </body>
 </html>
