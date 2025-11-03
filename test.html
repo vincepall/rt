@@ -203,29 +203,26 @@
     <h1>Gecombineerde FFD en Opname Calculator</h1>
     
     <div style="text-align: center;">
-        <button class="info-btn" onclick="openModal('myModal1')">i (FFD)</button>
-        <button class="info-btn" onclick="openModal('myModal2')">i (Opnames)</button>
+        <button class="info-btn" onclick="openModal('myModal')">i</button>
     </div>
 
-    <div id="myModal1" class="modal">
+    <div id="myModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal1')">&times;</span>
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
             <p>
+                <b>[TEKST VOOR FFD]</b>
                 De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
                 Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
                 Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
             </p>
+            <hr>
+            <p>
+                <b>[TEKST VOOR OPNAME]</b>
+                Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.
+                <br><br>
+                <b>Let op:</b> Bij een diameter kleiner of gelijk aan 100mm is het antwoord altijd "2 bij opstelling 11/F , 3 bij opstelling 12/G".
+            </p>
         </div>
-    </div>
-
-    <div id="myModal2" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal('myModal2')">&times;</span>
-        <p>Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.
-           <br><br>
-           <b>Let op:</b> Bij een diameter kleiner of gelijk aan 100mm is het antwoord altijd "2 bij opstelling 11/F , 3 bij opstelling 12/G".
-        </p>
-      </div>
     </div>
 
     <form id="combinedForm">
@@ -316,7 +313,6 @@
         const extraOptiesDiv = document.getElementById("extraOpties");
         const wanddikteDiv = document.getElementById("wanddikteInput");
         const optieSelect = document.getElementById("optie");
-        const diameterInputDiv = document.getElementById("diameterInput");
 
         // --- Event Listener voor 'standaard' om velden te tonen/verbergen ---
         standaardSelect.addEventListener("change", function () {
@@ -348,6 +344,8 @@
 
             // Stop als basiswaarden ontbreken
             if (isNaN(ofa) || isNaN(brongrootte) || standaard === "") {
+                // Leeg SFD veld als de input incompleet is
+                document.getElementById("sfd").value = ""; 
                 return; 
             }
 
@@ -368,33 +366,29 @@
                 ffd_min = boa + ofa;
             } else if (standaard === '2') {  // EN-klasse B
                 let basis = brongrootte * 15 * Math.pow(ofa, 2 / 3);
-                if (centraal) { 
+                if (centraal || excentrisch) { 
                     if (isNaN(diameter)) { return; } // Wacht op diameter
-                    basis *= 0.5; 
-                }
-                else if (excentrisch) { 
-                    if (isNaN(diameter)) { return; } // Wacht op diameter
-                    basis *= 0.8; 
+                    if (centraal) { basis *= 0.5; }
+                    else if (excentrisch) { basis *= 0.8; }
                 }
                 ffd_min = basis + ofa;
             } else if (standaard === '1') {  // EN-klasse A
                 let basis = brongrootte * 7.5 * Math.pow(ofa, 2 / 3);
-                if (centraal) { 
+                if (centraal || excentrisch) { 
                     if (isNaN(diameter)) { return; } // Wacht op diameter
-                    basis *= 0.5; 
-                }
-                else if (excentrisch) { 
-                    if (isNaN(diameter)) { return; } // Wacht op diameter
-                    basis *= 0.8; 
+                    if (centraal) { basis *= 0.5; }
+                    else if (excentrisch) { basis *= 0.8; }
                 }
                 ffd_min = basis + ofa;
             } else {
                 return; // Geen geldige standaard
             }
 
-            // Sla op en vul in
-            global_min_ffd = ffd_min;
-            document.getElementById("sfd").value = ffd_min.toFixed(2);
+            // --- Invullen met +1 Logica ---
+            global_min_ffd = ffd_min; // De correct berekende minimale FFD
+            const prefilled_ffd = ffd_min + 1; // De waarde die we invullen
+
+            document.getElementById("sfd").value = prefilled_ffd.toFixed(2);
 
             // Toon centraal/excentrisch checks (als diameter is ingevuld)
             if (centraal && !isNaN(diameter)) {
@@ -440,15 +434,17 @@
             }
 
             // Toon de FFD waarschuwing
-            // global_min_ffd is al ingesteld door de updateMinFFD() functie
-            ffd_output_span.innerHTML = `(Minimaal vereiste FFD: ${global_min_ffd.toFixed(2)} mm)`;
-            if (sfd_invoer < global_min_ffd) {
-                ffd_output_span.style.color = "red";
-                ffd_output_span.innerHTML += " - Uw invoer is te laag!";
-            } else {
-                ffd_output_span.style.color = "green";
-                ffd_output_span.innerHTML += " - OK";
+            if(global_min_ffd > 0) { // Zorg ervoor dat de berekening is uitgevoerd
+                ffd_output_span.innerHTML = `(Minimaal vereiste FFD: ${global_min_ffd.toFixed(2)} mm)`;
+                if (sfd_invoer < global_min_ffd) {
+                    ffd_output_span.style.color = "red";
+                    ffd_output_span.innerHTML += " - Uw invoer is te laag!";
+                } else {
+                    ffd_output_span.style.color = "green";
+                    ffd_output_span.innerHTML += " - OK";
+                }
             }
+
 
             // --- Deel 3: Plot de opnames ---
             
@@ -467,6 +463,7 @@
             const De_plot = diameter; 
             const SFD = sfd_invoer; 
 
+            // De plotwaarden (uit de nomogrammen)
             const x_value1 = t_plot / De_plot;
             const y_value1 = De_plot / SFD;
             const x_value2 = t_plot / De_plot;
@@ -489,6 +486,7 @@
             const container1 = document.getElementById(`container1${klasse}`);
             const container2 = document.getElementById(`container2${klasse}`);
 
+            // Maak de plots schoon en voeg de nieuwe kruizen toe
             container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
             container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
             container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
@@ -512,8 +510,7 @@
         function openModal(id) { document.getElementById(id).style.display = "block"; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; }
         
-        // Roep 'updateMinFFD' eenmalig aan bij laden om de velden correct in te stellen
-        // (vooral om de 'standaard' check te triggeren)
+        // Roep 'updateMinFFD' eenmalig aan bij laden 
         document.addEventListener('DOMContentLoaded', updateMinFFD);
 
     </script>
