@@ -236,7 +236,10 @@
     <div id="myModal2" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal('myModal2')">&times;</span>
-        <p>Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.</p>
+        <p>Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn.
+           <br><br>
+           <b>Let op:</b> Bij een diameter kleiner of gelijk aan 100mm is het antwoord altijd "2 bij opstelling 11/F , 3 bij opstelling 12/G".
+        </p>
       </div>
     </div>
 
@@ -264,7 +267,7 @@
             </div>
     
             <div id="wanddikteInput" class="form-item" style="display:none;">
-                <label for="wanddikte">Wanddikte (t/wt) in mm:</label>
+                <label for="wanddikte">Wanddikte (wt) in mm (voor ASME):</label>
                 <input type="number" id="wanddikte" name="wanddikte" step="0.01">
             </div>
     
@@ -277,9 +280,9 @@
                 </select>
             </div>
     
-            <div id="diameterInput" class="form-item" style="display:none;">
+            <div id="diameterInput" class="form-item">
                 <label for="diameter">Diameter (De) in mm:</label>
-                <input type="number" id="diameter" name="diameter" step="0.01">
+                <input type="number" id="diameter" name="diameter" step="0.01" required>
             </div>
     
             <div class="form-item">
@@ -298,6 +301,12 @@
     </ul>
 
     <hr style="margin: 40px 0; border: 1px solid #F5DF4D;">
+
+    <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
+        <strong style="font-size: 1.3em; color: white; background-color: #007bff; padding: 15px; border-radius: 8px;">
+            Antwoord: 2 bij opstelling 11/F , 3 bij opstelling 12/G
+        </strong>
+    </div>
 
     <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
       <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
@@ -319,40 +328,31 @@
         const extraOptiesDiv = document.getElementById("extraOpties");
         const wanddikteDiv = document.getElementById("wanddikteInput");
         const optieSelect = document.getElementById("optie");
-        const diameterDiv = document.getElementById("diameterInput");
+        // Diameter div is niet meer nodig, want het is altijd zichtbaar
 
         // --- Event Listeners voor dynamische velden ---
         standaardSelect.addEventListener("change", function () {
-            // Toon altijd de Centraal/Excentrisch optie
+            // Toon Centraal/Excentrisch optie
             if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
                 extraOptiesDiv.style.display = "flex"; // "flex" ipv "block" voor .form-item
             } else {
                 extraOptiesDiv.style.display = "none";
             }
 
-            // Toon wanddikte alleen voor ASME
+            // Toon wanddikte (wt) alleen voor ASME
             if (standaardSelect.value === '3') {
                 wanddikteDiv.style.display = "flex";
             } else {
                 wanddikteDiv.style.display = "none";
             }
-            
-            // Trigger check voor diameter, voor het geval optie al geselecteerd was
-            toggleDiameterVisibility(); 
         });
 
+        // Event listener voor 'optie' is niet meer nodig om diameter te tonen,
+        // maar we laten hem staan voor het geval je later logica wilt toevoegen.
+        // Als je wilt, kan 'optieSelect.addEventListener' compleet verwijderd worden.
         optieSelect.addEventListener("change", function () {
-            toggleDiameterVisibility();
+            // Deze functie is nu leeg, omdat diameter altijd zichtbaar is.
         });
-
-        function toggleDiameterVisibility() {
-            // Toon diameter als Centraal of Excentrisch is gekozen
-            if (optieSelect.value === '1' || optieSelect.value === '2') {
-                diameterDiv.style.display = "flex";
-            } else {
-                diameterDiv.style.display = "none";
-            }
-        }
 
         // --- Grote functie voor berekenen en plotten ---
         function berekenEnPlot() {
@@ -361,14 +361,22 @@
             let brongrootte = parseFloat(document.getElementById("brongrootte").value);
             let standaard = document.getElementById("standaard").value;
             let optie = document.getElementById("optie").value;
-            let diameter = parseFloat(document.getElementById("diameter").value);
-            let wt = parseFloat(document.getElementById("wanddikte").value);
+            let diameter = parseFloat(document.getElementById("diameter").value); // (De) - Altijd zichtbaar
+            let wt = parseFloat(document.getElementById("wanddikte").value); // (wt) - Alleen voor ASME FFD
             let sfd_invoer = parseFloat(document.getElementById("sfd").value); // De handmatig ingevoerde FFD
             
             let output = document.getElementById("output");
             let ffd_output_span = document.getElementById("min_ffd_output");
-            output.innerHTML = ""; // Reset meldingen
-            ffd_output_span.innerHTML = ""; // Reset meldingen
+            let diameterAntwoordDiv = document.getElementById("diameterAntwoord");
+            
+            // Reset meldingen en verberg afbeeldingen/antwoord
+            output.innerHTML = ""; 
+            ffd_output_span.innerHTML = ""; 
+            diameterAntwoordDiv.style.display = "none";
+            document.getElementById('container1A').style.display = 'none';
+            document.getElementById('container2A').style.display = 'none';
+            document.getElementById('container1B').style.display = 'none';
+            document.getElementById('container2B').style.display = 'none';
 
             let centraal = (optie === '1');
             let excentrisch = (optie === '2');
@@ -385,18 +393,14 @@
                 output.innerHTML = "Voer geldige OFA en Brongrootte in.";
                 return;
             }
-            if (centraal && (isNaN(diameter) || diameter <= 0)) {
-                output.innerHTML = "Voer een geldige diameter in voor centrale opstelling.";
-                return;
-            }
-            if (excentrisch && (isNaN(diameter) || diameter <= 0)) {
-                output.innerHTML = "Voer een geldige diameter in voor excentrische opstelling.";
+            if (isNaN(diameter)) {
+                output.innerHTML = "Voer een geldige Diameter (De) in.";
                 return;
             }
             
             if (standaard === '3') {  // ASME
                 if (isNaN(wt)) {
-                    output.innerHTML = "Voer een geldige wanddikte in voor ASME.";
+                    output.innerHTML = "Voer een geldige wanddikte (wt) in voor ASME.";
                     return;
                 }
                 if (wt < 50) { var boa = (brongrootte * ofa) / 0.51; }
@@ -421,7 +425,7 @@
                 ffd_min = basis + ofa;
             }
 
-            // Toon de centraal/excentrisch checks
+            // Toon de centraal/excentrisch checks (gebruikt 'diameter' (De))
             if (centraal) {
                 let maxFFD = diameter / 2;
                 if (ffd_min < maxFFD) {
@@ -441,7 +445,7 @@
 
             // --- Deel 3: Toon FFD Advies ---
             if (isNaN(sfd_invoer)) {
-                output.innerHTML = "Voer een geldige Bron Film Afstand (SFD) in om te plotten.";
+                output.innerHTML += "Voer een geldige Bron Film Afstand (SFD) in om te plotten.";
                 return;
             }
             
@@ -465,28 +469,26 @@
                 klasse = 'B';
             }
 
-            // Haal de waarden opnieuw op voor de plot (wanddikte kan anders zijn dan bij ASME)
-            const t = parseFloat(document.getElementById("wanddikte").value); // Wanddikte voor plot
-            const De = parseFloat(document.getElementById("diameter").value); // Diameter voor plot
+            // --- NIEUWE LOGICA ---
+            if (diameter <= 100) {
+                // Toon het vaste antwoord
+                diameterAntwoordDiv.style.display = "block";
+                diameterAntwoordDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return; // Stop de functie hier
+            } 
+            
+            // Als we hier komen, is diameter > 100
+            // Gebruik OFA als 't' voor de plot
+            const t_plot = ofa; 
+            const De_plot = diameter; 
             const SFD = sfd_invoer; // Gebruik de ingevoerde SFD voor de plot
 
-            if (isNaN(t) || isNaN(De)) {
-                 output.innerHTML += "<br>Voer een geldige Wanddikte en Diameter in om te plotten.";
-                 return;
-            }
-
-            const x_value1 = t / De;
-            const y_value1 = De / SFD;
-            const x_value2 = t / De;
-            const y_value2 = De / (SFD - t);
+            const x_value1 = t_plot / De_plot;
+            const y_value1 = De_plot / SFD;
+            const x_value2 = t_plot / De_plot;
+            const y_value2 = De_plot / (SFD - t_plot);
 
             let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
-
-            // Verberg alle containers
-            document.getElementById('container1A').style.display = 'none';
-            document.getElementById('container2A').style.display = 'none';
-            document.getElementById('container1B').style.display = 'none';
-            document.getElementById('container2B').style.display = 'none';
 
             if (klasse === 'B') {
                 x_pixel1 = (x_value1 / 0.25) * 488;
