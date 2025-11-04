@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minimale FFD Berekening</title>
     <style>
-       body {
+        body {
             font-family: 'Roboto Condensed', sans-serif;
             padding: 50px;
             margin: 0;
@@ -40,16 +40,30 @@
             align-items: center;
             margin-bottom: 15px;
         }
+        
+        /* AANVULLENDE STIJLEN VOOR BETERE INVOER */
+        #ffdForm {
+            max-width: 400px; /* Zorgt voor een gecentreerd en compact formulier */
+            width: 100%;
+        }
+
+        #ffdForm input[type="number"], #ffdForm select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 
 <h2 style="color: #F5DF4D; text-align: center;">Minimale FFD Onstream Opnames</h2>
 
-<!-- De knop om het pop-up venster te openen -->
-    <button class="info-btn" onclick="openModal('myModal')">i</button>
+<button class="info-btn" onclick="openModal('myModal')">i</button>
 
-    <!-- Het pop-up venster -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('myModal')">&times;</span>
@@ -58,8 +72,13 @@
         </div>
     </div>
 
-    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
-
+    <div id="myModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>De Minimale FFD voor Onstream opnames zoals in RT 21021 / RT 21022.
+            </p>
+        </div>
+    </div>
 
 <form id="ffdForm">
     <label for="procedure">Selecteer de procedure:</label>
@@ -75,13 +94,16 @@
     </select>
 
     <label for="diameter">Diameter van de pijp (De) in mm:</label>
-    <input type="number" id="diameter" min="0" required>
+    <input type="number" id="diameter" min="0" step="0.01" required>
 
-    <label for="bron">Brongrootte (b) in mm:</label>
-    <input type="number" id="bron" min="0" required>
+    <label for="brongrootteInput">Brongrootte (b) in mm:</label>
+    <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)">
+
+    <datalist id="bronKeuzes">
+    </datalist>
 
     <label for="isolatie">Isolatiedikte in mm:</label>
-    <input type="number" id="isolatie" value="0" min="0">
+    <input type="number" id="isolatie" value="0" min="0" step="0.01">
 
     <button type="button" class="calculate-btn" onclick="berekenFFD()">Bereken Minimale FFD</button>
 </form>
@@ -90,43 +112,106 @@
 <h2 id="resultaat" style="color: #F5DF4D;"></h2>
 
 <script>
-function berekenFFD() {
-    const procedure = document.getElementById("procedure").value;
-    const klasse = document.getElementById("klasse").value;
-    const De = parseFloat(document.getElementById("diameter").value);
-    const b = parseFloat(document.getElementById("bron").value);
-    const Iso = parseFloat(document.getElementById("isolatie").value);
+    // Functies voor de modal
+    function openModal(id) {
+        document.getElementById(id).style.display = "block";
+    }
 
-    // PDD en OFD berekeningen
-    const PDD = (De / 2) + Iso;
-    const OFD = De + Iso;
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
 
-    let minimaleFFD = 0;
+    // Functie om bronnen.csv te laden (gekopieerd uit MinFFD.html)
+    const brongrootteInput = document.getElementById("brongrootteInput");
+    const bronKeuzesDatalist = document.getElementById("bronKeuzes");
 
-    if (procedure === "tangentiaal") {
-        if (klasse === "TA") {
-            const ffd1 = PDD + 3.5 * De;
-            const ffd2 = (b * PDD) / 0.6;
-            minimaleFFD = Math.max(ffd1, ffd2);
-        } else if (klasse === "TB") {
-            const ffd1 = PDD + 3.5 * De;
-            const ffd2 = (b * PDD) / 0.3;
-            minimaleFFD = Math.max(ffd1, ffd2);
-        }
-    } else if (procedure === "dubbelwand") {
-        if (klasse === "TA") {
-            minimaleFFD = (b * OFD) / 0.6;
-        } else if (klasse === "TB") {
-            minimaleFFD = (b * OFD) / 0.3;
+    async function laadBronnenCSV() {
+        try {
+            // Pas de bestandslocatie aan indien nodig
+            const response = await fetch('bronnen.csv'); 
+            if (!response.ok) {
+                // Log de fout en stel een placeholder in, maar gooi geen fatale fout
+                console.error(`Fout bij laden CSV: ${response.statusText}`);
+                brongrootteInput.placeholder = "Geen dynamische bronnen geladen";
+                return;
+            }
+            const csvText = await response.text();
+            
+            // Slaat de header over (veronderstelt dat de eerste regel de header is)
+            const rows = csvText.trim().split('\n').slice(1); 
+
+            rows.forEach(row => {
+                const columns = row.split(',');
+                // Veronderstelt dat de naam in kolom 0 en de grootte in kolom 4 staat, zoals in de eerste HTML
+                if (columns.length >= 5) {
+                    const bronNaam = columns[0].trim();
+                    const bronGrootte = columns[4].trim();
+
+                    if (bronNaam && bronGrootte) {
+                        const option = document.createElement('option');
+                        option.value = bronGrootte;
+                        option.label = `${bronNaam} (${bronGrootte} mm)`;
+                        bronKeuzesDatalist.appendChild(option);
+                    }
+                }
+            });
+
+            brongrootteInput.placeholder = "Kies of vul in (mm)";
+        } catch (error) {
+            console.error("Kon bronnen.csv niet laden of verwerken. Zorg ervoor dat het bestand op de juiste plek staat en toegankelijk is (fout:", error, ")");
+            brongrootteInput.placeholder = "Geen dynamische bronnen geladen";
         }
     }
 
-    document.getElementById("resultaat").innerHTML = "Minimale FFD: " + minimaleFFD.toFixed(2) + " mm";
 
-    document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
-}
+    function berekenFFD() {
+        const procedure = document.getElementById("procedure").value;
+        const klasse = document.getElementById("klasse").value;
+        const De = parseFloat(document.getElementById("diameter").value);
+        // AANGEPAST: Haalt de waarde op van de nieuwe ID
+        const b = parseFloat(document.getElementById("brongrootteInput").value); 
+        const Iso = parseFloat(document.getElementById("isolatie").value);
+
+        // PDD en OFD berekeningen
+        const PDD = (De / 2) + Iso;
+        const OFD = De + Iso;
+
+        let minimaleFFD = 0;
+
+        if (isNaN(De) || isNaN(b) || isNaN(Iso)) {
+            document.getElementById("resultaat").innerHTML = "Vul alle vereiste velden correct in.";
+            return;
+        }
+
+        if (procedure === "tangentiaal") {
+            if (klasse === "TA") {
+                const ffd1 = PDD + 3.5 * De;
+                const ffd2 = (b * PDD) / 0.6;
+                minimaleFFD = Math.max(ffd1, ffd2);
+            } else if (klasse === "TB") {
+                const ffd1 = PDD + 3.5 * De;
+                const ffd2 = (b * PDD) / 0.3;
+                minimaleFFD = Math.max(ffd1, ffd2);
+            }
+        } else if (procedure === "dubbelwand") {
+            if (klasse === "TA") {
+                minimaleFFD = (b * OFD) / 0.6;
+            } else if (klasse === "TB") {
+                minimaleFFD = (b * OFD) / 0.3;
+            }
+        }
+
+        document.getElementById("resultaat").innerHTML = "Minimale FFD: " + minimaleFFD.toFixed(2) + " mm";
+
+        document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Laad de bronnen zodra de pagina geladen is
+        laadBronnenCSV(); 
+    });
+
 </script>
 
 </body>
 </html>
-
