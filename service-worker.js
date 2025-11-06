@@ -34,6 +34,7 @@ const FILES_TO_CACHE = [
   '/rt/verzet.html',
   '/rt/buistabel.html',
   '/rt/smart300.png',
+  '/rt/filmkwaliteit.html',
   '/rt/ceramrondstraler.png',
   '/rt/d4balteau107.png',
   '/rt/d4balteau119.png',
