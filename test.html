@@ -29,11 +29,78 @@
             border-radius: 8px;
         }
 
+        /* Nieuwe stijlen voor de info-knop en modal */
+        .info-btn {
+            position: absolute; 
+            top: 60px;
+            right: 50px;
+            background-color: #F5DF4D;
+            color: black;
+            border: none;
+            border-radius: 50%; /* Maak het rond */
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            line-height: 30px; /* Centreer de 'i' */
+        }
+        
+        /* Modal (pop-up) achtergrond */
+        .modal {
+            display: none; /* Standaard verborgen */
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); /* Zwarte achtergrond met dekking */
+        }
+
+        /* Modal inhoud/venster */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            border-radius: 10px;
+            position: relative;
+        }
+
+        /* De sluitknop */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Einde nieuwe stijlen */
+
     </style>
 </head>
 <body>
     <h1 style="color: #F5DF4D; text-align: center;">Minimale kwaliteit filmtype</h1>
+    
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
 
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Deze tool gaat er van uit dat men in een montage situatie, waarbij X-ray niet toegestaan is (bij RT16172,RT14171) en er toestemming is voor het gebruik van Se75 0-14mm, IR192 10-20mm. </p>
+        </div>
+    </div>
+    
     <form id="filmkwaliteitForm">
         <label for="procedure">Kies de procedure:</label>
         <select id="procedure" name="procedure" required>
@@ -74,6 +141,24 @@
     <h2 id="result" style="color: #F5DF4D;"></h2>
 
     <script>
+        // Functies voor de Modal (pop-up)
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Sluit het modal wanneer de gebruiker overal buiten het modal klikt
+        window.onclick = function(event) {
+            var modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        // Einde Modal functies
+        
         document.getElementById("procedure").addEventListener("change", function() {
             var procedure = document.getElementById("procedure").value;
             var rt16172Option = document.getElementById("rt16172Option");
