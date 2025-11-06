@@ -115,6 +115,7 @@
             // Definitie van de tabellen (gebaseerd op de CSV)
             var tables = {
                 "RT21013": {
+                    // Diktebereiken zoals in de RT21013 tabel
                     "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
                     "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
                     "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
@@ -122,7 +123,7 @@
                     ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D7", "Se75": "/", "Ir192": "D5" }
                 },
                 "RT16172": {
-                    // Ovenmateriaal is al afgehandeld in de submit functie, dus hier alleen de 'Nee' waarden
+                    // Diktebereiken gesplitst zoals in de RT16172 tabel
                     "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
                     "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
                     "10-14mm": { "X-Ray <150kv": "D5", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
@@ -131,6 +132,7 @@
                     ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
                 },
                 "RT14171": {
+                    // Diktebereiken gesplitst zoals in de RT14171 tabel
                     "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
                     "6-10mm": { "X-Ray <150kv": "D5", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
                     "10-14mm": { "X-Ray <150kv": "D5", "X-Ray >150Kv": "D5", "Se75": "D4", "Ir192": "D4 (Zwarting 2.6)" },
@@ -143,21 +145,27 @@
             var selectedTable = tables[procedure];
             var dikteRange;
 
-            // Bepaal de juiste dikte range
+            // Bepaal de juiste dikte range op basis van procedure en dikte (w)
             if (w >= 0 && w <= 6) {
                 dikteRange = "0-6mm";
             } else if (w > 6 && w <= 10) {
                 dikteRange = "6-10mm";
-            } else if (procedure === "RT14171" && w > 10 && w <= 14) {
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) {
+                // Specifieke bereiken voor RT16172 en RT14171
                 dikteRange = "10-14mm";
-            } else if (procedure === "RT14171" && w > 14 && w <= 20) {
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) {
+                // Specifieke bereiken voor RT16172 en RT14171
                 dikteRange = "14-20mm";
-            } else if ((procedure === "RT21013" || procedure === "RT16172") && w > 10 && w <= 20) {
+            } else if (procedure === "RT21013" && w > 10 && w <= 20) {
+                // Bereik 10-20mm voor RT21013
                 dikteRange = "10-20mm";
             } else if (w > 20 && w <= 50) {
                 dikteRange = "20-50mm";
             } else if (w > 50) {
                 dikteRange = ">50mm";
+            } else {
+                // Als w niet in een bereik valt
+                return "Ongeldige dikte"; 
             }
 
             if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
@@ -165,7 +173,7 @@
             }
 
             if (quality === "/") {
-                 return "deze combinatie van bron en doorstraalde dikte is onlogisch";
+                return "deze combinatie van bron en doorstraalde dikte is onlogisch";
             }
 
             return quality;
