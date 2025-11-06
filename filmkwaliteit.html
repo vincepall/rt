@@ -91,7 +91,7 @@
             <option value="RT21013">RT21013</option>
             <option value="RT16172">RT16172</option>
             <option value="RT14171">RT14171</option>
-        </select>
+            <option value="RT21002">RT21002</option> </select>
         <br><br>
 
         <label for="wanddikte">Doorstraalde dikte w (mm):</label>
@@ -165,8 +165,12 @@
 
             var filmkwaliteit = "Onbekend";
 
+            // Speciale regel voor RT21002
+            if (procedure === "RT21002") {
+                filmkwaliteit = "D7";
+            } 
             // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
-            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
+            else if (procedure === "RT16172" && ovenMateriaal === "Ja") {
                 // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja' 
                 filmkwaliteit = "D4";
             } else {
@@ -178,6 +182,11 @@
         });
 
         function determineFilmQuality(procedure, w, source) {
+            // DIRECTE RETURN VOOR RT21002
+            if (procedure === "RT21002") {
+                return "D7"; // Altijd D7 voor RT21002
+            }
+            
             var quality = "/"; 
 
             // Definitie van de tabellen (gebaseerd op de CSV)
