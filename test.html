@@ -58,7 +58,7 @@
         </select>
         <br><br>
 
-        <div id="rt14171Option" style="display:none;">
+        <div id="rt16172Option" style="display:none;">
             <label for="ovenMateriaal">Ovenmateriaal:</label>
             <select id="ovenMateriaal" name="ovenMateriaal">
                 <option value="Nee">Nee</option>
@@ -76,13 +76,13 @@
     <script>
         document.getElementById("procedure").addEventListener("change", function() {
             var procedure = document.getElementById("procedure").value;
-            var rt14171Option = document.getElementById("rt14171Option");
+            var rt16172Option = document.getElementById("rt16172Option");
 
-            // Toon of verberg de 'Ovenmateriaal' optie voor RT14171
-            if (procedure === "RT14171") {
-                rt14171Option.style.display = "block";
+            // Toon of verberg de 'Ovenmateriaal' optie voor RT16172
+            if (procedure === "RT16172") {
+                rt16172Option.style.display = "block";
             } else {
-                rt14171Option.style.display = "none";
+                rt16172Option.style.display = "none";
             }
         });
 
@@ -92,12 +92,14 @@
             var procedure = document.getElementById("procedure").value;
             var w = parseFloat(document.getElementById("doorstraaldeDikte").value);
             var source = document.getElementById("source").value;
-            var ovenMateriaal = document.getElementById("ovenMateriaal") ? document.getElementById("ovenMateriaal").value : "Nee"; // Check if element exists
+            // Haal de waarde op van het element dat nu correct wordt getoond
+            var ovenMateriaal = (procedure === "RT16172") ? document.getElementById("ovenMateriaal").value : "Nee"; 
 
             var filmkwaliteit = "Onbekend";
 
-            if (procedure === "RT14171" && ovenMateriaal === "Ja") {
-                // Regel voor ovenmateriaal: altijd D4
+            // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
+            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
+                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja' 
                 filmkwaliteit = "D4";
             } else {
                 // Bepaal de Filmkwaliteit op basis van procedure, dikte en bron
@@ -108,7 +110,7 @@
         });
 
         function determineFilmQuality(procedure, w, source) {
-            var quality = "/"; // Standaardwaarde voor 'niet van toepassing' of onbekend
+            var quality = "/"; 
 
             // Definitie van de tabellen (gebaseerd op de CSV)
             var tables = {
@@ -120,6 +122,7 @@
                     ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D7", "Se75": "/", "Ir192": "D5" }
                 },
                 "RT16172": {
+                    // Ovenmateriaal is al afgehandeld in de submit functie, dus hier alleen de 'Nee' waarden
                     "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
                     "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
                     "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
@@ -158,14 +161,8 @@
 
             if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
                 quality = selectedTable[dikteRange][source];
-            } else if (quality === "/" && procedure === "RT16172" && source === "X-Ray <150kv" && w > 6) {
-                // Als er '/' staat voor X-Ray <150kv bij RT16172 voor w > 6mm, is er een onzekerheid.
-                // In de bron is de cel leeg. We houden de onbekende status aan tenzij er een duidelijke regel is.
-            } else if (quality === "/" && procedure === "RT14171" && source === "X-Ray <150kv" && w > 10 && w <= 20) {
-                // Als er '/' staat voor X-Ray <150kv bij RT14171 voor w > 10mm.
             }
 
-            // Vervang de '/' met een meer duidelijke boodschap of een default als dat van toepassing is
             if (quality === "/") {
                  return "Niet gespecificeerd voor deze combinatie in de geselecteerde proceduretabel.";
             }
