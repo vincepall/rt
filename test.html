@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="styles.css">
+
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Film Focus Afstand Berekening</title>
+    <title>Minimale Filmkwaliteit</title>
     <style>
         body {
             font-family: 'Roboto Condensed', sans-serif;
@@ -14,360 +15,163 @@
             margin: 0;
         }
 
-        /* De stijlen voor de 'Bereken FFD' knop zijn verwijderd en moeten nu in styles.css staan */
-
-        /* Stijlen voor de modal knop (blijven hier) */
-        .info-btn {
-            background-color: #ddd;
-            color: black;
-            padding: 5px 12px;
-            font-size: 16px;
-            border-radius: 50%;
+        .btn {
+            background-color: #F5DF4D; /* Gele kleur */
             border: none;
-            cursor: pointer;
-            margin: 5px;
-            width: auto;
-            margin-top: 0;
-        }
-
-        .submit-btn {
-            background-color: #F5DF4D;
             color: black;
             padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
             text-align: center;
-            display: block;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .submit-btn:hover {
-            background-color: #FFD700;
-        }
-
-        /* Stijlen voor de modals (pop-ups) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
             text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            margin: 4px 2px;
             cursor: pointer;
-        }
-
-        /* AANGEPAST: Kleinere gap tussen de invoervelden */
-        #ffdForm {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px; /* De ruimte tussen de elementen */
-            align-items: center;
-        }
-
-        #ffdForm > * {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        #ffdForm input[type="number"], #ffdForm select {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            /* Marges geminimaliseerd */
-            margin-top: 2px;
-            margin-bottom: 2px; 
-        }
-
-        #ffdForm label {
-            display: block;
-            margin-bottom: 2px; /* Marge geminimaliseerd */
-            font-weight: bold;
-        }
-        
-        /* Zorg ervoor dat de knop onderaan ook het submit-btn design overneemt */
-        #ffdForm .submit-btn {
-            margin-top: 15px; /* Ruimte boven de knop */
+            border-radius: 8px;
         }
 
     </style>
 </head>
 <body>
-    <h1 style="color: #F5DF4D; text-align: center;">Minimale FFD</h1>
+    <h1 style="color: #F5DF4D; text-align: center;">Vereiste Minimale Filmkwaliteit</h1>
 
-    <div style="text-align: center;">
-        <button class="info-btn" onclick="openModal('myModal')">i</button>
-    </div>
-
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>
-                De minimale bron film afstand wordt bij EN bepaald doormiddel van de formules waar het nomogram op gebaseerd is en bij ASME doormiddel van de formule voor geometrische onscherpte.
-                Er wordt bij ASME automatisch de juiste formule gebruikt tot 100mm wanddikte. Bij EN kun je de optie excentrisch of centraal aanklikken waardoor er 20%(excentrisch) of 50%(centraal) van de FFD wordt afgetrokken.
-                Bij ASME wordt géén factor toegepast maar wordt alleen gecontroleerd of dit is toegestaan op basis van diameter en OFA.
-            </p>
-        </div>
-    </div>
-
-    <form id="ffdForm">
-        <label for="ofa">Object Film Afstand (OFA):</label>
-        <input type="number" id="ofa" name="ofa" step="0.01" required>
-
-        <label for="brongrootteInput">Brongrootte in mm:</label>
-        <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)">
-
-        <datalist id="bronKeuzes">
-            <option value="2.5" label="Balteau (2.5 mm)"></option>
-            <option value="3" label="Yxlon (3 mm)"></option>
-            <option value="1" label="Yxlon Smart (1 mm)"></option>
-        </datalist>
-
-        <label for="standaard">Kies een standaard:</label>
-        <select id="standaard" name="standaard" required>
-            <option value="" disabled selected>Kies een standaard</option>
-            <option value="1">EN-klasse A</option>
-            <option value="2">EN-klasse B</option>
-            <option value="3">ASME</option>
+    <form id="filmkwaliteitForm">
+        <label for="procedure">Kies de procedure:</label>
+        <select id="procedure" name="procedure" required>
+            <option value="" disabled selected>Selecteer procedure</option>
+            <option value="RT21013">RT21013</option>
+            <option value="RT16172">RT16172</option>
+            <option value="RT14171">RT14171</option>
         </select>
+        <br><br>
 
-        <div id="extraOpties" style="display:none;">
-            <label for="optie">Centraal of Excentrisch:</label>
-            <select id="optie" name="optie">
-                <option value="">Nee</option>
-                <option value="1">Centraal</option>
-                <option value="2">Excentrisch</option>
+        <label for="wanddikte">Doorstraalde dikte w (mm):</label>
+        <input type="number" id="doorstraaldeDikte" name="doorstraaldeDikte" step="any" placeholder="Vul doorstraalde dikte in" required>
+        <br><br>
+
+        <label for="source">Kies de stralingsbron:</label>
+        <select id="source" name="source" required>
+            <option value="" disabled selected>Selecteer bron</option>
+            <option value="X-Ray <150kv">X-Ray <150kv</option>
+            <option value="X-Ray >150Kv">X-Ray >150Kv</option>
+            <option value="Se75">Se75</option>
+            <option value="Ir192">Ir192</option>
+        </select>
+        <br><br>
+
+        <div id="rt14171Option" style="display:none;">
+            <label for="ovenMateriaal">Ovenmateriaal:</label>
+            <select id="ovenMateriaal" name="ovenMateriaal">
+                <option value="Nee">Nee</option>
+                <option value="Ja">Ja</option>
             </select>
+            <br><br>
         </div>
 
-        <div id="diameterInput" style="display:none;">
-            <label for="diameter">Diameter in mm:</label>
-            <input type="number" id="diameter" name="diameter" step="0.01">
-        </div>
-
-        <div id="wanddikteInput" style="display:none;">
-            <label for="wt">Wanddikte (wt) in mm:</label>
-            <input type="number" id="wt" name="wt" step="0.01">
-        </div>
-
-        <button type="button" class="submit-btn" onclick="berekenFFD(); scrollToAnswer()">Bereken FFD</button>
+        <button type="submit" class="btn">Geef de minimale filmkwaliteit</button>
     </form>
 
-    <p id="output" style="color: #F5DF4D; text-align: center;"></p>
+    <h2>Resultaat</h2>
+    <h2 id="result" style="color: #F5DF4D;"></h2>
 
     <script>
-        const standaardSelect = document.getElementById("standaard");
-        const extraOptiesDiv = document.getElementById("extraOpties");
-        const wanddikteDiv = document.getElementById("wanddikteInput");
-        const optieSelect = document.getElementById("optie");
-        const diameterDiv = document.getElementById("diameterInput");
+        document.getElementById("procedure").addEventListener("change", function() {
+            var procedure = document.getElementById("procedure").value;
+            var rt14171Option = document.getElementById("rt14171Option");
 
-        const brongrootteInput = document.getElementById("brongrootteInput");
-        const bronKeuzesDatalist = document.getElementById("bronKeuzes");
-
-
-        async function laadBronnenCSV() {
-            try {
-                const response = await fetch('bronnen.csv');
-                if (!response.ok) {
-                    throw new Error(`Fout bij laden CSV: ${response.statusText}`);
-                }
-                const csvText = await response.text();
-
-                const rows = csvText.trim().split('\n').slice(1);
-
-                rows.forEach(row => {
-                    const columns = row.split(',');
-
-                    if (columns.length >= 5) {
-                        const bronNaam = columns[0].trim();
-                        const bronGrootte = columns[4].trim();
-
-                        if (bronNaam && bronGrootte) {
-                            const option = document.createElement('option');
-                            option.value = bronGrootte;
-                            option.label = `${bronNaam} (${bronGrootte} mm)`;
-                            bronKeuzesDatalist.appendChild(option);
-                        }
-                    }
-                });
-
-                brongrootteInput.placeholder = "Kies of vul in (mm)";
-            } catch (error) {
-                console.error("Kon bronnen.csv niet laden of verwerken. Zorg ervoor dat het bestand op de juiste plek staat en toegankelijk is (fout:", error, ")");
-                brongrootteInput.placeholder = "Geen dynamische bronnen geladen";
-            }
-        }
-
-
-        standaardSelect.addEventListener("change", function () {
-            if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
-                extraOptiesDiv.style.display = "block";
+            // Toon of verberg de 'Ovenmateriaal' optie voor RT14171
+            if (procedure === "RT14171") {
+                rt14171Option.style.display = "block";
             } else {
-                extraOptiesDiv.style.display = "none";
-            }
-
-            if (standaardSelect.value === '3') {
-                wanddikteDiv.style.display = "block";
-            } else {
-                wanddikteDiv.style.display = "none";
-            }
-
-            if (optieSelect.value === '1' || optieSelect.value === '2') {
-                diameterDiv.style.display = "block";
-            } else {
-                diameterDiv.style.display = "none";
+                rt14171Option.style.display = "none";
             }
         });
 
-        optieSelect.addEventListener("change", function () {
-            if (optieSelect.value === '1' || optieSelect.value === '2') {
-                diameterDiv.style.display = "block";
+        document.getElementById("filmkwaliteitForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var procedure = document.getElementById("procedure").value;
+            var w = parseFloat(document.getElementById("doorstraaldeDikte").value);
+            var source = document.getElementById("source").value;
+            var ovenMateriaal = document.getElementById("ovenMateriaal") ? document.getElementById("ovenMateriaal").value : "Nee"; // Check if element exists
+
+            var filmkwaliteit = "Onbekend";
+
+            if (procedure === "RT14171" && ovenMateriaal === "Ja") {
+                // Regel voor ovenmateriaal: altijd D4
+                filmkwaliteit = "D4";
             } else {
-                diameterDiv.style.display = "none";
+                // Bepaal de Filmkwaliteit op basis van procedure, dikte en bron
+                filmkwaliteit = determineFilmQuality(procedure, w, source);
             }
+
+            document.getElementById("result").innerText = "De minimale filmkwaliteit is: " + filmkwaliteit;
         });
 
-        function berekenFFD() {
-            let ofa = parseFloat(document.getElementById("ofa").value);
-            let brongrootte = parseFloat(document.getElementById("brongrootteInput").value);
-            let keuze = document.getElementById("standaard").value;
-            let optie = document.getElementById("optie").value;
-            let diameter = parseFloat(document.getElementById("diameter").value);
-            let wt = parseFloat(document.getElementById("wt").value);
-            let output = document.getElementById("output");
-            let centraal = false;
-            let excentrisch = false;
-            let ffd;
+        function determineFilmQuality(procedure, w, source) {
+            var quality = "/"; // Standaardwaarde voor 'niet van toepassing' of onbekend
 
-            output.innerHTML = "";
+            // Definitie van de tabellen (gebaseerd op de CSV)
+            var tables = {
+                "RT21013": {
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D5 (D4 recommended) *", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D5 (D4 recommended) *", "Ir192": "/" },
+                    "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D7", "Se75": "/", "Ir192": "D5" }
+                },
+                "RT16172": {
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
+                },
+                "RT14171": {
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D5", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "10-14mm": { "X-Ray <150kv": "D5", "X-Ray >150Kv": "D5", "Se75": "D4", "Ir192": "D4 (Zwarting 2.6)" },
+                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
+                }
+            };
 
-            if (keuze === "") {
-                output.innerHTML = "Maak een keuze in het veld 'Kies een standaard'.<br>";
-                return;
+            var selectedTable = tables[procedure];
+            var dikteRange;
+
+            // Bepaal de juiste dikte range
+            if (w >= 0 && w <= 6) {
+                dikteRange = "0-6mm";
+            } else if (w > 6 && w <= 10) {
+                dikteRange = "6-10mm";
+            } else if (procedure === "RT14171" && w > 10 && w <= 14) {
+                dikteRange = "10-14mm";
+            } else if (procedure === "RT14171" && w > 14 && w <= 20) {
+                dikteRange = "14-20mm";
+            } else if ((procedure === "RT21013" || procedure === "RT16172") && w > 10 && w <= 20) {
+                dikteRange = "10-20mm";
+            } else if (w > 20 && w <= 50) {
+                dikteRange = "20-50mm";
+            } else if (w > 50) {
+                dikteRange = ">50mm";
             }
 
-            if (optie === '1') {
-                centraal = true;
-                if (isNaN(diameter) || diameter <= 0) {
-                    output.innerHTML = "Voer een geldige diameter in voor centrale opstelling.<br>";
-                    return;
-                }
-            } else if (optie === '2') {
-                excentrisch = true;
-                if (isNaN(diameter) || diameter <= 0) {
-                    output.innerHTML = "Voer een geldige diameter in voor excentrische opstelling.<br>";
-                    return;
-                }
+            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
+                quality = selectedTable[dikteRange][source];
+            } else if (quality === "/" && procedure === "RT16172" && source === "X-Ray <150kv" && w > 6) {
+                // Als er '/' staat voor X-Ray <150kv bij RT16172 voor w > 6mm, is er een onzekerheid.
+                // In de bron is de cel leeg. We houden de onbekende status aan tenzij er een duidelijke regel is.
+            } else if (quality === "/" && procedure === "RT14171" && source === "X-Ray <150kv" && w > 10 && w <= 20) {
+                // Als er '/' staat voor X-Ray <150kv bij RT14171 voor w > 10mm.
             }
 
-            if (keuze === '3') {  // ASME
-                if (isNaN(wt)) {
-                    output.innerHTML = "Voer een geldige wanddikte in.<br>";
-                    return;
-                }
-
-                if (wt < 50) {
-                    var boa = (brongrootte * ofa) / 0.51;
-                } else if (wt < 75) {
-                    var boa = (brongrootte * ofa) / 0.76;
-                } else if (wt <= 100) {
-                    var boa = (brongrootte * ofa) / 1.02;
-                } else {
-                    output.innerHTML = "Ongeldige wanddikte. Voer een waarde tussen 0 en 100 mm in.<br>";
-                    return;
-                }
-                ffd = boa + ofa;
-
-            } else if (keuze === '2') {  // EN-klasse B
-                let basis = brongrootte * 15 * Math.pow(ofa, 2 / 3);
-                if (centraal) {
-                    basis *= 0.5;
-                } else if (excentrisch) {
-                    basis *= 0.8;
-                }
-                ffd = basis + ofa;
-
-            } else if (keuze === '1') {  // EN-klasse A
-                let basis = brongrootte * 7.5 * Math.pow(ofa, 2 / 3);
-                if (centraal) {
-                    basis *= 0.5;
-                } else if (excentrisch) {
-                    basis *= 0.8;
-                }
-                ffd = basis + ofa;
-
-            } else {
-                output.innerHTML = "Ongeldige keuze. Voer 1, 2 of 3 in.<br>";
-                return;
+            // Vervang de '/' met een meer duidelijke boodschap of een default als dat van toepassing is
+            if (quality === "/") {
+                 return "Niet gespecificeerd voor deze combinatie in de geselecteerde proceduretabel.";
             }
 
-            output.innerHTML += `De minimale Film Focus Afstand (FFD) is: ${ffd.toFixed(2)} mm<br>`;
-
-            if (centraal) {
-                let maxFFD = diameter / 2;
-                if (ffd < maxFFD) {
-                    output.innerHTML += `✅ Centrale opstelling is toegestaan (FFD < ${maxFFD.toFixed(2)} mm)<br>`;
-                } else {
-                    output.innerHTML += `❌ Centrale opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxFFD.toFixed(2)} mm)<br>`;
-                }
-            }
-
-            if (excentrisch) {
-                let maxExcentrischFFD = diameter - (ofa + 10);
-                if (ffd < maxExcentrischFFD) {
-                    output.innerHTML += `✅ Excentrische opstelling is toegestaan (FFD < ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
-                } else {
-                    output.innerHTML += `❌ Excentrische opstelling is <strong>niet</strong> toegestaan (FFD ≥ ${maxExcentrischFFD.toFixed(2)} mm)<br>`;
-                }
-            }
+            return quality;
         }
-
-        function scrollToAnswer() {
-            const output = document.getElementById("output");
-            output.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function openModal(id) {
-            document.getElementById(id).style.display = "block";
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = "none";
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            laadBronnenCSV();
-        });
 
     </script>
 </body>
