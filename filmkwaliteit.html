@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimale Filmkwaliteit</title>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            padding: 50px;
+            margin: 0;
+        }
+
+        .btn {
+            background-color: #F5DF4D; /* Gele kleur */
+            border: none;
+            color: black;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        
+        /* Modal (pop-up) achtergrond */
+        .modal {
+            display: none; /* Standaard verborgen */
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); /* Zwarte achtergrond met dekking */
+        }
+
+        /* Modal inhoud/venster */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            border-radius: 10px;
+            position: relative;
+        }
+
+        /* De sluitknop */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Einde nieuwe stijlen */
+
+    </style>
+</head>
+<body>
+    <h1 style="color: #F5DF4D; text-align: center;">Minimale kwaliteit filmtype</h1>
+    
+    <button class="info-btn" onclick="openModal('myModal')">i</button>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('myModal')">&times;</span>
+            <p>Deze tool gaat er van uit dat men in een montage situatie, waarbij X-ray niet toegestaan is (bij RT16172,RT14171) en er toestemming is voor het gebruik van Se75 0-14mm, IR192 10-20mm. </p>
+        </div>
+    </div>
+    
+    <form id="filmkwaliteitForm">
+        <label for="procedure">Kies de procedure:</label>
+        <select id="procedure" name="procedure" required>
+            <option value="" disabled selected>Selecteer procedure</option>
+            <option value="RT21013">RT21013</option>
+            <option value="RT16172">RT16172</option>
+            <option value="RT14171">RT14171</option>
+        </select>
+        <br><br>
+
+        <label for="wanddikte">Doorstraalde dikte w (mm):</label>
+        <input type="number" id="doorstraaldeDikte" name="doorstraaldeDikte" step="any" placeholder="Vul doorstraalde dikte in" required>
+        <br><br>
+
+        <label for="source">Kies de stralingsbron:</label>
+        <select id="source" name="source" required>
+            <option value="" disabled selected>Selecteer bron</option>
+            <option value="X-Ray <150kv">X-Ray <150kv</option>
+            <option value="X-Ray >150Kv">X-Ray >150Kv</option>
+            <option value="Se75">Se75</option>
+            <option value="Ir192">Ir192</option>
+        </select>
+        <br><br>
+
+        <div id="rt16172Option" style="display:none;">
+            <label for="ovenMateriaal">Ovenmateriaal:</label>
+            <select id="ovenMateriaal" name="ovenMateriaal">
+                <option value="Nee">Nee</option>
+                <option value="Ja">Ja</option>
+            </select>
+            <br><br>
+        </div>
+
+        <button type="submit" class="btn">Minimale Filmkwaliteit</button>
+    </form>
+
+    <h2>Resultaat</h2>
+    <h2 id="result" style="color: #F5DF4D;"></h2>
+
+    <script>
+        // Functies voor de Modal (pop-up)
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Sluit het modal wanneer de gebruiker overal buiten het modal klikt
+        window.onclick = function(event) {
+            var modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        // Einde Modal functies
+        
+        document.getElementById("procedure").addEventListener("change", function() {
+            var procedure = document.getElementById("procedure").value;
+            var rt16172Option = document.getElementById("rt16172Option");
+
+            // Toon of verberg de 'Ovenmateriaal' optie voor RT16172
+            if (procedure === "RT16172") {
+                rt16172Option.style.display = "block";
+            } else {
+                rt16172Option.style.display = "none";
+            }
+        });
+
+        document.getElementById("filmkwaliteitForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var procedure = document.getElementById("procedure").value;
+            var w = parseFloat(document.getElementById("doorstraaldeDikte").value);
+            var source = document.getElementById("source").value;
+            // Haal de waarde op van het element dat nu correct wordt getoond
+            var ovenMateriaal = (procedure === "RT16172") ? document.getElementById("ovenMateriaal").value : "Nee"; 
+
+            var filmkwaliteit = "Onbekend";
+
+            // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
+            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
+                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja' 
+                filmkwaliteit = "D4";
+            } else {
+                // Bepaal de Filmkwaliteit op basis van procedure, dikte en bron
+                filmkwaliteit = determineFilmQuality(procedure, w, source);
+            }
+
+            document.getElementById("result").innerText = "De minimale filmkwaliteit is: " + filmkwaliteit;
+        });
+
+        function determineFilmQuality(procedure, w, source) {
+            var quality = "/"; 
+
+            // Definitie van de tabellen (gebaseerd op de CSV)
+            var tables = {
+                "RT21013": {
+                    // Diktebereiken zoals in de RT21013 tabel
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
+                    "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D7", "Se75": "/", "Ir192": "D5" }
+                },
+                "RT16172": {
+                    // Diktebereiken gesplitst zoals in de RT16172 tabel
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
+                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
+                },
+                "RT14171": {
+                    // Diktebereiken gesplitst zoals in de RT14171 tabel
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
+                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
+                }
+            };
+
+            var selectedTable = tables[procedure];
+            var dikteRange;
+
+            // Bepaal de juiste dikte range op basis van procedure en dikte (w)
+            if (w >= 0 && w <= 6) {
+                dikteRange = "0-6mm";
+            } else if (w > 6 && w <= 10) {
+                dikteRange = "6-10mm";
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) {
+                // Specifieke bereiken voor RT16172 en RT14171
+                dikteRange = "10-14mm";
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) {
+                // Specifieke bereiken voor RT16172 en RT14171
+                dikteRange = "14-20mm";
+            } else if (procedure === "RT21013" && w > 10 && w <= 20) {
+                // Bereik 10-20mm voor RT21013
+                dikteRange = "10-20mm";
+            } else if (w > 20 && w <= 50) {
+                dikteRange = "20-50mm";
+            } else if (w > 50) {
+                dikteRange = ">50mm";
+            } else {
+                // Als w niet in een bereik valt
+                return "Ongeldige dikte"; 
+            }
+
+            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
+                quality = selectedTable[dikteRange][source];
+            }
+
+            if (quality === "/") {
+                return "deze combinatie van bron en doorstraalde dikte is onlogisch";
+            }
+
+            return quality;
+        }
+
+    </script>
+</body>
+</html>
