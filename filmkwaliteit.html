@@ -16,7 +16,8 @@
         }
 
         .btn {
-            background-color: #F5DF4D; /* Gele kleur */
+            /* GELE KLEUR HERSTELD */
+            background-color: #F5DF4D; 
             border: none;
             color: black;
             padding: 15px 30px;
@@ -92,7 +93,7 @@
             <option value="RT16172">RT16172 Sabic</option>
             <option value="RT14171">RT14171 Sitech</option>
             <option value="RT21002">RT21002 ASME</option>
-            <option value="RT20230059">RT 2023 0059 Haffmans</option> 
+            <option value="RT20230059">RT 2023 0059 Haffmans</option> 
         </select>
         <br><br>
 
@@ -191,7 +192,8 @@
                     // Dit zou in theorie niet mogen gebeuren door de change event, maar is een extra vangnet
                     filmkwaliteit = "Alleen Se75 kan worden gebruikt voor RT 2023 0059";
                 } else if (w > 0 && w <= 14) {
-                    filmkwaliteit = "D4";
+                    /* AANPASSING 1: D4 met Zwarting 2.6 toegevoegd */
+                    filmkwaliteit = "D4 (Zwarting 2.6)";
                 } else if (w > 14) {
                     filmkwaliteit = "D5";
                 } else {
@@ -212,6 +214,9 @@
             }
 
             document.getElementById("result").innerText = "De minimale filmkwaliteit is: " + filmkwaliteit;
+            
+            /* AANPASSING 3: Scrollen naar het resultaat */
+            document.getElementById("result").scrollIntoView({ behavior: 'smooth' });
         });
 
         function determineFilmQuality(procedure, w, source) {
@@ -219,9 +224,10 @@
             if (procedure === "RT20230059") {
                 // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
                 if (source !== "Se75") return "Alleen Se75 is toegestaan";
-                
+                
                 if (w > 0 && w <= 14) {
-                    return "D4";
+                    /* AANPASSING 2: D4 met Zwarting 2.6 toegevoegd in de functie */
+                    return "D4 (Zwarting 2.6)";
                 } else if (w > 14) {
                     return "D5";
                 } else {
