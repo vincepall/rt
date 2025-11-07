@@ -188,13 +188,14 @@
             // Speciale regel voor RT20230059 (Haffmans)
             if (procedure === "RT20230059") {
                 if (source !== "Se75") {
-                    filmkwaliteit = "Alleen Se75 is toegestaan voor RT 2023 0059";
+                    // Dit zou in theorie niet mogen gebeuren door de change event, maar is een extra vangnet
+                    filmkwaliteit = "Alleen Se75 kan worden gebruikt voor RT 2023 0059";
                 } else if (w > 0 && w <= 14) {
                     filmkwaliteit = "D4";
                 } else if (w > 14) {
                     filmkwaliteit = "D5";
                 } else {
-                    filmkwaliteit = "Ongeldige dikte";
+                    filmkwaliteit = "Ongeldige dikte (w moet > 0 zijn)";
                 }
             }
             // Speciale regel voor RT21002
@@ -216,9 +217,10 @@
         function determineFilmQuality(procedure, w, source) {
             // DIRECTE RETURN VOOR RT20230059 (Haffmans)
             if (procedure === "RT20230059") {
-                if (source !== "Se75") {
-                    return "Alleen Se75 is toegestaan";
-                } else if (w > 0 && w <= 14) {
+                // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
+                if (source !== "Se75") return "Alleen Se75 is toegestaan";
+                
+                if (w > 0 && w <= 14) {
                     return "D4";
                 } else if (w > 14) {
                     return "D5";
@@ -279,3 +281,28 @@
                 // Specifieke bereiken voor RT16172 en RT14171
                 dikteRange = "14-20mm";
             } else if (procedure === "RT21013" && w > 10 && w <= 20) {
+                // Bereik 10-20mm voor RT21013
+                dikteRange = "10-20mm";
+            } else if (w > 20 && w <= 50) {
+                dikteRange = "20-50mm";
+            } else if (w > 50) {
+                dikteRange = ">50mm";
+            } else {
+                // Als w niet in een bereik valt
+                return "Ongeldige dikte"; 
+            }
+
+            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
+                quality = selectedTable[dikteRange][source];
+            }
+
+            if (quality === "/") {
+                return "deze combinatie van bron en doorstraalde dikte is onlogisch";
+            }
+
+            return quality;
+        }
+
+    </script>
+</body>
+</html>
