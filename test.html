@@ -21,7 +21,7 @@
             flex-direction: row;
             align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 10px; /* Added margin */
+            margin-bottom: 10px;
         }
         .form-item label {
             min-width: 200px;
@@ -93,6 +93,18 @@
         #container1B h2,
         #container2B h2 {
             color: red;
+        }
+        #results-section {
+            scroll-margin-top: 20px;
+        }
+        .ffd-warning {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(255, 0, 0, 0.1);
+            border-radius: 5px;
+            display: none;
         }
     </style>
 </head>
@@ -180,26 +192,29 @@
         <button type="button" class="submit-btn" onclick="calculate()">Bereken</button>
     </div>
 
-    <h2>Resultaten</h2>
-    <p id="wire-result"></p>
+    <div id="results-section">
+        <h2>Resultaten</h2>
+        <div class="ffd-warning" id="ffd-result-warning"></div>
+        <p id="wire-result"></p>
 
-    <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
-        <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
-            Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
-        </strong>
-    </div>
+        <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
+            <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
+                Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
+            </strong>
+        </div>
 
-    <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
-      <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
-    </div>
-    <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
-      <h2>Opstelling 2 (Klasse B)</h2>
-    </div>
-    <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
-      <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
-    </div>
-    <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
-      <h2>Opstelling 2 (Klasse A)</h2>
+        <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
+          <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
+        </div>
+        <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
+          <h2>Opstelling 2 (Klasse B)</h2>
+        </div>
+        <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
+          <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
+        </div>
+        <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
+          <h2>Opstelling 2 (Klasse A)</h2>
+        </div>
     </div>
 
     <script>
@@ -207,9 +222,12 @@
         let minFFD = 0;
 
         // Add event listeners to all relevant inputs
-        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "sfd", "technique", "source", "optie"].forEach(id => {
+        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "technique", "source", "optie"].forEach(id => {
             document.getElementById(id).addEventListener("input", updateFFD);
         });
+        
+        // Add separate listener for manual FFD changes
+        document.getElementById("sfd").addEventListener("input", checkFFDWarning);
         
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
@@ -284,9 +302,12 @@
 
             minFFD = ffd;
             document.getElementById("sfd").value = ffd.toFixed(2);
-            
+            checkFFDWarning();
+        }
+
+        function checkFFDWarning() {
             const userFFD = parseFloat(document.getElementById("sfd").value);
-            if (userFFD < minFFD) {
+            if (!isNaN(userFFD) && !isNaN(minFFD) && userFFD < minFFD) {
                 document.getElementById("ffd-warning").innerText = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
             } else {
                 document.getElementById("ffd-warning").innerText = "";
@@ -315,12 +336,8 @@
 
             if (technique === "SWSI" || technique === "DWSI") {
                 ofaInput.value = wanddikte;
-                ofaInput.readOnly = true;
             } else if (technique === "DWDI") {
                 ofaInput.value = diameter;
-                ofaInput.readOnly = true;
-            } else {
-                ofaInput.readOnly = false;
             }
 
             if (technique === "SWSI") {
@@ -384,6 +401,10 @@
 
         function calculate() {
             updateFFD();
+            
+            // Scroll to results section
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+            
             // Get all input values
             const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
@@ -391,6 +412,15 @@
             const ofa = parseFloat(document.getElementById("ofa").value);
             let sfd = parseFloat(document.getElementById("sfd").value);
             const source = document.getElementById("source").value;
+
+            // Check if FFD is below minimum and show warning in results
+            const warningDiv = document.getElementById("ffd-result-warning");
+            if (!isNaN(sfd) && !isNaN(minFFD) && sfd < minFFD) {
+                warningDiv.textContent = `Je gekozen FFD is lager dan de minimale FFD: ${minFFD.toFixed(2)} mm`;
+                warningDiv.style.display = 'block';
+            } else {
+                warningDiv.style.display = 'none';
+            }
 
             // --- 1. Calculate Required Wire ---
             let wire = "Onbekend";
