@@ -155,6 +155,22 @@
                     <option value="Ir192">Ir-192</option>
                 </select>
             </div>
+            <div class="form-item" id="enBSubProcedureDiv" style="display:none;">
+                <label for="enBSubProcedure">EN-B Sub-procedure:</label>
+                <select id="enBSubProcedure" name="enBSubProcedure">
+                    <option value="RT21013">RT21013 EN-B</option>
+                    <option value="RT16172">RT16172 Sabic</option>
+                    <option value="RT14171">RT14171 Sitech</option>
+                    <option value="RT20230059">RT 2023 0059 Haffmans</option>
+                </select>
+            </div>
+            <div class="form-item" id="ovenMateriaalDiv" style="display:none;">
+                <label for="ovenMateriaal">Ovenmateriaal:</label>
+                <select id="ovenMateriaal" name="ovenMateriaal">
+                    <option value="Nee">Nee</option>
+                    <option value="Ja">Ja</option>
+                </select>
+            </div>
              <div class="form-item" id="optieDiv" style="display:none;">
                 <label for="optie">Centraal of Excentrisch:</label>
                 <select id="optie" name="optie">
@@ -207,6 +223,7 @@
         <div class="ffd-warning" id="ffd-result-warning"></div>
         <p id="wire-result"></p>
         <p id="min-ffd-result" style="color: yellow;"></p>
+        <p id="film-quality-result" style="color: yellow;"></p>
 
         <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
             <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
@@ -250,6 +267,17 @@
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
         document.getElementById("optie").addEventListener("change", autoCalculate);
+
+        document.getElementById("enBSubProcedure").addEventListener("change", function() {
+            const enBSubProcedure = this.value;
+            const ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
+            if (enBSubProcedure === "RT16172") {
+                ovenMateriaalDiv.style.display = "flex";
+            } else {
+                ovenMateriaalDiv.style.display = "none";
+            }
+            autoCalculate(); // Recalculate when sub-procedure changes
+        });
 
 
         function updateBronGrootteOptions() {
@@ -416,12 +444,25 @@
         // Show/hide options based on procedure
         document.getElementById("procedure").addEventListener("change", function() {
             var procedure = document.getElementById("procedure").value;
+            var enBSubProcedureDiv = document.getElementById("enBSubProcedureDiv");
+            var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv"); // Get ovenMateriaalDiv
+
             if (procedure === "EN-A" || procedure === "EN-B") {
                 document.getElementById("enOptions").style.display = "block";
                 document.getElementById("asmeOptions").style.display = "none";
+                if (procedure === "EN-B") {
+                    enBSubProcedureDiv.style.display = "flex"; // Show sub-procedure dropdown for EN-B
+                    // Hide ovenMateriaalDiv by default, it will be shown by enBSubProcedure listener
+                    ovenMateriaalDiv.style.display = "none";
+                } else {
+                    enBSubProcedureDiv.style.display = "none"; // Hide for EN-A
+                    ovenMateriaalDiv.style.display = "none"; // Hide for EN-A
+                }
             } else { // ASME
                 document.getElementById("enOptions").style.display = "none";
                 document.getElementById("asmeOptions").style.display = "block";
+                enBSubProcedureDiv.style.display = "none"; // Hide for ASME
+                ovenMateriaalDiv.style.display = "none"; // Hide for ASME
                 updateBronGrootteOptions(); // Call to update brongrootte options for ASME
             }
             handleDiameterTechniqueRestriction(); // Call to handle technique restriction
@@ -676,6 +717,40 @@
             }
             document.getElementById("min-ffd-result").innerHTML = minFFDOutput;
 
+            // --- Calculate Film Quality ---
+            let filmQualityProcedure = "";
+            let doorstraaldeDikte = 0;
+            const currentSource = document.getElementById("source").value; // Source from test.html
+            let filmQualitySource = currentSource;
+
+            if (technique === "SWSI") {
+                doorstraaldeDikte = wanddikte;
+            } else if (technique === "DWSI" || technique === "DWDI") {
+                doorstraaldeDikte = 2 * wanddikte;
+            }
+
+            if (procedure === "EN-A") {
+                filmQualityProcedure = "RT21013"; // Default EN-B logic for EN-A
+            } else if (procedure === "EN-B") {
+                filmQualityProcedure = document.getElementById("enBSubProcedure").value;
+            } else if (procedure === "ASME") {
+                filmQualityProcedure = "RT21002";
+            }
+
+            // Map X-ray source from test.html to filmkwaliteit.html's source types
+            if (filmQualitySource === "X-ray") {
+                // For simplicity, assume X-Ray >150Kv for now, or add a new input for voltage
+                filmQualitySource = "X-Ray >150Kv";
+            }
+
+            let ovenMateriaal = "Nee";
+            if (filmQualityProcedure === "RT16172") {
+                ovenMateriaal = document.getElementById("ovenMateriaal").value;
+            }
+
+            let filmType = determineFilmQuality(filmQualityProcedure, doorstraaldeDikte, filmQualitySource, ovenMateriaal);
+            document.getElementById("film-quality-result").innerText = "Vereist filmtype: " + filmType;
+
             const optie = document.getElementById("optie").value;
             const centraal = optie === '1';
 
@@ -741,6 +816,102 @@
                     container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
                 }
             }
+        }
+
+        function determineFilmQuality(procedure, w, source, ovenMateriaal = "Nee") {
+            // DIRECTE RETURN VOOR RT20230059 (Haffmans)
+            if (procedure === "RT20230059") {
+                // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
+                if (source !== "Se75") return "Alleen Se75 is toegestaan";
+                
+                if (w > 0 && w <= 14) {
+                    /* AANPASSING 1: D4 met Zwarting 2.6 toegevoegd */
+                    return "D4 (Zwarting 2.6)";
+                } else if (w > 14) {
+                    return "D5";
+                } else {
+                    return "Ongeldige dikte (w moet > 0 zijn)";
+                }
+            }
+
+            // DIRECTE RETURN VOOR RT21002
+            if (procedure === "RT21002") {
+                return "D7"; // Altijd D7 voor RT21002
+            }
+            
+            var quality = "/"; 
+
+            // Definitie van de tabellen (gebaseerd op de CSV)
+            var tables = {
+                "RT21013": {
+                    // Diktebereiken zoals in de RT21013 tabel
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
+                    "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D7", "Se75": "/", "Ir192": "D5" }
+                },
+                "RT16172": {
+                    // Diktebereiken gesplitst zoals in de RT16172 tabel
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
+                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
+                },
+                "RT14171": {
+                    // Diktebereiken gesplitst zoals in de RT14171 tabel
+                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
+                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
+                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
+                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
+                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
+                }
+            };
+
+            var selectedTable = tables[procedure];
+            var dikteRange;
+
+            // Bepaal de juiste dikte range op basis van procedure en dikte (w)
+            if (w >= 0 && w <= 6) {
+                dikteRange = "0-6mm";
+            } else if (w > 6 && w <= 10) {
+                dikteRange = "6-10mm";
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) {
+                // Specifieke bereiken voor RT16172 en RT14171
+                dikteRange = "10-14mm";
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) {
+                // Specifieke bereiken voor RT16172 en RT14171
+                dikteRange = "14-20mm";
+            } else if (procedure === "RT21013" && w > 10 && w <= 20) {
+                // Bereik 10-20mm voor RT21013
+                dikteRange = "10-20mm";
+            } else if (w > 20 && w <= 50) {
+                dikteRange = "20-50mm";
+            } else if (w > 50) {
+                dikteRange = ">50mm";
+            } else {
+                // Als w niet in een bereik valt
+                return "Ongeldige dikte"; 
+            }
+
+            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
+                quality = selectedTable[dikteRange][source];
+            }
+
+            if (quality === "/") {
+                return "deze combinatie van bron en doorstraalde dikte is onlogisch";
+            }
+
+            // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
+            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
+                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja' 
+                return "D4";
+            }
+
+            return quality;
         }
 
         document.addEventListener('DOMContentLoaded', function() {
