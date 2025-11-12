@@ -179,6 +179,8 @@
     </div>
 
     <script>
+        let bronnenData = [];
+
         // Show/hide options based on procedure
         document.getElementById("procedure").addEventListener("change", function() {
             var procedure = document.getElementById("procedure").value;
@@ -188,6 +190,44 @@
             } else { // ASME
                 document.getElementById("enOptions").style.display = "none";
                 document.getElementById("asmeOptions").style.display = "block";
+            }
+        });
+
+        document.getElementById("technique").addEventListener("change", function() {
+            const technique = this.value;
+            const ofaInput = document.getElementById("ofa");
+            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const optieDiv = document.getElementById("optie").parentElement;
+
+            if (technique === "SWSI" || technique === "DWSI") {
+                ofaInput.value = wanddikte;
+                ofaInput.readOnly = true;
+            } else if (technique === "DWDI") {
+                ofaInput.value = diameter;
+                ofaInput.readOnly = true;
+            } else {
+                ofaInput.readOnly = false;
+            }
+
+            if (technique === "SWSI") {
+                optieDiv.style.display = "flex";
+            } else {
+                optieDiv.style.display = "none";
+            }
+        });
+
+        document.getElementById("brongrootte").addEventListener("input", function() {
+            const selectedLabel = this.value;
+            const sourceSelect = document.getElementById("source");
+            const bron = bronnenData.find(b => b.label === selectedLabel);
+
+            if (bron) {
+                if (bron.type === 'Se75' || bron.type === 'Ir192') {
+                    sourceSelect.value = bron.type;
+                } else if (bron.name.toLowerCase().includes('yxlon') || bron.name.toLowerCase().includes('balteau')) {
+                    sourceSelect.value = 'X-ray';
+                }
             }
         });
 
@@ -201,12 +241,14 @@
                     const columns = row.split(',');
                     if (columns.length >= 5) {
                         const bronNaam = columns[0].trim();
+                        const bronType = columns[1].trim();
                         const bronGrootte = columns[4].trim();
                         if (bronNaam && bronGrootte) {
+                            const label = `${bronNaam} (${bronGrootte} mm)`;
                             const option = document.createElement('option');
-                            option.value = bronGrootte;
-                            option.label = `${bronNaam} (${bronGrootte} mm)`;
+                            option.value = label;
                             bronKeuzesDatalist.appendChild(option);
+                            bronnenData.push({ name: bronNaam, type: bronType, size: parseFloat(bronGrootte), label: label });
                         }
                     }
                 });
@@ -228,15 +270,18 @@
             const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
-            const brongrootte = parseFloat(document.getElementById("brongrootte").value);
+            const brongrootteValue = document.getElementById("brongrootte").value;
+            const bron = bronnenData.find(b => b.label === brongrootteValue);
+            const brongrootte = bron ? bron.size : parseFloat(brongrootteValue);
+            
             const ofa = parseFloat(document.getElementById("ofa").value);
             let sfd = parseFloat(document.getElementById("sfd").value);
+            const source = document.getElementById("source").value;
 
             // --- 1. Calculate Required Wire ---
             let wire = "Onbekend";
             if (procedure === "EN-B") {
                 const technique = document.getElementById("technique").value;
-                const source = document.getElementById("source").value;
                 let doorstraaldeDikte = 2 * wanddikte;
 
                 if (technique === "SWSI") {
@@ -357,21 +402,33 @@
                 if (excentrisch) basis *= 0.8;
                 ffd = basis + ofa;
             }
-            document.getElementById("ffd-result").innerText = `Minimale FFD: ${ffd.toFixed(2)} mm`;
-            if (isNaN(sfd)) {
-                document.getElementById("sfd").value = (ffd + 1).toFixed(2);
-                sfd = ffd + 1;
+
+            if (source === 'X-ray') {
+                const xrayFFD = diameter + 150;
+                ffd = Math.max(ffd, xrayFFD);
             }
+
+            document.getElementById("ffd-result").innerText = `Minimale FFD: ${ffd.toFixed(2)} mm`;
+            document.getElementById("sfd").value = ffd.toFixed(2);
+            sfd = ffd;
 
 
             // --- 3. Plot Exposures ---
+            const technique = document.getElementById("technique").value;
             document.getElementById('container1A').style.display = 'none';
             document.getElementById('container2A').style.display = 'none';
             document.getElementById('container1B').style.display = 'none';
             document.getElementById('container2B').style.display = 'none';
             document.getElementById('diameterAntwoord').style.display = 'none';
 
+            if (technique === "DWDI") {
+                document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 (opstelling 11,F) of 3 (opstelling 12,G)</strong>';
+                document.getElementById('diameterAntwoord').style.display = 'block';
+                return;
+            }
+
             if (diameter <= 100) {
+                document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G</strong>';
                 document.getElementById('diameterAntwoord').style.display = 'block';
                 return;
             }
@@ -411,6 +468,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             laadBronnenCSV();
+            document.getElementById("optie").parentElement.style.display = "none";
         });
     </script>
 </body>
