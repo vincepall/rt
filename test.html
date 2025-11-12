@@ -630,7 +630,34 @@
                 }
             }
             document.getElementById("wire-result").innerText = "Vereist draadje: " + wire;
-            document.getElementById("min-ffd-result").innerText = "Minimale FFD: " + minFFD.toFixed(2) + " mm";
+
+            let minFFDOutput = "Minimale FFD: " + minFFD.toFixed(2) + " mm";
+
+            // Add Centraal/Excentrisch check if applicable
+            if (procedure === "EN-A" || procedure === "EN-B") {
+                const optie = document.getElementById("optie").value;
+                const centraal = optie === '1';
+                const excentrisch = optie === '2';
+
+                if (centraal) {
+                    let maxFFDAllowed = diameter / 2;
+                    if (minFFD < maxFFDAllowed) {
+                        minFFDOutput += `<br>✅ Centrale opstelling is toegestaan (Min. FFD < ${maxFFDAllowed.toFixed(2)} mm)`;
+                    } else {
+                        minFFDOutput += `<br>❌ Centrale opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ ${maxFFDAllowed.toFixed(2)} mm)`;
+                    }
+                }
+
+                if (excentrisch) {
+                    let maxExcentrischFFDAllowed = diameter - (ofa + 10);
+                    if (minFFD < maxExcentrischFFDAllowed) {
+                        minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < ${maxExcentrischFFDAllowed.toFixed(2)} mm)`;
+                    } else {
+                        minFFDOutput += `<br>❌ Excentrische opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ ${maxExcentrischFFDAllowed.toFixed(2)} mm)`;
+                    }
+                }
+            }
+            document.getElementById("min-ffd-result").innerHTML = minFFDOutput;
 
             // --- 3. Plot Exposures ---
             document.getElementById('container1A').style.display = 'none';
