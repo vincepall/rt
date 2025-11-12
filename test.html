@@ -1,252 +1,417 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
-
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimale Filmkwaliteit</title>
+    <title>Gecombineerde Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
     <style>
-        body {
-            font-family: 'Roboto Condensed', sans-serif;
-            padding: 50px;
-            margin: 0;
+        /* Add some styling to make the layout look good */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 10px auto;
+            max-width: 600px;
         }
-
-        .btn {
-            background-color: #F5DF4D; /* Gele kleur */
-            border: none;
-            color: black;
-            padding: 15px 30px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 18px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 8px;
+        .form-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
         }
-
-        
-        /* Modal (pop-up) achtergrond */
-        .modal {
-            display: none; /* Standaard verborgen */
-            position: fixed; 
-            z-index: 1; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.4); /* Zwarte achtergrond met dekking */
-        }
-
-        /* Modal inhoud/venster */
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; 
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; 
-            border-radius: 10px;
-            position: relative;
-        }
-
-        /* De sluitknop */
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
+        .form-item label {
+            min-width: 200px;
+            margin-bottom: 5px;
             font-weight: bold;
         }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+        .form-item input,
+        .form-item select {
+            flex: 1;
+            padding: 8px;
+            width: 100%;
+            min-width: 200px;
+            box-sizing: border-box;
         }
-        /* Einde nieuwe stijlen */
-
+        .submit-btn {
+            background-color: #F5DF4D;
+            color: black;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 400px;
+        }
+        .image-container {
+            position: relative;
+            background-size: cover;
+            border: 1px solid black;
+            margin: 20px auto;
+        }
+        .crosshair {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+        }
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: rgb(255, 49, 49);
+        }
+        .crosshair::before { top: 14px; left: 0; width: 30px; height: 2px; }
+        .crosshair::after { left: 14px; top: 0; width: 2px; height: 30px; }
     </style>
 </head>
 <body>
-    <h1 style="color: #F5DF4D; text-align: center;">Minimale kwaliteit filmtype</h1>
-    
-    <button class="info-btn" onclick="openModal('myModal')">i</button>
+    <h1>Gecombineerde Tool</h1>
 
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Deze tool gaat er van uit dat men in een montage situatie, waarbij X-ray niet toegestaan is (bij RT16172,RT14171) en er toestemming is voor het gebruik van Se75 0-14mm, IR192 10-20mm. </p>
-        </div>
-    </div>
-    
-    <form id="filmkwaliteitForm">
-        <label for="procedure">Kies de procedure:</label>
-        <select id="procedure" name="procedure" required>
-            <option value="" disabled selected>Selecteer procedure</option>
-            <option value="RT21013">RT21013</option>
-            <option value="RT16172">RT16172</option>
-            <option value="RT14171">RT14171</option>
-        </select>
-        <br><br>
-
-        <label for="wanddikte">Doorstraalde dikte w (mm):</label>
-        <input type="number" id="doorstraaldeDikte" name="doorstraaldeDikte" step="any" placeholder="Vul doorstraalde dikte in" required>
-        <br><br>
-
-        <label for="source">Kies de stralingsbron:</label>
-        <select id="source" name="source" required>
-            <option value="" disabled selected>Selecteer bron</option>
-            <option value="X-Ray <150kv">X-Ray <150kv</option>
-            <option value="X-Ray >150Kv">X-Ray >150Kv</option>
-            <option value="Se75">Se75</option>
-            <option value="Ir192">Ir192</option>
-        </select>
-        <br><br>
-
-        <div id="rt16172Option" style="display:none;">
-            <label for="ovenMateriaal">Ovenmateriaal:</label>
-            <select id="ovenMateriaal" name="ovenMateriaal">
-                <option value="Nee">Nee</option>
-                <option value="Ja">Ja</option>
+    <div class="form-container">
+        <div class="form-item">
+            <label for="procedure">Kies de procedure:</label>
+            <select id="procedure" name="procedure" required>
+                <option value="" disabled selected>Selecteer procedure</option>
+                <option value="EN-A">EN-Klasse A</option>
+                <option value="EN-B">EN-Klasse B</option>
+                <option value="ASME">ASME</option>
             </select>
-            <br><br>
+        </div>
+        <div class="form-item">
+            <label for="diameter">Diameter (De) in mm:</label>
+            <input type="number" id="diameter" name="diameter" step="0.01" required>
+        </div>
+        <div class="form-item">
+            <label for="wanddikte">Wanddikte (t) in mm:</label>
+            <input type="number" id="wanddikte" name="wanddikte" step="0.01" required>
+        </div>
+        <div class="form-item">
+            <label for="brongrootte">Brongrootte in mm:</label>
+            <input type="number" id="brongrootte" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)">
+            <datalist id="bronKeuzes"></datalist>
+        </div>
+        <div class="form-item">
+            <label for="ofa">Object Film Afstand (OFA) in mm:</label>
+            <input type="number" id="ofa" name="ofa" step="0.01" required>
+        </div>
+        <div class="form-item">
+            <label for="sfd">Bron Film Afstand (FFD) in mm:</label>
+            <input type="number" id="sfd" name="sfd" step="0.01" required>
+        </div>
+        <div id="enOptions" style="display:none;">
+            <div class="form-item">
+                <label for="technique">Opstelling:</label>
+                <select id="technique" name="technique">
+                    <option value="SWSI">SWSI</option>
+                    <option value="DWSI">DWSI</option>
+                    <option value="DWDI">DWDI</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label for="source">Stralingsbron:</label>
+                <select id="source" name="source">
+                    <option value="X-ray">X-ray</option>
+                    <option value="Se75">Se-75</option>
+                    <option value="Ir192">Ir-192</option>
+                </select>
+            </div>
+             <div class="form-item">
+                <label for="optie">Centraal of Excentrisch:</label>
+                <select id="optie" name="optie">
+                    <option value="">Nee</option>
+                    <option value="1">Centraal</option>
+                    <option value="2">Excentrisch</option>
+                </select>
+            </div>
+        </div>
+        <div id="asmeOptions" style="display:none;">
+            <div class="form-item">
+                <label for="asmeTechnique">Plaats van de BKI:</label>
+                <select id="asmeTechnique" name="asmeTechnique">
+                    <option value="Sourceside">BKI bronzijde</option>
+                    <option value="Filmside">BKI Filmzijde</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label for="weldType">Lastype:</label>
+                <select id="weldType" name="weldType">
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+            </div>
         </div>
 
-        <button type="submit" class="btn">Minimale Filmkwaliteit</button>
-    </form>
+        <button type="button" class="submit-btn" onclick="calculate()">Bereken</button>
+    </div>
 
-    <h2>Resultaat</h2>
-    <h2 id="result" style="color: #F5DF4D;"></h2>
+    <h2>Resultaten</h2>
+    <p id="wire-result"></p>
+    <p id="ffd-result"></p>
+
+    <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
+        <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
+            Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
+        </strong>
+    </div>
+
+    <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
+      <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
+    </div>
+    <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
+      <h2>Opstelling 2 (Klasse B)</h2>
+    </div>
+    <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
+      <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
+    </div>
+    <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
+      <h2>Opstelling 2 (Klasse A)</h2>
+    </div>
 
     <script>
-        // Functies voor de Modal (pop-up)
-        function openModal(id) {
-            document.getElementById(id).style.display = "block";
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = "none";
-        }
-
-        // Sluit het modal wanneer de gebruiker overal buiten het modal klikt
-        window.onclick = function(event) {
-            var modal = document.getElementById('myModal');
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-        // Einde Modal functies
-        
+        // Show/hide options based on procedure
         document.getElementById("procedure").addEventListener("change", function() {
             var procedure = document.getElementById("procedure").value;
-            var rt16172Option = document.getElementById("rt16172Option");
-
-            // Toon of verberg de 'Ovenmateriaal' optie voor RT16172
-            if (procedure === "RT16172") {
-                rt16172Option.style.display = "block";
-            } else {
-                rt16172Option.style.display = "none";
+            if (procedure === "EN-A" || procedure === "EN-B") {
+                document.getElementById("enOptions").style.display = "block";
+                document.getElementById("asmeOptions").style.display = "none";
+            } else { // ASME
+                document.getElementById("enOptions").style.display = "none";
+                document.getElementById("asmeOptions").style.display = "block";
             }
         });
 
-        document.getElementById("filmkwaliteitForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            var procedure = document.getElementById("procedure").value;
-            var w = parseFloat(document.getElementById("doorstraaldeDikte").value);
-            var source = document.getElementById("source").value;
-            // Haal de waarde op van het element dat nu correct wordt getoond
-            var ovenMateriaal = (procedure === "RT16172") ? document.getElementById("ovenMateriaal").value : "Nee"; 
-
-            var filmkwaliteit = "Onbekend";
-
-            // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
-            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
-                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja' 
-                filmkwaliteit = "D4";
-            } else {
-                // Bepaal de Filmkwaliteit op basis van procedure, dikte en bron
-                filmkwaliteit = determineFilmQuality(procedure, w, source);
+        async function laadBronnenCSV() {
+            try {
+                const response = await fetch('bronnen.csv');
+                const csvText = await response.text();
+                const rows = csvText.trim().split('\n').slice(1);
+                const bronKeuzesDatalist = document.getElementById("bronKeuzes");
+                rows.forEach(row => {
+                    const columns = row.split(',');
+                    if (columns.length >= 5) {
+                        const bronNaam = columns[0].trim();
+                        const bronGrootte = columns[4].trim();
+                        if (bronNaam && bronGrootte) {
+                            const option = document.createElement('option');
+                            option.value = bronGrootte;
+                            option.label = `${bronNaam} (${bronGrootte} mm)`;
+                            bronKeuzesDatalist.appendChild(option);
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Kon bronnen.csv niet laden.", error);
             }
-
-            document.getElementById("result").innerText = "De minimale filmkwaliteit is: " + filmkwaliteit;
-        });
-
-        function determineFilmQuality(procedure, w, source) {
-            var quality = "/"; 
-
-            // Definitie van de tabellen (gebaseerd op de CSV)
-            var tables = {
-                "RT21013": {
-                    // Diktebereiken zoals in de RT21013 tabel
-                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
-                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
-                    "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D7", "Se75": "/", "Ir192": "D5" }
-                },
-                "RT16172": {
-                    // Diktebereiken gesplitst zoals in de RT16172 tabel
-                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
-                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
-                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
-                },
-                "RT14171": {
-                    // Diktebereiken gesplitst zoals in de RT14171 tabel
-                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
-                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
-                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
-                }
-            };
-
-            var selectedTable = tables[procedure];
-            var dikteRange;
-
-            // Bepaal de juiste dikte range op basis van procedure en dikte (w)
-            if (w >= 0 && w <= 6) {
-                dikteRange = "0-6mm";
-            } else if (w > 6 && w <= 10) {
-                dikteRange = "6-10mm";
-            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) {
-                // Specifieke bereiken voor RT16172 en RT14171
-                dikteRange = "10-14mm";
-            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) {
-                // Specifieke bereiken voor RT16172 en RT14171
-                dikteRange = "14-20mm";
-            } else if (procedure === "RT21013" && w > 10 && w <= 20) {
-                // Bereik 10-20mm voor RT21013
-                dikteRange = "10-20mm";
-            } else if (w > 20 && w <= 50) {
-                dikteRange = "20-50mm";
-            } else if (w > 50) {
-                dikteRange = ">50mm";
-            } else {
-                // Als w niet in een bereik valt
-                return "Ongeldige dikte"; 
-            }
-
-            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
-                quality = selectedTable[dikteRange][source];
-            }
-
-            if (quality === "/") {
-                return "deze combinatie van bron en doorstraalde dikte is onlogisch";
-            }
-
-            return quality;
+        }
+        
+        function createCrosshair(x, y) {
+            const cross = document.createElement('div');
+            cross.className = 'crosshair';
+            cross.style.left = (x - 15) + 'px';
+            cross.style.top = (y - 15) + 'px';
+            return cross;
         }
 
+        function calculate() {
+            // Get all input values
+            const procedure = document.getElementById("procedure").value;
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            const brongrootte = parseFloat(document.getElementById("brongrootte").value);
+            const ofa = parseFloat(document.getElementById("ofa").value);
+            let sfd = parseFloat(document.getElementById("sfd").value);
+
+            // --- 1. Calculate Required Wire ---
+            let wire = "Onbekend";
+            if (procedure === "EN-B") {
+                const technique = document.getElementById("technique").value;
+                const source = document.getElementById("source").value;
+                let doorstraaldeDikte = 2 * wanddikte;
+
+                if (technique === "SWSI") {
+                    if (wanddikte <= 1.5) wire = "W19";
+                    else if (wanddikte <= 2.5) wire = "W18";
+                    else if (wanddikte <= 4) wire = "W17";
+                    else if (wanddikte <= 6) wire = "W16";
+                    else if (wanddikte <= 8) wire = "W15";
+                    else if (wanddikte <= 12) wire = "W14";
+                    else if (wanddikte <= 20) wire = "W13";
+                    else if (wanddikte <= 30) wire = "W12";
+                    else if (wanddikte <= 35) wire = "W11";
+                    else if (wanddikte <= 45) wire = "W10";
+                    else if (wanddikte <= 65) wire = "W9";
+                } else if (technique === "DWDI") {
+                    if (doorstraaldeDikte <= 1.5) wire = "W19";
+                    else if (doorstraaldeDikte <= 2.5) wire = "W18";
+                    else if (doorstraaldeDikte <= 4) wire = "W17";
+                    else if (doorstraaldeDikte <= 6) wire = "W16";
+                    else if (doorstraaldeDikte <= 8) wire = "W15";
+                    else if (doorstraaldeDikte <= 15) wire = "W14";
+                    else if (doorstraaldeDikte <= 25) wire = "W13";
+                    else if (doorstraaldeDikte <= 38) wire = "W12";
+                    else if (doorstraaldeDikte <= 45) wire = "W11";
+                    else if (doorstraaldeDikte <= 55) wire = "W10";
+                    else if (doorstraaldeDikte <= 70) wire = "W9";
+                } else if (technique === "DWSI") {
+                    if (doorstraaldeDikte <= 1.5) wire = "W19";
+                    else if (doorstraaldeDikte <= 2.5) wire = "W18";
+                    else if (doorstraaldeDikte <= 4) wire = "W17";
+                    else if (doorstraaldeDikte <= 6) wire = "W16";
+                    else if (doorstraaldeDikte <= 12) wire = "W15";
+                    else if (doorstraaldeDikte <= 18) wire = "W14";
+                    else if (doorstraaldeDikte <= 30) wire = "W13";
+                    else if (doorstraaldeDikte <= 45) wire = "W12";
+                    else if (doorstraaldeDikte <= 55) wire = "W11";
+                    else if (doorstraaldeDikte <= 70) wire = "W10";
+                }
+
+                if (source === "Se75") {
+                    if (technique === "SWSI"  && wanddikte >5 && wanddikte <= 20) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWDI" && doorstraaldeDikte >5 &&  doorstraaldeDikte <= 12) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWSI" && doorstraaldeDikte >5 && doorstraaldeDikte <= 20) {
+                        wire = "W" + (parseInt(wire.substring(1))-1);
+                    }
+                } else if (source === "Ir192") {
+                    if (technique === "SWSI" && wanddikte >= 10 && wanddikte <= 40) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWDI" && doorstraaldeDikte > 10 && doorstraaldeDikte <= 25) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if (technique === "DWSI" && doorstraaldeDikte >10 && doorstraaldeDikte <= 40) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1 );
+                    }
+                }
+            } else if (procedure === "ASME") {
+                const asmeTechnique = document.getElementById("asmeTechnique").value;
+                const weldType = document.getElementById("weldType").value;
+                
+                let maxOverdikte = 0;
+                if (weldType === "A" || weldType === "D") {
+                    if (wanddikte <= 2.4) maxOverdikte = 0.8;
+                    else if (wanddikte <= 4.8) maxOverdikte = 1.5;
+                    else if (wanddikte <= 25) maxOverdikte = 2.5;
+                    else maxOverdikte = 3;
+                } else if (weldType === "B" || weldType === "C") {
+                    if (wanddikte <= 2.4) maxOverdikte = 2.5;
+                    else if (wanddikte <= 4.8) maxOverdikte = 3;
+                    else if (wanddikte <= 13) maxOverdikte = 4;
+                    else if (wanddikte <= 25) maxOverdikte = 5;
+                    else maxOverdikte = 6;
+                }
+                const effectiveWanddikte = wanddikte + maxOverdikte;
+
+                if (asmeTechnique === "Sourceside") {
+                    if (effectiveWanddikte <= 6.4) wire = "EN W13,ASME 5";
+                    else if (effectiveWanddikte <= 9.5) wire = "EN W12, ASME 6";
+                    else if (effectiveWanddikte <= 12.7) wire = "EN W11, ASME 7";
+                    else if (effectiveWanddikte <= 19) wire = "EN W10, ASME 8";
+                    else if (effectiveWanddikte <= 25.4) wire = "EN W9, ASME 9";
+                    else if (effectiveWanddikte <= 38.1) wire = "EN W8, ASME 10";
+                    else if (effectiveWanddikte <= 50.8) wire = "EN W7, ASME 11";
+                    else if (effectiveWanddikte <= 63.5) wire = "EN W6, ASME 12";
+                    else wire = "EN W5, ASME 13";
+                } else { // Film side
+                    if (effectiveWanddikte <= 6.4) wire = "EN W14,ASME 4";
+                    else if (effectiveWanddikte <= 9.5) wire = "EN W13, ASME 5";
+                    else if (effectiveWanddikte <= 12.7) wire = "EN W12, ASME 6";
+                    else if (effectiveWanddikte <= 19) wire = "EN W11, ASME 7";
+                    else if (effectiveWanddikte <= 25.4) wire = "EN W10, ASME 8";
+                    else if (effectiveWanddikte <= 38.1) wire = "EN W9, ASME 9";
+                    else if (effectiveWanddikte <= 50.8) wire = "EN W8, ASME 10";
+                    else if (effectiveWanddikte <= 63.5) wire = "EN W7, ASME 11";
+                    else wire = "EN W6, ASME 12";
+                }
+            }
+            document.getElementById("wire-result").innerText = "Vereist draadje: " + wire;
+
+            // --- 2. Calculate Minimum FFD ---
+            let ffd = 0;
+            const optie = document.getElementById("optie").value;
+            const centraal = optie === '1';
+            const excentrisch = optie === '2';
+
+            if (procedure === "ASME") {
+                if (wanddikte < 50) ffd = (brongrootte * ofa) / 0.51 + ofa;
+                else if (wanddikte < 75) ffd = (brongrootte * ofa) / 0.76 + ofa;
+                else if (wanddikte <= 100) ffd = (brongrootte * ofa) / 1.02 + ofa;
+                else {
+                    document.getElementById("ffd-result").innerText = "Wanddikte te groot voor ASME berekening.";
+                    return;
+                }
+            } else { // EN-A or EN-B
+                let factor = (procedure === "EN-A") ? 7.5 : 15;
+                let basis = brongrootte * factor * Math.pow(ofa, 2 / 3);
+                if (centraal) basis *= 0.5;
+                if (excentrisch) basis *= 0.8;
+                ffd = basis + ofa;
+            }
+            document.getElementById("ffd-result").innerText = `Minimale FFD: ${ffd.toFixed(2)} mm`;
+            if (isNaN(sfd)) {
+                document.getElementById("sfd").value = (ffd + 1).toFixed(2);
+                sfd = ffd + 1;
+            }
+
+
+            // --- 3. Plot Exposures ---
+            document.getElementById('container1A').style.display = 'none';
+            document.getElementById('container2A').style.display = 'none';
+            document.getElementById('container1B').style.display = 'none';
+            document.getElementById('container2B').style.display = 'none';
+            document.getElementById('diameterAntwoord').style.display = 'none';
+
+            if (diameter <= 100) {
+                document.getElementById('diameterAntwoord').style.display = 'block';
+                return;
+            }
+
+            const klasse = (procedure === 'EN-A' || procedure === 'ASME') ? 'A' : 'B';
+            const t_plot = ofa;
+            const De_plot = diameter;
+            const SFD = sfd;
+
+            const x_value1 = t_plot / De_plot;
+            const y_value1 = De_plot / SFD;
+            const x_value2 = t_plot / De_plot;
+            const y_value2 = De_plot / (SFD - t_plot);
+
+            let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
+
+            if (klasse === 'B') {
+                x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
+                x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
+                document.getElementById('container1B').style.display = 'block';
+                document.getElementById('container2B').style.display = 'block';
+            } else { // Klasse A or ASME
+                x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
+                x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
+                document.getElementById('container1A').style.display = 'block';
+                document.getElementById('container2A').style.display = 'block';
+            }
+
+            const container1 = document.getElementById(`container1${klasse}`);
+            const container2 = document.getElementById(`container2${klasse}`);
+
+            container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
+            container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+            container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
+            container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            laadBronnenCSV();
+        });
     </script>
 </body>
 </html>
