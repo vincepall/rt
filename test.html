@@ -206,6 +206,7 @@
         <div class="diameter-warning" id="diameter-warning"></div>
         <div class="ffd-warning" id="ffd-result-warning"></div>
         <p id="wire-result"></p>
+        <p id="min-ffd-result" style="color: yellow;"></p>
 
         <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
             <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
@@ -285,9 +286,36 @@
         }
 
         function autoCalculate() {
+            handleDiameterTechniqueRestriction(); // Handle technique restriction based on diameter
             updateOFAForASME(); // Call this first to update OFA if ASME
             updateFFD();
             calculateResults();
+        }
+
+        function handleDiameterTechniqueRestriction() {
+            const procedure = document.getElementById("procedure").value;
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const techniqueSelect = document.getElementById("technique");
+
+            if ((procedure === "EN-A" || procedure === "EN-B") && !isNaN(diameter) && diameter < 100) {
+                // Disable SWSI and DWSI options
+                Array.from(techniqueSelect.options).forEach(option => {
+                    if (option.value === "SWSI" || option.value === "DWSI") {
+                        option.disabled = true;
+                    } else {
+                        option.disabled = false;
+                    }
+                });
+                // If current technique is not DWDI, set it to DWDI
+                if (techniqueSelect.value !== "DWDI") {
+                    techniqueSelect.value = "DWDI";
+                }
+            } else {
+                // Enable all options if diameter >= 100 or not EN-A/EN-B
+                Array.from(techniqueSelect.options).forEach(option => {
+                    option.disabled = false;
+                });
+            }
         }
 
         function updateOFAForASME() {
@@ -379,6 +407,7 @@
                 document.getElementById("asmeOptions").style.display = "block";
                 updateBronGrootteOptions(); // Call to update brongrootte options for ASME
             }
+            handleDiameterTechniqueRestriction(); // Call to handle technique restriction
             autoCalculate(); // Ensure everything recalculates
         });
 
@@ -400,6 +429,7 @@
             } else {
                 optieDiv.style.display = "none";
             }
+            autoCalculate(); // Ensure everything recalculates
         });
 
         document.getElementById("brongrootte").addEventListener("input", function() {
@@ -600,6 +630,7 @@
                 }
             }
             document.getElementById("wire-result").innerText = "Vereist draadje: " + wire;
+            document.getElementById("min-ffd-result").innerText = "Minimale FFD: " + minFFD.toFixed(2) + " mm";
 
             // --- 3. Plot Exposures ---
             document.getElementById('container1A').style.display = 'none';
