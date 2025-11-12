@@ -342,24 +342,35 @@
             const diameter = parseFloat(document.getElementById("diameter").value);
             const techniqueSelect = document.getElementById("technique");
 
-            if ((procedure === "EN-A" || procedure === "EN-B") && !isNaN(diameter) && diameter < 100) {
-                // Disable SWSI and DWSI options
-                Array.from(techniqueSelect.options).forEach(option => {
-                    if (option.value === "SWSI" || option.value === "DWSI") {
-                        option.disabled = true;
-                    } else {
-                        option.disabled = false;
+            // Always enable all options first to reset previous states
+            Array.from(techniqueSelect.options).forEach(option => {
+                option.disabled = false;
+            });
+
+            if (!isNaN(diameter)) {
+                if (diameter > 100) {
+                    // If diameter > 100, DWDI is not an option
+                    Array.from(techniqueSelect.options).forEach(option => {
+                        if (option.value === "DWDI") {
+                            option.disabled = true;
+                        }
+                    });
+                    // If DWDI is currently selected, change it to SWSI (or another valid default)
+                    if (techniqueSelect.value === "DWDI") {
+                        techniqueSelect.value = "SWSI";
                     }
-                });
-                // If current technique is not DWDI, set it to DWDI
-                if (techniqueSelect.value !== "DWDI") {
-                    techniqueSelect.value = "DWDI";
+                } else if ((procedure === "EN-A" || procedure === "EN-B") && diameter < 100) {
+                    // If diameter < 100 and EN-A/EN-B, only DWDI is allowed
+                    Array.from(techniqueSelect.options).forEach(option => {
+                        if (option.value === "SWSI" || option.value === "DWSI") {
+                            option.disabled = true;
+                        }
+                    });
+                    // If current technique is not DWDI, set it to DWDI
+                    if (techniqueSelect.value !== "DWDI") {
+                        techniqueSelect.value = "DWDI";
+                    }
                 }
-            } else {
-                // Enable all options if diameter >= 100 or not EN-A/EN-B
-                Array.from(techniqueSelect.options).forEach(option => {
-                    option.disabled = false;
-                });
             }
         }
 
