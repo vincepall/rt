@@ -659,6 +659,9 @@
             }
             document.getElementById("min-ffd-result").innerHTML = minFFDOutput;
 
+            const optie = document.getElementById("optie").value;
+            const centraal = optie === '1';
+
             // --- 3. Plot Exposures ---
             document.getElementById('container1A').style.display = 'none';
             document.getElementById('container2A').style.display = 'none';
@@ -666,58 +669,60 @@
             document.getElementById('container2B').style.display = 'none';
             document.getElementById('diameterAntwoord').style.display = 'none';
 
-            if (technique === "DWDI") {
-                document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 (opstelling 11,F) of 3 (opstelling 12,G)</strong>';
-                document.getElementById('diameterAntwoord').style.display = 'block';
-                return;
-            }
-
-            if (diameter <= 100) {
-                document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G</strong>';
-                document.getElementById('diameterAntwoord').style.display = 'block';
-                return;
-            }
-
-            const klasse = (procedure === 'EN-A' || procedure === 'ASME') ? 'A' : 'B';
-            const t_plot = ofa;
-            const De_plot = diameter;
-            const SFD = sfd;
-
-            const x_value1 = t_plot / De_plot;
-            const y_value1 = De_plot / SFD;
-            const x_value2 = t_plot / De_plot;
-            const y_value2 = De_plot / (SFD - t_plot);
-
-            let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
-
-            if (klasse === 'B') {
-                x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
-                x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
-                document.getElementById('container1B').style.display = 'block';
-                // Only show second image if NOT DWSI
-                if (technique !== "DWSI") {
-                    document.getElementById('container2B').style.display = 'block';
+            if (!centraal) { // Only show images if Centraal is NOT selected
+                if (technique === "DWDI") {
+                    document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 (opstelling 11,F) of 3 (opstelling 12,G)</strong>';
+                    document.getElementById('diameterAntwoord').style.display = 'block';
+                    return;
                 }
-            } else { // Klasse A or ASME
-                x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
-                x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
-                document.getElementById('container1A').style.display = 'block';
-                // Only show second image if NOT DWSI
-                if (technique !== "DWSI") {
-                    document.getElementById('container2A').style.display = 'block';
+
+                if (diameter <= 100) {
+                    document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G</strong>';
+                    document.getElementById('diameterAntwoord').style.display = 'block';
+                    return;
                 }
-            }
 
-            const container1 = document.getElementById(`container1${klasse}`);
-            const container2 = document.getElementById(`container2${klasse}`);
+                const klasse = (procedure === 'EN-A' || procedure === 'ASME') ? 'A' : 'B';
+                const t_plot = ofa;
+                const De_plot = diameter;
+                const SFD = sfd;
 
-            container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
-            container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
-            
-            // Only add crosshair to second container if NOT DWSI
-            if (technique !== "DWSI") {
-                container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
-                container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+                const x_value1 = t_plot / De_plot;
+                const y_value1 = De_plot / SFD;
+                const x_value2 = t_plot / De_plot;
+                const y_value2 = De_plot / (SFD - t_plot);
+
+                let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
+
+                if (klasse === 'B') {
+                    x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
+                    x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
+                    document.getElementById('container1B').style.display = 'block';
+                    // Only show second image if NOT DWSI
+                    if (technique !== "DWSI") {
+                        document.getElementById('container2B').style.display = 'block';
+                    }
+                } else { // Klasse A or ASME
+                    x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
+                    x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
+                    document.getElementById('container1A').style.display = 'block';
+                    // Only show second image if NOT DWSI
+                    if (technique !== "DWSI") {
+                        document.getElementById('container2A').style.display = 'block';
+                    }
+                }
+
+                const container1 = document.getElementById(`container1${klasse}`);
+                const container2 = document.getElementById(`container2${klasse}`);
+
+                container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
+                container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+                
+                // Only add crosshair to second container if NOT DWSI
+                if (technique !== "DWSI") {
+                    container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
+                    container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+                }
             }
         }
 
