@@ -254,6 +254,13 @@
         }
 
         function updateFFD() {
+            calculateMinFFD();
+            // Auto-fill the FFD field with calculated value
+            document.getElementById("sfd").value = minFFD.toFixed(2);
+            checkFFDWarning();
+        }
+
+        function calculateMinFFD() {
             const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
@@ -301,7 +308,6 @@
             }
 
             minFFD = ffd;
-            document.getElementById("sfd").value = ffd.toFixed(2);
             checkFFDWarning();
         }
 
@@ -400,7 +406,8 @@
         }
 
         function calculate() {
-            updateFFD();
+            // Calculate minFFD but don't update the field value
+            calculateMinFFD();
             
             // Scroll to results section
             document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
