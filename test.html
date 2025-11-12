@@ -250,11 +250,19 @@
 
 
         function updateBronGrootteOptions() {
+            const procedure = document.getElementById("procedure").value;
             const source = document.getElementById("source").value;
             const bronKeuzesDatalist = document.getElementById("bronKeuzes");
             bronKeuzesDatalist.innerHTML = '';
 
-            if (source === 'X-ray') {
+            if (procedure === "ASME") {
+                // For ASME, show all bronnenData options
+                bronnenData.forEach(bron => {
+                    const option = document.createElement('option');
+                    option.value = bron.label;
+                    bronKeuzesDatalist.appendChild(option);
+                });
+            } else if (source === 'X-ray') {
                 bronKeuzesDatalist.innerHTML = `
                     <option value="Yxlon (3 mm)"></option>
                     <option value="Yxlon Smart (1 mm)"></option>
@@ -271,8 +279,24 @@
         }
 
         function autoCalculate() {
+            updateOFAForASME(); // Call this first to update OFA if ASME
             updateFFD();
             calculateResults();
+        }
+
+        function updateOFAForASME() {
+            const procedure = document.getElementById("procedure").value;
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            const ofaInput = document.getElementById("ofa");
+
+            if (procedure === "ASME" && !isNaN(diameter) && !isNaN(wanddikte)) {
+                if (diameter < 100) {
+                    ofaInput.value = diameter.toFixed(2);
+                } else {
+                    ofaInput.value = wanddikte.toFixed(2);
+                }
+            }
         }
 
         function updateFFD() {
@@ -347,7 +371,9 @@
             } else { // ASME
                 document.getElementById("enOptions").style.display = "none";
                 document.getElementById("asmeOptions").style.display = "block";
+                updateBronGrootteOptions(); // Call to update brongrootte options for ASME
             }
+            autoCalculate(); // Ensure everything recalculates
         });
 
         document.getElementById("technique").addEventListener("change", function() {
@@ -373,17 +399,20 @@
         document.getElementById("brongrootte").addEventListener("input", function() {
             const selectedLabel = this.value;
             const sourceSelect = document.getElementById("source");
-            
-            if (selectedLabel.toLowerCase().includes('yxlon') || selectedLabel.toLowerCase().includes('balteau')) {
-                sourceSelect.value = 'X-ray';
-                return;
-            }
+            const procedure = document.getElementById("procedure").value;
 
-            const bron = bronnenData.find(b => b.label === selectedLabel);
+            if (procedure !== "ASME") { // Only update source if not ASME
+                if (selectedLabel.toLowerCase().includes('yxlon') || selectedLabel.toLowerCase().includes('balteau')) {
+                    sourceSelect.value = 'X-ray';
+                    return;
+                }
 
-            if (bron) {
-                if (bron.type === 'Se75' || bron.type === 'Ir192') {
-                    sourceSelect.value = bron.type;
+                const bron = bronnenData.find(b => b.label === selectedLabel);
+
+                if (bron) {
+                    if (bron.type === 'Se75' || bron.type === 'Ir192') {
+                        sourceSelect.value = bron.type;
+                    }
                 }
             }
         });
