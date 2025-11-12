@@ -277,8 +277,6 @@
 
         function updateFFD() {
             calculateMinFFD();
-            // Auto-fill the FFD field with calculated value
-            document.getElementById("sfd").value = minFFD.toFixed(2);
             checkFFDWarning();
         }
 
@@ -636,6 +634,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             laadBronnenCSV();
             document.getElementById("optieDiv").style.display = "none";
+            updateFFD(); // Calculate minFFD
+            document.getElementById("sfd").value = minFFD.toFixed(2); // Initialize FFD field
         });
     </script>
 </body>
