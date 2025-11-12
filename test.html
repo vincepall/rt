@@ -106,6 +106,15 @@
             border-radius: 5px;
             display: none;
         }
+        .diameter-warning {
+            color: orange;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(255, 165, 0, 0.1);
+            border-radius: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -194,6 +203,7 @@
 
     <div id="results-section">
         <h2>Resultaten</h2>
+        <div class="diameter-warning" id="diameter-warning"></div>
         <div class="ffd-warning" id="ffd-result-warning"></div>
         <p id="wire-result"></p>
 
@@ -221,13 +231,20 @@
         let bronnenData = [];
         let minFFD = 0;
 
-        // Add event listeners to all relevant inputs
-        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "technique", "source", "optie"].forEach(id => {
-            document.getElementById(id).addEventListener("input", updateFFD);
+        // Add event listeners to all relevant inputs for auto-update
+        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "technique", "source", "optie", "asmeTechnique", "weldType"].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener("input", autoCalculate);
+                element.addEventListener("change", autoCalculate);
+            }
         });
         
         // Add separate listener for manual FFD changes
-        document.getElementById("sfd").addEventListener("input", checkFFDWarning);
+        document.getElementById("sfd").addEventListener("input", function() {
+            checkFFDWarning();
+            autoCalculate();
+        });
         
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
@@ -251,6 +268,11 @@
                     bronKeuzesDatalist.appendChild(option);
                 });
             }
+        }
+
+        function autoCalculate() {
+            updateFFD();
+            calculateResults();
         }
 
         function updateFFD() {
@@ -408,10 +430,13 @@
         function calculate() {
             // Calculate minFFD but don't update the field value
             calculateMinFFD();
+            calculateResults();
             
             // Scroll to results section
             document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
-            
+        }
+
+        function calculateResults() {
             // Get all input values
             const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
@@ -419,6 +444,20 @@
             const ofa = parseFloat(document.getElementById("ofa").value);
             let sfd = parseFloat(document.getElementById("sfd").value);
             const source = document.getElementById("source").value;
+            const technique = document.getElementById("technique").value;
+
+            // Check diameter warning
+            const diameterWarningDiv = document.getElementById("diameter-warning");
+            if (!isNaN(diameter) && diameter < 100 && (procedure === "EN-A" || procedure === "EN-B")) {
+                if (technique !== "DWDI") {
+                    diameterWarningDiv.textContent = "Waarschuwing: Bij een diameter kleiner dan 100 mm wordt aanbevolen om de DWDI opstelling te gebruiken.";
+                    diameterWarningDiv.style.display = 'block';
+                } else {
+                    diameterWarningDiv.style.display = 'none';
+                }
+            } else {
+                diameterWarningDiv.style.display = 'none';
+            }
 
             // Check if FFD is below minimum and show warning in results
             const warningDiv = document.getElementById("ffd-result-warning");
@@ -533,7 +572,6 @@
             document.getElementById("wire-result").innerText = "Vereist draadje: " + wire;
 
             // --- 3. Plot Exposures ---
-            const technique = document.getElementById("technique").value;
             document.getElementById('container1A').style.display = 'none';
             document.getElementById('container2A').style.display = 'none';
             document.getElementById('container1B').style.display = 'none';
@@ -568,12 +606,18 @@
                 x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
                 x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
                 document.getElementById('container1B').style.display = 'block';
-                document.getElementById('container2B').style.display = 'block';
+                // Only show second image if NOT DWSI
+                if (technique !== "DWSI") {
+                    document.getElementById('container2B').style.display = 'block';
+                }
             } else { // Klasse A or ASME
                 x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
                 x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
                 document.getElementById('container1A').style.display = 'block';
-                document.getElementById('container2A').style.display = 'block';
+                // Only show second image if NOT DWSI
+                if (technique !== "DWSI") {
+                    document.getElementById('container2A').style.display = 'block';
+                }
             }
 
             const container1 = document.getElementById(`container1${klasse}`);
@@ -581,8 +625,12 @@
 
             container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
             container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
-            container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
-            container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+            
+            // Only add crosshair to second container if NOT DWSI
+            if (technique !== "DWSI") {
+                container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
+                container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
