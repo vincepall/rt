@@ -249,6 +249,8 @@
         
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
+        document.getElementById("optie").addEventListener("change", autoCalculate);
+
 
         function updateBronGrootteOptions() {
             const procedure = document.getElementById("procedure").value;
@@ -286,10 +288,25 @@
         }
 
         function autoCalculate() {
-            handleDiameterTechniqueRestriction(); // Handle technique restriction based on diameter
-            updateOFAForASME(); // Call this first to update OFA if ASME
+            handleCentraalAutoFill(); // New: Auto-fill FFD and OFA for Centraal
+            handleDiameterTechniqueRestriction();
+            updateOFAForASME();
             updateFFD();
             calculateResults();
+        }
+
+        function handleCentraalAutoFill() {
+            const procedure = document.getElementById("procedure").value;
+            const optie = document.getElementById("optie").value;
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            const sfdInput = document.getElementById("sfd");
+            const ofaInput = document.getElementById("ofa");
+
+            if ((procedure === "EN-A" || procedure === "EN-B") && optie === '1' && !isNaN(diameter) && !isNaN(wanddikte)) {
+                sfdInput.value = (diameter / 2).toFixed(2);
+                ofaInput.value = wanddikte.toFixed(2);
+            }
         }
 
         function handleDiameterTechniqueRestriction() {
