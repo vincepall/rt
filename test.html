@@ -21,6 +21,7 @@
             flex-direction: row;
             align-items: center;
             flex-wrap: wrap;
+            margin-bottom: 10px; /* Added margin */
         }
         .form-item label {
             min-width: 200px;
@@ -63,14 +64,36 @@
             top: 0;
             pointer-events: none;
         }
+
         .crosshair::before,
         .crosshair::after {
             content: '';
             position: absolute;
             background-color: rgb(255, 49, 49);
         }
+
         .crosshair::before { top: 14px; left: 0; width: 30px; height: 2px; }
         .crosshair::after { left: 14px; top: 0; width: 2px; height: 30px; }
+
+        .highlight-circle {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 128, 0.2);
+            left: -10px;
+            top: -10px;
+            pointer-events: none;
+        }
+        #wire-result {
+            color: yellow;
+        }
+        #container1A h2,
+        #container2A h2,
+        #container1B h2,
+        #container2B h2 {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -124,9 +147,6 @@
             <label for="brongrootte">Brongrootte in mm:</label>
             <input type="text" id="brongrootte" name="brongrootte" list="bronKeuzes" required placeholder="Kies of vul in (mm)">
             <datalist id="bronKeuzes">
-                <option value="Yxlon (3 mm)"></option>
-                <option value="Yxlon Smart (1 mm)"></option>
-                <option value="Balteau (2.5 mm)"></option>
             </datalist>
         </div>
         <div class="form-item">
@@ -188,8 +208,32 @@
 
         // Add event listeners to all relevant inputs
         ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "sfd", "technique", "source", "optie"].forEach(id => {
-            document.getElementById(id).addEventListener("change", updateFFD);
+            document.getElementById(id).addEventListener("input", updateFFD);
         });
+        
+        document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
+
+
+        function updateBronGrootteOptions() {
+            const source = document.getElementById("source").value;
+            const bronKeuzesDatalist = document.getElementById("bronKeuzes");
+            bronKeuzesDatalist.innerHTML = '';
+
+            if (source === 'X-ray') {
+                bronKeuzesDatalist.innerHTML = `
+                    <option value="Yxlon (3 mm)"></option>
+                    <option value="Yxlon Smart (1 mm)"></option>
+                    <option value="Balteau (2.5 mm)"></option>
+                `;
+            } else {
+                const filteredBronnen = bronnenData.filter(b => b.type === source);
+                filteredBronnen.forEach(bron => {
+                    const option = document.createElement('option');
+                    option.value = bron.label;
+                    bronKeuzesDatalist.appendChild(option);
+                });
+            }
+        }
 
         function updateFFD() {
             const procedure = document.getElementById("procedure").value;
@@ -309,7 +353,6 @@
                 const response = await fetch('bronnen.csv');
                 const csvText = await response.text();
                 const rows = csvText.trim().split('\n').slice(1);
-                const bronKeuzesDatalist = document.getElementById("bronKeuzes");
                 rows.forEach(row => {
                     const columns = row.split(',');
                     if (columns.length >= 5) {
@@ -318,13 +361,11 @@
                         const bronGrootte = columns[4].trim();
                         if (bronNaam && bronGrootte) {
                             const label = `${bronNaam} (${bronGrootte} mm)`;
-                            const option = document.createElement('option');
-                            option.value = label;
-                            bronKeuzesDatalist.appendChild(option);
                             bronnenData.push({ name: bronNaam, type: bronType, size: parseFloat(bronGrootte), label: label });
                         }
                     }
                 });
+                updateBronGrootteOptions();
             } catch (error) {
                 console.error("Kon bronnen.csv niet laden.", error);
             }
@@ -335,6 +376,9 @@
             cross.className = 'crosshair';
             cross.style.left = (x - 15) + 'px';
             cross.style.top = (y - 15) + 'px';
+            const circle = document.createElement('div');
+            circle.className = 'highlight-circle';
+            cross.appendChild(circle);
             return cross;
         }
 
