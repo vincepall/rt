@@ -94,19 +94,6 @@
             <label for="wanddikte">Wanddikte (t) in mm:</label>
             <input type="number" id="wanddikte" name="wanddikte" step="0.01" required>
         </div>
-        <div class="form-item">
-            <label for="brongrootte">Brongrootte in mm:</label>
-            <input type="number" id="brongrootte" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)">
-            <datalist id="bronKeuzes"></datalist>
-        </div>
-        <div class="form-item">
-            <label for="ofa">Object Film Afstand (OFA) in mm:</label>
-            <input type="number" id="ofa" name="ofa" step="0.01" required>
-        </div>
-        <div class="form-item">
-            <label for="sfd">Bron Film Afstand (FFD) in mm:</label>
-            <input type="number" id="sfd" name="sfd" step="0.01" required>
-        </div>
         <div id="enOptions" style="display:none;">
             <div class="form-item">
                 <label for="technique">Opstelling:</label>
@@ -124,7 +111,7 @@
                     <option value="Ir192">Ir-192</option>
                 </select>
             </div>
-             <div class="form-item">
+             <div class="form-item" id="optieDiv" style="display:none;">
                 <label for="optie">Centraal of Excentrisch:</label>
                 <select id="optie" name="optie">
                     <option value="">Nee</option>
@@ -132,6 +119,24 @@
                     <option value="2">Excentrisch</option>
                 </select>
             </div>
+        </div>
+        <div class="form-item">
+            <label for="brongrootte">Brongrootte in mm:</label>
+            <input type="text" id="brongrootte" name="brongrootte" list="bronKeuzes" required placeholder="Kies of vul in (mm)">
+            <datalist id="bronKeuzes">
+                <option value="Yxlon (3 mm)"></option>
+                <option value="Yxlon Smart (1 mm)"></option>
+                <option value="Balteau (2.5 mm)"></option>
+            </datalist>
+        </div>
+        <div class="form-item">
+            <label for="ofa">Object Film Afstand (OFA) in mm:</label>
+            <input type="number" id="ofa" name="ofa" step="0.01" required>
+        </div>
+        <div class="form-item">
+            <label for="sfd">Bron Film Afstand (FFD) in mm:</label>
+            <input type="number" id="sfd" name="sfd" step="0.01" required>
+            <span id="ffd-warning" style="color: red; margin-left: 10px;"></span>
         </div>
         <div id="asmeOptions" style="display:none;">
             <div class="form-item">
@@ -157,7 +162,6 @@
 
     <h2>Resultaten</h2>
     <p id="wire-result"></p>
-    <p id="ffd-result"></p>
 
     <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
         <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
@@ -180,6 +184,71 @@
 
     <script>
         let bronnenData = [];
+        let minFFD = 0;
+
+        // Add event listeners to all relevant inputs
+        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "sfd", "technique", "source", "optie"].forEach(id => {
+            document.getElementById(id).addEventListener("change", updateFFD);
+        });
+
+        function updateFFD() {
+            const procedure = document.getElementById("procedure").value;
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            const brongrootteValue = document.getElementById("brongrootte").value;
+            const ofa = parseFloat(document.getElementById("ofa").value);
+            const source = document.getElementById("source").value;
+            const optie = document.getElementById("optie").value;
+            const centraal = optie === '1';
+            const excentrisch = optie === '2';
+
+            let brongrootte = 0;
+            if (brongrootteValue.includes("Yxlon (3 mm)")) brongrootte = 3;
+            else if (brongrootteValue.includes("Yxlon Smart (1 mm)")) brongrootte = 1;
+            else if (brongrootteValue.includes("Balteau (2.5 mm)")) brongrootte = 2.5;
+            else {
+                 const bron = bronnenData.find(b => b.label === brongrootteValue);
+                 brongrootte = bron ? bron.size : parseFloat(brongrootteValue);
+            }
+
+
+            if (isNaN(diameter) || isNaN(wanddikte) || isNaN(brongrootte) || isNaN(ofa)) {
+                return;
+            }
+
+            let ffd = 0;
+            if (procedure === "ASME") {
+                if (wanddikte < 50) ffd = (brongrootte * ofa) / 0.51 + ofa;
+                else if (wanddikte < 75) ffd = (brongrootte * ofa) / 0.76 + ofa;
+                else if (wanddikte <= 100) ffd = (brongrootte * ofa) / 1.02 + ofa;
+                else {
+                    document.getElementById("ffd-warning").innerText = "Wanddikte te groot voor ASME berekening.";
+                    return;
+                }
+            } else { // EN-A or EN-B
+                let factor = (procedure === "EN-A") ? 7.5 : 15;
+                let basis = brongrootte * factor * Math.pow(ofa, 2 / 3);
+                if (centraal) basis *= 0.5;
+                if (excentrisch) basis *= 0.8;
+                ffd = basis + ofa;
+            }
+
+            if (source === 'X-ray') {
+                const xrayFFD = diameter + 150;
+                ffd = Math.max(ffd, xrayFFD);
+            }
+
+            minFFD = ffd;
+            document.getElementById("sfd").value = ffd.toFixed(2);
+            
+            const userFFD = parseFloat(document.getElementById("sfd").value);
+            if (userFFD < minFFD) {
+                document.getElementById("ffd-warning").innerText = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
+            } else {
+                document.getElementById("ffd-warning").innerText = "";
+            }
+        }
+
 
         // Show/hide options based on procedure
         document.getElementById("procedure").addEventListener("change", function() {
@@ -198,7 +267,7 @@
             const ofaInput = document.getElementById("ofa");
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
             const diameter = parseFloat(document.getElementById("diameter").value);
-            const optieDiv = document.getElementById("optie").parentElement;
+            const optieDiv = document.getElementById("optieDiv");
 
             if (technique === "SWSI" || technique === "DWSI") {
                 ofaInput.value = wanddikte;
@@ -220,13 +289,17 @@
         document.getElementById("brongrootte").addEventListener("input", function() {
             const selectedLabel = this.value;
             const sourceSelect = document.getElementById("source");
+            
+            if (selectedLabel.toLowerCase().includes('yxlon') || selectedLabel.toLowerCase().includes('balteau')) {
+                sourceSelect.value = 'X-ray';
+                return;
+            }
+
             const bron = bronnenData.find(b => b.label === selectedLabel);
 
             if (bron) {
                 if (bron.type === 'Se75' || bron.type === 'Ir192') {
                     sourceSelect.value = bron.type;
-                } else if (bron.name.toLowerCase().includes('yxlon') || bron.name.toLowerCase().includes('balteau')) {
-                    sourceSelect.value = 'X-ray';
                 }
             }
         });
@@ -266,14 +339,11 @@
         }
 
         function calculate() {
+            updateFFD();
             // Get all input values
             const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
-            const brongrootteValue = document.getElementById("brongrootte").value;
-            const bron = bronnenData.find(b => b.label === brongrootteValue);
-            const brongrootte = bron ? bron.size : parseFloat(brongrootteValue);
-            
             const ofa = parseFloat(document.getElementById("ofa").value);
             let sfd = parseFloat(document.getElementById("sfd").value);
             const source = document.getElementById("source").value;
@@ -381,38 +451,6 @@
             }
             document.getElementById("wire-result").innerText = "Vereist draadje: " + wire;
 
-            // --- 2. Calculate Minimum FFD ---
-            let ffd = 0;
-            const optie = document.getElementById("optie").value;
-            const centraal = optie === '1';
-            const excentrisch = optie === '2';
-
-            if (procedure === "ASME") {
-                if (wanddikte < 50) ffd = (brongrootte * ofa) / 0.51 + ofa;
-                else if (wanddikte < 75) ffd = (brongrootte * ofa) / 0.76 + ofa;
-                else if (wanddikte <= 100) ffd = (brongrootte * ofa) / 1.02 + ofa;
-                else {
-                    document.getElementById("ffd-result").innerText = "Wanddikte te groot voor ASME berekening.";
-                    return;
-                }
-            } else { // EN-A or EN-B
-                let factor = (procedure === "EN-A") ? 7.5 : 15;
-                let basis = brongrootte * factor * Math.pow(ofa, 2 / 3);
-                if (centraal) basis *= 0.5;
-                if (excentrisch) basis *= 0.8;
-                ffd = basis + ofa;
-            }
-
-            if (source === 'X-ray') {
-                const xrayFFD = diameter + 150;
-                ffd = Math.max(ffd, xrayFFD);
-            }
-
-            document.getElementById("ffd-result").innerText = `Minimale FFD: ${ffd.toFixed(2)} mm`;
-            document.getElementById("sfd").value = ffd.toFixed(2);
-            sfd = ffd;
-
-
             // --- 3. Plot Exposures ---
             const technique = document.getElementById("technique").value;
             document.getElementById('container1A').style.display = 'none';
@@ -468,7 +506,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             laadBronnenCSV();
-            document.getElementById("optie").parentElement.style.display = "none";
+            document.getElementById("optieDiv").style.display = "none";
         });
     </script>
 </body>
