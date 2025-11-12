@@ -256,12 +256,18 @@
             bronKeuzesDatalist.innerHTML = '';
 
             if (procedure === "ASME") {
-                // For ASME, show all bronnenData options
+                // For ASME, show all bronnenData options AND hardcoded X-ray options
                 bronnenData.forEach(bron => {
                     const option = document.createElement('option');
                     option.value = bron.label;
                     bronKeuzesDatalist.appendChild(option);
                 });
+                // Add hardcoded X-ray options
+                bronKeuzesDatalist.innerHTML += `
+                    <option value="Yxlon (3 mm)"></option>
+                    <option value="Yxlon Smart (1 mm)"></option>
+                    <option value="Balteau (2.5 mm)"></option>
+                `;
             } else if (source === 'X-ray') {
                 bronKeuzesDatalist.innerHTML = `
                     <option value="Yxlon (3 mm)"></option>
