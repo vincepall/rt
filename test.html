@@ -575,8 +575,7 @@
 
             // --- 1. Calculate Required Wire ---
             let wire = "Onbekend";
-            if (procedure === "EN-B") {
-                // const technique = document.getElementById("technique").value; // Already defined above
+            if (procedure.startsWith("EN-B_")) { // Changed condition to check for combined EN-B procedures
                 let doorstraaldeDikte = 2 * wanddikte;
 
                 if (technique === "SWSI") {
