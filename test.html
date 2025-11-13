@@ -179,6 +179,17 @@
                     <option value="2">Excentrisch</option>
                 </select>
             </div>
+            <div class="form-item" id="ovaaltjeDiv" style="display:none;">
+                <label for="ovaaltje">Ovaaltje:</label>
+                <select id="ovaaltje" name="ovaaltje">
+                    <option value="Nee">Nee</option>
+                    <option value="Ja">Ja</option>
+                </select>
+            </div>
+            <div class="form-item" id="lasbreedteDiv" style="display:none;">
+                <label for="lasbreedte">Lasbreedte (mm):</label>
+                <input type="number" id="lasbreedte" name="lasbreedte" step="0.01">
+            </div>
         </div>
         <div class="form-item">
             <label for="brongrootte">Brongrootte in mm:</label>
@@ -224,6 +235,7 @@
         <p id="wire-result"></p>
         <p id="min-ffd-result" style="color: yellow;"></p>
         <p id="film-quality-result" style="color: yellow;"></p>
+        <p id="verzet-result" style="color: yellow;"></p>
 
         <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
             <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
@@ -250,7 +262,7 @@
         let minFFD = 0;
 
         // Add event listeners to all relevant inputs for auto-update
-        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "technique", "source", "optie", "asmeTechnique", "weldType"].forEach(id => {
+        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "technique", "source", "optie", "asmeTechnique", "weldType", "ovaaltje", "lasbreedte"].forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener("input", autoCalculate);
@@ -277,6 +289,17 @@
                 ovenMateriaalDiv.style.display = "none";
             }
             autoCalculate(); // Recalculate when sub-procedure changes
+        });
+
+        document.getElementById("ovaaltje").addEventListener("change", function() {
+            const ovaaltje = this.value;
+            const lasbreedteDiv = document.getElementById("lasbreedteDiv");
+            if (ovaaltje === "Ja") {
+                lasbreedteDiv.style.display = "flex";
+            } else {
+                lasbreedteDiv.style.display = "none";
+            }
+            autoCalculate();
         });
 
 
@@ -318,74 +341,35 @@
         function autoCalculate() {
             handleCentraalAutoFill(); // New: Auto-fill FFD and OFA for Centraal
             handleDiameterTechniqueRestriction();
-            updateOFAForASME();
+            updateOFA(); // Consolidated OFA update
             updateFFD();
             calculateResults();
         }
 
-        function handleCentraalAutoFill() {
-            const procedure = document.getElementById("procedure").value;
-            const optie = document.getElementById("optie").value;
-            const diameter = parseFloat(document.getElementById("diameter").value);
-            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
-            const sfdInput = document.getElementById("sfd");
-            const ofaInput = document.getElementById("ofa");
-
-            if ((procedure === "EN-A" || procedure === "EN-B") && optie === '1' && !isNaN(diameter) && !isNaN(wanddikte)) {
-                sfdInput.value = (diameter / 2).toFixed(2);
-                ofaInput.value = wanddikte.toFixed(2);
-            }
-        }
-
-        function handleDiameterTechniqueRestriction() {
-            const procedure = document.getElementById("procedure").value;
-            const diameter = parseFloat(document.getElementById("diameter").value);
-            const techniqueSelect = document.getElementById("technique");
-
-            // Always enable all options first to reset previous states
-            Array.from(techniqueSelect.options).forEach(option => {
-                option.disabled = false;
-            });
-
-            if (!isNaN(diameter)) {
-                if (diameter > 100) {
-                    // If diameter > 100, DWDI is not an option
-                    Array.from(techniqueSelect.options).forEach(option => {
-                        if (option.value === "DWDI") {
-                            option.disabled = true;
-                        }
-                    });
-                    // If DWDI is currently selected, change it to SWSI (or another valid default)
-                    if (techniqueSelect.value === "DWDI") {
-                        techniqueSelect.value = "SWSI";
-                    }
-                } else if ((procedure === "EN-A" || procedure === "EN-B") && diameter < 100) {
-                    // If diameter < 100 and EN-A/EN-B, only DWDI is allowed
-                    Array.from(techniqueSelect.options).forEach(option => {
-                        if (option.value === "SWSI" || option.value === "DWSI") {
-                            option.disabled = true;
-                        }
-                    });
-                    // If current technique is not DWDI, set it to DWDI
-                    if (techniqueSelect.value !== "DWDI") {
-                        techniqueSelect.value = "DWDI";
-                    }
-                }
-            }
-        }
-
-        function updateOFAForASME() {
+        function updateOFA() {
             const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
             const ofaInput = document.getElementById("ofa");
+            const technique = document.getElementById("technique").value;
 
-            if (procedure === "ASME" && !isNaN(diameter) && !isNaN(wanddikte)) {
+            if (isNaN(diameter) || isNaN(wanddikte)) {
+                return;
+            }
+
+            if (procedure === "ASME") {
                 if (diameter < 100) {
                     ofaInput.value = diameter.toFixed(2);
                 } else {
                     ofaInput.value = wanddikte.toFixed(2);
                 }
+            } else if ((procedure === "EN-A" || procedure === "EN-B") && technique === "DWDI" && diameter < 100) {
+                // New rule: If diameter < 100 and DWDI, OFA is always diameter
+                ofaInput.value = diameter.toFixed(2);
+            } else if (technique === "SWSI" || technique === "DWSI") {
+                ofaInput.value = wanddikte.toFixed(2);
+            } else if (technique === "DWDI") {
+                ofaInput.value = diameter.toFixed(2);
             }
         }
 
@@ -486,17 +470,20 @@
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
             const diameter = parseFloat(document.getElementById("diameter").value);
             const optieDiv = document.getElementById("optieDiv");
+            const ovaaltjeDiv = document.getElementById("ovaaltjeDiv");
+            const lasbreedteDiv = document.getElementById("lasbreedteDiv");
 
             if (technique === "SWSI" || technique === "DWSI") {
                 ofaInput.value = wanddikte;
+                optieDiv.style.display = "flex";
+                ovaaltjeDiv.style.display = "none";
+                lasbreedteDiv.style.display = "none";
             } else if (technique === "DWDI") {
                 ofaInput.value = diameter;
-            }
-
-            if (technique === "SWSI") {
-                optieDiv.style.display = "flex";
-            } else {
                 optieDiv.style.display = "none";
+                ovaaltjeDiv.style.display = "flex";
+                // Hide lasbreedteDiv by default, it will be shown by ovaaltje listener
+                lasbreedteDiv.style.display = "none";
             }
             autoCalculate(); // Ensure everything recalculates
         });
@@ -574,6 +561,8 @@
             let sfd = parseFloat(document.getElementById("sfd").value);
             const source = document.getElementById("source").value;
             const technique = document.getElementById("technique").value;
+            const ovaaltje = document.getElementById("ovaaltje").value;
+            const lasbreedte = parseFloat(document.getElementById("lasbreedte").value);
 
             // Check diameter warning
             const diameterWarningDiv = document.getElementById("diameter-warning");
@@ -600,7 +589,7 @@
             // --- 1. Calculate Required Wire ---
             let wire = "Onbekend";
             if (procedure === "EN-B") {
-                const technique = document.getElementById("technique").value;
+                // const technique = document.getElementById("technique").value; // Already defined above
                 let doorstraaldeDikte = 2 * wanddikte;
 
                 if (technique === "SWSI") {
@@ -771,10 +760,28 @@
             document.getElementById('container1B').style.display = 'none';
             document.getElementById('container2B').style.display = 'none';
             document.getElementById('diameterAntwoord').style.display = 'none';
+            document.getElementById('verzet-result').style.display = 'none'; // Hide verzet result by default
 
             if (!centraal) { // Only show images if Centraal is NOT selected
                 if (technique === "DWDI") {
-                    document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 (opstelling 11,F) of 3 (opstelling 12,G)</strong>';
+                    if (ovaaltje === "Ja") {
+                        document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 Opnames onder 90 graden</strong>';
+                        // Calculate verzet
+                        if (!isNaN(diameter) && !isNaN(wanddikte) && !isNaN(lasbreedte) && !isNaN(sfd)) {
+                            // Conditions for Opstelling 11 / F
+                            if (diameter > 100 || wanddikte > 8 || lasbreedte > (diameter / 4)) {
+                                document.getElementById('verzet-result').innerText = "Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.";
+                                document.getElementById('verzet-result').style.display = 'block';
+                            } else {
+                                const A = sfd - diameter;
+                                const verzet = 1.5 * lasbreedte * (A / diameter);
+                                document.getElementById('verzet-result').innerText = `Het benodigde verzet is: ${verzet.toFixed(2)} mm`;
+                                document.getElementById('verzet-result').style.display = 'block';
+                            }
+                        }
+                    } else { // Ovaaltje is Nee
+                        document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 3 Opnames onder 60 / 120 graden</strong>';
+                    }
                     document.getElementById('diameterAntwoord').style.display = 'block';
                     return;
                 }
