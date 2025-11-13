@@ -272,13 +272,13 @@
                 element.addEventListener("change", autoCalculate);
             }
         });
-        
+
         // Add separate listener for manual FFD changes
         document.getElementById("sfd").addEventListener("input", function() {
             checkFFDWarning();
             autoCalculate();
         });
-        
+
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
         document.getElementById("optie").addEventListener("change", autoCalculate);
@@ -339,6 +339,43 @@
                     bronKeuzesDatalist.appendChild(option);
                 });
             }
+        }
+
+        function handleDiameterTechniqueRestriction() {
+            const procedure = document.getElementById("procedure").value;
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const techniqueSelect = document.getElementById("technique");
+            const swsiOption = techniqueSelect.querySelector('option[value="SWSI"]');
+            const dwsiOption = techniqueSelect.querySelector('option[value="DWSI"]');
+            const dwdiOption = techniqueSelect.querySelector('option[value="DWDI"]');
+
+            if (isNaN(diameter) || (procedure !== "EN-A" && procedure !== "EN-B")) {
+                // If diameter is not a number or not EN-A/EN-B, enable all options
+                if (swsiOption) swsiOption.disabled = false;
+                if (dwsiOption) dwsiOption.disabled = false;
+                if (dwdiOption) dwdiOption.disabled = false;
+                return;
+            }
+
+            if (diameter < 100) {
+                // Diameter < 100mm, force DWDI
+                if (techniqueSelect.value !== "DWDI") {
+                    techniqueSelect.value = "DWDI";
+                }
+                if (swsiOption) swsiOption.disabled = true;
+                if (dwsiOption) dwsiOption.disabled = true;
+                if (dwdiOption) dwdiOption.disabled = false;
+            } else {
+                // Diameter >= 100mm, force SWSI or DWSI
+                if (techniqueSelect.value === "DWDI") {
+                    techniqueSelect.value = "SWSI"; // Default to SWSI if DWDI was selected
+                }
+                if (swsiOption) swsiOption.disabled = false;
+                if (dwsiOption) dwsiOption.disabled = false;
+                if (dwdiOption) dwdiOption.disabled = true;
+            }
+            // Trigger autoCalculate to update other fields based on new technique
+            autoCalculate();
         }
 
         function autoCalculate() {
@@ -534,7 +571,7 @@
                 console.error("Kon bronnen.csv niet laden.", error);
             }
         }
-        
+
         function createCrosshair(x, y) {
             const cross = document.createElement('div');
             cross.className = 'crosshair';
@@ -550,7 +587,7 @@
             // Calculate minFFD but don't update the field value
             calculateMinFFD();
             calculateResults();
-            
+
             // Scroll to results section
             document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
         }
@@ -652,7 +689,7 @@
             } else if (procedure === "ASME") {
                 const asmeTechnique = document.getElementById("asmeTechnique").value;
                 const weldType = document.getElementById("weldType").value;
-                
+
                 let maxOverdikte = 0;
                 if (weldType === "A" || weldType === "D") {
                     if (wanddikte <= 2.4) maxOverdikte = 0.8;
@@ -774,8 +811,7 @@
                             // Conditions for Opstelling 11 / F
                             const verzetResultElement = document.getElementById('verzet-result');
                             if (diameter > 100 || wanddikte > 8 || lasbreedte > (diameter / 4)) {
-                                verzetResultElement.innerText = "Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.";
-                                verzetResultElement.classList.add('red-text');
+                                verzetResultElement.innerHTML = '<strong class="red-text">Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.</strong>';
                                 verzetResultElement.style.display = 'block';
                             } else {
                                 const A = sfd - diameter;
@@ -792,11 +828,7 @@
                     return;
                 }
 
-                if (diameter <= 100) {
-                    document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G</strong>';
-                    document.getElementById('diameterAntwoord').style.display = 'block';
-                    return;
-                }
+
 
                 const klasse = (procedure === 'EN-A' || procedure === 'ASME') ? 'A' : 'B';
                 const t_plot = ofa;
@@ -833,7 +865,7 @@
 
                 container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
                 container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
-                
+
                 // Only add crosshair to second container if NOT DWSI
                 if (technique !== "DWSI") {
                     container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
@@ -847,7 +879,7 @@
             if (procedure === "RT20230059") {
                 // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
                 if (source !== "Se75") return "Alleen Se75 is toegestaan";
-                
+
                 if (w > 0 && w <= 14) {
                     /* AANPASSING 1: D4 met Zwarting 2.6 toegevoegd */
                     return "D4 (Zwarting 2.6)";
@@ -862,8 +894,8 @@
             if (procedure === "RT21002") {
                 return "D7"; // Altijd D7 voor RT21002
             }
-            
-            var quality = "/"; 
+
+            var quality = "/";
 
             // Definitie van de tabellen (gebaseerd op de CSV)
             var tables = {
@@ -918,7 +950,7 @@
                 dikteRange = ">50mm";
             } else {
                 // Als w niet in een bereik valt
-                return "Ongeldige dikte"; 
+                return "Ongeldige dikte";
             }
 
             if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
@@ -931,7 +963,7 @@
 
             // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
             if (procedure === "RT16172" && ovenMateriaal === "Ja") {
-                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja' 
+                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja'
                 return "D4";
             }
 
