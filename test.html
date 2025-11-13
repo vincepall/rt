@@ -115,6 +115,9 @@
             border-radius: 5px;
             display: none;
         }
+        .red-text {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -769,14 +772,17 @@
                         // Calculate verzet
                         if (!isNaN(diameter) && !isNaN(wanddikte) && !isNaN(lasbreedte) && !isNaN(sfd)) {
                             // Conditions for Opstelling 11 / F
+                            const verzetResultElement = document.getElementById('verzet-result');
                             if (diameter > 100 || wanddikte > 8 || lasbreedte > (diameter / 4)) {
-                                document.getElementById('verzet-result').innerText = "Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.";
-                                document.getElementById('verzet-result').style.display = 'block';
+                                verzetResultElement.innerText = "Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.";
+                                verzetResultElement.classList.add('red-text');
+                                verzetResultElement.style.display = 'block';
                             } else {
                                 const A = sfd - diameter;
                                 const verzet = 1.5 * lasbreedte * (A / diameter);
-                                document.getElementById('verzet-result').innerText = `Het benodigde verzet is: ${verzet.toFixed(2)} mm`;
-                                document.getElementById('verzet-result').style.display = 'block';
+                                verzetResultElement.innerText = `Het benodigde verzet is: ${verzet.toFixed(2)} mm`;
+                                verzetResultElement.classList.remove('red-text');
+                                verzetResultElement.style.display = 'block';
                             }
                         }
                     } else { // Ovaaltje is Nee
