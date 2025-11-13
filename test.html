@@ -129,10 +129,7 @@
             <select id="procedure" name="procedure" required>
                 <option value="" disabled selected>Selecteer procedure</option>
                 <option value="EN-A">EN-Klasse A</option>
-                <option value="EN-B_RT21013">EN-Klasse B (RT21013)</option>
-                <option value="EN-B_RT16172">EN-Klasse B (RT16172 Sabic)</option>
-                <option value="EN-B_RT14171">EN-Klasse B (RT14171 Sitech)</option>
-                <option value="EN-B_RT20230059">EN-Klasse B (RT20230059 Haffmans)</option>
+                <option value="EN-B">EN-Klasse B</option>
                 <option value="ASME">ASME</option>
             </select>
         </div>
@@ -161,12 +158,13 @@
                     <option value="Ir192">Ir-192</option>
                 </select>
             </div>
-             <div class="form-item" id="optieDiv" style="display:none;">
-                <label for="optie">Centraal of Excentrisch:</label>
-                <select id="optie" name="optie">
-                    <option value="">Nee</option>
-                    <option value="1">Centraal</option>
-                    <option value="2">Excentrisch</option>
+            <div class="form-item" id="enBSubProcedureDiv" style="display:none;">
+                <label for="enBSubProcedure">EN-B Sub-procedure:</label>
+                <select id="enBSubProcedure" name="enBSubProcedure">
+                    <option value="RT21013">RT21013 EN-B</option>
+                    <option value="RT16172">RT16172 Sabic</option>
+                    <option value="RT14171">RT14171 Sitech</option>
+                    <option value="RT20230059">RT 2023 0059 Haffmans</option>
                 </select>
             </div>
             <div class="form-item" id="ovenMateriaalDiv" style="display:none;">
@@ -174,6 +172,14 @@
                 <select id="ovenMateriaal" name="ovenMateriaal">
                     <option value="Nee">Nee</option>
                     <option value="Ja">Ja</option>
+                </select>
+            </div>
+             <div class="form-item" id="optieDiv" style="display:none;">
+                <label for="optie">Centraal of Excentrisch:</label>
+                <select id="optie" name="optie">
+                    <option value="">Nee</option>
+                    <option value="1">Centraal</option>
+                    <option value="2">Excentrisch</option>
                 </select>
             </div>
             <div class="form-item" id="ovaaltjeDiv" style="display:none;">
@@ -231,8 +237,8 @@
         <div class="ffd-warning" id="ffd-result-warning"></div>
         <p id="wire-result"></p>
         <p id="min-ffd-result" style="color: yellow;"></p>
-        <p id="film-quality-result"></p>
-        <p id="verzet-result"></p>
+        <p id="film-quality-result" style="color: yellow;"></p>
+        <p id="verzet-result" style="color: yellow;"></p>
 
         <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
             <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
@@ -276,6 +282,17 @@
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
         document.getElementById("optie").addEventListener("change", autoCalculate);
+
+        document.getElementById("enBSubProcedure").addEventListener("change", function() {
+            const enBSubProcedure = this.value;
+            const ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
+            if (enBSubProcedure === "RT16172") {
+                ovenMateriaalDiv.style.display = "flex";
+            } else {
+                ovenMateriaalDiv.style.display = "none";
+            }
+            autoCalculate(); // Recalculate when sub-procedure changes
+        });
 
         document.getElementById("ovaaltje").addEventListener("change", function() {
             const ovaaltje = this.value;
@@ -361,10 +378,6 @@
 
         function updateFFD() {
             calculateMinFFD();
-            const sfdInput = document.getElementById("sfd");
-            if (sfdInput.value === "" && !isNaN(minFFD)) {
-                sfdInput.value = minFFD.toFixed(2);
-            }
             checkFFDWarning();
         }
 
@@ -428,29 +441,27 @@
 
         // Show/hide options based on procedure
         document.getElementById("procedure").addEventListener("change", function() {
-            var procedure = this.value; // Use 'this.value' for the selected procedure
-            var enOptionsDiv = document.getElementById("enOptions");
-            var asmeOptionsDiv = document.getElementById("asmeOptions");
-            var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
+            var procedure = document.getElementById("procedure").value;
+            var enBSubProcedureDiv = document.getElementById("enBSubProcedureDiv");
+            var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv"); // Get ovenMateriaalDiv
 
-            if (procedure.startsWith("EN-") || procedure === "EN-A") {
-                enOptionsDiv.style.display = "block";
-                asmeOptionsDiv.style.display = "none";
-                
-                if (procedure === "EN-B_RT16172") {
-                    ovenMateriaalDiv.style.display = "flex";
-                } else {
+            if (procedure === "EN-A" || procedure === "EN-B") {
+                document.getElementById("enOptions").style.display = "block";
+                document.getElementById("asmeOptions").style.display = "none";
+                if (procedure === "EN-B") {
+                    enBSubProcedureDiv.style.display = "flex"; // Show sub-procedure dropdown for EN-B
+                    // Hide ovenMateriaalDiv by default, it will be shown by enBSubProcedure listener
                     ovenMateriaalDiv.style.display = "none";
+                } else {
+                    enBSubProcedureDiv.style.display = "none"; // Hide for EN-A
+                    ovenMateriaalDiv.style.display = "none"; // Hide for EN-A
                 }
-            } else if (procedure === "ASME") {
-                enOptionsDiv.style.display = "none";
-                asmeOptionsDiv.style.display = "block";
-                ovenMateriaalDiv.style.display = "none";
+            } else { // ASME
+                document.getElementById("enOptions").style.display = "none";
+                document.getElementById("asmeOptions").style.display = "block";
+                enBSubProcedureDiv.style.display = "none"; // Hide for ASME
+                ovenMateriaalDiv.style.display = "none"; // Hide for ASME
                 updateBronGrootteOptions(); // Call to update brongrootte options for ASME
-            } else { // Handle empty selection or other cases
-                enOptionsDiv.style.display = "none";
-                asmeOptionsDiv.style.display = "none";
-                ovenMateriaalDiv.style.display = "none";
             }
             handleDiameterTechniqueRestriction(); // Call to handle technique restriction
             autoCalculate(); // Ensure everything recalculates
@@ -458,15 +469,20 @@
 
         document.getElementById("technique").addEventListener("change", function() {
             const technique = this.value;
+            const ofaInput = document.getElementById("ofa");
+            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            const diameter = parseFloat(document.getElementById("diameter").value);
             const optieDiv = document.getElementById("optieDiv");
             const ovaaltjeDiv = document.getElementById("ovaaltjeDiv");
             const lasbreedteDiv = document.getElementById("lasbreedteDiv");
 
             if (technique === "SWSI" || technique === "DWSI") {
+                ofaInput.value = wanddikte;
                 optieDiv.style.display = "flex";
                 ovaaltjeDiv.style.display = "none";
                 lasbreedteDiv.style.display = "none";
             } else if (technique === "DWDI") {
+                ofaInput.value = diameter;
                 optieDiv.style.display = "none";
                 ovaaltjeDiv.style.display = "flex";
                 // Hide lasbreedteDiv by default, it will be shown by ovaaltje listener
@@ -575,7 +591,8 @@
 
             // --- 1. Calculate Required Wire ---
             let wire = "Onbekend";
-            if (procedure.startsWith("EN-B_")) { // Changed condition to check for combined EN-B procedures
+            if (procedure === "EN-B") {
+                // const technique = document.getElementById("technique").value; // Already defined above
                 let doorstraaldeDikte = 2 * wanddikte;
 
                 if (technique === "SWSI") {
@@ -716,11 +733,11 @@
             }
 
             if (procedure === "EN-A") {
-                filmQualityProcedure = "EN-A";
-            } else if (procedure.startsWith("EN-B_")) {
-                filmQualityProcedure = procedure; // Use the full combined string
+                filmQualityProcedure = "RT21013"; // Default EN-B logic for EN-A
+            } else if (procedure === "EN-B") {
+                filmQualityProcedure = document.getElementById("enBSubProcedure").value;
             } else if (procedure === "ASME") {
-                filmQualityProcedure = "ASME";
+                filmQualityProcedure = "RT21002";
             }
 
             // Map X-ray source from test.html to filmkwaliteit.html's source types
@@ -730,7 +747,7 @@
             }
 
             let ovenMateriaal = "Nee";
-            if (procedure === "EN-B_RT16172") { // Check against the combined procedure string
+            if (filmQualityProcedure === "RT16172") {
                 ovenMateriaal = document.getElementById("ovenMateriaal").value;
             }
 
@@ -765,7 +782,6 @@
                                 const verzet = 1.5 * lasbreedte * (A / diameter);
                                 verzetResultElement.innerText = `Het benodigde verzet is: ${verzet.toFixed(2)} mm`;
                                 verzetResultElement.classList.remove('red-text');
-                                verzetResultElement.style.color = 'yellow'; // Explicitly set to yellow for successful results
                                 verzetResultElement.style.display = 'block';
                             }
                         }
@@ -827,17 +843,8 @@
         }
 
         function determineFilmQuality(procedure, w, source, ovenMateriaal = "Nee") {
-            let actualProcedure = procedure;
-            if (procedure.startsWith("EN-B_")) {
-                actualProcedure = procedure.substring(5); // Extract "RTXXXXX"
-            } else if (procedure === "EN-A") {
-                actualProcedure = "RT21013"; // Default for EN-A
-            } else if (procedure === "ASME") {
-                actualProcedure = "RT21002"; // Default for ASME
-            }
-
             // DIRECTE RETURN VOOR RT20230059 (Haffmans)
-            if (actualProcedure === "RT20230059") {
+            if (procedure === "RT20230059") {
                 // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
                 if (source !== "Se75") return "Alleen Se75 is toegestaan";
                 
@@ -852,7 +859,7 @@
             }
 
             // DIRECTE RETURN VOOR RT21002
-            if (actualProcedure === "RT21002") {
+            if (procedure === "RT21002") {
                 return "D7"; // Altijd D7 voor RT21002
             }
             
@@ -888,7 +895,7 @@
                 }
             };
 
-            var selectedTable = tables[actualProcedure];
+            var selectedTable = tables[procedure];
             var dikteRange;
 
             // Bepaal de juiste dikte range op basis van procedure en dikte (w)
@@ -896,13 +903,13 @@
                 dikteRange = "0-6mm";
             } else if (w > 6 && w <= 10) {
                 dikteRange = "6-10mm";
-            } else if ((actualProcedure === "RT16172" || actualProcedure === "RT14171") && w > 10 && w <= 14) {
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) {
                 // Specifieke bereiken voor RT16172 en RT14171
                 dikteRange = "10-14mm";
-            } else if ((actualProcedure === "RT16172" || actualProcedure === "RT14171") && w > 14 && w <= 20) {
+            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) {
                 // Specifieke bereiken voor RT16172 en RT14171
                 dikteRange = "14-20mm";
-            } else if (actualProcedure === "RT21013" && w > 10 && w <= 20) {
+            } else if (procedure === "RT21013" && w > 10 && w <= 20) {
                 // Bereik 10-20mm voor RT21013
                 dikteRange = "10-20mm";
             } else if (w > 20 && w <= 50) {
@@ -923,7 +930,7 @@
             }
 
             // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
-            if (actualProcedure === "RT16172" && ovenMateriaal === "Ja") {
+            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
                 // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja' 
                 return "D4";
             }
