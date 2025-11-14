@@ -342,40 +342,29 @@
         }
 
         function handleDiameterTechniqueRestriction() {
-            const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
             const techniqueSelect = document.getElementById("technique");
             const swsiOption = techniqueSelect.querySelector('option[value="SWSI"]');
             const dwsiOption = techniqueSelect.querySelector('option[value="DWSI"]');
             const dwdiOption = techniqueSelect.querySelector('option[value="DWDI"]');
 
-            if (isNaN(diameter) || (procedure !== "EN-A" && procedure !== "EN-B")) {
-                // If diameter is not a number or not EN-A/EN-B, enable all options
-                if (swsiOption) swsiOption.disabled = false;
-                if (dwsiOption) dwsiOption.disabled = false;
-                if (dwdiOption) dwdiOption.disabled = false;
-                return;
-            }
+            if (!techniqueSelect || !swsiOption || !dwsiOption || !dwdiOption) return;
 
-            if (diameter < 100) {
-                // Diameter < 100mm, force DWDI
-                if (techniqueSelect.value !== "DWDI") {
-                    techniqueSelect.value = "DWDI";
-                }
-                if (swsiOption) swsiOption.disabled = true;
-                if (dwsiOption) dwsiOption.disabled = true;
-                if (dwdiOption) dwdiOption.disabled = false;
-            } else {
-                // Diameter >= 100mm, force SWSI or DWSI
-                if (techniqueSelect.value === "DWDI") {
-                    techniqueSelect.value = "SWSI"; // Default to SWSI if DWDI was selected
-                }
-                if (swsiOption) swsiOption.disabled = false;
-                if (dwsiOption) dwsiOption.disabled = false;
-                if (dwdiOption) dwdiOption.disabled = true;
+            const isNotNumber = isNaN(diameter);
+            const isSmallDiameter = !isNotNumber && diameter < 100;
+            const isLargeDiameter = !isNotNumber && diameter >= 100;
+
+            // Enable/disable options based on diameter. If not a number, all will be enabled.
+            swsiOption.disabled = isSmallDiameter;
+            dwsiOption.disabled = isSmallDiameter;
+            dwdiOption.disabled = isLargeDiameter;
+
+            // Adjust selection if the currently selected option is now disabled
+            if (isSmallDiameter && techniqueSelect.value !== "DWDI") {
+                techniqueSelect.value = "DWDI";
+            } else if (isLargeDiameter && techniqueSelect.value === "DWDI") {
+                techniqueSelect.value = "SWSI"; // Default to SWSI
             }
-            // Trigger autoCalculate to update other fields based on new technique
-            autoCalculate();
         }
 
         function autoCalculate() {
