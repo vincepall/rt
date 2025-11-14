@@ -240,6 +240,7 @@
         <p id="film-quality-result" style="color: yellow;"></p>
         <p id="verzet-result" style="color: yellow;"></p>
         <p id="max-kv-result" style="color: yellow;"></p>
+        <p id="activity-result" style="color: yellow;"></p>
 
         <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
             <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
@@ -574,6 +575,21 @@
             }
         });
 
+        function calculateActivityForCSV(ci1, type, firstDate, secondDate) {
+            const firstDateObj = new Date(firstDate.split('-').reverse().join('-'));
+            const timeDifference = secondDate - firstDateObj;
+            const days = timeDifference / (1000 * 3600 * 24);
+            let ci2 = 0;
+
+            if (type === "Se75") {
+                ci2 = ci1 / Math.pow(2, days / 120);
+            } else if (type === "Ir192") {
+                ci2 = ci1 / Math.pow(2, days / 74);
+            }
+
+            return ci2;
+        }
+
         async function laadBronnenCSV() {
             try {
                 const response = await fetch('bronnen.csv');
@@ -584,10 +600,12 @@
                     if (columns.length >= 5) {
                         const bronNaam = columns[0].trim();
                         const bronType = columns[1].trim();
+                        const activiteit = parseFloat(columns[2].trim());
+                        const datum = columns[3].trim();
                         const bronGrootte = columns[4].trim();
                         if (bronNaam && bronGrootte) {
                             const label = `${bronNaam} (${bronGrootte} mm)`;
-                            bronnenData.push({ name: bronNaam, type: bronType, size: parseFloat(bronGrootte), label: label });
+                            bronnenData.push({ name: bronNaam, type: bronType, size: parseFloat(bronGrootte), label: label, initialActivity: activiteit, date: datum });
                         }
                     }
                 });
@@ -839,6 +857,19 @@
 
             let filmType = determineFilmQuality(filmQualityProcedure, doorstraaldeDikte, filmQualitySource, ovenMateriaal);
             document.getElementById("film-quality-result").innerText = "Vereist filmtype: " + filmType;
+
+            const activityResultElement = document.getElementById("activity-result");
+            const brongrootteValue = document.getElementById("brongrootte").value;
+            const selectedBron = bronnenData.find(b => b.label === brongrootteValue);
+
+            if (selectedBron && (selectedBron.type === 'Se75' || selectedBron.type === 'Ir192')) {
+                const today = new Date();
+                const currentActivity = calculateActivityForCSV(selectedBron.initialActivity, selectedBron.type, selectedBron.date, today);
+                activityResultElement.innerHTML = `Bron ${selectedBron.name} is op dit moment: ${currentActivity.toFixed(2)} Ci.`;
+                activityResultElement.style.display = 'block';
+            } else {
+                activityResultElement.style.display = 'none';
+            }
 
             const optie = document.getElementById("optie").value;
             const centraal = optie === '1';
