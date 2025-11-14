@@ -354,17 +354,14 @@
             const isSmallDiameter = !isNotNumber && diameter < 100;
             const isLargeDiameter = !isNotNumber && diameter >= 100;
 
-            // Enable/disable options based on diameter. If not a number, all will be enabled.
+            // Disable DWDI if diameter >= 100
+            dwdiOption.disabled = isLargeDiameter;
+            // Disable SWSI and DWSI if diameter < 100
             swsiOption.disabled = isSmallDiameter;
             dwsiOption.disabled = isSmallDiameter;
-            dwdiOption.disabled = isLargeDiameter;
 
-            // Adjust selection if the currently selected option is now disabled
-            if (isSmallDiameter && techniqueSelect.value !== "DWDI") {
-                techniqueSelect.value = "DWDI";
-            } else if (isLargeDiameter && techniqueSelect.value === "DWDI") {
-                techniqueSelect.value = "SWSI"; // Default to SWSI
-            }
+            // If diameter is not a number, all options should be enabled.
+            // This is implicitly handled as isSmallDiameter and isLargeDiameter will be false.
         }
 
         function autoCalculate() {
