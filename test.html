@@ -867,6 +867,7 @@
                 const currentActivity = calculateActivityForCSV(selectedBron.initialActivity, selectedBron.type, selectedBron.date, today);
                 activityResultElement.innerHTML = `Bron ${selectedBron.name} is op dit moment: ${currentActivity.toFixed(2)} Ci.`;
                 activityResultElement.style.display = 'block';
+                maxKvResultElement.style.display = 'none';
             } else {
                 activityResultElement.style.display = 'none';
             }
