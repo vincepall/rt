@@ -392,9 +392,29 @@
             }
         }
 
+        function updateVisibility() {
+            const technique = document.getElementById("technique").value;
+            const optieDiv = document.getElementById("optieDiv");
+            const ovaaltjeDiv = document.getElementById("ovaaltjeDiv");
+            const lasbreedteDiv = document.getElementById("lasbreedteDiv");
+
+            // Control visibility of optieDiv ("Centraal of Excentrisch")
+            optieDiv.style.display = (technique === "SWSI") ? "flex" : "none";
+
+            // Control visibility of ovaaltjeDiv ("Ovaaltje")
+            ovaaltjeDiv.style.display = (technique === "DWDI") ? "flex" : "none";
+
+            // If the parent div is hidden, also hide the child and reset its value
+            if (ovaaltjeDiv.style.display === "none" && document.getElementById("ovaaltje").value === "Ja") {
+                document.getElementById("ovaaltje").value = "Nee";
+                lasbreedteDiv.style.display = "none";
+            }
+        }
+
         function autoCalculate() {
             handleCentraalAutoFill(); // New: Auto-fill FFD and OFA for Centraal
             handleDiameterTechniqueRestriction();
+            updateVisibility(); // Ensure visibility is always correct
             updateOFA(); // Consolidated OFA update
             updateFFD();
             calculateResults();
@@ -523,37 +543,13 @@
             const ofaInput = document.getElementById("ofa");
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
             const diameter = parseFloat(document.getElementById("diameter").value);
-            const optieDiv = document.getElementById("optieDiv");
-            const ovaaltjeDiv = document.getElementById("ovaaltjeDiv");
-            const lasbreedteDiv = document.getElementById("lasbreedteDiv");
 
-            // Update OFA based on technique
             if (technique === "SWSI" || technique === "DWSI") {
                 ofaInput.value = wanddikte;
             } else if (technique === "DWDI") {
                 ofaInput.value = diameter;
             }
-
-            // Control visibility of optieDiv ("Centraal of Excentrisch")
-            if (technique === "SWSI") {
-                optieDiv.style.display = "flex";
-            } else {
-                optieDiv.style.display = "none";
-            }
-
-            // Control visibility of ovaaltjeDiv ("Ovaaltje")
-            if (technique === "DWDI") {
-                ovaaltjeDiv.style.display = "flex";
-            } else {
-                ovaaltjeDiv.style.display = "none";
-            }
-
-            // lasbreedteDiv is controlled by ovaaltje listener, so hide it if ovaaltjeDiv is hidden
-            if (ovaaltjeDiv.style.display === "none") {
-                lasbreedteDiv.style.display = "none";
-            }
-
-            autoCalculate(); // Ensure everything recalculates
+            autoCalculate(); // This will now call updateVisibility
         });
 
         document.getElementById("brongrootte").addEventListener("input", function() {
