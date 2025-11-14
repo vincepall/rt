@@ -239,6 +239,7 @@
         <p id="min-ffd-result" style="color: yellow;"></p>
         <p id="film-quality-result" style="color: yellow;"></p>
         <p id="verzet-result" style="color: yellow;"></p>
+        <p id="max-kv-result" style="color: yellow;"></p>
 
         <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
             <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
@@ -814,6 +815,27 @@
 
             let filmType = determineFilmQuality(filmQualityProcedure, doorstraaldeDikte, filmQualitySource, ovenMateriaal);
             document.getElementById("film-quality-result").innerText = "Vereist filmtype: " + filmType;
+
+            // --- Calculate Max Kv ---
+            const maxKvResultElement = document.getElementById("max-kv-result");
+            if (source === 'X-ray' && !isNaN(wanddikte)) {
+                let maxKv = 0;
+                if (technique === 'SWSI') {
+                    maxKv = 100 + (8 * wanddikte);
+                } else if (technique === 'DWDI' || technique === 'DWSI') {
+                    maxKv = 100 + (8 * (2 * wanddikte));
+                }
+
+                if (maxKv > 0) {
+                    const maxKvUitzondering = maxKv + 50;
+                    maxKvResultElement.innerText = `Maximale Kv waarde: ${maxKv.toFixed(0)} (${maxKvUitzondering.toFixed(0)} bij uitzondering)`;
+                    maxKvResultElement.style.display = 'block';
+                } else {
+                    maxKvResultElement.style.display = 'none';
+                }
+            } else {
+                maxKvResultElement.style.display = 'none';
+            }
 
             const optie = document.getElementById("optie").value;
             const centraal = optie === '1';
