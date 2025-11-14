@@ -527,18 +527,32 @@
             const ovaaltjeDiv = document.getElementById("ovaaltjeDiv");
             const lasbreedteDiv = document.getElementById("lasbreedteDiv");
 
+            // Update OFA based on technique
             if (technique === "SWSI" || technique === "DWSI") {
                 ofaInput.value = wanddikte;
-                optieDiv.style.display = "flex";
-                ovaaltjeDiv.style.display = "none";
-                lasbreedteDiv.style.display = "none";
             } else if (technique === "DWDI") {
                 ofaInput.value = diameter;
+            }
+
+            // Control visibility of optieDiv ("Centraal of Excentrisch")
+            if (technique === "SWSI") {
+                optieDiv.style.display = "flex";
+            } else {
                 optieDiv.style.display = "none";
+            }
+
+            // Control visibility of ovaaltjeDiv ("Ovaaltje")
+            if (technique === "DWDI") {
                 ovaaltjeDiv.style.display = "flex";
-                // Hide lasbreedteDiv by default, it will be shown by ovaaltje listener
+            } else {
+                ovaaltjeDiv.style.display = "none";
+            }
+
+            // lasbreedteDiv is controlled by ovaaltje listener, so hide it if ovaaltjeDiv is hidden
+            if (ovaaltjeDiv.style.display === "none") {
                 lasbreedteDiv.style.display = "none";
             }
+
             autoCalculate(); // Ensure everything recalculates
         });
 
