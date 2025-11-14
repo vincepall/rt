@@ -373,6 +373,25 @@
             // If diameter is not a number, no selection change is needed, and all options are enabled.
         }
 
+        function handleCentraalAutoFill() {
+            const procedure = document.getElementById("procedure").value;
+            const optie = document.getElementById("optie").value;
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
+            const sfdInput = document.getElementById("sfd");
+            const ofaInput = document.getElementById("ofa");
+
+            // Only apply for EN-A/EN-B when "Centraal" is selected
+            if ((procedure === "EN-A" || procedure === "EN-B") && optie === '1') {
+                if (!isNaN(diameter)) {
+                    sfdInput.value = (diameter / 2).toFixed(2);
+                }
+                if (!isNaN(wanddikte)) {
+                    ofaInput.value = wanddikte.toFixed(2);
+                }
+            }
+        }
+
         function autoCalculate() {
             handleCentraalAutoFill(); // New: Auto-fill FFD and OFA for Centraal
             handleDiameterTechniqueRestriction();
