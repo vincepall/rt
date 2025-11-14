@@ -782,6 +782,27 @@
             }
             document.getElementById("min-ffd-result").innerHTML = minFFDOutput;
 
+            // --- Calculate Max Kv ---
+            const maxKvResultElement = document.getElementById("max-kv-result");
+            let maxKv = 0; // Declare maxKv here
+            if (source === 'X-ray' && !isNaN(wanddikte)) {
+                if (technique === 'SWSI') {
+                    maxKv = 100 + (8 * wanddikte);
+                } else if (technique === 'DWDI' || technique === 'DWSI') {
+                    maxKv = 100 + (8 * (2 * wanddikte));
+                }
+
+                if (maxKv > 0) {
+                    const maxKvUitzondering = maxKv + 50;
+                    maxKvResultElement.innerText = `Maximale Kv waarde: ${maxKv.toFixed(0)} (${maxKvUitzondering.toFixed(0)} bij uitzondering)`;
+                    maxKvResultElement.style.display = 'block';
+                } else {
+                    maxKvResultElement.style.display = 'none';
+                }
+            } else {
+                maxKvResultElement.style.display = 'none';
+            }
+
             // --- Calculate Film Quality ---
             let filmQualityProcedure = "";
             let doorstraaldeDikte = 0;
@@ -804,8 +825,11 @@
 
             // Map X-ray source from test.html to filmkwaliteit.html's source types
             if (filmQualitySource === "X-ray") {
-                // For simplicity, assume X-Ray >150Kv for now, or add a new input for voltage
-                filmQualitySource = "X-Ray >150Kv";
+                if (maxKv > 0 && maxKv < 150) {
+                    filmQualitySource = "X-Ray <150kv";
+                } else {
+                    filmQualitySource = "X-Ray >150Kv";
+                }
             }
 
             let ovenMateriaal = "Nee";
@@ -815,27 +839,6 @@
 
             let filmType = determineFilmQuality(filmQualityProcedure, doorstraaldeDikte, filmQualitySource, ovenMateriaal);
             document.getElementById("film-quality-result").innerText = "Vereist filmtype: " + filmType;
-
-            // --- Calculate Max Kv ---
-            const maxKvResultElement = document.getElementById("max-kv-result");
-            if (source === 'X-ray' && !isNaN(wanddikte)) {
-                let maxKv = 0;
-                if (technique === 'SWSI') {
-                    maxKv = 100 + (8 * wanddikte);
-                } else if (technique === 'DWDI' || technique === 'DWSI') {
-                    maxKv = 100 + (8 * (2 * wanddikte));
-                }
-
-                if (maxKv > 0) {
-                    const maxKvUitzondering = maxKv + 50;
-                    maxKvResultElement.innerText = `Maximale Kv waarde: ${maxKv.toFixed(0)} (${maxKvUitzondering.toFixed(0)} bij uitzondering)`;
-                    maxKvResultElement.style.display = 'block';
-                } else {
-                    maxKvResultElement.style.display = 'none';
-                }
-            } else {
-                maxKvResultElement.style.display = 'none';
-            }
 
             const optie = document.getElementById("optie").value;
             const centraal = optie === '1';
