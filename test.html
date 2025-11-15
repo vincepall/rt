@@ -139,7 +139,7 @@
                 <option value="ASME">ASME</option>
             </select>
         </div>
-        <div class="form-item" id="klantprocedureDiv" style="display: none;">
+        <div class="form-item" id="klantprocedureDiv">
             <label for="klantprocedureCheckbox">Klantprocedure:</label>
             <input type="checkbox" id="klantprocedureCheckbox">
         </div>
@@ -524,7 +524,6 @@
         // Show/hide options based on procedure
         document.getElementById("procedure").addEventListener("change", function() {
             var procedure = document.getElementById("procedure").value;
-            var klantprocedureDiv = document.getElementById("klantprocedureDiv");
             var klantprocedureCheckbox = document.getElementById("klantprocedureCheckbox");
             var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
 
@@ -532,9 +531,8 @@
                 document.getElementById("enOptions").style.display = "block";
                 document.getElementById("asmeOptions").style.display = "none";
                 if (procedure === "EN-B") {
-                    klantprocedureDiv.style.display = "flex";
+                    // klantprocedureDiv is always visible now
                 } else { // EN-A
-                    klantprocedureDiv.style.display = "none";
                     if (klantprocedureCheckbox.checked) {
                         klantprocedureCheckbox.checked = false;
                         klantprocedureCheckbox.dispatchEvent(new Event('change'));
@@ -543,7 +541,6 @@
             } else { // ASME
                 document.getElementById("enOptions").style.display = "none";
                 document.getElementById("asmeOptions").style.display = "block";
-                klantprocedureDiv.style.display = "none";
                 if (klantprocedureCheckbox.checked) {
                     klantprocedureCheckbox.checked = false;
                     klantprocedureCheckbox.dispatchEvent(new Event('change'));
