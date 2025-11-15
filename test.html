@@ -127,7 +127,7 @@
         }
         h1 {
             background-color: white;
-            font-size: 30px; 
+            font-size: 30px;
             color: black;
             padding: 10px;
             border-radius: 30px;
@@ -968,6 +968,9 @@
                 filmQualityProcedure = "RT21013"; // Default EN-B logic for EN-A
             } else if (procedure === "EN-B") {
                 filmQualityProcedure = document.getElementById("enBSubProcedure").value;
+                if (!filmQualityProcedure) {
+                    filmQualityProcedure = "RT21013"; // Default to standard EN-B
+                }
             } else if (procedure === "ASME") {
                 filmQualityProcedure = "RT21002";
             }
@@ -981,12 +984,17 @@
                 }
             }
 
+            let filmType;
             let ovenMateriaal = "Nee";
             if (filmQualityProcedure === "RT16172") {
                 ovenMateriaal = document.getElementById("ovenMateriaal").value;
             }
 
-            let filmType = determineFilmQuality(filmQualityProcedure, doorstraaldeDikte, filmQualitySource, ovenMateriaal);
+            if (filmQualityProcedure === "RT16172" && ovenMateriaal === "Ja") {
+                filmType = "D4";
+            } else {
+                filmType = determineFilmQuality(filmQualityProcedure, doorstraaldeDikte, filmQualitySource);
+            }
             document.getElementById("film-quality-result").innerText = "Vereist filmtype: " + filmType;
 
             const activityResultElement = document.getElementById("activity-result");
@@ -1087,7 +1095,7 @@
             }
         }
 
-        function determineFilmQuality(procedure, w, source, ovenMateriaal = "Nee") {
+        function determineFilmQuality(procedure, w, source) {
             // DIRECTE RETURN VOOR RT20230059 (Haffmans)
             if (procedure === "RT20230059") {
                 // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
@@ -1172,12 +1180,6 @@
 
             if (quality === "/") {
                 return "deze combinatie van bron en doorstraalde dikte is onlogisch";
-            }
-
-            // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
-            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
-                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja'
-                return "D4";
             }
 
             return quality;
