@@ -535,6 +535,15 @@
                 enBSubProcedureDiv.style.display = "none"; // Hide for ASME
                 ovenMateriaalDiv.style.display = "none"; // Hide for ASME
                 updateBronGrootteOptions(); // Call to update brongrootte options for ASME
+
+                // Automatically set ASME BKI placement based on current technique
+                const technique = document.getElementById("technique").value;
+                const asmeTechniqueSelect = document.getElementById("asmeTechnique");
+                if (technique === "SWSI" || technique === "DWDI") {
+                    asmeTechniqueSelect.value = "Sourceside";
+                } else if (technique === "DWSI") {
+                    asmeTechniqueSelect.value = "Filmside";
+                }
             }
             handleDiameterTechniqueRestriction(); // Call to handle technique restriction
             autoCalculate(); // Ensure everything recalculates
@@ -551,6 +560,18 @@
             } else if (technique === "DWDI") {
                 ofaInput.value = diameter;
             }
+
+            // Automatically set ASME BKI placement based on technique
+            const procedure = document.getElementById("procedure").value;
+            if (procedure === "ASME") {
+                const asmeTechniqueSelect = document.getElementById("asmeTechnique");
+                if (technique === "SWSI" || technique === "DWDI") {
+                    asmeTechniqueSelect.value = "Sourceside";
+                } else if (technique === "DWSI") {
+                    asmeTechniqueSelect.value = "Filmside";
+                }
+            }
+
             autoCalculate(); // This will now call updateVisibility
         });
 
