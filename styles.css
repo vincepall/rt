@@ -22,7 +22,7 @@ body {
          1px -1px 0 #000,
         -1px  1px 0 #000,
          1px  1px 0 #000;
-    background-image: url('bgsteel.png');
+    background-image: url('bgpunk.png');
     background-size: cover; /* This will make the image cover the entire background */
     background-position: center; /* This will center the image */
     background-repeat: no-repeat; /* This prevents the image from repeating */
