@@ -144,7 +144,7 @@
             <input type="checkbox" id="klantprocedureCheckbox">
         </div>
         <div class="form-item" id="enBSubProcedureDiv" style="display:none;">
-            <label for="enBSubProcedure">EN-B Sub-procedure:</label>
+            <label for="enBSubProcedure">Klantprocedure:</label>
             <select id="enBSubProcedure" name="enBSubProcedure">
                 <option value="RT16172">RT16172 Sabic</option>
                 <option value="RT14171">RT14171 Sitech</option>
@@ -718,7 +718,51 @@
 
             // --- 1. Calculate Required Wire ---
             let wire = "Onbekend";
-            if (procedure === "EN-B") {
+            if (procedure === "EN-A") {
+                let penetratedThickness = 0;
+                if (technique === "SWSI") {
+                    penetratedThickness = wanddikte;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 7) wire = "W14";
+                    else if (penetratedThickness <= 10) wire = "W13";
+                    else if (penetratedThickness <= 15) wire = "W12";
+                    else if (penetratedThickness <= 25) wire = "W11";
+                    else if (penetratedThickness <= 32) wire = "W10";
+                    else if (penetratedThickness <= 40) wire = "W9";
+                    else if (penetratedThickness <= 55) wire = "W8";
+                    else if (penetratedThickness <= 85) wire = "W7";
+                } else if (technique === "DWSI") {
+                    penetratedThickness = wanddikte * 2;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 10) wire = "W14";
+                    else if (penetratedThickness <= 15) wire = "W13";
+                    else if (penetratedThickness <= 22) wire = "W12";
+                    else if (penetratedThickness <= 38) wire = "W11";
+                    else if (penetratedThickness <= 48) wire = "W10";
+                    else if (penetratedThickness <= 60) wire = "W9";
+                    else if (penetratedThickness <= 85) wire = "W8";
+                } else if (technique === "DWDI") {
+                    penetratedThickness = wanddikte * 2;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 7) wire = "W14";
+                    else if (penetratedThickness <= 12) wire = "W13";
+                    else if (penetratedThickness <= 18) wire = "W12";
+                    else if (penetratedThickness <= 30) wire = "W11";
+                    else if (penetratedThickness <= 40) wire = "W10";
+                    else if (penetratedThickness <= 50) wire = "W9";
+                    else if (penetratedThickness <= 60) wire = "W8";
+                    else if (penetratedThickness <= 85) wire = "W7";
+                }
+            } else if (procedure === "EN-B") {
                 // const technique = document.getElementById("technique").value; // Already defined above
                 let doorstraaldeDikte = 2 * wanddikte;
 
