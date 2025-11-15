@@ -129,7 +129,10 @@
             <select id="procedure" name="procedure" required>
                 <option value="" disabled selected>Selecteer procedure</option>
                 <option value="EN-A">EN-Klasse A</option>
-                <option value="EN-B">EN-Klasse B</option>
+                <option value="RT21013">EN-Klasse B</option>
+                <option value="RT16172">RT16172 Sabic</option>
+                <option value="RT14171">RT14171 Sitech</option>
+                <option value="RT20230059">RT 2023 0059 Haffmans</option>
                 <option value="ASME">ASME</option>
             </select>
         </div>
@@ -141,14 +144,6 @@
             <label for="wanddikte">Wanddikte (t) in mm:</label>
             <input type="number" id="wanddikte" name="wanddikte" step="0.01" required>
         </div>
-        <div class="form-item">
-            <label for="technique">Opstelling:</label>
-            <select id="technique" name="technique">
-                <option value="SWSI">SWSI</option>
-                <option value="DWSI">DWSI</option>
-                <option value="DWDI">DWDI</option>
-            </select>
-        </div>
         <div id="enOptions" style="display:none;">
             <div class="form-item">
                 <label for="source">Stralingsbron:</label>
@@ -156,15 +151,6 @@
                     <option value="X-ray">X-ray</option>
                     <option value="Se75">Se-75</option>
                     <option value="Ir192">Ir-192</option>
-                </select>
-            </div>
-            <div class="form-item" id="enBSubProcedureDiv" style="display:none;">
-                <label for="enBSubProcedure">EN-B Sub-procedure:</label>
-                <select id="enBSubProcedure" name="enBSubProcedure">
-                    <option value="RT21013">RT21013 EN-B</option>
-                    <option value="RT16172">RT16172 Sabic</option>
-                    <option value="RT14171">RT14171 Sitech</option>
-                    <option value="RT20230059">RT 2023 0059 Haffmans</option>
                 </select>
             </div>
             <div class="form-item" id="ovenMateriaalDiv" style="display:none;">
@@ -266,6 +252,10 @@
         let bronnenData = [];
         let minFFD = 0;
 
+        function isEnB(proc) {
+            return proc === 'RT21013' || proc === 'RT16172' || proc === 'RT14171' || proc === 'RT20230059';
+        }
+
         // Add event listeners to all relevant inputs for auto-update
         ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "technique", "source", "optie", "asmeTechnique", "weldType", "ovaaltje", "lasbreedte"].forEach(id => {
             const element = document.getElementById(id);
@@ -284,17 +274,6 @@
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
         document.getElementById("optie").addEventListener("change", autoCalculate);
-
-        document.getElementById("enBSubProcedure").addEventListener("change", function() {
-            const enBSubProcedure = this.value;
-            const ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
-            if (enBSubProcedure === "RT16172") {
-                ovenMateriaalDiv.style.display = "flex";
-            } else {
-                ovenMateriaalDiv.style.display = "none";
-            }
-            autoCalculate(); // Recalculate when sub-procedure changes
-        });
 
         document.getElementById("ovaaltje").addEventListener("change", function() {
             const ovaaltje = this.value;
@@ -690,7 +669,7 @@
 
             // --- 1. Calculate Required Wire ---
             let wire = "Onbekend";
-            if (procedure === "EN-B") {
+            if (isEnB(procedure)) {
                 // const technique = document.getElementById("technique").value; // Already defined above
                 let doorstraaldeDikte = 2 * wanddikte;
 
@@ -794,7 +773,7 @@
             let minFFDOutput = "Minimale FFD: " + minFFD.toFixed(2) + " mm";
 
             // Add Centraal/Excentrisch check if applicable
-            if (procedure === "EN-A" || procedure === "EN-B") {
+            if (procedure === "EN-A" || isEnB(procedure)) {
                 const optie = document.getElementById("optie").value;
                 const centraal = optie === '1';
                 const excentrisch = optie === '2';
@@ -854,8 +833,8 @@
 
             if (procedure === "EN-A") {
                 filmQualityProcedure = "RT21013"; // Default EN-B logic for EN-A
-            } else if (procedure === "EN-B") {
-                filmQualityProcedure = document.getElementById("enBSubProcedure").value;
+            } else if (isEnB(procedure)) {
+                filmQualityProcedure = procedure;
             } else if (procedure === "ASME") {
                 filmQualityProcedure = "RT21002";
             }
