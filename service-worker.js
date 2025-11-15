@@ -54,6 +54,7 @@ const FILES_TO_CACHE = [
   '/rt/schuifje.html',
   '/rt/kvregel.html',
   '/rt/onstream.html',
+  '/rt/pruts.html',
   '/rt/gevuldeleiding.html',
   '/rt/bronkeuze2.html',
   '/rt/onstreamffd.html'
