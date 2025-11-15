@@ -129,6 +129,7 @@
 <body>
     <h1>Gecombineerde Tool</h1>
 
+    <div class="form-container">
         <div class="form-item">
             <label for="procedure">Kies de procedure:</label>
             <select id="procedure" name="procedure" required>
@@ -138,20 +139,17 @@
                 <option value="ASME">ASME</option>
             </select>
         </div>
-        <div id="en-b-extra-options" style="display: none;">
-            <div class="form-item">
-                <label for="klantprocedureCheckbox">Klantprocedure:</label>
-                <input type="checkbox" id="klantprocedureCheckbox">
-            </div>
-            <div class="form-item" id="enBSubProcedureDiv" style="display:none;">
-                <label for="enBSubProcedure">EN-B Sub-procedure:</label>
-                <select id="enBSubProcedure" name="enBSubProcedure">
-                    <option value="RT21013">RT21013 EN-B</option>
-                    <option value="RT16172">RT16172 Sabic</option>
-                    <option value="RT14171">RT14171 Sitech</option>
-                    <option value="RT20230059">RT 2023 0059 Haffmans</option>
-                </select>
-            </div>
+        <div class="form-item" id="klantprocedureDiv" style="display: none;">
+            <label for="klantprocedureCheckbox">Klantprocedure:</label>
+            <input type="checkbox" id="klantprocedureCheckbox">
+        </div>
+        <div class="form-item" id="enBSubProcedureDiv" style="display:none;">
+            <label for="enBSubProcedure">EN-B Sub-procedure:</label>
+            <select id="enBSubProcedure" name="enBSubProcedure">
+                <option value="RT16172">RT16172 Sabic</option>
+                <option value="RT14171">RT14171 Sitech</option>
+                <option value="RT20230059">RT 2023 0059 Haffmans</option>
+            </select>
         </div>
         <div class="form-item">
             <label for="diameter">Diameter (De) in mm:</label>
@@ -178,6 +176,33 @@
                     <option value="Ir192">Ir-192</option>
                 </select>
             </div>
+            <div class="form-item" id="ovenMateriaalDiv" style="display:none;">
+                <label for="ovenMateriaal">Ovenmateriaal:</label>
+                <select id="ovenMateriaal" name="ovenMateriaal">
+                    <option value="Nee">Nee</option>
+                    <option value="Ja">Ja</option>
+                </select>
+            </div>
+             <div class="form-item" id="optieDiv" style="display:none;">
+                <label for="optie">Centraal of Excentrisch:</label>
+                <select id="optie" name="optie">
+                    <option value="">Nee</option>
+                    <option value="1">Centraal</option>
+                    <option value="2">Excentrisch</option>
+                </select>
+            </div>
+            <div class="form-item" id="ovaaltjeDiv" style="display:none;">
+                <label for="ovaaltje">Ovaaltje:</label>
+                <select id="ovaaltje" name="ovaaltje">
+                    <option value="Nee">Nee</option>
+                    <option value="Ja">Ja</option>
+                </select>
+            </div>
+            <div class="form-item" id="lasbreedteDiv" style="display:none;">
+                <label for="lasbreedte">Lasbreedte (mm):</label>
+                <input type="number" id="lasbreedte" name="lasbreedte" step="0.01">
+            </div>
+        </div>
         <div class="form-item">
             <label for="brongrootte">Brongrootte in mm:</label>
             <input type="text" id="brongrootte" name="brongrootte" list="bronKeuzes" required placeholder="Kies of vul in (mm)">
@@ -499,29 +524,30 @@
         // Show/hide options based on procedure
         document.getElementById("procedure").addEventListener("change", function() {
             var procedure = document.getElementById("procedure").value;
-            var enBExtraOptions = document.getElementById("en-b-extra-options");
-            var enBSubProcedureDiv = document.getElementById("enBSubProcedureDiv");
-            var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
+            var klantprocedureDiv = document.getElementById("klantprocedureDiv");
             var klantprocedureCheckbox = document.getElementById("klantprocedureCheckbox");
+            var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
 
             if (procedure === "EN-A" || procedure === "EN-B") {
                 document.getElementById("enOptions").style.display = "block";
                 document.getElementById("asmeOptions").style.display = "none";
                 if (procedure === "EN-B") {
-                    enBExtraOptions.style.display = "block";
+                    klantprocedureDiv.style.display = "flex";
                 } else { // EN-A
-                    enBExtraOptions.style.display = "none";
-                    klantprocedureCheckbox.checked = false;
-                    enBSubProcedureDiv.style.display = "none";
-                    ovenMateriaalDiv.style.display = "none";
+                    klantprocedureDiv.style.display = "none";
+                    if (klantprocedureCheckbox.checked) {
+                        klantprocedureCheckbox.checked = false;
+                        klantprocedureCheckbox.dispatchEvent(new Event('change'));
+                    }
                 }
             } else { // ASME
                 document.getElementById("enOptions").style.display = "none";
                 document.getElementById("asmeOptions").style.display = "block";
-                enBExtraOptions.style.display = "none";
-                klantprocedureCheckbox.checked = false;
-                enBSubProcedureDiv.style.display = "none";
-                ovenMateriaalDiv.style.display = "none";
+                klantprocedureDiv.style.display = "none";
+                if (klantprocedureCheckbox.checked) {
+                    klantprocedureCheckbox.checked = false;
+                    klantprocedureCheckbox.dispatchEvent(new Event('change'));
+                }
                 updateBronGrootteOptions(); // Call to update brongrootte options for ASME
 
                 // Automatically set ASME BKI placement based on current technique
@@ -538,21 +564,18 @@
         });
 
         document.getElementById("klantprocedureCheckbox").addEventListener("change", function() {
-            const enBSubProcedureDiv = document.getElementById("enBSubProcedureDiv");
-            if (this.checked) {
-                enBSubProcedureDiv.style.display = "flex";
-            } else {
-                enBSubProcedureDiv.style.display = "none";
-            }
-            autoCalculate();
-        });
+            const subProcedureDiv = document.getElementById("enBSubProcedureDiv");
+            const procedureSelect = document.getElementById("procedure");
 
-        document.getElementById("klantprocedureCheckbox").addEventListener("change", function() {
-            const enBSubProcedureDiv = document.getElementById("enBSubProcedureDiv");
             if (this.checked) {
-                enBSubProcedureDiv.style.display = "flex";
+                if (procedureSelect.value !== "EN-B") {
+                    procedureSelect.value = "EN-B";
+                    procedureSelect.dispatchEvent(new Event('change'));
+                }
+                subProcedureDiv.style.display = "flex";
             } else {
-                enBSubProcedureDiv.style.display = "none";
+                subProcedureDiv.style.display = "none";
+                document.getElementById("ovenMateriaalDiv").style.display = "none";
             }
             autoCalculate();
         });
