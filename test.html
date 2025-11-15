@@ -720,6 +720,8 @@
             let wire = "Onbekend";
             if (procedure === "EN-A") {
                 let penetratedThickness = 0;
+                const source = document.getElementById("source").value; // Get source here
+
                 if (technique === "SWSI") {
                     penetratedThickness = wanddikte;
                     if (penetratedThickness <= 1.2) wire = "W18";
@@ -761,6 +763,21 @@
                     else if (penetratedThickness <= 50) wire = "W9";
                     else if (penetratedThickness <= 60) wire = "W8";
                     else if (penetratedThickness <= 85) wire = "W7";
+                }
+
+                // Apply edge case rules for EN-A
+                if (source === "Se75") {
+                    if (technique === "DWDI" && penetratedThickness <= 12) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if ((technique === "SWSI" || technique === "DWSI") && penetratedThickness <= 20) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    }
+                } else if (source === "Ir192") {
+                    if (technique === "DWDI" && penetratedThickness > 10 && penetratedThickness <= 25) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if ((technique === "SWSI" || technique === "DWSI") && penetratedThickness > 10 && penetratedThickness <= 40) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    }
                 }
             } else if (procedure === "EN-B") {
                 // const technique = document.getElementById("technique").value; // Already defined above
