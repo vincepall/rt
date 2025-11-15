@@ -55,7 +55,8 @@
         <label for="norm">Kies de norm:</label>
         <select id="norm" name="norm" required>
             <option value="" disabled selected>Selecteer norm</option>
-            <option value="EN">EN Klasse B</option>
+            <option value="EN-A">EN Klasse A</option>
+            <option value="EN-B">EN Klasse B</option>
             <option value="ASME">ASME</option>
         </select>
         <br><br>
@@ -115,17 +116,7 @@
     
     <img id="asmeImage" src="Lascategorie.png" alt="ASME Lastype" style="display:none; align:center;">
 
-    <script>
-        document.getElementById("norm").addEventListener("change", function() {
-            var norm = document.getElementById("norm").value;
-            if (norm === "EN") {
-                document.getElementById("enOptions").style.display = "block";
-                document.getElementById("asmeOptions").style.display = "none";
-            } else {
-                document.getElementById("enOptions").style.display = "none";
-                document.getElementById("asmeOptions").style.display = "block";
-            }
-        });
+        <script>
 
         document.getElementById("wanddikte").addEventListener("input", updateLasoverdikte);
         document.getElementById("weldType").addEventListener("change", updateLasoverdikte);
@@ -180,7 +171,52 @@
             var wanddikte = parseFloat(document.getElementById("wanddikte").value);
             var wire = "Onbekend";
 
-            if (norm === "EN") {
+            if (norm === "EN-A") {
+                var technique = document.getElementById("technique").value;
+                let penetratedThickness = 0;
+                if (technique === "SWSI") {
+                    penetratedThickness = wanddikte;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 7) wire = "W14";
+                    else if (penetratedThickness <= 10) wire = "W13";
+                    else if (penetratedThickness <= 15) wire = "W12";
+                    else if (penetratedThickness <= 25) wire = "W11";
+                    else if (penetratedThickness <= 32) wire = "W10";
+                    else if (penetratedThickness <= 40) wire = "W9";
+                    else if (penetratedThickness <= 55) wire = "W8";
+                    else if (penetratedThickness <= 85) wire = "W7";
+                } else if (technique === "DWSI") {
+                    penetratedThickness = wanddikte * 2;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 10) wire = "W14";
+                    else if (penetratedThickness <= 15) wire = "W13";
+                    else if (penetratedThickness <= 22) wire = "W12";
+                    else if (penetratedThickness <= 38) wire = "W11";
+                    else if (penetratedThickness <= 48) wire = "W10";
+                    else if (penetratedThickness <= 60) wire = "W9";
+                    else if (penetratedThickness <= 85) wire = "W8";
+                } else if (technique === "DWDI") {
+                    penetratedThickness = wanddikte * 2;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 7) wire = "W14";
+                    else if (penetratedThickness <= 12) wire = "W13";
+                    else if (penetratedThickness <= 18) wire = "W12";
+                    else if (penetratedThickness <= 30) wire = "W11";
+                    else if (penetratedThickness <= 40) wire = "W10";
+                    else if (penetratedThickness <= 50) wire = "W9";
+                    else if (penetratedThickness <= 60) wire = "W8";
+                    else if (penetratedThickness <= 85) wire = "W7";
+                }
+            } else if (norm === "EN-B") {
                 var technique = document.getElementById("technique").value;
                 var source = document.getElementById("source").value;
                 var doorstraaldeDikte = 2 * wanddikte; // Voor w = 2 * t
@@ -279,7 +315,7 @@
     var norm = document.getElementById("norm").value;
     var asmeImage = document.getElementById("asmeImage");
 
-    if (norm === "EN") {
+    if (norm === "EN-A" || norm === "EN-B") {
         document.getElementById("enOptions").style.display = "block";
         document.getElementById("asmeOptions").style.display = "none";
         asmeImage.style.display = "none";  // Verberg de afbeelding
