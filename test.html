@@ -893,6 +893,7 @@
 
             const optie = document.getElementById("optie").value;
             const centraal = optie === '1';
+            const excentrisch = optie === '2';
 
             // --- 3. Plot Exposures ---
             document.getElementById('container1A').style.display = 'none';
@@ -946,16 +947,16 @@
                     x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
                     x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
                     document.getElementById('container1B').style.display = 'block';
-                    // Only show second image if NOT DWSI
-                    if (technique !== "DWSI") {
+                    // Only show second image if NOT DWSI and not Excentrisch
+                    if (technique !== "DWSI" && !excentrisch) {
                         document.getElementById('container2B').style.display = 'block';
                     }
                 } else { // Klasse A or ASME
                     x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
                     x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
                     document.getElementById('container1A').style.display = 'block';
-                    // Only show second image if NOT DWSI
-                    if (technique !== "DWSI") {
+                    // Only show second image if NOT DWSI and not Excentrisch
+                    if (technique !== "DWSI" && !excentrisch) {
                         document.getElementById('container2A').style.display = 'block';
                     }
                 }
@@ -966,8 +967,8 @@
                 container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
                 container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
 
-                // Only add crosshair to second container if NOT DWSI
-                if (technique !== "DWSI") {
+                // Only add crosshair to second container if NOT DWSI and not Excentrisch
+                if (technique !== "DWSI" && !excentrisch) {
                     container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
                     container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
                 }
