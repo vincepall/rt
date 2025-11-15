@@ -141,15 +141,15 @@
             <label for="wanddikte">Wanddikte (t) in mm:</label>
             <input type="number" id="wanddikte" name="wanddikte" step="0.01" required>
         </div>
+        <div class="form-item">
+            <label for="technique">Opstelling:</label>
+            <select id="technique" name="technique">
+                <option value="SWSI">SWSI</option>
+                <option value="DWSI">DWSI</option>
+                <option value="DWDI">DWDI</option>
+            </select>
+        </div>
         <div id="enOptions" style="display:none;">
-            <div class="form-item">
-                <label for="technique">Opstelling:</label>
-                <select id="technique" name="technique">
-                    <option value="SWSI">SWSI</option>
-                    <option value="DWSI">DWSI</option>
-                    <option value="DWDI">DWDI</option>
-                </select>
-            </div>
             <div class="form-item">
                 <label for="source">Stralingsbron:</label>
                 <select id="source" name="source">
@@ -559,18 +559,16 @@
             const sourceSelect = document.getElementById("source");
             const procedure = document.getElementById("procedure").value;
 
-            if (procedure !== "ASME") { // Only update source if not ASME
-                if (selectedLabel.toLowerCase().includes('yxlon') || selectedLabel.toLowerCase().includes('balteau')) {
-                    sourceSelect.value = 'X-ray';
-                    return;
-                }
+            if (selectedLabel.toLowerCase().includes('yxlon') || selectedLabel.toLowerCase().includes('balteau')) {
+                sourceSelect.value = 'X-ray';
+                return;
+            }
 
-                const bron = bronnenData.find(b => b.label === selectedLabel);
+            const bron = bronnenData.find(b => b.label === selectedLabel);
 
-                if (bron) {
-                    if (bron.type === 'Se75' || bron.type === 'Ir192') {
-                        sourceSelect.value = bron.type;
-                    }
+            if (bron) {
+                if (bron.type === 'Se75' || bron.type === 'Ir192') {
+                    sourceSelect.value = bron.type;
                 }
             }
         });
