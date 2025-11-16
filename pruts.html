@@ -298,24 +298,56 @@
         let bronnenData = [];
         let minFFD = 0;
 
-        // Add event listeners to all relevant inputs for auto-update
-        ["procedure", "diameter", "wanddikte", "brongrootte", "ofa", "technique", "source", "optie", "asmeTechnique", "weldType", "ovaaltje", "lasbreedte"].forEach(id => {
+        // --- START EVENT LISTENERS ---
+
+        // Lijst van velden die automatisch invullen moeten triggeren
+        const fieldsThatTriggerAutoFill = [
+            "procedure", "diameter", "wanddikte", "brongrootte", "technique", 
+            "source", "optie", "asmeTechnique", "weldType", "ovaaltje", "lasbreedte"
+        ];
+
+        // Lijst van velden die alleen berekeningen moeten triggeren (geen auto-fill)
+        const fieldsThatTriggerCalcOnly = ["ofa", "sfd"];
+
+        // Functie die autoCalculate(true) aanroept
+        const calculateAndFill = () => autoCalculate(true);
+        
+        // Functie die autoCalculate(false) aanroept
+        const calculateWithoutFill = () => autoCalculate(false);
+
+        // Voeg listeners toe voor velden die auto-fill triggeren
+        fieldsThatTriggerAutoFill.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
-                element.addEventListener("input", autoCalculate);
-                element.addEventListener("change", autoCalculate);
+                element.addEventListener("input", calculateAndFill);
+                element.addEventListener("change", calculateAndFill);
             }
         });
 
-        // Add separate listener for manual FFD changes
+        // Voeg listeners toe voor velden die alleen berekening triggeren
+        fieldsThatTriggerCalcOnly.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                // 'input' event is voor direct typen
+                element.addEventListener("input", calculateWithoutFill);
+                // 'change' event vangt bijv. wijzigingen met pijltjes in number-fields
+                element.addEventListener("change", calculateWithoutFill);
+            }
+        });
+        
+        // De 'sfd' listener heeft ook checkFFDWarning nodig
         document.getElementById("sfd").addEventListener("input", function() {
             checkFFDWarning();
-            autoCalculate();
+            calculateWithoutFill(); // Gebruik hier de versie zonder auto-fill
         });
+        
+        // --- EINDE EVENT LISTENERS ---
+
 
         document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
 
-        document.getElementById("optie").addEventListener("change", autoCalculate);
+        // 'optie' is onderdeel van fieldsThatTriggerAutoFill, dus deze aparte listener is niet nodig
+        // document.getElementById("optie").addEventListener("change", calculateAndFill);
 
         document.getElementById("enBSubProcedure").addEventListener("change", function() {
             const enBSubProcedure = this.value;
@@ -325,7 +357,7 @@
             } else {
                 ovenMateriaalDiv.style.display = "none";
             }
-            autoCalculate(); // Recalculate when sub-procedure changes
+            calculateAndFill(); // Recalculate when sub-procedure changes
         });
 
         document.getElementById("ovaaltje").addEventListener("change", function() {
@@ -336,7 +368,7 @@
             } else {
                 lasbreedteDiv.style.display = "none";
             }
-            autoCalculate();
+            calculateAndFill();
         });
 
 
@@ -445,34 +477,65 @@
             }
         }
 
-        function autoCalculate() {
-            handleCentraalAutoFill(); // New: Auto-fill FFD and OFA for Centraal
+        function autoCalculate(shouldAutoFill = true) {
+            if (shouldAutoFill) {
+                handleCentraalAutoFill(); // Auto-fill FFD and OFA for Centraal
+                updateOFA(); // Consolidated OFA update
+            }
             handleDiameterTechniqueRestriction();
             updateVisibility(); // Ensure visibility is always correct
-            updateOFA(); // Consolidated OFA update
-            updateFFD();
-            calculateResults();
+            updateFFD(); // This calculates minFFD and checks warnings
+            calculateResults(); // This calculates all results
         }
 
+        // --- START AANGEPASTE 'SLIMME' UPDATEOFA ---
         function updateOFA() {
             const procedure = document.getElementById("procedure").value;
             const diameter = parseFloat(document.getElementById("diameter").value);
             const wanddikte = parseFloat(document.getElementById("wanddikte").value);
             const ofaInput = document.getElementById("ofa");
+            const currentOFA = parseFloat(ofaInput.value); // Huidige waarde lezen
             const technique = document.getElementById("technique").value;
+            const optie = document.getElementById("optie").value;
+
+            // Stop als 'Centraal' is geselecteerd (heeft eigen logica)
+            if (optie === '1' && (procedure === "EN-A" || procedure === "EN-B")) {
+                return;
+            }
 
             if (isNaN(diameter) || isNaN(wanddikte)) {
                 return;
             }
 
+            // --- NIEUWE LOGICA ---
+            // Controleer of de huidige OFA-waarde "handmatig" is.
+            // Een waarde is handmatig als deze bestaat (geen NaN) EN
+            // niet gelijk is aan de wanddikte EN niet gelijk is aan de diameter.
+            const isCustomOFA = !isNaN(currentOFA) &&
+                                currentOFA.toFixed(2) !== wanddikte.toFixed(2) &&
+                                currentOFA.toFixed(2) !== diameter.toFixed(2);
+
+            // Dit is de uitzonderingsregel die *altijd* moet gelden
+            const hardRuleDWDI = (procedure === "EN-A" || procedure === "EN-B") && technique === "DWDI" && diameter < 100;
+
+            // Als de waarde handmatig is EN de harde regel niet geldt, stop dan.
+            if (isCustomOFA && !hardRuleDWDI) {
+                return; // Overschrijf de handmatige waarde van de gebruiker NIET
+            }
+            
+            // --- EINDE NIEUWE LOGICA ---
+
+            // (Oude logica volgt)
+            // Als de waarde niet handmatig was (of als de harde regel geldt),
+            // pas dan de auto-fill toe.
             if (procedure === "ASME") {
                 if (diameter < 100) {
                     ofaInput.value = diameter.toFixed(2);
                 } else {
                     ofaInput.value = wanddikte.toFixed(2);
                 }
-            } else if ((procedure === "EN-A" || procedure === "EN-B") && technique === "DWDI" && diameter < 100) {
-                // New rule: If diameter < 100 and DWDI, OFA is always diameter
+            } else if (hardRuleDWDI) {
+                // Regel: Bij diameter < 100 en DWDI, OFA is *altijd* diameter
                 ofaInput.value = diameter.toFixed(2);
             } else if (technique === "SWSI" || technique === "DWSI") {
                 ofaInput.value = wanddikte.toFixed(2);
@@ -480,6 +543,7 @@
                 ofaInput.value = diameter.toFixed(2);
             }
         }
+        // --- EINDE AANGEPASTE 'SLIMME' UPDATEOFA ---
 
         function updateFFD() {
             calculateMinFFD();
@@ -508,6 +572,7 @@
 
 
             if (isNaN(diameter) || isNaN(wanddikte) || isNaN(brongrootte) || isNaN(ofa)) {
+                minFFD = 0; // Reset minFFD if inputs are invalid
                 return;
             }
 
@@ -518,6 +583,7 @@
                 else if (wanddikte <= 100) ffd = (brongrootte * ofa) / 1.02 + ofa;
                 else {
                     document.getElementById("ffd-warning").innerText = "Wanddikte te groot voor ASME berekening.";
+                    minFFD = 0;
                     return;
                 }
             } else { // EN-A or EN-B
@@ -528,18 +594,22 @@
                 ffd = basis + ofa;
             }
 
-
-
             minFFD = ffd;
-            checkFFDWarning();
         }
 
         function checkFFDWarning() {
             const userFFD = parseFloat(document.getElementById("sfd").value);
-            if (!isNaN(userFFD) && !isNaN(minFFD) && userFFD < minFFD) {
-                document.getElementById("ffd-warning").innerText = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
+            const warningSpan = document.getElementById("ffd-warning");
+            
+            if (isNaN(minFFD) || minFFD === 0) {
+                 warningSpan.innerText = "";
+                 return;
+            }
+
+            if (!isNaN(userFFD) && userFFD < minFFD) {
+                warningSpan.innerText = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
             } else {
-                document.getElementById("ffd-warning").innerText = "";
+                warningSpan.innerText = "";
             }
         }
 
@@ -580,7 +650,7 @@
                 }
             }
             handleDiameterTechniqueRestriction(); // Call to handle technique restriction
-            autoCalculate(); // Ensure everything recalculates
+            autoCalculate(true); // Ensure everything recalculates and fills
         });
 
         document.getElementById("klantprocedureCheckbox").addEventListener("change", function() {
@@ -590,6 +660,8 @@
             if (this.checked) {
                 if (procedureSelect.value !== "EN-B") {
                     procedureSelect.value = "EN-B";
+                    // Manually trigger the 'change' event for 'procedure'
+                    // Dit zorgt ervoor dat de autoCalculate(true) van die listener afgaat.
                     procedureSelect.dispatchEvent(new Event('change'));
                 }
                 subProcedureDiv.style.display = "flex";
@@ -597,33 +669,30 @@
                 subProcedureDiv.style.display = "none";
                 document.getElementById("ovenMateriaalDiv").style.display = "none";
             }
-            autoCalculate();
+            // autoCalculate(true) is hier niet per se nodig, omdat het al
+            // getriggerd wordt door de procedureSelect.dispatchEvent hierboven,
+            // of als de procedure al EN-B was. We roepen het voor de zekerheid toch aan.
+            autoCalculate(true);
         });
 
         document.getElementById("technique").addEventListener("change", function() {
-            const technique = this.value;
-            const ofaInput = document.getElementById("ofa");
-            const wanddikte = parseFloat(document.getElementById("wanddikte").value);
-            const diameter = parseFloat(document.getElementById("diameter").value);
-
-            if (technique === "SWSI" || technique === "DWSI") {
-                ofaInput.value = wanddikte;
-            } else if (technique === "DWDI") {
-                ofaInput.value = diameter;
-            }
-
+            // Deze listener wordt nu afgehandeld door de algemene 'fieldsThatTriggerAutoFill'
+            // De 'autoCalculate(true)' die daar wordt aangeroepen, is correct.
+            // De 'slimme' updateOFA functie zorgt voor de juiste afhandeling.
+            
+            // Deze extra logica hier is wel nog nodig:
             // Automatically set ASME BKI placement based on technique
             const procedure = document.getElementById("procedure").value;
             if (procedure === "ASME") {
                 const asmeTechniqueSelect = document.getElementById("asmeTechnique");
-                if (technique === "SWSI" || technique === "DWDI") {
+                if (this.value === "SWSI" || this.value === "DWDI") {
                     asmeTechniqueSelect.value = "Sourceside";
-                } else if (technique === "DWSI") {
+                } else if (this.value === "DWSI") {
                     asmeTechniqueSelect.value = "Filmside";
                 }
             }
-
-            autoCalculate(); // This will now call updateVisibility
+            
+            // autoCalculate(true); // Dit wordt al gedaan door de algemene listener
         });
 
         document.getElementById("brongrootte").addEventListener("input", function() {
@@ -633,7 +702,7 @@
 
             if (selectedLabel.toLowerCase().includes('yxlon') || selectedLabel.toLowerCase().includes('balteau')) {
                 sourceSelect.value = 'X-ray';
-                return;
+                return; // Geen autoCalculate nodig, wordt al afgehandeld door de algemene listener
             }
 
             const bron = bronnenData.find(b => b.label === selectedLabel);
@@ -643,6 +712,7 @@
                     sourceSelect.value = bron.type;
                 }
             }
+            // Geen autoCalculate nodig, wordt al afgehandeld door de algemene listener
         });
 
         function calculateActivityForCSV(ci1, type, firstDate, secondDate) {
@@ -697,10 +767,9 @@
         }
 
         function calculate() {
-            // Calculate minFFD but don't update the field value
-            calculateMinFFD();
-            calculateResults();
-
+            // Calculate minFFD maar update het veld niet, forceer een volledige herberekening
+            autoCalculate(true); // Forceer auto-fill bij handmatige "Controleer" klik
+            
             // Scroll to results section
             document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
         }
@@ -732,7 +801,7 @@
 
             // Check if FFD is below minimum and show warning in results
             const warningDiv = document.getElementById("ffd-result-warning");
-            if (!isNaN(sfd) && !isNaN(minFFD) && sfd < minFFD) {
+            if (!isNaN(sfd) && !isNaN(minFFD) && minFFD > 0 && sfd < minFFD) {
                 warningDiv.textContent = `Je gekozen FFD is lager dan de minimale FFD: ${minFFD.toFixed(2)} mm`;
                 warningDiv.style.display = 'block';
             } else {
@@ -907,7 +976,7 @@
             }
             document.getElementById("wire-result").innerText = "Vereist draadje: " + wire;
 
-            let minFFDOutput = "Minimale FFD: " + minFFD.toFixed(2) + " mm";
+            let minFFDOutput = "Minimale FFD: " + (isNaN(minFFD) || minFFD === 0 ? "N/A" : minFFD.toFixed(2) + " mm");
 
             // Add Centraal/Excentrisch check if applicable
             if (procedure === "EN-A" || procedure === "EN-B") {
@@ -915,7 +984,7 @@
                 const centraal = optie === '1';
                 const excentrisch = optie === '2';
 
-                if (centraal) {
+                if (centraal && !isNaN(minFFD) && minFFD > 0) {
                     let maxFFDAllowed = diameter / 2;
                     if (minFFD < maxFFDAllowed) {
                         minFFDOutput += `<br>✅ Centrale opstelling is toegestaan (Min. FFD < ${maxFFDAllowed.toFixed(2)} mm)`;
@@ -924,7 +993,7 @@
                     }
                 }
 
-                if (excentrisch) {
+                if (excentrisch && !isNaN(minFFD) && minFFD > 0) {
                     let maxExcentrischFFDAllowed = diameter - (ofa + 10);
                     if (minFFD < maxExcentrischFFDAllowed) {
                         minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < ${maxExcentrischFFDAllowed.toFixed(2)} mm)`;
@@ -1054,6 +1123,11 @@
                 const t_plot = ofa;
                 const De_plot = diameter;
                 const SFD = sfd;
+
+                if (isNaN(t_plot) || isNaN(De_plot) || isNaN(SFD) || De_plot === 0 || SFD === 0 || (SFD - t_plot) === 0) {
+                    // Stop als we geen geldige waarden hebben om deling door nul te voorkomen
+                    return;
+                }
 
                 const x_value1 = t_plot / De_plot;
                 const y_value1 = De_plot / SFD;
@@ -1193,8 +1267,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             laadBronnenCSV();
             document.getElementById("optieDiv").style.display = "none";
-            updateFFD(); // Calculate minFFD
-            document.getElementById("sfd").value = minFFD.toFixed(2); // Initialize FFD field
+            // Initialiseer de pagina met een berekening en auto-fill
+            autoCalculate(true);
+            
+            // Zet de FFD-waarde pas *na* de eerste autoCalculate
+            if (!isNaN(minFFD) && minFFD > 0) {
+                 document.getElementById("sfd").value = minFFD.toFixed(2); // Initialize FFD field
+            }
         });
     </script>
 </body>
