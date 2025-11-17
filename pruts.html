@@ -190,6 +190,14 @@
                 <option value="DWDI">DWDI</option>
             </select>
         </div>
+         <div class="form-item" id="optieDiv" style="display:none;">
+            <label for="optie">Centraal of Excentrisch:</label>
+            <select id="optie" name="optie">
+                <option value="">Nee</option>
+                <option value="1">Centraal</option>
+                <option value="2">Excentrisch</option>
+            </select>
+        </div>
         <div id="enOptions" style="display:none;">
             <div class="form-item">
                 <label for="source">Stralingsbron:</label>
@@ -204,14 +212,6 @@
                 <select id="ovenMateriaal" name="ovenMateriaal">
                     <option value="Nee">Nee</option>
                     <option value="Ja">Ja</option>
-                </select>
-            </div>
-             <div class="form-item" id="optieDiv" style="display:none;">
-                <label for="optie">Centraal of Excentrisch:</label>
-                <select id="optie" name="optie">
-                    <option value="">Nee</option>
-                    <option value="1">Centraal</option>
-                    <option value="2">Excentrisch</option>
                 </select>
             </div>
             <div class="form-item" id="ovaaltjeDiv" style="display:none;">
@@ -267,7 +267,7 @@
     <div id="results-section">
         <h2>Resultaten</h2>
         <p id="summary-result" style="color: yellow; background-color: #333; padding: 5px; border-radius: 5px; display: inline-block; width: fit-content; margin: 0 auto;"></p>
-        <div id="source-warning" class="ffd-warning"></div>
+        <div id="source-warning" class="diameter-warning"></div>
         <div class="diameter-warning" id="diameter-warning"></div>
         <div class="ffd-warning" id="ffd-result-warning"></div>
         <p id="wire-result"></p>
@@ -843,6 +843,9 @@
             let sfd = getFloatValue("sfd");
             const source = document.getElementById("source").value;
             const technique = document.getElementById("technique").value;
+            const optie = document.getElementById("optie").value;
+            const centraal = optie === '1';
+            const excentrisch = optie === '2';
             const ovaaltje = document.getElementById("ovaaltje").value;
             const lasbreedte = getFloatValue("lasbreedte");
 
@@ -1093,27 +1096,21 @@
             }
 
             // Add Centraal/Excentrisch check if applicable
-            if (procedure === "EN-A" || procedure === "EN-B") {
-                const optie = document.getElementById("optie").value;
-                const centraal = optie === '1';
-                const excentrisch = optie === '2';
-
-                if (centraal && !isNaN(minFFD) && minFFD > 0) {
-                    let maxFFDAllowed = diameter / 2;
-                    if (minFFD < maxFFDAllowed) {
-                        minFFDOutput += `<br>✅ Centrale opstelling is toegestaan (Min. FFD < <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
-                    } else {
-                        minFFDOutput += `<br>❌ Centrale opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
-                    }
+            if (centraal && !isNaN(minFFD) && minFFD > 0) {
+                let maxFFDAllowed = diameter / 2;
+                if (minFFD < maxFFDAllowed) {
+                    minFFDOutput += `<br>✅ Centrale opstelling is toegestaan (Min. FFD < <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
+                } else {
+                    minFFDOutput += `<br>❌ Centrale opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
                 }
+            }
 
-                if (excentrisch && !isNaN(minFFD) && minFFD > 0) {
-                    let maxExcentrischFFDAllowed = diameter - (ofa + 10);
-                    if (minFFD < maxExcentrischFFDAllowed) {
-                        minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
-                    } else {
-                        minFFDOutput += `<br>❌ Excentrische opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
-                    }
+            if (excentrisch && !isNaN(minFFD) && minFFD > 0) {
+                let maxExcentrischFFDAllowed = diameter - (ofa + 10);
+                if (minFFD < maxExcentrischFFDAllowed) {
+                    minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
+                } else {
+                    minFFDOutput += `<br>❌ Excentrische opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
                 }
             }
             document.getElementById("min-ffd-result").innerHTML = minFFDOutput;
@@ -1193,10 +1190,6 @@
                 activityResultElement.style.display = 'none';
             }
 
-            const optie = document.getElementById("optie").value;
-            const centraal = optie === '1';
-            const excentrisch = optie === '2';
-
             // --- 3. Plot Exposures ---
             document.getElementById('container1A').style.display = 'none';
             document.getElementById('container2A').style.display = 'none';
@@ -1249,10 +1242,14 @@
 
                 let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
 
+                const showContainer1 = !(technique === "SWSI" && optie === "");
+
                 if (klasse === 'B') {
                     x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
                     x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
-                    document.getElementById('container1B').style.display = 'block';
+                    if (showContainer1) {
+                        document.getElementById('container1B').style.display = 'block';
+                    }
                     // Only show second image if NOT DWSI and not Excentrisch
                     if (technique !== "DWSI" && !excentrisch) {
                         document.getElementById('container2B').style.display = 'block';
@@ -1260,7 +1257,9 @@
                 } else { // Klasse A or ASME
                     x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
                     x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
-                    document.getElementById('container1A').style.display = 'block';
+                    if (showContainer1) {
+                        document.getElementById('container1A').style.display = 'block';
+                    }
                     // Only show second image if NOT DWSI and not Excentrisch
                     if (technique !== "DWSI" && !excentrisch) {
                         document.getElementById('container2A').style.display = 'block';
@@ -1270,8 +1269,10 @@
                 const container1 = document.getElementById(`container1${klasse}`);
                 const container2 = document.getElementById(`container2${klasse}`);
 
-                container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
-                container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+                if (showContainer1) {
+                    container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
+                    container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
+                }
 
                 // Only add crosshair to second container if NOT DWSI and not Excentrisch
                 if (technique !== "DWSI" && !excentrisch) {
@@ -1392,5 +1393,7 @@
             }
         });
     </script>
+    <div style="height: 200px;"></div>
+<div style="height: 200px;"></div>
 </body>
 </html>
