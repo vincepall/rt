@@ -316,7 +316,6 @@
             ofaManuallyEdited = true;
         });
 
-        // Reset the manual edit flag when a core parameter changes
         const coreParams = ['procedure', 'diameter', 'wanddikte', 'technique'];
         coreParams.forEach(id => {
             document.getElementById(id).addEventListener('change', () => { ofaManuallyEdited = false; });
@@ -577,10 +576,9 @@
             }
         }
         
-        // *** HIGH-PRECISION QUADRATIC MODEL FUNCTION ***
+        // *** FINAL HIGH-PRECISION QUADRATIC MODEL FUNCTION ***
         function getNumberOfExposures(graphType, x, y) {
-            // Check for the impossible zone first.
-            // The dashed line is mathematically y=x. Anything below it is impossible.
+            // Check for the impossible zone first. The dashed line is mathematically y=x.
             if (y <= x) {
                 return '<span class="red-text">Onmogelijk (bron in/voorbij de wand)</span>';
             }
@@ -616,8 +614,9 @@
 
             if (y > calcBoundary(m.line_3, x)) return "2";
             if (y > calcBoundary(m.line_4, x)) return "3";
-            // The impossible zone (dashed line area) is handled by the y<=x check, so we don't need line_5
-            if (y > calcBoundary(m.line_6, x)) return "5";
+            // The impossible zone (dashed line area is y<=x) implies that if we are here, y must be > x.
+            // The region between line_4 and line_6 is the "5" region.
+            if (y > calcBoundary(m.line_6, x)) return "5"; 
             if (y > calcBoundary(m.line_7, x)) return "6";
             if (y > calcBoundary(m.line_8, x)) return "7";
             if (y > calcBoundary(m.line_9, x)) return "8";
@@ -625,9 +624,8 @@
             if (y > calcBoundary(m.line_11, x)) return "10";
             if (y <= calcBoundary(m.line_11, x) && y > 0) return "11+";
 
-            return "N/B";
+            return "4"; // If it's not impossible, and not in any other region, it must be in 4.
         }
-
 
         // --- MAIN CALCULATION AND DISPLAY ---
         function calculate() {
@@ -708,7 +706,152 @@
             }
 
             let wire = "Onbekend";
-            // Wire logic is complex and remains unchanged
+            if (procedure === "EN-A") {
+                let penetratedThickness = 0;
+                if (technique === "SWSI") {
+                    penetratedThickness = wanddikte;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 7) wire = "W14";
+                    else if (penetratedThickness <= 10) wire = "W13";
+                    else if (penetratedThickness <= 15) wire = "W12";
+                    else if (penetratedThickness <= 25) wire = "W11";
+                    else if (penetratedThickness <= 32) wire = "W10";
+                    else if (penetratedThickness <= 40) wire = "W9";
+                    else if (penetratedThickness <= 55) wire = "W8";
+                    else if (penetratedThickness <= 85) wire = "W7";
+                } else if (technique === "DWSI") {
+                    penetratedThickness = wanddikte * 2;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 10) wire = "W14";
+                    else if (penetratedThickness <= 15) wire = "W13";
+                    else if (penetratedThickness <= 22) wire = "W12";
+                    else if (penetratedThickness <= 38) wire = "W11";
+                    else if (penetratedThickness <= 48) wire = "W10";
+                    else if (penetratedThickness <= 60) wire = "W9";
+                    else if (penetratedThickness <= 85) wire = "W8";
+                } else if (technique === "DWDI") {
+                    penetratedThickness = wanddikte * 2;
+                    if (penetratedThickness <= 1.2) wire = "W18";
+                    else if (penetratedThickness <= 2.0) wire = "W17";
+                    else if (penetratedThickness <= 3.5) wire = "W16";
+                    else if (penetratedThickness <= 5) wire = "W15";
+                    else if (penetratedThickness <= 7) wire = "W14";
+                    else if (penetratedThickness <= 12) wire = "W13";
+                    else if (penetratedThickness <= 18) wire = "W12";
+                    else if (penetratedThickness <= 30) wire = "W11";
+                    else if (penetratedThickness <= 40) wire = "W10";
+                    else if (penetratedThickness <= 50) wire = "W9";
+                    else if (penetratedThickness <= 60) wire = "W8";
+                    else if (penetratedThickness <= 85) wire = "W7";
+                }
+
+                if (source === "Se75") {
+                    if (technique === "DWDI" && penetratedThickness <= 12) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if ((technique === "SWSI" || technique === "DWSI") && penetratedThickness <= 20) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    }
+                } else if (source === "Ir192") {
+                    if (technique === "DWDI" && penetratedThickness > 10 && penetratedThickness <= 25) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    } else if ((technique === "SWSI" || technique === "DWSI") && penetratedThickness > 10 && penetratedThickness <= 40) {
+                        wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    }
+                }
+            } else if (procedure === "EN-B") {
+                let doorstraaldeDikte = (technique === "SWSI") ? wanddikte : 2 * wanddikte;
+
+                if (technique === "SWSI") {
+                    if (doorstraaldeDikte <= 1.5) wire = "W19";
+                    else if (doorstraaldeDikte <= 2.5) wire = "W18";
+                    else if (doorstraaldeDikte <= 4) wire = "W17";
+                    else if (doorstraaldeDikte <= 6) wire = "W16";
+                    else if (doorstraaldeDikte <= 8) wire = "W15";
+                    else if (doorstraaldeDikte <= 12) wire = "W14";
+                    else if (doorstraaldeDikte <= 20) wire = "W13";
+                    else if (doorstraaldeDikte <= 30) wire = "W12";
+                    else if (doorstraaldeDikte <= 35) wire = "W11";
+                    else if (doorstraaldeDikte <= 45) wire = "W10";
+                    else if (doorstraaldeDikte <= 65) wire = "W9";
+                } else if (technique === "DWDI") {
+                    if (doorstraaldeDikte <= 1.5) wire = "W19";
+                    else if (doorstraaldeDikte <= 2.5) wire = "W18";
+                    else if (doorstraaldeDikte <= 4) wire = "W17";
+                    else if (doorstraaldeDikte <= 6) wire = "W16";
+                    else if (doorstraaldeDikte <= 8) wire = "W15";
+                    else if (doorstraaldeDikte <= 15) wire = "W14";
+                    else if (doorstraaldeDikte <= 25) wire = "W13";
+                    else if (doorstraaldeDikte <= 38) wire = "W12";
+                    else if (doorstraaldeDikte <= 45) wire = "W11";
+                    else if (doorstraaldeDikte <= 55) wire = "W10";
+                    else if (doorstraaldeDikte <= 70) wire = "W9";
+                } else if (technique === "DWSI") {
+                    if (doorstraaldeDikte <= 1.5) wire = "W19";
+                    else if (doorstraaldeDikte <= 2.5) wire = "W18";
+                    else if (doorstraaldeDikte <= 4) wire = "W17";
+                    else if (doorstraaldeDikte <= 6) wire = "W16";
+                    else if (doorstraaldeDikte <= 12) wire = "W15";
+                    else if (doorstraaldeDikte <= 18) wire = "W14";
+                    else if (doorstraaldeDikte <= 30) wire = "W13";
+                    else if (doorstraaldeDikte <= 45) wire = "W12";
+                    else if (doorstraaldeDikte <= 55) wire = "W11";
+                    else if (doorstraaldeDikte <= 70) wire = "W10";
+                }
+
+                if (source === "Se75") {
+                    if (technique === "SWSI"  && doorstraaldeDikte > 5 && doorstraaldeDikte <= 20) wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    else if (technique === "DWDI" && doorstraaldeDikte > 5 &&  doorstraaldeDikte <= 12) wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    else if (technique === "DWSI" && doorstraaldeDikte > 5 && doorstraaldeDikte <= 20) wire = "W" + (parseInt(wire.substring(1)) - 1);
+                } else if (source === "Ir192") {
+                    if (technique === "SWSI" && wanddikte >= 10 && wanddikte <= 40) wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    else if (technique === "DWDI" && doorstraaldeDikte > 10 && doorstraaldeDikte <= 25) wire = "W" + (parseInt(wire.substring(1)) - 1);
+                    else if (technique === "DWSI" && doorstraaldeDikte > 10 && doorstraaldeDikte <= 40) wire = "W" + (parseInt(wire.substring(1)) - 1 );
+                }
+            } else if (procedure === "ASME") {
+                const asmeTechnique = document.getElementById("asmeTechnique").value;
+                const weldType = document.getElementById("weldType").value;
+                let maxOverdikte = 0;
+                if (weldType === "A" || weldType === "D") {
+                    if (wanddikte <= 2.4) maxOverdikte = 0.8;
+                    else if (wanddikte <= 4.8) maxOverdikte = 1.5;
+                    else if (wanddikte <= 25) maxOverdikte = 2.5;
+                    else maxOverdikte = 3;
+                } else if (weldType === "B" || weldType === "C") {
+                    if (wanddikte <= 2.4) maxOverdikte = 2.5;
+                    else if (wanddikte <= 4.8) maxOverdikte = 3;
+                    else if (wanddikte <= 13) maxOverdikte = 4;
+                    else if (wanddikte <= 25) maxOverdikte = 5;
+                    else maxOverdikte = 6;
+                }
+                const effectiveWanddikte = wanddikte + maxOverdikte;
+                if (asmeTechnique === "Sourceside") {
+                    if (effectiveWanddikte <= 6.4) wire = "EN W13,ASME 5";
+                    else if (effectiveWanddikte <= 9.5) wire = "EN W12, ASME 6";
+                    else if (effectiveWanddikte <= 12.7) wire = "EN W11, ASME 7";
+                    else if (effectiveWanddikte <= 19) wire = "EN W10, ASME 8";
+                    else if (effectiveWanddikte <= 25.4) wire = "EN W9, ASME 9";
+                    else if (effectiveWanddikte <= 38.1) wire = "EN W8, ASME 10";
+                    else if (effectiveWanddikte <= 50.8) wire = "EN W7, ASME 11";
+                    else if (effectiveWanddikte <= 63.5) wire = "EN W6, ASME 12";
+                    else wire = "EN W5, ASME 13";
+                } else { // Film side
+                    if (effectiveWanddikte <= 6.4) wire = "EN W14,ASME 4";
+                    else if (effectiveWanddikte <= 9.5) wire = "EN W13, ASME 5";
+                    else if (effectiveWanddikte <= 12.7) wire = "EN W12, ASME 6";
+                    else if (effectiveWanddikte <= 19) wire = "EN W11, ASME 7";
+                    else if (effectiveWanddikte <= 25.4) wire = "EN W10, ASME 8";
+                    else if (effectiveWanddikte <= 38.1) wire = "EN W9, ASME 9";
+                    else if (effectiveWanddikte <= 50.8) wire = "EN W8, ASME 10";
+                    else if (effectiveWanddikte <= 63.5) wire = "EN W7, ASME 11";
+                    else wire = "EN W6, ASME 12";
+                }
+            }
             document.getElementById("wire-result").innerHTML = "Vereist draadje: <strong>" + wire + "</strong>";
 
             let minFFDOutput = "Minimale FFD: <strong>" + (isNaN(minFFD) || minFFD === 0 ? "N/A" : minFFD.toFixed(2) + " mm") + "</strong>";
