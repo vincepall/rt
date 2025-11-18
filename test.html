@@ -917,4 +917,31 @@
             else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) dikteRange = "10-14mm";
             else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) dikteRange = "14-20mm";
             else if (procedure === "RT21013" && w > 10 && w <= 20) dikteRange = "10-20mm";
-            else if (w > 2
+            else if (w > 20 && w <= 50) dikteRange = "20-50mm";
+            else if (w > 50) dikteRange = ">50mm";
+            else return "Ongeldige dikte";
+            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
+                quality = selectedTable[dikteRange][source];
+            }
+            if (quality === "/") return "deze combinatie van bron en doorstraalde dikte is onlogisch";
+            if (procedure === "RT16172" && ovenMateriaal === "Ja") return "D4";
+            return quality;
+        }
+
+        // --- ONLOAD INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', function() {
+            laadBronnenCSV();
+            document.getElementById("optieDiv").style.display = "none";
+            autoCalculate(true);
+            
+            const sfdInput = document.getElementById("sfd");
+            if (!isNaN(minFFD) && minFFD > 0) {
+                 sfdInput.value = minFFD.toFixed(2);
+            } else {
+                 sfdInput.value = "0";
+            }
+        });
+    </script>
+    <div style="height: 200px;"></div>
+</body>
+</html>
