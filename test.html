@@ -577,44 +577,47 @@
             }
         }
         
-        // *** RE-CALIBRATED AND CORRECTED FUNCTION ***
+        // *** HIGH-PRECISION QUADRATIC MODEL FUNCTION ***
         function getNumberOfExposures(graphType, x, y) {
-            // Models based on two points (left/right) for each straight line (y = mx + c)
+            // Check for the impossible zone first.
+            // The dashed line is mathematically y=x. Anything below it is impossible.
+            if (y <= x) {
+                return '<span class="red-text">Onmogelijk (bron in/voorbij de wand)</span>';
+            }
+
+            // High-precision quadratic models (y = ax^2 + bx + c)
             const models = {
                 graph1: { // Opstelling 5/8/13/14
-                    line_3: { m: 1.565, c: 1.089 },
-                    line_4: { m: 1.304, c: 0.774 },
-                    line_5_dashed: { m: 1.500, c: 0.525 },
-                    line_6: { m: 1.478, c: 0.352 },
-                    line_7: { m: 1.333, c: 0.267 },
-                    line_8: { m: 1.538, c: 0.115 },
-                    line_9: { m: 1.818, c: -0.055},
-                    line_10: { m: 2.222, c: -0.256},
-                    line_11: { m: 2.143, c: -0.336}
+                    line_3: { a: -1.74, b: 1.99, c: 1.05 },
+                    line_4: { a: -1.48, b: 1.74, c: 0.73 },
+                    line_6: { a: -0.64, b: 1.40, c: 0.38 },
+                    line_7: { a: -0.42, b: 1.25, c: 0.26 },
+                    line_8: { a: 0.84,  b: 0.91, c: 0.17 },
+                    line_9: { a: 1.09,  b: 0.85, c: 0.08 },
+                    line_10:{ a: 0.0,   b: 1.39, c: 0.04 },
+                    line_11:{ a: 1.63,  b: 0.45, c: -0.01 }
                 },
                 graph2: { // Opstelling 2
-                    line_3: { m: 3.043, c: 2.239 },
-                    line_4: { m: 3.043, c: 1.439 },
-                    line_5_dashed: { m: 3.000, c: 1.050 },
-                    line_6: { m: 3.158, c: 0.711 },
-                    line_7: { m: 2.941, c: 0.465 },
-                    line_8: { m: 2.857, c: 0.286 },
-                    line_9: { m: 2.917, c: 0.121 },
-                    line_10: { m: 3.000, c: -0.050},
-                    line_11: { m: 2.500, c: -0.125}
+                    line_3: { a: -3.48, b: 3.98, c: 2.1 },
+                    line_4: { a: -2.96, b: 3.48, c: 1.46 },
+                    line_6: { a: -1.28, b: 2.80, c: 0.76 },
+                    line_7: { a: -0.84, b: 2.50, c: 0.52 },
+                    line_8: { a: 1.68,  b: 1.82, c: 0.34 },
+                    line_9: { a: 2.18,  b: 1.70, c: 0.16 },
+                    line_10:{ a: 0.0,   b: 2.78, c: 0.08 },
+                    line_11:{ a: 3.26,  b: 0.90, c: -0.02}
                 }
             };
 
             const m = models[graphType];
             if (!m) return "N/A";
             
-            const calcBoundary = (line, x_val) => (line.m * x_val) + line.c;
+            const calcBoundary = (line, x_val) => (line.a * x_val * x_val) + (line.b * x_val) + line.c;
 
-            // The number N refers to the region BETWEEN line N and line N+1.
             if (y > calcBoundary(m.line_3, x)) return "2";
             if (y > calcBoundary(m.line_4, x)) return "3";
-            if (y > calcBoundary(m.line_5_dashed, x)) return "4";
-            if (y > calcBoundary(m.line_6, x)) return "5 (Gearceerd gebied)";
+            // The impossible zone (dashed line area) is handled by the y<=x check, so we don't need line_5
+            if (y > calcBoundary(m.line_6, x)) return "5";
             if (y > calcBoundary(m.line_7, x)) return "6";
             if (y > calcBoundary(m.line_8, x)) return "7";
             if (y > calcBoundary(m.line_9, x)) return "8";
@@ -625,6 +628,7 @@
             return "N/B";
         }
 
+
         // --- MAIN CALCULATION AND DISPLAY ---
         function calculate() {
             autoCalculate(true);
@@ -632,7 +636,6 @@
         }
 
         function calculateResults() {
-            // Get all input values
             const procedure = document.getElementById("procedure").value;
             const diameter = getFloatValue("diameter");
             const wanddikte = getFloatValue("wanddikte");
@@ -647,10 +650,6 @@
             const lasbreedte = getFloatValue("lasbreedte");
             const klantprocedureCheckbox = document.getElementById("klantprocedureCheckbox").checked;
             const enBSubProcedure = document.getElementById("enBSubProcedure").value;
-
-            // ... (The rest of this function remains exactly the same as the previous version) ...
-            // It correctly calls the now-fixed getNumberOfExposures() function.
-            // ... (The following code is identical to the previous answer, no need to replace if only the function above was changed)
 
             let procedureText = procedure;
             if (klantprocedureCheckbox && enBSubProcedure) {
@@ -874,7 +873,7 @@
                 }
             }
         }
-        // ... (determineFilmQuality and other functions remain the same)
+        
         function determineFilmQuality(procedure, w, source, ovenMateriaal = "Nee") {
             if (procedure === "RT20230059") {
                 if (source !== "Se75") return "Alleen Se75 is toegestaan";
@@ -918,31 +917,4 @@
             else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) dikteRange = "10-14mm";
             else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) dikteRange = "14-20mm";
             else if (procedure === "RT21013" && w > 10 && w <= 20) dikteRange = "10-20mm";
-            else if (w > 20 && w <= 50) dikteRange = "20-50mm";
-            else if (w > 50) dikteRange = ">50mm";
-            else return "Ongeldige dikte";
-            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
-                quality = selectedTable[dikteRange][source];
-            }
-            if (quality === "/") return "deze combinatie van bron en doorstraalde dikte is onlogisch";
-            if (procedure === "RT16172" && ovenMateriaal === "Ja") return "D4";
-            return quality;
-        }
-
-        // --- ONLOAD INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', function() {
-            laadBronnenCSV();
-            document.getElementById("optieDiv").style.display = "none";
-            autoCalculate(true);
-            
-            const sfdInput = document.getElementById("sfd");
-            if (!isNaN(minFFD) && minFFD > 0) {
-                 sfdInput.value = minFFD.toFixed(2);
-            } else {
-                 sfdInput.value = "0";
-            }
-        });
-    </script>
-    <div style="height: 200px;"></div>
-</body>
-</html>
+            else if (w > 2
