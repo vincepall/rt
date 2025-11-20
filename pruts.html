@@ -1216,6 +1216,97 @@
         locatiesDiv.style.display = "block";
       }
 
+      // --- NEW FUNCTION: Calculate Minimum Exposures based on Geometry (ISO 17636 principles) ---
+      function calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure) {
+        if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0) return "";
+
+        // Allowable thickness variation ratio
+        let ratioLimit = 1.2; // Default Class A / ASME
+        if (procedure === "EN-B") {
+            ratioLimit = 1.1;
+        }
+
+        const R = diameter / 2.0;
+        const r = R - wanddikte;
+        // SFD is typically defined as Source-to-Film.
+        // Assuming Film is wrapped on the back (bottom in this coord system at -R).
+        // Source is at +Y relative to center.
+        const sourceY = sfd - R;
+
+        // Determine if we are calculating for Double Wall Single Image (DWSI)
+        // or Single Wall Single Image (SWSI) non-panoramic.
+        const isDoubleWall = (technique === "DWSI");
+
+        // Iterate to find minimum N that satisfies the ratio condition
+        for (let n = 3; n <= 30; n++) {
+            const alpha = Math.PI / n; // Half-angle of coverage (radians)
+
+            // Target Point P on outer surface at angle alpha
+            const Px = R * Math.sin(alpha);
+            const Py = -R * Math.cos(alpha); // Film side (bottom)
+
+            // Vector from Source (0, sourceY) to P (Px, Py)
+            const Vx = Px;
+            const Vy = Py - sourceY;
+
+            // Intersection parameters for Line: Source + u * V
+            const A = Vx*Vx + Vy*Vy;
+            const B = 2 * (-sourceY * Vy); // Sx is 0
+            const C_outer = sourceY*sourceY - R*R;
+            const C_inner = sourceY*sourceY - r*r;
+
+            // Calculate intersections with outer circle
+            const delta_outer = B*B - 4*A*C_outer;
+            if (delta_outer < 0) continue; // Invalid geometry
+
+            const sqrt_outer = Math.sqrt(delta_outer);
+            // u_out1 (near), u_out2 (far/film side)
+            const u_out1 = (-B - sqrt_outer) / (2*A);
+            const u_out2 = (-B + sqrt_outer) / (2*A);
+
+            // Calculate intersections with inner circle
+            const delta_inner = B*B - 4*A*C_inner;
+
+            let pathLength = 0;
+
+            if (isDoubleWall) {
+                // Double Wall: Path = (OuterChord) - (InnerChord)
+                if (delta_inner < 0) {
+                    // Ray misses ID? Full chord thickness
+                    pathLength = (u_out2 - u_out1) * Math.sqrt(A);
+                } else {
+                    const sqrt_inner = Math.sqrt(delta_inner);
+                    const u_in1 = (-B - sqrt_inner) / (2*A);
+                    const u_in2 = (-B + sqrt_inner) / (2*A);
+
+                    const chordOuter = (u_out2 - u_out1) * Math.sqrt(A);
+                    const chordInner = (u_in2 - u_in1) * Math.sqrt(A);
+                    pathLength = chordOuter - chordInner;
+                }
+
+                // Nominal thickness for DWSI is 2 * wall thickness
+                if (pathLength / (2 * wanddikte) <= ratioLimit) return n;
+
+            } else {
+                // SWSI (Source Outside viewing far wall)
+                // Path is the segment on the far side: u_in2 to u_out2
+                if (delta_inner < 0) {
+                    // Tangential or misses ID, effectively unusable for SWSI thickness check
+                    continue;
+                }
+                const sqrt_inner = Math.sqrt(delta_inner);
+                // Assuming standard order u_out1 < u_in1 < u_in2 < u_out2
+                const u_in2 = (-B + sqrt_inner) / (2*A);
+
+                pathLength = (u_out2 - u_in2) * Math.sqrt(A);
+
+                // Nominal thickness for SWSI is 1 * wall thickness
+                if (pathLength / wanddikte <= ratioLimit) return n;
+            }
+        }
+        return ">30";
+      }
+
       function calculateResults() {
         // Hide and clear the new elements at the start
 
@@ -1745,6 +1836,30 @@
           schuifjeLinkResultElement.style.display = "none";
         }
 
+        // Sabic Edge Case for exposures
+        const isSabicEdgeCase =
+          enBSubProcedure === "RT16172" &&
+          diameter >= 88 &&
+          diameter <= 99 &&
+          (source === "Se75" || source === "Ir192");
+
+        if (isSabicEdgeCase) {
+          document.getElementById("technique").value = "DWSI";
+          document.getElementById("ovaaltjeDiv").style.display = "none"; // Hide "Ovaaltje"
+          let exposures = wanddikte < 7.62 ? 4 : 5;
+          const diameterAntwoord = document.getElementById("diameterAntwoord");
+          diameterAntwoord.innerHTML = `<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: ${exposures}, opstelling DWSI</strong>`;
+          diameterAntwoord.style.display = "block";
+
+          // Hide standard plotting elements
+          document.getElementById("container1A").style.display = "none";
+          document.getElementById("container2A").style.display = "none";
+          document.getElementById("container1B").style.display = "none";
+          document.getElementById("container2B").style.display = "none";
+          document.getElementById("verzet-result").style.display = "none";
+          return; // Exit before standard plotting
+        }
+
         if (technique !== "DWDI" && !isNaN(diameter)) {
           const omtrek = diameter * Math.PI;
           const omtrekCalculatorElement =
@@ -1769,34 +1884,13 @@
             omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong>. Films: <strong>${aantalFilms} x ${chosenFilmFormat}</strong>`;
             document.getElementById("opname-locaties").style.display = "none";
           } else {
-            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
+            // CALCULATE MINIMUM EXPOSURES
+            let minExposures = calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure);
+
+            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${minExposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
             berekenOpnameLocaties();
           }
           omtrekCalculatorElement.style.display = "block";
-        }
-
-        // Sabic Edge Case for exposures
-        const isSabicEdgeCase =
-          enBSubProcedure === "RT16172" &&
-          diameter >= 88 &&
-          diameter <= 99 &&
-          (source === "Se75" || source === "Ir192");
-
-        if (isSabicEdgeCase) {
-          document.getElementById("technique").value = "DWSI";
-          document.getElementById("ovaaltjeDiv").style.display = "none"; // Hide "Ovaaltje"
-          let exposures = wanddikte < 7.62 ? 4 : 5;
-          const diameterAntwoord = document.getElementById("diameterAntwoord");
-          diameterAntwoord.innerHTML = `<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: ${exposures}, opstelling DWSI</strong>`;
-          diameterAntwoord.style.display = "block";
-
-          // Hide standard plotting elements
-          document.getElementById("container1A").style.display = "none";
-          document.getElementById("container2A").style.display = "none";
-          document.getElementById("container1B").style.display = "none";
-          document.getElementById("container2B").style.display = "none";
-          document.getElementById("verzet-result").style.display = "none";
-          return; // Exit before standard plotting
         }
 
         // --- 3. Plot Exposures ---
