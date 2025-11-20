@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aantal Opnames</title>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="styles.css">
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
 
     <style>
@@ -26,7 +26,7 @@
             border: none;
             cursor: pointer;
             margin: 5px;
-            width: auto; 
+            width: auto;
             margin-top: 0;
         }
 
@@ -51,23 +51,23 @@
 
         /* Stijlen voor de modals (pop-ups) */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
         }
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; 
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; 
+            width: 80%;
             max-width: 600px;
         }
         .close {
@@ -113,7 +113,7 @@
             min-width: 200px;
             box-sizing: border-box;
         }
-        
+
         /* Specifieke styling voor de datalist input (indien nodig) */
         #brongrootteInput {
             flex: 1;
@@ -168,10 +168,10 @@
         }
 
         h1 {
-             color: #F5DF4D; 
+             color: #F5DF4D;
              text-align: center;
         }
-        
+
         h2 {
             color: blue;
         }
@@ -195,7 +195,27 @@
         }
         .link-list a:hover { transform: scale(1.05); background-color: transparent; }
         .link2 { background-image: url('tape2.PNG'); }
-        
+
+        /* Styles for result calculation text */
+        #omtrek-calculator {
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        #opname-locaties {
+            text-align: center;
+            margin-top: 10px;
+            color: #F5DF4D; /* Yellow to match theme */
+            font-weight: bold;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         @media (max-width: 600px) {
             .form-item { flex-direction: column; align-items: flex-start; }
             .form-item label { min-width: 100%; margin-bottom: 5px; }
@@ -209,7 +229,7 @@
 <body>
 
     <h1>Aantal opnames</h1>
-    
+
     <div style="text-align: center;">
         <button class="info-btn" onclick="openModal('myModal')">i</button>
     </div>
@@ -226,7 +246,7 @@
             <hr>
             <p>
                 <b>Aantal opnames</b>
-                Deze tool geeft je geen direct antwoord maar zal op basis van de ingevoerde gegevens een rode punt op de afbeelding zetten waardoor je zelf kunt zien hoeveel opnames het zouden moeten zijn. Voor ASME wordt het aantal opnames van klasse A aangehouden.
+                Deze tool berekent het aantal opnames volgens de geometrische regels van ISO 17636 of ASME. Daarnaast toont het de grafiek ter verificatie.
                 <br><br>
                 <b>Let op:</b> Bij een diameter kleiner of gelijk aan 100mm is het antwoord altijd "2 bij opstelling 11/F , 3 bij opstelling 12/G".
             </p>
@@ -235,23 +255,23 @@
 
     <form id="combinedForm">
         <div class="form-container">
-            
+
             <div class="form-item">
                 <label for="brongrootteInput">Brongrootte in mm:</label>
                 <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required oninput="updateMinFFD()">
-                
+
                 <datalist id="bronKeuzes">
                     <option value="2.5" label="Balteau (2.5 mm)"></option>
                     <option value="3" label="Yxlon (3 mm)"></option>
                     <option value="1" label="Yxlon Smart (1 mm)"></option>
                     </datalist>
             </div>
-            
+
             <div class="form-item">
                 <label for="ofa">Object Film Afstand in mm:</label>
                 <input type="number" id="ofa" name="ofa" step="0.01" required oninput="updateMinFFD()">
             </div>
-            
+
             <div class="form-item">
                 <label for="standaard">Kies een standaard:</label>
                 <select id="standaard" name="standaard" required onchange="updateMinFFD()">
@@ -261,12 +281,12 @@
                     <option value="3">ASME</option>
                 </select>
             </div>
-            
+
             <div id="wanddikteInput" class="form-item" style="display:none;">
                 <label for="wanddikte">Wanddikte (wt) in mm (voor ASME):</label>
                 <input type="number" id="wanddikte" name="wanddikte" step="0.01" oninput="updateMinFFD()">
             </div>
-            
+
             <div id="extraOpties" class="form-item" style="display:none;">
                 <label for="optie">Centraal of Excentrisch:</label>
                 <select id="optie" name="optie" onchange="updateMinFFD()">
@@ -275,12 +295,12 @@
                     <option value="2">Excentrisch</option>
                 </select>
             </div>
-            
+
             <div id="diameterInput" class="form-item">
                 <label for="diameter">Diameter (De) in mm:</label>
                 <input type="number" id="diameter" name="diameter" step="0.01" required oninput="updateMinFFD()">
             </div>
-            
+
             <div class="form-item">
                 <label for="sfd">Bron Film Afstand in mm:</label>
                 <input type="number" id="sfd" name="sfd" step="0.001" required>
@@ -289,8 +309,14 @@
 
         </div> <button type="button" class="submit-btn" onclick="berekenEnPlot()">Bekijk opnames</button>
     </form>
-    
+
     <p id="output" style="color: #F5DF4D; text-align: center; font-weight: bold;"></p>
+
+    <!-- Nieuw Resultaten Blok -->
+    <div id="calc-results">
+        <p id="omtrek-calculator" style="display: none;"></p>
+        <div id="opname-locaties"></div>
+    </div>
 
     <ul class="link-list">
         <li><a href="cw2.html" class="link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
@@ -327,7 +353,7 @@
         const extraOptiesDiv = document.getElementById("extraOpties");
         const wanddikteDiv = document.getElementById("wanddikteInput");
         const optieSelect = document.getElementById("optie");
-        
+
         // **NIEUW: Referentie naar de nieuwe input en datalist**
         const brongrootteInput = document.getElementById("brongrootteInput");
         const bronKeuzesDatalist = document.getElementById("bronKeuzes");
@@ -342,20 +368,20 @@
                     throw new Error(`Fout bij laden CSV: ${response.statusText}`);
                 }
                 const csvText = await response.text();
-                
+
                 // Splits in regels en negeer de header (eerste regel)
-                const rows = csvText.trim().split('\n').slice(1); 
-                
+                const rows = csvText.trim().split('\n').slice(1);
+
                 rows.forEach(row => {
                     // Split de regel op komma (of puntkomma, afhankelijk van hoe het CSV is opgemaakt. Comma is standaard)
                     // We gaan uit van komma's als scheidingsteken
-                    const columns = row.split(','); 
-                    
+                    const columns = row.split(',');
+
                     // Controleer of de benodigde kolommen bestaan
                     if (columns.length >= 5) {
                         const bronNaam = columns[0].trim(); // Naam in de eerste kolom (index 0)
                         const bronGrootte = columns[4].trim(); // Grootte in de vijfde kolom (index 4)
-                        
+
                         // Maak een nieuwe <option> aan voor de datalist
                         if (bronNaam && bronGrootte) {
                             const option = document.createElement('option');
@@ -365,7 +391,7 @@
                         }
                     }
                 });
-                
+
                 // Pas de placeholder aan om aan te geven dat het laden gelukt is
                 brongrootteInput.placeholder = "Kies of vul in (mm)";
             } catch (error) {
@@ -373,12 +399,12 @@
                 brongrootteInput.placeholder = "Geen dynamische bronnen geladen";
             }
         }
-        
+
         // --- Event Listener voor 'standaard' om velden te tonen/verbergen (Ongewijzigd) ---
         standaardSelect.addEventListener("change", function () {
             // Toon Centraal/Excentrisch optie
             if (standaardSelect.value === '1' || standaardSelect.value === '2' || standaardSelect.value === '3') {
-                extraOptiesDiv.style.display = "flex"; 
+                extraOptiesDiv.style.display = "flex";
             } else {
                 extraOptiesDiv.style.display = "none";
             }
@@ -395,7 +421,7 @@
         function updateMinFFD() {
             let ofa = parseFloat(document.getElementById("ofa").value);
             // **GEWIJZIGD:** Gebruikt de nieuwe ID
-            let brongrootte = parseFloat(brongrootteInput.value); 
+            let brongrootte = parseFloat(brongrootteInput.value);
             let standaard = document.getElementById("standaard").value;
             let optie = document.getElementById("optie").value;
             let diameter = parseFloat(document.getElementById("diameter").value);
@@ -406,8 +432,8 @@
             // Stop als basiswaarden ontbreken
             if (isNaN(ofa) || isNaN(brongrootte) || standaard === "") {
                 // Leeg SFD veld als de input incompleet is
-                document.getElementById("sfd").value = ""; 
-                return; 
+                document.getElementById("sfd").value = "";
+                return;
             }
 
             let centraal = (optie === '1');
@@ -427,7 +453,7 @@
                 ffd_min = boa + ofa;
             } else if (standaard === '2') {  // EN-klasse B
                 let basis = brongrootte * 15 * Math.pow(ofa, 2 / 3);
-                if (centraal || excentrisch) { 
+                if (centraal || excentrisch) {
                     if (isNaN(diameter)) { return; } // Wacht op diameter
                     if (centraal) { basis *= 0.5; }
                     else if (excentrisch) { basis *= 0.8; }
@@ -435,7 +461,7 @@
                 ffd_min = basis + ofa;
             } else if (standaard === '1') {  // EN-klasse A
                 let basis = brongrootte * 7.5 * Math.pow(ofa, 2 / 3);
-                if (centraal || excentrisch) { 
+                if (centraal || excentrisch) {
                     if (isNaN(diameter)) { return; } // Wacht op diameter
                     if (centraal) { basis *= 0.5; }
                     else if (excentrisch) { basis *= 0.8; }
@@ -464,26 +490,125 @@
             }
         }
 
-        // --- Hoofdfunctie voor de "Bekijk opnames" knop (Ongewijzigd) ---
+        // --- NIEUWE FUNCTIES VOOR BEREKENING AANTAL OPNAMES ---
+
+        function calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure) {
+            if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0) return "";
+
+            // Allowable thickness variation ratio
+            // EN-B = 1.1, EN-A/ASME = 1.2
+            let ratioLimit = 1.2;
+            if (procedure === "EN-B") {
+                ratioLimit = 1.1;
+            }
+
+            const R = diameter / 2.0;
+            const r = R - wanddikte;
+
+            // Voor nomogrammen (bron buiten) is de SFD de afstand van bron tot film.
+            // De film zit aan de achterkant (Y = -R). De bron zit op Y = SFD - R.
+            const sourceY = sfd - R;
+
+            // Loop om minimale N te vinden die aan de ratio voldoet
+            for (let n = 3; n <= 30; n++) {
+                const alpha = Math.PI / n; // Half-angle (radialen)
+
+                // Target Punt P op buitenoppervlak bij hoek alpha
+                const Px = R * Math.sin(alpha);
+                const Py = -R * Math.cos(alpha); // Film zijde (onder)
+
+                // Vector van Bron (0, sourceY) naar P (Px, Py)
+                const Vx = Px;
+                const Vy = Py - sourceY;
+
+                // Cirkel-Lijn Intersectie: Source + u * V
+                const A = Vx*Vx + Vy*Vy;
+                const B = 2 * (-sourceY * Vy);
+                const C_outer = sourceY*sourceY - R*R;
+                const C_inner = sourceY*sourceY - r*r;
+
+                // Snijpunten buiten cirkel
+                const delta_outer = B*B - 4*A*C_outer;
+                if (delta_outer < 0) continue;
+
+                const sqrt_outer = Math.sqrt(delta_outer);
+                const u_out2 = (-B + sqrt_outer) / (2*A); // Verre zijde (film)
+
+                // Snijpunten binnen cirkel
+                const delta_inner = B*B - 4*A*C_inner;
+
+                let pathLength = 0;
+
+                // Bij de nomogrammen kijken we naar SWSI / Doorstraling van buitenaf
+                // Pad is segment op verre zijde: u_in2 tot u_out2
+                if (delta_inner < 0) { continue; } // Raakt ID niet, ongeldig voor deze check
+
+                const sqrt_inner = Math.sqrt(delta_inner);
+                const u_in2 = (-B + sqrt_inner) / (2*A);
+
+                pathLength = (u_out2 - u_in2) * Math.sqrt(A);
+
+                // Nominale dikte check
+                if (pathLength / wanddikte <= ratioLimit) return n;
+            }
+            return ">30";
+        }
+
+        function berekenOpnameLocaties() {
+            const diameter = parseFloat(document.getElementById("diameter").value);
+            const opnamesInput = document.getElementById("aantal-opnames-input");
+            const locatiesDiv = document.getElementById("opname-locaties");
+
+            if (!opnamesInput) return;
+
+            const opnames = parseInt(opnamesInput.value);
+
+            if (isNaN(diameter) || isNaN(opnames) || opnames <= 0) {
+                locatiesDiv.innerHTML = "";
+                locatiesDiv.style.display = "none";
+                return;
+            }
+
+            const omtrek = diameter * Math.PI;
+            const afstand = omtrek / opnames;
+            let locatiesLijst = `Effectieve filmlengte: <strong>${afstand.toFixed(2)} mm</strong><br><br>`;
+            let huidigeLocatie = 0;
+
+            for (let i = 1; i <= opnames; i++) {
+                locatiesLijst += `Film ${i} = ${Math.round(huidigeLocatie)} mm<br>`;
+                huidigeLocatie += afstand;
+            }
+
+            locatiesDiv.innerHTML = locatiesLijst;
+            locatiesDiv.style.display = "block";
+        }
+
+        // --- Hoofdfunctie voor de "Bekijk opnames" knop ---
         function berekenEnPlot() {
             // --- Deel 1: Waarden verzamelen ---
             let sfd_invoer = parseFloat(document.getElementById("sfd").value);
             let diameter = parseFloat(document.getElementById("diameter").value);
             let ofa = parseFloat(document.getElementById("ofa").value);
             let standaard = document.getElementById("standaard").value;
-            
+            let optie = document.getElementById("optie").value; // 1=Centraal, 2=Excentrisch
+            // Wanddikte ophalen: indien ASME gebruik veld, anders gebruik OFA als proxy voor 't' in formule
+            let wanddikte = (standaard === '3') ? parseFloat(document.getElementById("wanddikte").value) : ofa;
+
             let ffd_output_span = document.getElementById("min_ffd_output");
             let diameterAntwoordDiv = document.getElementById("diameterAntwoord");
             let output = document.getElementById("output");
-            
+            let omtrekCalculatorElement = document.getElementById("omtrek-calculator");
+
             // Reset meldingen en verberg resultaten
-            ffd_output_span.innerHTML = ""; 
+            ffd_output_span.innerHTML = "";
             diameterAntwoordDiv.style.display = "none";
             document.getElementById('container1A').style.display = 'none';
             document.getElementById('container2A').style.display = 'none';
             document.getElementById('container1B').style.display = 'none';
             document.getElementById('container2B').style.display = 'none';
-            
+            omtrekCalculatorElement.style.display = "none";
+            document.getElementById("opname-locaties").style.display = "none";
+
             // --- Deel 2: Validatie & FFD Waarschuwing ---
             if (isNaN(sfd_invoer)) {
                 output.innerHTML = "Voer een geldige Bron Film Afstand (SFD) in.";
@@ -495,7 +620,7 @@
             }
 
             // Toon de FFD waarschuwing
-            if(global_min_ffd > 0) { // Zorg ervoor dat de berekening is uitgevoerd
+            if(global_min_ffd > 0) {
                 ffd_output_span.innerHTML = `(Minimaal vereiste FFD: ${global_min_ffd.toFixed(2)} mm)`;
                 if (sfd_invoer < global_min_ffd) {
                     ffd_output_span.style.color = "red";
@@ -507,24 +632,59 @@
             }
 
 
-            // --- Deel 3: Plot de opnames ---
-            
-            // Bepaal de klasse
-            let klasse = (standaard === '1' || standaard === '3') ? 'A' : 'B';
+            // --- Deel 3: Bepaal aantal opnames (Nieuwe Functionaliteit) ---
 
-            // Check diameter voor plot-logica
+            // Bepaal Procedure String voor de math functie
+            let procStr = "EN-A";
+            if (standaard === '2') procStr = "EN-B";
+            if (standaard === '3') procStr = "ASME";
+
             if (diameter <= 100) {
                 diameterAntwoordDiv.style.display = "block";
                 diameterAntwoordDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return; // Stop hier
-            } 
-            
-            // Als diameter > 100, gebruik OFA als 't'
-            const t_plot = ofa; 
-            const De_plot = diameter; 
-            const SFD = sfd_invoer; 
+                return; // Stop hier, geen grafieken of berekening nodig
+            } else {
+                const omtrek = diameter * Math.PI;
 
-            // De plotwaarden (uit de nomogrammen)
+                if (optie === '1') { // Centraal
+                    const aantalFilms_10x48 = Math.ceil(omtrek / 400);
+                    const aantalFilms_10x40 = Math.ceil(omtrek / 320);
+
+                    let chosenFilmFormat = "10x48";
+                    let effectiveFilmValue = 400;
+
+                    if (aantalFilms_10x48 === aantalFilms_10x40) {
+                        chosenFilmFormat = "10x40";
+                        effectiveFilmValue = 320;
+                    }
+
+                    const aantalFilms = Math.ceil(omtrek / effectiveFilmValue);
+                    omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong>. Films: <strong>${aantalFilms} x ${chosenFilmFormat}</strong>`;
+                    omtrekCalculatorElement.style.display = "block";
+
+                } else { // Excentrisch of standaard (Bron Buiten)
+                    // Bereken geometrisch minimum
+                    let minExposures = calculateMinimumExposures(diameter, wanddikte, sfd_invoer, "SWSI", procStr);
+
+                    omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${minExposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
+                    omtrekCalculatorElement.style.display = "block";
+
+                    // Direct locaties tonen
+                    berekenOpnameLocaties();
+                }
+            }
+
+
+            // --- Deel 4: Plot de opnames (Nomogrammen) ---
+
+            // Bepaal de klasse voor grafieken
+            let klasse = (standaard === '1' || standaard === '3') ? 'A' : 'B';
+
+            const t_plot = ofa;
+            const De_plot = diameter;
+            const SFD = sfd_invoer;
+
+            // De plotwaarden
             const x_value1 = t_plot / De_plot;
             const y_value1 = De_plot / SFD;
             const x_value2 = t_plot / De_plot;
@@ -536,12 +696,13 @@
                 x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
                 x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
                 document.getElementById('container1B').style.display = 'block';
-                document.getElementById('container2B').style.display = 'block';
+                // Alleen tweede container als niet Centraal (hoewel nomogrammen meestal bron buiten zijn)
+                if (optie !== '1') document.getElementById('container2B').style.display = 'block';
             } else if (klasse === 'A') {
                 x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
                 x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
                 document.getElementById('container1A').style.display = 'block';
-                document.getElementById('container2A').style.display = 'block';
+                if (optie !== '1') document.getElementById('container2A').style.display = 'block';
             }
 
             const container1 = document.getElementById(`container1${klasse}`);
@@ -550,10 +711,14 @@
             // Maak de plots schoon en voeg de nieuwe kruizen toe
             container1.innerHTML = `<h2 style="color: red;">Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
             container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
-            container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
-            container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
 
-            container1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (optie !== '1') {
+                container2.innerHTML = `<h2 style="color: red;">Opstelling 2 (Klasse ${klasse})</h2>`;
+                container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
+            }
+
+            // Scroll naar resultaat
+            omtrekCalculatorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // --- Hulpfuncties (Ongewijzigd) ---
@@ -570,8 +735,8 @@
 
         function openModal(id) { document.getElementById(id).style.display = "block"; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; }
-        
-        // Roep 'laadBronnenCSV' en 'updateMinFFD' aan bij laden 
+
+        // Roep 'laadBronnenCSV' en 'updateMinFFD' aan bij laden
         document.addEventListener('DOMContentLoaded', function() {
             laadBronnenCSV(); // Laad de dynamische keuzes
             updateMinFFD(); // Voer initiële FFD berekening uit
