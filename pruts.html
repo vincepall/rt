@@ -1,2027 +1,2199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>P.R.U.T.S</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
     <style>
-        /* Add some styling to make the layout look good */
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin: 10px auto;
-            max-width: 600px;
-        }
-        .form-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-        .form-item label {
-            min-width: 200px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-item input,
-        .form-item select {
-            flex: 1;
-            padding: 8px;
-            width: 100%;
-            min-width: 200px;
-            box-sizing: border-box;
-        }
-        .submit-btn {
-            background-color: #F5DF4D;
-            color: black;
-            padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 400px;
-        }
-        .image-container {
-            position: relative;
-            background-size: cover;
-            border: 1px solid black;
-            margin: 20px auto;
-            z-index: 2;
-        }
-        .crosshair {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            left: 0;
-            top: 0;
-            pointer-events: none;
-        }
+      /* Add some styling to make the layout look good */
+      .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 10px auto;
+        max-width: 600px;
+      }
+      .form-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .form-item label {
+        min-width: 200px;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      .form-item input,
+      .form-item select {
+        flex: 1;
+        padding: 8px;
+        width: 100%;
+        min-width: 200px;
+        box-sizing: border-box;
+      }
+      .submit-btn {
+        background-color: #f5df4d;
+        color: black;
+        padding: 15px 30px;
+        font-size: 18px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        text-align: center;
+        display: block;
+        margin: 20px auto;
+        width: 100%;
+        max-width: 400px;
+      }
+      .image-container {
+        position: relative;
+        background-size: cover;
+        border: 1px solid black;
+        margin: 20px auto;
+        z-index: 2;
+      }
+      .crosshair {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        left: 0;
+        top: 0;
+        pointer-events: none;
+      }
 
-        .crosshair::before,
-        .crosshair::after {
-            content: '';
-            position: absolute;
-            background-color: rgb(255, 49, 49);
-        }
+      .crosshair::before,
+      .crosshair::after {
+        content: "";
+        position: absolute;
+        background-color: rgb(255, 49, 49);
+      }
 
-        .crosshair::before { top: 14px; left: 0; width: 30px; height: 2px; }
-        .crosshair::after { left: 14px; top: 0; width: 2px; height: 30px; }
+      .crosshair::before {
+        top: 14px;
+        left: 0;
+        width: 30px;
+        height: 2px;
+      }
+      .crosshair::after {
+        left: 14px;
+        top: 0;
+        width: 2px;
+        height: 30px;
+      }
 
-        .highlight-circle {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: rgba(0, 0, 128, 0.2);
-            left: -10px;
-            top: -10px;
-            pointer-events: none;
-        }
-        #wire-result {
-            color: yellow;
-        }
-        #container1A h2,
-        #container2A h2,
-        #container1B h2,
-        #container2B h2 {
-            color: red;
-        }
-        #results-section {
-            scroll-margin-top: 20px;
-        }
-        .ffd-warning {
-            color: red;
-            font-weight: bold;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: rgba(255, 0, 0, 0.1);
-            border-radius: 5px;
-            display: none;
-        }
-        .diameter-warning {
-            color: orange;
-            font-weight: bold;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: rgba(255, 165, 0, 0.1);
-            border-radius: 5px;
-            display: none;
-        }
-        .red-text {
-            color: red;
-        }
-        .form-item input[type="checkbox"] {
-            flex: 0;
-            width: 20px;
-            height: 20px;
-            min-width: 20px;
-        }
-        h1 {
-            background-color: white;
-            font-size: 30px;
-            color: black;
-            padding: 10px;
-            border-radius: 30px;
-            text-align: center;
-            max-width: 500px;
-            margin: 20px auto;
-            border-style: solid;
-            border-color: black;
-            text-shadow: none;
-        }
-        #pruts-image {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 150px;
-            z-index: 1;
-        }
+      .highlight-circle {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 128, 0.2);
+        left: -10px;
+        top: -10px;
+        pointer-events: none;
+      }
+      #results-section p {
+        color: white;
+      }
+      #results-section p strong {
+        color: yellow;
+      }
+      #wire-result {
+        /* This is now handled by the general #results-section p styling */
+      }
+      #min-ffd-result {
+        color: yellow;
+      }
+      #container1A h2,
+      #container2A h2,
+      #container1B h2,
+      #container2B h2 {
+        color: red;
+      }
+      #results-section {
+        scroll-margin-top: 20px;
+      }
+      .ffd-warning {
+        color: red;
+        font-weight: bold;
+        margin: 10px 0;
+        padding: 10px;
+        background-color: rgba(255, 0, 0, 0.1);
+        border-radius: 5px;
+        display: none;
+      }
+      .diameter-warning {
+        color: orange;
+        font-weight: bold;
+        margin: 10px 0;
+        padding: 10px;
+        background-color: rgba(255, 165, 0, 0.1);
+        border-radius: 5px;
+        display: none;
+      }
+      .red-text {
+        color: red;
+      }
+      .info-icon-button {
+        cursor: pointer;
+        color: #007bff; /* A blue color to make it stand out */
+        margin-left: 5px;
+      }
+      .info-icon-button:hover {
+        color: #0056b3; /* Darker blue on hover */
+      }
+      .form-item input[type="checkbox"] {
+        flex: 0;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+      }
+      h1 {
+        background-color: white;
+        font-size: 30px;
+        color: black;
+        padding: 10px;
+        border-radius: 30px;
+        text-align: center;
+        max-width: 500px;
+        margin: 20px auto;
+        border-style: solid;
+        border-color: black;
+        text-shadow: none;
+      }
+      #pruts-image {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 150px;
+        z-index: 1;
+      }
     </style>
-</head>
-<body>
-    <img src="pruts.png" id="pruts-image" alt="P.R.U.T.S. Mascot">
-    <h1>Hallo, Ik ben P.R.U.T.S <br> (Pijplas Radiografie Ultieme Technische Sidekick)</h1>
+  </head>
+  <body>
+    <img src="pruts.png" id="pruts-image" alt="P.R.U.T.S. Mascot" onclick="showEasterEgg()" />
+    <h1>
+      Hallo, Ik ben P.R.U.T.S <br />
+      (Pijplas Radiografie Ultieme Technische Sidekick)
+    </h1>
 
     <div class="form-container">
+      <div class="form-item">
+        <label for="procedure">Kies de procedure:</label>
+        <select id="procedure" name="procedure" required>
+          <option value="" disabled selected>Selecteer procedure</option>
+          <option value="EN-A">EN-Klasse A</option>
+          <option value="EN-B">EN-Klasse B</option>
+          <option value="ASME">ASME</option>
+        </select>
+      </div>
+      <div class="form-item" id="klantprocedureDiv">
+        <label for="klantprocedureCheckbox">Klantprocedure:</label>
+        <input type="checkbox" id="klantprocedureCheckbox" />
+      </div>
+      <div class="form-item" id="enBSubProcedureDiv" style="display: none">
+        <label for="enBSubProcedure">Klantprocedure:</label>
+        <select id="enBSubProcedure" name="enBSubProcedure">
+          <option value="" disabled selected>Selecteer procedure</option>
+          <option value="RT16172">RT16172 Sabic</option>
+          <option value="RT14171">RT14171 Sitech</option>
+          <option value="RT20230059">RT 2023 0059 Haffmans</option>
+        </select>
+      </div>
+      <div class="form-item">
+        <label for="diameter">Diameter (De) in mm:</label>
+        <input
+          type="number"
+          id="diameter"
+          name="diameter"
+          step="0.01"
+          required
+        />
+      </div>
+      <div class="form-item">
+        <label for="wanddikte">Wanddikte (t) in mm:</label>
+        <input
+          type="number"
+          id="wanddikte"
+          name="wanddikte"
+          step="0.01"
+          required
+        />
+      </div>
+      <div class="form-item">
+        <label for="technique">Opstelling:</label>
+        <select id="technique" name="technique">
+          <option value="SWSI">SWSI</option>
+          <option value="DWSI">DWSI</option>
+          <option value="DWDI">DWDI</option>
+        </select>
+      </div>
+      <div class="form-item" id="optieDiv" style="display: none">
+        <label for="optie">Centraal of Excentrisch:</label>
+        <select id="optie" name="optie">
+          <option value="">Nee</option>
+          <option value="1">Centraal</option>
+          <option value="2">Excentrisch</option>
+        </select>
+      </div>
+      <div id="enOptions" style="display: none">
         <div class="form-item">
-            <label for="procedure">Kies de procedure:</label>
-            <select id="procedure" name="procedure" required>
-                <option value="" disabled selected>Selecteer procedure</option>
-                <option value="EN-A">EN-Klasse A</option>
-                <option value="EN-B">EN-Klasse B</option>
-                <option value="ASME">ASME</option>
-            </select>
+          <label for="source">Stralingsbron:</label>
+          <select id="source" name="source">
+            <option value="X-ray">X-ray</option>
+            <option value="Se75">Se-75</option>
+            <option value="Ir192">Ir-192</option>
+          </select>
         </div>
-        <div class="form-item" id="klantprocedureDiv">
-            <label for="klantprocedureCheckbox">Klantprocedure:</label>
-            <input type="checkbox" id="klantprocedureCheckbox">
+        <div class="form-item" id="ovenMateriaalDiv" style="display: none">
+          <label for="ovenMateriaal">Ovenmateriaal:</label>
+          <select id="ovenMateriaal" name="ovenMateriaal">
+            <option value="Nee">Nee</option>
+            <option value="Ja">Ja</option>
+          </select>
         </div>
-        <div class="form-item" id="enBSubProcedureDiv" style="display:none;">
-            <label for="enBSubProcedure">Klantprocedure:</label>
-            <select id="enBSubProcedure" name="enBSubProcedure">
-                <option value="" disabled selected>Selecteer procedure</option>
-                <option value="RT16172">RT16172 Sabic</option>
-                <option value="RT14171">RT14171 Sitech</option>
-                <option value="RT20230059">RT 2023 0059 Haffmans</option>
-            </select>
+        <div class="form-item" id="ovaaltjeDiv" style="display: none">
+          <label for="ovaaltje">Ovaaltje:</label>
+          <select id="ovaaltje" name="ovaaltje">
+            <option value="Nee">Nee</option>
+            <option value="Ja">Ja</option>
+          </select>
+        </div>
+        <div class="form-item" id="lasbreedteDiv" style="display: none">
+          <label for="lasbreedte">Lasbreedte (mm):</label>
+          <input type="number" id="lasbreedte" name="lasbreedte" step="0.01" />
+        </div>
+      </div>
+      <div class="form-item">
+        <label for="brongrootte">Brongrootte in mm:</label>
+        <input
+          type="text"
+          id="brongrootte"
+          name="brongrootte"
+          list="bronKeuzes"
+          required
+          placeholder="Kies of vul in (mm)"
+        />
+        <datalist id="bronKeuzes"> </datalist>
+      </div>
+      <div class="form-item">
+        <label for="ofa">Object Film Afstand (OFA) in mm:</label>
+        <input type="number" id="ofa" name="ofa" step="0.01" required />
+        <span id="ofa-warning" style="color: red; margin-left: 10px"></span>
+      </div>
+      <div class="form-item">
+        <label for="sfd">Bron Film Afstand (FFD) in mm:</label>
+        <input type="number" id="sfd" name="sfd" step="0.01" required />
+        <span id="ffd-warning" style="color: red; margin-left: 10px"></span>
+      </div>
+      <div id="asmeOptions" style="display: none">
+        <div class="form-item">
+          <label for="asmeTechnique">Plaats van de BKI:</label>
+          <select id="asmeTechnique" name="asmeTechnique">
+            <option value="Sourceside">BKI bronzijde</option>
+            <option value="Filmside">BKI Filmzijde</option>
+          </select>
         </div>
         <div class="form-item">
-            <label for="diameter">Diameter (De) in mm:</label>
-            <input type="number" id="diameter" name="diameter" step="0.01" required>
+          <label for="weldType"
+            >Lastype:
+            <i
+              class="fas fa-info-circle info-icon-button"
+              onclick="openModal('lascategorieModal')"
+            ></i
+          ></label>
+          <select id="weldType" name="weldType">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
         </div>
-        <div class="form-item">
-            <label for="wanddikte">Wanddikte (t) in mm:</label>
-            <input type="number" id="wanddikte" name="wanddikte" step="0.01" required>
+        <div class="form-item" id="lasoverdikteDiv">
+          <label for="lasoverdikte">Lasoverdikte (mm):</label>
+          <input
+            type="number"
+            id="lasoverdikte"
+            name="lasoverdikte"
+            step="0.1"
+            placeholder="Lasoverdikte wordt berekend"
+            readonly
+          />
         </div>
-        <div class="form-item">
-            <label for="technique">Opstelling:</label>
-            <select id="technique" name="technique">
-                <option value="SWSI">SWSI</option>
-                <option value="DWSI">DWSI</option>
-                <option value="DWDI">DWDI</option>
-            </select>
-        </div>
-         <div class="form-item" id="optieDiv" style="display:none;">
-            <label for="optie">Centraal of Excentrisch:</label>
-            <select id="optie" name="optie">
-                <option value="">Nee</option>
-                <option value="1">Centraal</option>
-                <option value="2">Excentrisch</option>
-            </select>
-        </div>
-        <div id="enOptions" style="display:none;">
-            <div class="form-item">
-                <label for="source">Stralingsbron:</label>
-                <select id="source" name="source">
-                    <option value="X-ray">X-ray</option>
-                    <option value="Se75">Se-75</option>
-                    <option value="Ir192">Ir-192</option>
-                </select>
-            </div>
-            <div class="form-item" id="ovenMateriaalDiv" style="display:none;">
-                <label for="ovenMateriaal">Ovenmateriaal:</label>
-                <select id="ovenMateriaal" name="ovenMateriaal">
-                    <option value="Nee">Nee</option>
-                    <option value="Ja">Ja</option>
-                </select>
-            </div>
-            <div class="form-item" id="ovaaltjeDiv" style="display:none;">
-                <label for="ovaaltje">Ovaaltje:</label>
-                <select id="ovaaltje" name="ovaaltje">
-                    <option value="Nee">Nee</option>
-                    <option value="Ja">Ja</option>
-                </select>
-            </div>
-            <div class="form-item" id="lasbreedteDiv" style="display:none;">
-                <label for="lasbreedte">Lasbreedte (mm):</label>
-                <input type="number" id="lasbreedte" name="lasbreedte" step="0.01">
-            </div>
-        </div>
-        <div class="form-item">
-            <label for="brongrootte">Brongrootte in mm:</label>
-            <input type="text" id="brongrootte" name="brongrootte" list="bronKeuzes" required placeholder="Kies of vul in (mm)">
-            <datalist id="bronKeuzes">
-            </datalist>
-        </div>
-        <div class="form-item">
-            <label for="ofa">Object Film Afstand (OFA) in mm:</label>
-            <input type="number" id="ofa" name="ofa" step="0.01" required>
-            <span id="ofa-warning" style="color: red; margin-left: 10px;"></span>
-        </div>
-        <div class="form-item">
-            <label for="sfd">Bron Film Afstand (FFD) in mm:</label>
-            <input type="number" id="sfd" name="sfd" step="0.01" required>
-            <span id="ffd-warning" style="color: red; margin-left: 10px;"></span>
-        </div>
-        <div id="asmeOptions" style="display:none;">
-            <div class="form-item">
-                <label for="asmeTechnique">Plaats van de BKI:</label>
-                <select id="asmeTechnique" name="asmeTechnique">
-                    <option value="Sourceside">BKI bronzijde</option>
-                    <option value="Filmside">BKI Filmzijde</option>
-                </select>
-            </div>
-            <div class="form-item">
-                <label for="weldType">Lastype:</label>
-                <select id="weldType" name="weldType">
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                </select>
-            </div>
-            <div class="form-item" id="lasoverdikteDiv">
-                <label for="lasoverdikte">Lasoverdikte (mm):</label>
-                <input type="number" id="lasoverdikte" name="lasoverdikte" step="0.1" placeholder="Lasoverdikte wordt berekend" readonly>
-            </div>
-        </div>
+      </div>
 
-        <button type="button" class="submit-btn" onclick="calculate()">Controleer</button>
+      <button type="button" class="submit-btn" onclick="calculate()">
+        Controleer
+      </button>
     </div>
 
     <div id="results-section">
-        <h2>Resultaten</h2>
-        <p id="summary-result" style="color: yellow; background-color: #333; padding: 5px; border-radius: 5px; display: inline-block; width: fit-content; margin: 0 auto;"></p>
-        <div id="source-warning" class="diameter-warning"></div>
-        <div class="diameter-warning" id="diameter-warning"></div>
-        <div class="ffd-warning" id="ffd-result-warning"></div>
-        <p id="wire-result"></p>
-        <p id="min-ffd-result" style="color: yellow;"></p>
-        <p id="film-quality-result" style="color: yellow;"></p>
-        <p id="verzet-result" style="color: yellow;"></p>
-        <p id="max-kv-result" style="color: yellow;"></p>
-        <p id="activity-result" style="color: yellow;"></p>
-        <p id="omtrek-calculator" style="color: yellow; display: none;"></p>
-        <div id="opname-locaties" style="color: yellow; display: none;"></div>
-        <p id="schuifje-link-result" style="color: #FFD700; display: none;"></p>
+      <h2>Resultaten</h2>
+      <p
+        id="summary-result"
+        style="
+          color: yellow;
+          background-color: #333;
+          padding: 5px;
+          border-radius: 5px;
+          display: inline-block;
+          width: fit-content;
+          margin: 0 auto;
+        "
+      ></p>
+      <div id="source-warning" class="diameter-warning"></div>
+      <div class="diameter-warning" id="diameter-warning"></div>
+      <div class="ffd-warning" id="ffd-result-warning"></div>
+      <p id="penetrated-thickness-result"></p>
+      <p id="wire-result"></p>
+      <p id="min-ffd-result"></p>
+      <p id="film-quality-result"></p>
+      <p id="verzet-result"></p>
+      <p id="max-kv-result"></p>
+      <p id="activity-result"></p>
+      <p id="omtrek-calculator" style="display: none"></p>
+      <div id="opname-locaties" style="color: yellow; display: none"></div>
+      <p id="schuifje-link-result" style="color: #ffd700; display: none"></p>
 
-        <div id="diameterAntwoord" style="display: none; text-align: center; margin: 20px;">
-            <strong style="font-size: 1.3em; color: yellow; padding: 15px;">
-                Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
-            </strong>
-        </div>
+      <div
+        id="diameterAntwoord"
+        style="display: none; text-align: center; margin: 20px"
+      >
+        <strong style="font-size: 1.3em; color: yellow; padding: 15px">
+          Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
+        </strong>
+      </div>
 
-        <div class="image-container" id="container1B" style="display: none; width: 488px; height: 819px; background-image: url('klasseb2.png');">
-          <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
-        </div>
-        <div class="image-container" id="container2B" style="display: none; width: 488px; height: 823px; background-image: url('klasseb1.png');">
-          <h2>Opstelling 2 (Klasse B)</h2>
-        </div>
-        <div class="image-container" id="container1A" style="display: none; width: 487px; height: 823px; background-image: url('opstelling13klassea.png');">
-          <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
-        </div>
-        <div class="image-container" id="container2A" style="display: none; width: 470px; height: 796px; background-image: url('opstelling2klassea.png');">
-          <h2>Opstelling 2 (Klasse A)</h2>
-        </div>
+      <div
+        class="image-container"
+        id="container1B"
+        style="
+          display: none;
+          width: 488px;
+          height: 819px;
+          background-image: url(&quot;klasseb2.png&quot;);
+        "
+      >
+        <h2>Opstelling 5/8/13/14 (Klasse B)</h2>
+      </div>
+      <div
+        class="image-container"
+        id="container2B"
+        style="
+          display: none;
+          width: 488px;
+          height: 823px;
+          background-image: url(&quot;klasseb1.png&quot;);
+        "
+      >
+        <h2>Opstelling 2 (Klasse B)</h2>
+      </div>
+      <div
+        class="image-container"
+        id="container1A"
+        style="
+          display: none;
+          width: 487px;
+          height: 823px;
+          background-image: url(&quot;opstelling13klassea.png&quot;);
+        "
+      >
+        <h2>Opstelling 5/8/13/14 (Klasse A)</h2>
+      </div>
+      <div
+        class="image-container"
+        id="container2A"
+        style="
+          display: none;
+          width: 470px;
+          height: 796px;
+          background-image: url(&quot;opstelling2klassea.png&quot;);
+        "
+      >
+        <h2>Opstelling 2 (Klasse A)</h2>
+      </div>
     </div>
 
     <script>
-        function getFloatValue(id) {
-            const element = document.getElementById(id);
-            if (element && element.value) {
-                return parseFloat(element.value.replace(',', '.'));
-            }
-            return NaN;
+      function openModal(modalId) {
+        var modal = document.getElementById(modalId);
+        modal.style.display = "block";
+      }
+
+      function closeModal(modalId) {
+        var modal = document.getElementById(modalId);
+        modal.style.display = "none";
+      }
+
+      window.onclick = function (event) {
+        var modals = document.getElementsByClassName("modal");
+        for (var i = 0; i < modals.length; i++) {
+          if (event.target == modals[i]) {
+            modals[i].style.display = "none";
+          }
         }
+      };
 
-        let bronnenData = [];
-        let minFFD = 0;
-let sfdManuallyEdited = false;
-        let lasoverdikteManuallyEdited = false;
-
-        document.getElementById('sfd').addEventListener('input', () => {
-            sfdManuallyEdited = true;
-        });
-        document.getElementById('lasoverdikte').addEventListener('input', () => {
-            lasoverdikteManuallyEdited = true;
-        });
-        document.getElementById('lasoverdikte').addEventListener('change', (event) => {
-            const field = event.target;
-            const enteredValue = parseFloat(field.value);
-            const maxValue = parseFloat(field.max);
-            if (!isNaN(enteredValue) && !isNaN(maxValue) && enteredValue > maxValue) {
-                field.value = maxValue.toFixed(1);
-            }
-        });
-
-        function resetManualEditFlags() {
-            ofaManuallyEdited = false;
-            sfdManuallyEdited = false;
-            lasoverdikteManuallyEdited = false;
+      function getFloatValue(id) {
+        const element = document.getElementById(id);
+        if (element && element.value) {
+          return parseFloat(element.value.replace(",", "."));
         }
+        return NaN;
+      }
 
-        document.getElementById('procedure').addEventListener('change', resetManualEditFlags);
-        document.getElementById('diameter').addEventListener('input', resetManualEditFlags);
-        document.getElementById('wanddikte').addEventListener('input', resetManualEditFlags);
-        document.getElementById('technique').addEventListener('change', resetManualEditFlags);
-        document.getElementById('weldType').addEventListener('change', () => {
-            lasoverdikteManuallyEdited = false;
+      const easterEggSentences = [
+          "Ga voor een strakke ovaal, een lasbreedte ertussen is optimaal!",
+          "Een test te veel is een film te veel, een test te weinig is een reshoot.",
+          "Waarom por je me? Ga werken!",
+          "Voor elk draadje bestaat een gaatje... Bij ASME tenminste",
+          "Als de tape niet plakt gebruik je niet genoeg tape",
+          "Vergeet je DTS niet!",
+          "Denk je dat de buis hard straalt? De diameter is straal x 2!",
+          "Alweer aan het werk?!",
+          "Nu even niet! kunnen jullie helemaal niks alleen?!",
+          "Ah...de \"Iridiumseleen\" zeker? ~knipoog~",
+          "\"excentrisch\" maar dan in het midden ~knipoog~",
+          "ach.. je had ook tvt kunnen hebben!",
+          "na regen komt... ontwikkelen, rapporteren",
+          "Beter een film te veel dan overlap te weinig!",
+          "Daar zit het draadje toch?!",
+          "zwarting is relatief, op een log schaal",
+          "2x D4 = D8 toch?",
+          "vergeet je de backscatter B niet?",
+          "Heb je een \"F-je\" op je BKI bij DWSI?"
+      ];
+
+      function showEasterEgg() {
+          const randomIndex = Math.floor(Math.random() * easterEggSentences.length);
+          const message = easterEggSentences[randomIndex];
+          document.getElementById('easterEggMessage').innerText = message;
+          openModal('easterEggModal');
+      }
+
+      let bronnenData = [];
+      let minFFD = 0;
+      let sfdManuallyEdited = false;
+      let lasoverdikteManuallyEdited = false;
+
+      document.getElementById("sfd").addEventListener("input", () => {
+        sfdManuallyEdited = true;
+      });
+      document.getElementById("lasoverdikte").addEventListener("input", () => {
+        lasoverdikteManuallyEdited = true;
+        updateOFA();
+      });
+      document
+        .getElementById("lasoverdikte")
+        .addEventListener("change", (event) => {
+          const field = event.target;
+          const enteredValue = parseFloat(field.value);
+          const maxValue = parseFloat(field.max);
+          if (
+            !isNaN(enteredValue) &&
+            !isNaN(maxValue) &&
+            enteredValue > maxValue
+          ) {
+            field.value = maxValue.toFixed(1);
+          }
         });
-        document.getElementById('optie').addEventListener('change', () => {
-             sfdManuallyEdited = false; // Reset only FFD flag when switching between Centraal/Excentrisch
+
+      function resetManualEditFlags() {
+        ofaManuallyEdited = false;
+        sfdManuallyEdited = false;
+        lasoverdikteManuallyEdited = false;
+      }
+
+      document
+        .getElementById("procedure")
+        .addEventListener("change", resetManualEditFlags);
+      document
+        .getElementById("diameter")
+        .addEventListener("input", resetManualEditFlags);
+      document
+        .getElementById("wanddikte")
+        .addEventListener("input", resetManualEditFlags);
+      document
+        .getElementById("technique")
+        .addEventListener("change", resetManualEditFlags);
+      document.getElementById("weldType").addEventListener("change", () => {
+        lasoverdikteManuallyEdited = false;
+      });
+      document.getElementById("optie").addEventListener("change", () => {
+        sfdManuallyEdited = false; // Reset only FFD flag when switching between Centraal/Excentrisch
+      });
+
+      // --- START EVENT LISTENERS ---
+
+      // Lijst van velden die automatisch invullen moeten triggeren
+      const fieldsThatTriggerAutoFill = [
+        "procedure",
+        "diameter",
+        "wanddikte",
+        "brongrootte",
+        "technique",
+        "source",
+        "optie",
+        "asmeTechnique",
+        "weldType",
+        "ovaaltje",
+        "lasbreedte",
+      ];
+
+      // Lijst van velden die alleen berekeningen moeten triggeren (geen auto-fill)
+      const fieldsThatTriggerCalcOnly = ["ofa", "sfd"];
+
+      // Functie die autoCalculate(true) aanroept
+      const calculateAndFill = () => {
+        autoCalculate(true);
+      };
+
+      // Functie die autoCalculate(false) aanroept
+      const calculateWithoutFill = () => autoCalculate(false);
+
+      // Voeg listeners toe voor velden die auto-fill triggeren
+      fieldsThatTriggerAutoFill.forEach((id) => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener("input", calculateAndFill);
+          element.addEventListener("change", calculateAndFill);
+        }
+      });
+
+      // Voeg listeners toe voor velden die alleen berekening triggeren
+      fieldsThatTriggerCalcOnly.forEach((id) => {
+        const element = document.getElementById(id);
+        if (element) {
+          const eventHandler = () => {
+            if (id === "ofa") {
+              checkOFAWarning();
+            }
+            calculateWithoutFill();
+          };
+          element.addEventListener("input", eventHandler);
+          element.addEventListener("change", eventHandler);
+        }
+      });
+
+      // De 'sfd' listener heeft ook checkFFDWarning nodig
+      document.getElementById("sfd").addEventListener("input", function () {
+        checkFFDWarning();
+        calculateWithoutFill(); // Gebruik hier de versie zonder auto-fill
+      });
+
+      // --- EINDE EVENT LISTENERS ---
+
+      document
+        .getElementById("source")
+        .addEventListener("change", updateBronGrootteOptions);
+
+      // 'optie' is onderdeel van fieldsThatTriggerAutoFill, dus deze aparte listener is niet nodig
+      // document.getElementById("optie").addEventListener("change", calculateAndFill);
+
+      document
+        .getElementById("enBSubProcedure")
+        .addEventListener("change", function () {
+          const enBSubProcedure = this.value;
+          const ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
+          if (enBSubProcedure === "RT16172") {
+            ovenMateriaalDiv.style.display = "flex";
+          } else {
+            ovenMateriaalDiv.style.display = "none";
+          }
+          calculateAndFill(); // Recalculate when sub-procedure changes
         });
-        
-                // --- START EVENT LISTENERS ---
-        
-                // Lijst van velden die automatisch invullen moeten triggeren
-                const fieldsThatTriggerAutoFill = [
-                    "procedure", "diameter", "wanddikte", "brongrootte", "technique",
-                    "source", "optie", "asmeTechnique", "weldType", "ovaaltje", "lasbreedte"
-                ];
-        
-                // Lijst van velden die alleen berekeningen moeten triggeren (geen auto-fill)
-                const fieldsThatTriggerCalcOnly = ["ofa", "sfd"];
-        
-                // Functie die autoCalculate(true) aanroept
-                const calculateAndFill = () => {
-                    autoCalculate(true);
-                };
-        
-                // Functie die autoCalculate(false) aanroept
-                const calculateWithoutFill = () => autoCalculate(false);
-        
-                // Voeg listeners toe voor velden die auto-fill triggeren
-                fieldsThatTriggerAutoFill.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.addEventListener("input", calculateAndFill);
-                        element.addEventListener("change", calculateAndFill);
-                    }
-                });
-        
-                // Voeg listeners toe voor velden die alleen berekening triggeren
-                fieldsThatTriggerCalcOnly.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        const eventHandler = () => {
-                            if (id === 'ofa') {
-                                checkOFAWarning();
-                            }
-                            calculateWithoutFill();
-                        };
-                        element.addEventListener("input", eventHandler);
-                        element.addEventListener("change", eventHandler);
-                    }
-                });
-        
-                // De 'sfd' listener heeft ook checkFFDWarning nodig
-                document.getElementById("sfd").addEventListener("input", function() {
-                    checkFFDWarning();
-                    calculateWithoutFill(); // Gebruik hier de versie zonder auto-fill
-                });
-        
-                // --- EINDE EVENT LISTENERS ---
-        
-        
-                document.getElementById("source").addEventListener("change", updateBronGrootteOptions);
-        
-                // 'optie' is onderdeel van fieldsThatTriggerAutoFill, dus deze aparte listener is niet nodig
-                // document.getElementById("optie").addEventListener("change", calculateAndFill);
-        
-                document.getElementById("enBSubProcedure").addEventListener("change", function() {
-                    const enBSubProcedure = this.value;
-                    const ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
-                    if (enBSubProcedure === "RT16172") {
-                        ovenMateriaalDiv.style.display = "flex";
-                    } else {
-                        ovenMateriaalDiv.style.display = "none";
-                    }
-                    calculateAndFill(); // Recalculate when sub-procedure changes
-                });
-        
-                document.getElementById("ovaaltje").addEventListener("change", function() {
-                    const ovaaltje = this.value;
-                    const lasbreedteDiv = document.getElementById("lasbreedteDiv");
-                    if (ovaaltje === "Ja") {
-                        lasbreedteDiv.style.display = "flex";
-                    } else {
-                        lasbreedteDiv.style.display = "none";
-                    }
-                    calculateAndFill();
-                });
-        
-        
-                function updateBronGrootteOptions() {
-                    const procedure = document.getElementById("procedure").value;
-                    const source = document.getElementById("source").value;
-                    const bronKeuzesDatalist = document.getElementById("bronKeuzes");
-                    bronKeuzesDatalist.innerHTML = '';
-        
-                    if (procedure === "ASME") {
-                        // For ASME, show all bronnenData options AND hardcoded X-ray options
-                        bronnenData.forEach(bron => {
-                            const option = document.createElement('option');
-                            option.value = bron.label;
-                            bronKeuzesDatalist.appendChild(option);
-                        });
-                        // Add hardcoded X-ray options
-                        bronKeuzesDatalist.innerHTML += `
+
+      document
+        .getElementById("ovaaltje")
+        .addEventListener("change", function () {
+          const ovaaltje = this.value;
+          const lasbreedteDiv = document.getElementById("lasbreedteDiv");
+          if (ovaaltje === "Ja") {
+            lasbreedteDiv.style.display = "flex";
+          } else {
+            lasbreedteDiv.style.display = "none";
+          }
+          calculateAndFill();
+        });
+
+      function updateBronGrootteOptions() {
+        const procedure = document.getElementById("procedure").value;
+        const source = document.getElementById("source").value;
+        const bronKeuzesDatalist = document.getElementById("bronKeuzes");
+        bronKeuzesDatalist.innerHTML = "";
+
+        if (procedure === "ASME") {
+          // For ASME, show all bronnenData options AND hardcoded X-ray options
+          bronnenData.forEach((bron) => {
+            const option = document.createElement("option");
+            option.value = bron.label;
+            bronKeuzesDatalist.appendChild(option);
+          });
+          // Add hardcoded X-ray options
+          bronKeuzesDatalist.innerHTML += `
                             <option value="Yxlon (3 mm)"></option>
                             <option value="Yxlon Smart (1 mm)"></option>
                             <option value="Balteau (2.5 mm)"></option>
                         `;
-                    } else if (source === 'X-ray') {
-                        bronKeuzesDatalist.innerHTML = `
+        } else if (source === "X-ray") {
+          bronKeuzesDatalist.innerHTML = `
                             <option value="Yxlon (3 mm)"></option>
                             <option value="Yxlon Smart (1 mm)"></option>
                             <option value="Balteau (2.5 mm)"></option>
                         `;
-                    } else {
-                        const filteredBronnen = bronnenData.filter(b => b.type === source);
-                        filteredBronnen.forEach(bron => {
-                            const option = document.createElement('option');
-                            option.value = bron.label;
-                            bronKeuzesDatalist.appendChild(option);
-                        });
-                    }
-                }
-        
-                function getFloatValue(id) {
-                    const element = document.getElementById(id);
-                    if (element && element.value) {
-                        return parseFloat(element.value.replace(',', '.'));
-                    }
-                    return NaN;
-                }
-        
-                function handleDiameterTechniqueRestriction() {
-                    const diameter = getFloatValue("diameter");
-                    const techniqueSelect = document.getElementById("technique");
-                    const swsiOption = techniqueSelect.querySelector('option[value="SWSI"]');
-                    const dwsiOption = techniqueSelect.querySelector('option[value="DWSI"]');
-                    const dwdiOption = techniqueSelect.querySelector('option[value="DWDI"]');
-        
-                    if (!techniqueSelect || !swsiOption || !dwsiOption || !dwdiOption) return;
-        
-                    const isNotNumber = isNaN(diameter);
-                    const isSmallDiameter = !isNotNumber && diameter < 100;
-                    const isLargeDiameter = !isNotNumber && diameter >= 100;
-        
-                    // Disable DWDI if diameter >= 100
-                    dwdiOption.disabled = isLargeDiameter;
-                    // Disable SWSI and DWSI if diameter < 100
-                    swsiOption.disabled = isSmallDiameter;
-                    dwsiOption.disabled = isSmallDiameter;
-        
-                    // Adjust selection if the currently selected option is now disabled
-                    if (isSmallDiameter) { // Diameter < 100, force DWDI
-                        if (techniqueSelect.value !== "DWDI") {
-                            techniqueSelect.value = "DWDI";
-                        }
-                    } else if (isLargeDiameter) { // Diameter >= 100, force SWSI or DWSI
-                        if (techniqueSelect.value === "DWDI") {
-                            techniqueSelect.value = "SWSI"; // Default to SWSI if DWDI was selected
-                        }
-                    }
-                    // If diameter is not a number, no selection change is needed, and all options are enabled.
-                }
-        
-                function handleOptieAutoFill() {
-                    const procedure = document.getElementById("procedure").value;
-                    const optie = document.getElementById("optie").value;
-                    const diameter = getFloatValue("diameter");
-                    const wanddikte = getFloatValue("wanddikte");
-                    const sfdInput = document.getElementById("sfd");
-                    const ofaInput = document.getElementById("ofa");
-        
-                    if (optie === '1') { // Centraal
-                        if (procedure === "EN-A" || procedure === "EN-B" || procedure === "ASME") {
-                            if (!isNaN(diameter)) {
-                                sfdInput.value = (diameter / 2).toFixed(2);
-                            }
-                            if (!isNaN(wanddikte) && (procedure === "EN-A" || procedure === "EN-B")) {
-                                ofaInput.value = wanddikte.toFixed(2);
-                            }
-                        }
-                    } else if (optie === '2') { // Excentrisch
-                        if (sfdManuallyEdited) return;
-                        if (!isNaN(diameter) && !isNaN(wanddikte)) {
-                            sfdInput.value = (diameter - wanddikte - 10).toFixed(2);
-                        }
-                    }
-                }
-        
-                function updateVisibility() {
-                    const technique = document.getElementById("technique").value;
-                    const optieDiv = document.getElementById("optieDiv");
-                    const ovaaltjeDiv = document.getElementById("ovaaltjeDiv");
-                    const lasbreedteDiv = document.getElementById("lasbreedteDiv");
-        
-                    // Control visibility of optieDiv ("Centraal of Excentrisch")
-                    optieDiv.style.display = (technique === "SWSI") ? "flex" : "none";
-        
-                    // Control visibility of ovaaltjeDiv ("Ovaaltje")
-                    ovaaltjeDiv.style.display = (technique === "DWDI") ? "flex" : "none";
-        
-                    // If the parent div is hidden, also hide the child and reset its value
-                    if (ovaaltjeDiv.style.display === "none" && document.getElementById("ovaaltje").value === "Ja") {
-                        document.getElementById("ovaaltje").value = "Nee";
-                        lasbreedteDiv.style.display = "none";
-                    }
-                }
-        
-                function checkOFAWarning() {
-                    const procedure = document.getElementById("procedure").value;
-                    const diameter = getFloatValue("diameter");
-                    const wanddikte = getFloatValue("wanddikte");
-                    const technique = document.getElementById("technique").value;
-                    const userOFA = getFloatValue("ofa");
-                    const warningSpan = document.getElementById("ofa-warning");
-        
-                    if (isNaN(userOFA)) {
-                        warningSpan.innerText = "";
-                        return;
-                    }
-        
-                    // Calculate the automatic OFA value
-                    let autoOFA = NaN;
-                    const hardRuleDWDI = (procedure === "EN-A" || procedure === "EN-B") && technique === "DWDI" && diameter < 100;
-        
-                    if (procedure === "ASME") {
-                        autoOFA = (diameter < 100) ? diameter : wanddikte;
-                    } else if (hardRuleDWDI) {
-                        autoOFA = diameter;
-                    } else if (technique === "SWSI" || technique === "DWSI") {
-                        autoOFA = wanddikte;
-                    } else if (technique === "DWDI") {
-                        autoOFA = diameter;
-                    }
-        
-                    if (!isNaN(autoOFA) && userOFA < autoOFA) {
-                        warningSpan.innerText = `Waarschuwing: OFA is lager dan het aanbevolen minimum van ${autoOFA.toFixed(2)} mm`;
-                    } else {
-                        warningSpan.innerText = "";
-                    }
-                }
-        
-                        function getMaxOverdikte(weldType, wanddikte) {
-                            let maxOverdikte = 0;
-                            if (weldType === "A" || weldType === "D") {
-                                if (wanddikte <= 2.4) maxOverdikte = 0.8;
-                                else if (wanddikte <= 4.8) maxOverdikte = 1.5;
-                                else if (wanddikte <= 25) maxOverdikte = 2.5;
-                                else maxOverdikte = 3;
-                            } else if (weldType === "B" || weldType === "C") {
-                                if (wanddikte <= 2.4) maxOverdikte = 2.5;
-                                else if (wanddikte <= 4.8) maxOverdikte = 3;
-                                else if (wanddikte <= 13) maxOverdikte = 4;
-                                else if (wanddikte <= 25) maxOverdikte = 5;
-                                else maxOverdikte = 6;
-                            }
-                            return maxOverdikte;
-                        }
-                
-                                function updateLasoverdikte() {
-                
-                                    const lasoverdikteDiv = document.getElementById("lasoverdikteDiv");
-                
-                                    const lasoverdikteField = document.getElementById("lasoverdikte");
-                
-                                    if (document.getElementById("procedure").value === 'ASME') {
-                
-                                        lasoverdikteDiv.style.display = 'flex';
-                
-                                        const wanddikte = getFloatValue("wanddikte");
-                
-                                        const weldType = document.getElementById("weldType").value;
-                
-                        
-                
-                                        if (!isNaN(wanddikte) && weldType) {
-                
-                                            const maxOverdikte = getMaxOverdikte(weldType, wanddikte);
-                
-                                            lasoverdikteField.max = maxOverdikte.toFixed(1);
-                
-                                            if (!lasoverdikteManuallyEdited) {
-                
-                                                lasoverdikteField.value = maxOverdikte.toFixed(1);
-                
-                                            }
-                
-                                            lasoverdikteField.readOnly = false;
-                
-                                        } else {
-                
-                                            lasoverdikteField.value = '';
-                
-                                            lasoverdikteField.readOnly = true;
-                
-                                            lasoverdikteField.max = '';
-                
-                                        }
-                
-                                    } else {
-                
-                                        lasoverdikteDiv.style.display = 'none';
-                
-                                    }
-                
-                                }
-                
-                        
-                
-                                function autoCalculate(shouldAutoFill = true) {
-                
-                                    updateLasoverdikte(); // Always run this first for other calculations
-                
-                                    if (shouldAutoFill) {
-                
-                                        handleOptieAutoFill();
-                
-                                        updateOFA();
-                
-                                    }
-                
-                                    checkOFAWarning();
-                
-                                    handleDiameterTechniqueRestriction();
-                
-                                    updateVisibility();
-                
-                                    updateFFD();
-                
-                                    calculateResults();
-                
-                                }        // --- START AANGEPASTE 'SLIMME' UPDATEOFA ---
-        function updateOFA() {
-            if (ofaManuallyEdited) {
-                return; // If user typed in OFA, do not override.
+        } else {
+          const filteredBronnen = bronnenData.filter((b) => b.type === source);
+          filteredBronnen.forEach((bron) => {
+            const option = document.createElement("option");
+            option.value = bron.label;
+            bronKeuzesDatalist.appendChild(option);
+          });
+        }
+      }
+
+      function getFloatValue(id) {
+        const element = document.getElementById(id);
+        if (element && element.value) {
+          return parseFloat(element.value.replace(",", "."));
+        }
+        return NaN;
+      }
+
+      function handleDiameterTechniqueRestriction() {
+        const diameter = getFloatValue("diameter");
+        const techniqueSelect = document.getElementById("technique");
+        const swsiOption = techniqueSelect.querySelector(
+          'option[value="SWSI"]',
+        );
+        const dwsiOption = techniqueSelect.querySelector(
+          'option[value="DWSI"]',
+        );
+        const dwdiOption = techniqueSelect.querySelector(
+          'option[value="DWDI"]',
+        );
+
+        if (!techniqueSelect || !swsiOption || !dwsiOption || !dwdiOption)
+          return;
+
+        const isNotNumber = isNaN(diameter);
+        const isSmallDiameter = !isNotNumber && diameter < 100;
+        const isLargeDiameter = !isNotNumber && diameter >= 100;
+
+        // Disable DWDI if diameter >= 100
+        dwdiOption.disabled = isLargeDiameter;
+        // Disable SWSI and DWSI if diameter < 100
+        swsiOption.disabled = isSmallDiameter;
+        dwsiOption.disabled = isSmallDiameter;
+
+        // Adjust selection if the currently selected option is now disabled
+        if (isSmallDiameter) {
+          // Diameter < 100, force DWDI
+          if (techniqueSelect.value !== "DWDI") {
+            techniqueSelect.value = "DWDI";
+          }
+        } else if (isLargeDiameter) {
+          // Diameter >= 100, force SWSI or DWSI
+          if (techniqueSelect.value === "DWDI") {
+            techniqueSelect.value = "SWSI"; // Default to SWSI if DWDI was selected
+          }
+        }
+        // If diameter is not a number, no selection change is needed, and all options are enabled.
+      }
+
+      function handleOptieAutoFill() {
+        const procedure = document.getElementById("procedure").value;
+        const optie = document.getElementById("optie").value;
+        const diameter = getFloatValue("diameter");
+        const wanddikte = getFloatValue("wanddikte");
+        const sfdInput = document.getElementById("sfd");
+        const ofaInput = document.getElementById("ofa");
+
+        if (optie === "1") {
+          // Centraal
+          if (
+            procedure === "EN-A" ||
+            procedure === "EN-B" ||
+            procedure === "ASME"
+          ) {
+            if (!isNaN(diameter)) {
+              sfdInput.value = (diameter / 2).toFixed(2);
+            }
+            if (
+              !isNaN(wanddikte) &&
+              (procedure === "EN-A" || procedure === "EN-B")
+            ) {
+              ofaInput.value = wanddikte.toFixed(2);
+            }
+          }
+        } else if (optie === "2") {
+          // Excentrisch
+          if (sfdManuallyEdited) return;
+          if (!isNaN(diameter) && !isNaN(wanddikte)) {
+            sfdInput.value = (diameter - wanddikte - 10).toFixed(2);
+          }
+        }
+      }
+
+      function updateVisibility() {
+        const technique = document.getElementById("technique").value;
+        const optieDiv = document.getElementById("optieDiv");
+        const ovaaltjeDiv = document.getElementById("ovaaltjeDiv");
+        const lasbreedteDiv = document.getElementById("lasbreedteDiv");
+
+        // Control visibility of optieDiv ("Centraal of Excentrisch")
+        optieDiv.style.display = technique === "SWSI" ? "flex" : "none";
+
+        // Control visibility of ovaaltjeDiv ("Ovaaltje")
+        ovaaltjeDiv.style.display = technique === "DWDI" ? "flex" : "none";
+
+        // If the parent div is hidden, also hide the child and reset its value
+        if (
+          ovaaltjeDiv.style.display === "none" &&
+          document.getElementById("ovaaltje").value === "Ja"
+        ) {
+          document.getElementById("ovaaltje").value = "Nee";
+          lasbreedteDiv.style.display = "none";
+        }
+      }
+
+      function checkOFAWarning() {
+        const procedure = document.getElementById("procedure").value;
+        const diameter = getFloatValue("diameter");
+        const wanddikte = getFloatValue("wanddikte");
+        const technique = document.getElementById("technique").value;
+        const userOFA = getFloatValue("ofa");
+        const warningSpan = document.getElementById("ofa-warning");
+
+        if (isNaN(userOFA)) {
+          warningSpan.innerText = "";
+          return;
+        }
+
+        // Calculate the automatic OFA value
+        let autoOFA = NaN;
+        const hardRuleDWDI =
+          (procedure === "EN-A" || procedure === "EN-B") &&
+          technique === "DWDI" &&
+          diameter < 100;
+
+        if (procedure === "ASME") {
+          autoOFA = diameter < 100 ? diameter : wanddikte;
+        } else if (hardRuleDWDI) {
+          autoOFA = diameter;
+        } else if (technique === "SWSI" || technique === "DWSI") {
+          autoOFA = wanddikte;
+        } else if (technique === "DWDI") {
+          autoOFA = diameter;
+        }
+
+        if (!isNaN(autoOFA) && userOFA < autoOFA) {
+          warningSpan.innerText = `Waarschuwing: OFA is lager dan het aanbevolen minimum van ${autoOFA.toFixed(2)} mm`;
+        } else {
+          warningSpan.innerText = "";
+        }
+      }
+
+      function getMaxOverdikte(weldType, wanddikte) {
+        let maxOverdikte = 0;
+        if (weldType === "A" || weldType === "D") {
+          if (wanddikte <= 2.4) maxOverdikte = 0.8;
+          else if (wanddikte <= 4.8) maxOverdikte = 1.5;
+          else if (wanddikte <= 25) maxOverdikte = 2.5;
+          else maxOverdikte = 3;
+        } else if (weldType === "B" || weldType === "C") {
+          if (wanddikte <= 2.4) maxOverdikte = 2.5;
+          else if (wanddikte <= 4.8) maxOverdikte = 3;
+          else if (wanddikte <= 13) maxOverdikte = 4;
+          else if (wanddikte <= 25) maxOverdikte = 5;
+          else maxOverdikte = 6;
+        }
+        return maxOverdikte;
+      }
+
+      function updateLasoverdikte() {
+        const lasoverdikteDiv = document.getElementById("lasoverdikteDiv");
+
+        const lasoverdikteField = document.getElementById("lasoverdikte");
+
+        if (document.getElementById("procedure").value === "ASME") {
+          lasoverdikteDiv.style.display = "flex";
+
+          const wanddikte = getFloatValue("wanddikte");
+
+          const weldType = document.getElementById("weldType").value;
+
+          if (!isNaN(wanddikte) && weldType) {
+            const maxOverdikte = getMaxOverdikte(weldType, wanddikte);
+
+            lasoverdikteField.max = maxOverdikte.toFixed(1);
+
+            if (!lasoverdikteManuallyEdited) {
+              lasoverdikteField.value = maxOverdikte.toFixed(1);
             }
 
-            const procedure = document.getElementById("procedure").value;
-            const diameter = getFloatValue("diameter");
-            const wanddikte = getFloatValue("wanddikte");
-            const ofaInput = document.getElementById("ofa");
+            lasoverdikteField.readOnly = false;
+          } else {
+            lasoverdikteField.value = "";
+
+            lasoverdikteField.readOnly = true;
+
+            lasoverdikteField.max = "";
+          }
+        } else {
+          lasoverdikteDiv.style.display = "none";
+        }
+      }
+
+      function autoCalculate(shouldAutoFill = true) {
+        updateLasoverdikte(); // Always run this first for other calculations
+
+        if (shouldAutoFill) {
+          handleOptieAutoFill();
+
+          updateOFA();
+        }
+
+        checkOFAWarning();
+
+        handleDiameterTechniqueRestriction();
+
+        updateVisibility();
+
+        updateFFD();
+
+        calculateResults();
+      } // --- START AANGEPASTE 'SLIMME' UPDATEOFA ---
+      function updateOFA() {
+        if (ofaManuallyEdited) {
+          return; // If user typed in OFA, do not override.
+        }
+
+        const procedure = document.getElementById("procedure").value;
+        const diameter = getFloatValue("diameter");
+        const wanddikte = getFloatValue("wanddikte");
+        const ofaInput = document.getElementById("ofa");
+        const technique = document.getElementById("technique").value;
+        const optie = document.getElementById("optie").value;
+
+        // Stop als 'Centraal' is geselecteerd (heeft eigen logica in handleCentraalAutoFill)
+        if (optie === "1" && (procedure === "EN-A" || procedure === "EN-B")) {
+          return;
+        }
+
+        if (isNaN(wanddikte)) {
+          // Only need to check wanddikte here for the main cases
+          return;
+        }
+
+        // Determine the correct auto-OFA value
+        let autoOFA = NaN;
+        const hardRuleDWDI =
+          (procedure === "EN-A" || procedure === "EN-B") &&
+          technique === "DWDI" &&
+          !isNaN(diameter) &&
+          diameter < 100;
+
+        if (procedure === "ASME") {
+          if (isNaN(diameter)) return;
+          const lasoverdikte = getFloatValue("lasoverdikte");
+          const effectiveWanddikte =
+            wanddikte + (isNaN(lasoverdikte) ? 0 : lasoverdikte);
+          autoOFA = diameter < 100 ? diameter : effectiveWanddikte;
+        } else if (hardRuleDWDI) {
+          autoOFA = diameter;
+        } else if (technique === "SWSI" || technique === "DWSI") {
+          autoOFA = wanddikte;
+        } else if (technique === "DWDI") {
+          if (isNaN(diameter)) return;
+          autoOFA = diameter;
+        }
+
+        // Set the value
+        if (!isNaN(autoOFA)) {
+          ofaInput.value = autoOFA.toFixed(2);
+        }
+      }
+      // --- EINDE AANGEPASTE 'SLIMME' UPDATEOFA ---
+
+      function updateFFD() {
+        calculateMinFFD();
+        checkFFDWarning();
+      }
+
+      function calculateMinFFD() {
+        const procedure = document.getElementById("procedure").value;
+        const diameter = getFloatValue("diameter");
+        const wanddikte = getFloatValue("wanddikte");
+        const brongrootteValue = document.getElementById("brongrootte").value;
+        const ofa = getFloatValue("ofa");
+        const source = document.getElementById("source").value;
+        const optie = document.getElementById("optie").value;
+        const centraal = optie === "1";
+        const excentrisch = optie === "2";
+
+        let brongrootte = 0;
+        if (brongrootteValue.includes("Yxlon (3 mm)")) brongrootte = 3;
+        else if (brongrootteValue.includes("Yxlon Smart (1 mm)"))
+          brongrootte = 1;
+        else if (brongrootteValue.includes("Balteau (2.5 mm)"))
+          brongrootte = 2.5;
+        else {
+          const bron = bronnenData.find((b) => b.label === brongrootteValue);
+          brongrootte = bron ? bron.size : getFloatValue("brongrootte");
+        }
+
+        if (
+          isNaN(diameter) ||
+          isNaN(wanddikte) ||
+          isNaN(brongrootte) ||
+          isNaN(ofa)
+        ) {
+          minFFD = 0; // Reset minFFD if inputs are invalid
+          return;
+        }
+
+        let ffd = 0;
+        if (procedure === "ASME") {
+          if (wanddikte < 50) ffd = (brongrootte * ofa) / 0.51 + ofa;
+          else if (wanddikte < 75) ffd = (brongrootte * ofa) / 0.76 + ofa;
+          else if (wanddikte <= 100) ffd = (brongrootte * ofa) / 1.02 + ofa;
+          else {
+            document.getElementById("ffd-warning").innerText =
+              "Wanddikte te groot voor ASME berekening.";
+            minFFD = 0;
+            return;
+          }
+        } else {
+          // EN-A or EN-B
+          let factor = procedure === "EN-A" ? 7.5 : 15;
+          let basis = brongrootte * factor * Math.pow(ofa, 2 / 3);
+          if (centraal) basis *= 0.5;
+          if (excentrisch) basis *= 0.8;
+          ffd = basis + ofa;
+        }
+
+        minFFD = ffd;
+      }
+
+      function checkFFDWarning() {
+        const userFFD = getFloatValue("sfd");
+        const warningSpan = document.getElementById("ffd-warning");
+
+        if (isNaN(minFFD) || minFFD === 0) {
+          warningSpan.innerText = "";
+          return;
+        }
+
+        if (!isNaN(userFFD) && userFFD < minFFD) {
+          warningSpan.innerText = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
+        } else {
+          warningSpan.innerText = "";
+        }
+      }
+
+      // Show/hide options based on procedure
+      document
+        .getElementById("procedure")
+        .addEventListener("change", function () {
+          var procedure = document.getElementById("procedure").value;
+          var klantprocedureCheckbox = document.getElementById(
+            "klantprocedureCheckbox",
+          );
+          var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
+
+          if (procedure === "EN-A" || procedure === "EN-B") {
+            document.getElementById("enOptions").style.display = "block";
+            document.getElementById("asmeOptions").style.display = "none";
+            if (procedure === "EN-B") {
+              // klantprocedureDiv is always visible now
+            } else {
+              // EN-A
+              if (klantprocedureCheckbox.checked) {
+                klantprocedureCheckbox.checked = false;
+                klantprocedureCheckbox.dispatchEvent(new Event("change"));
+              }
+            }
+          } else {
+            // ASME
+            document.getElementById("enOptions").style.display = "none";
+            document.getElementById("asmeOptions").style.display = "block";
+            if (klantprocedureCheckbox.checked) {
+              klantprocedureCheckbox.checked = false;
+              klantprocedureCheckbox.dispatchEvent(new Event("change"));
+            }
+            updateBronGrootteOptions(); // Call to update brongrootte options for ASME
+
+            // Automatically set ASME BKI placement based on current technique
             const technique = document.getElementById("technique").value;
-            const optie = document.getElementById("optie").value;
-
-            // Stop als 'Centraal' is geselecteerd (heeft eigen logica in handleCentraalAutoFill)
-            if (optie === '1' && (procedure === "EN-A" || procedure === "EN-B")) {
-                return;
+            const asmeTechniqueSelect =
+              document.getElementById("asmeTechnique");
+            if (technique === "SWSI" || technique === "DWDI") {
+              asmeTechniqueSelect.value = "Sourceside";
+            } else if (technique === "DWSI") {
+              asmeTechniqueSelect.value = "Filmside";
             }
-
-            if (isNaN(wanddikte)) { // Only need to check wanddikte here for the main cases
-                return;
-            }
-
-            // Determine the correct auto-OFA value
-            let autoOFA = NaN;
-            const hardRuleDWDI = (procedure === "EN-A" || procedure === "EN-B") && technique === "DWDI" && !isNaN(diameter) && diameter < 100;
-
-            if (procedure === "ASME") {
-                if (isNaN(diameter)) return;
-                const lasoverdikte = getFloatValue("lasoverdikte");
-                const effectiveWanddikte = wanddikte + (isNaN(lasoverdikte) ? 0 : lasoverdikte);
-                autoOFA = (diameter < 100) ? diameter : effectiveWanddikte;
-            } else if (hardRuleDWDI) {
-                autoOFA = diameter;
-            } else if (technique === "SWSI" || technique === "DWSI") {
-                autoOFA = wanddikte;
-            } else if (technique === "DWDI") {
-                if (isNaN(diameter)) return;
-                autoOFA = diameter;
-            }
-
-            // Set the value
-            if (!isNaN(autoOFA)) {
-                ofaInput.value = autoOFA.toFixed(2);
-            }
-        }
-        // --- EINDE AANGEPASTE 'SLIMME' UPDATEOFA ---
-
-        function updateFFD() {
-            calculateMinFFD();
-            checkFFDWarning();
-        }
-
-        function calculateMinFFD() {
-            const procedure = document.getElementById("procedure").value;
-            const diameter = getFloatValue("diameter");
-            const wanddikte = getFloatValue("wanddikte");
-            const brongrootteValue = document.getElementById("brongrootte").value;
-            const ofa = getFloatValue("ofa");
-            const source = document.getElementById("source").value;
-            const optie = document.getElementById("optie").value;
-            const centraal = optie === '1';
-            const excentrisch = optie === '2';
-
-            let brongrootte = 0;
-            if (brongrootteValue.includes("Yxlon (3 mm)")) brongrootte = 3;
-            else if (brongrootteValue.includes("Yxlon Smart (1 mm)")) brongrootte = 1;
-            else if (brongrootteValue.includes("Balteau (2.5 mm)")) brongrootte = 2.5;
-            else {
-                 const bron = bronnenData.find(b => b.label === brongrootteValue);
-                 brongrootte = bron ? bron.size : getFloatValue("brongrootte");
-            }
-
-
-            if (isNaN(diameter) || isNaN(wanddikte) || isNaN(brongrootte) || isNaN(ofa)) {
-                minFFD = 0; // Reset minFFD if inputs are invalid
-                return;
-            }
-
-            let ffd = 0;
-            if (procedure === "ASME") {
-                if (wanddikte < 50) ffd = (brongrootte * ofa) / 0.51 + ofa;
-                else if (wanddikte < 75) ffd = (brongrootte * ofa) / 0.76 + ofa;
-                else if (wanddikte <= 100) ffd = (brongrootte * ofa) / 1.02 + ofa;
-                else {
-                    document.getElementById("ffd-warning").innerText = "Wanddikte te groot voor ASME berekening.";
-                    minFFD = 0;
-                    return;
-                }
-            } else { // EN-A or EN-B
-                let factor = (procedure === "EN-A") ? 7.5 : 15;
-                let basis = brongrootte * factor * Math.pow(ofa, 2 / 3);
-                if (centraal) basis *= 0.5;
-                if (excentrisch) basis *= 0.8;
-                ffd = basis + ofa;
-            }
-
-            minFFD = ffd;
-        }
-
-        function checkFFDWarning() {
-            const userFFD = getFloatValue("sfd");
-            const warningSpan = document.getElementById("ffd-warning");
-
-            if (isNaN(minFFD) || minFFD === 0) {
-                 warningSpan.innerText = "";
-                 return;
-            }
-
-            if (!isNaN(userFFD) && userFFD < minFFD) {
-                warningSpan.innerText = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
-            } else {
-                warningSpan.innerText = "";
-            }
-        }
-
-
-        // Show/hide options based on procedure
-        document.getElementById("procedure").addEventListener("change", function() {
-            var procedure = document.getElementById("procedure").value;
-            var klantprocedureCheckbox = document.getElementById("klantprocedureCheckbox");
-            var ovenMateriaalDiv = document.getElementById("ovenMateriaalDiv");
-
-            if (procedure === "EN-A" || procedure === "EN-B") {
-                document.getElementById("enOptions").style.display = "block";
-                document.getElementById("asmeOptions").style.display = "none";
-                if (procedure === "EN-B") {
-                    // klantprocedureDiv is always visible now
-                } else { // EN-A
-                    if (klantprocedureCheckbox.checked) {
-                        klantprocedureCheckbox.checked = false;
-                        klantprocedureCheckbox.dispatchEvent(new Event('change'));
-                    }
-                }
-            } else { // ASME
-                document.getElementById("enOptions").style.display = "none";
-                document.getElementById("asmeOptions").style.display = "block";
-                if (klantprocedureCheckbox.checked) {
-                    klantprocedureCheckbox.checked = false;
-                    klantprocedureCheckbox.dispatchEvent(new Event('change'));
-                }
-                updateBronGrootteOptions(); // Call to update brongrootte options for ASME
-
-                // Automatically set ASME BKI placement based on current technique
-                const technique = document.getElementById("technique").value;
-                const asmeTechniqueSelect = document.getElementById("asmeTechnique");
-                if (technique === "SWSI" || technique === "DWDI") {
-                    asmeTechniqueSelect.value = "Sourceside";
-                } else if (technique === "DWSI") {
-                    asmeTechniqueSelect.value = "Filmside";
-                }
-            }
-            handleDiameterTechniqueRestriction(); // Call to handle technique restriction
-            autoCalculate(true); // Ensure everything recalculates and fills
+          }
+          handleDiameterTechniqueRestriction(); // Call to handle technique restriction
+          autoCalculate(true); // Ensure everything recalculates and fills
         });
 
-        document.getElementById("klantprocedureCheckbox").addEventListener("change", function() {
-            const subProcedureDiv = document.getElementById("enBSubProcedureDiv");
-            const procedureSelect = document.getElementById("procedure");
-            const enBSubProcedureSelect = document.getElementById("enBSubProcedure");
+      document
+        .getElementById("klantprocedureCheckbox")
+        .addEventListener("change", function () {
+          const subProcedureDiv = document.getElementById("enBSubProcedureDiv");
+          const procedureSelect = document.getElementById("procedure");
+          const enBSubProcedureSelect =
+            document.getElementById("enBSubProcedure");
 
-            if (this.checked) {
-                if (procedureSelect.value !== "EN-B") {
-                    procedureSelect.value = "EN-B";
-                    // Manually trigger the 'change' event for 'procedure'
-                    // Dit zorgt ervoor dat de autoCalculate(true) van die listener afgaat.
-                    procedureSelect.dispatchEvent(new Event('change'));
-                }
-                subProcedureDiv.style.display = "flex";
-            } else {
-                subProcedureDiv.style.display = "none";
-                document.getElementById("ovenMateriaalDiv").style.display = "none";
-                enBSubProcedureSelect.value = ""; // Reset the value
+          if (this.checked) {
+            if (procedureSelect.value !== "EN-B") {
+              procedureSelect.value = "EN-B";
+              // Manually trigger the 'change' event for 'procedure'
+              // Dit zorgt ervoor dat de autoCalculate(true) van die listener afgaat.
+              procedureSelect.dispatchEvent(new Event("change"));
             }
-            // autoCalculate(true) is hier niet per se nodig, omdat het al
-            // getriggerd wordt door de procedureSelect.dispatchEvent hierboven,
-            // of als de procedure al EN-B was. We roepen het voor de zekerheid toch aan.
-            autoCalculate(true);
+            subProcedureDiv.style.display = "flex";
+          } else {
+            subProcedureDiv.style.display = "none";
+            document.getElementById("ovenMateriaalDiv").style.display = "none";
+            enBSubProcedureSelect.value = ""; // Reset the value
+          }
+          // autoCalculate(true) is hier niet per se nodig, omdat het al
+          // getriggerd wordt door de procedureSelect.dispatchEvent hierboven,
+          // of als de procedure al EN-B was. We roepen het voor de zekerheid toch aan.
+          autoCalculate(true);
         });
 
-        document.getElementById("technique").addEventListener("change", function() {
-            // Deze listener wordt nu afgehandeld door de algemene 'fieldsThatTriggerAutoFill'
-            // De 'autoCalculate(true)' die daar wordt aangeroepen, is correct.
-            // De 'slimme' updateOFA functie zorgt voor de juiste afhandeling.
+      document
+        .getElementById("technique")
+        .addEventListener("change", function () {
+          // Deze listener wordt nu afgehandeld door de algemene 'fieldsThatTriggerAutoFill'
+          // De 'autoCalculate(true)' die daar wordt aangeroepen, is correct.
+          // De 'slimme' updateOFA functie zorgt voor de juiste afhandeling.
 
-            // Deze extra logica hier is wel nog nodig:
-            // Automatically set ASME BKI placement based on technique
-            const procedure = document.getElementById("procedure").value;
-            if (procedure === "ASME") {
-                const asmeTechniqueSelect = document.getElementById("asmeTechnique");
-                if (this.value === "SWSI" || this.value === "DWDI") {
-                    asmeTechniqueSelect.value = "Sourceside";
-                } else if (this.value === "DWSI") {
-                    asmeTechniqueSelect.value = "Filmside";
-                }
+          // Deze extra logica hier is wel nog nodig:
+          // Automatically set ASME BKI placement based on technique
+          const procedure = document.getElementById("procedure").value;
+          if (procedure === "ASME") {
+            const asmeTechniqueSelect =
+              document.getElementById("asmeTechnique");
+            if (this.value === "SWSI" || this.value === "DWDI") {
+              asmeTechniqueSelect.value = "Sourceside";
+            } else if (this.value === "DWSI") {
+              asmeTechniqueSelect.value = "Filmside";
             }
+          }
 
-            // autoCalculate(true); // Dit wordt al gedaan door de algemene listener
+          // autoCalculate(true); // Dit wordt al gedaan door de algemene listener
         });
 
-        document.getElementById("brongrootte").addEventListener("input", function() {
-            const selectedLabel = this.value;
-            const sourceSelect = document.getElementById("source");
-            const procedure = document.getElementById("procedure").value;
+      document
+        .getElementById("brongrootte")
+        .addEventListener("input", function () {
+          const selectedLabel = this.value;
+          const sourceSelect = document.getElementById("source");
+          const procedure = document.getElementById("procedure").value;
 
-            if (selectedLabel.toLowerCase().includes('yxlon') || selectedLabel.toLowerCase().includes('balteau')) {
-                sourceSelect.value = 'X-ray';
-                return; // Geen autoCalculate nodig, wordt al afgehandeld door de algemene listener
+          if (
+            selectedLabel.toLowerCase().includes("yxlon") ||
+            selectedLabel.toLowerCase().includes("balteau")
+          ) {
+            sourceSelect.value = "X-ray";
+            return; // Geen autoCalculate nodig, wordt al afgehandeld door de algemene listener
+          }
+
+          const bron = bronnenData.find((b) => b.label === selectedLabel);
+
+          if (bron) {
+            if (bron.type === "Se75" || bron.type === "Ir192") {
+              sourceSelect.value = bron.type;
             }
-
-            const bron = bronnenData.find(b => b.label === selectedLabel);
-
-            if (bron) {
-                if (bron.type === 'Se75' || bron.type === 'Ir192') {
-                    sourceSelect.value = bron.type;
-                }
-            }
-            // Geen autoCalculate nodig, wordt al afgehandeld door de algemene listener
+          }
+          // Geen autoCalculate nodig, wordt al afgehandeld door de algemene listener
         });
 
-        function calculateActivityForCSV(ci1, type, firstDate, secondDate) {
-            const firstDateObj = new Date(firstDate.split('-').reverse().join('-'));
-            const timeDifference = secondDate - firstDateObj;
-            const days = timeDifference / (1000 * 3600 * 24);
-            let ci2 = 0;
+      function calculateActivityForCSV(ci1, type, firstDate, secondDate) {
+        const firstDateObj = new Date(firstDate.split("-").reverse().join("-"));
+        const timeDifference = secondDate - firstDateObj;
+        const days = timeDifference / (1000 * 3600 * 24);
+        let ci2 = 0;
 
-            if (type === "Se75") {
-                ci2 = ci1 / Math.pow(2, days / 120);
-            } else if (type === "Ir192") {
-                ci2 = ci1 / Math.pow(2, days / 74);
-            }
-
-            return ci2;
+        if (type === "Se75") {
+          ci2 = ci1 / Math.pow(2, days / 120);
+        } else if (type === "Ir192") {
+          ci2 = ci1 / Math.pow(2, days / 74);
         }
 
-        async function laadBronnenCSV() {
-            try {
-                const response = await fetch('bronnen.csv');
-                const csvText = await response.text();
-                const rows = csvText.trim().split('\n').slice(1);
-                rows.forEach(row => {
-                    const columns = row.split(',');
-                    if (columns.length >= 5) {
-                        const bronNaam = columns[0].trim();
-                        const bronType = columns[1].trim();
-                        const activiteit = parseFloat(columns[2].trim());
-                        const datum = columns[3].trim();
-                        const bronGrootte = columns[4].trim();
-                        if (bronNaam && bronGrootte) {
-                            const label = `${bronNaam} (${bronGrootte} mm)`;
-                            bronnenData.push({ name: bronNaam, type: bronType, size: parseFloat(bronGrootte), label: label, initialActivity: activiteit, date: datum });
-                        }
-                    }
+        return ci2;
+      }
+
+      async function laadBronnenCSV() {
+        try {
+          const response = await fetch("bronnen.csv");
+          const csvText = await response.text();
+          const rows = csvText.trim().split("\n").slice(1);
+          rows.forEach((row) => {
+            const columns = row.split(",");
+            if (columns.length >= 5) {
+              const bronNaam = columns[0].trim();
+              const bronType = columns[1].trim();
+              const activiteit = parseFloat(columns[2].trim());
+              const datum = columns[3].trim();
+              const bronGrootte = columns[4].trim();
+              if (bronNaam && bronGrootte) {
+                const label = `${bronNaam} (${bronGrootte} mm)`;
+                bronnenData.push({
+                  name: bronNaam,
+                  type: bronType,
+                  size: parseFloat(bronGrootte),
+                  label: label,
+                  initialActivity: activiteit,
+                  date: datum,
                 });
-                updateBronGrootteOptions();
-            } catch (error) {
-                console.error("Kon bronnen.csv niet laden.", error);
+              }
             }
+          });
+          updateBronGrootteOptions();
+        } catch (error) {
+          console.error("Kon bronnen.csv niet laden.", error);
+        }
+      }
+
+      function createCrosshair(x, y) {
+        const cross = document.createElement("div");
+        cross.className = "crosshair";
+        cross.style.left = x - 15 + "px";
+        cross.style.top = y - 15 + "px";
+        const circle = document.createElement("div");
+        circle.className = "highlight-circle";
+        cross.appendChild(circle);
+        return cross;
+      }
+
+      function calculate() {
+        // Calculate minFFD maar update het veld niet, forceer een volledige herberekening
+        autoCalculate(true); // Forceer auto-fill bij handmatige "Controleer" klik
+
+        // Scroll to results section
+        document
+          .getElementById("results-section")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function berekenOpnameLocaties() {
+        const diameter = getFloatValue("diameter");
+        const opnamesInput = document.getElementById("aantal-opnames-input");
+        const locatiesDiv = document.getElementById("opname-locaties");
+
+        if (!opnamesInput) return; // Stop if the input doesn't exist
+
+        const opnames = parseInt(opnamesInput.value);
+
+        if (isNaN(diameter) || isNaN(opnames) || opnames <= 0) {
+          locatiesDiv.innerHTML = "";
+          locatiesDiv.style.display = "none";
+          return;
         }
 
-        function createCrosshair(x, y) {
-            const cross = document.createElement('div');
-            cross.className = 'crosshair';
-            cross.style.left = (x - 15) + 'px';
-            cross.style.top = (y - 15) + 'px';
-            const circle = document.createElement('div');
-            circle.className = 'highlight-circle';
-            cross.appendChild(circle);
-            return cross;
+        const omtrek = diameter * Math.PI;
+        const afstand = omtrek / opnames;
+        let locatiesLijst = `Effectieve filmlengte: <strong>${afstand.toFixed(2)} mm</strong><br><br>`;
+        let huidigeLocatie = 0;
+
+        for (let i = 1; i <= opnames; i++) {
+          locatiesLijst += `Film ${i} = ${Math.round(huidigeLocatie)} mm<br>`;
+          huidigeLocatie += afstand;
         }
 
-        function calculate() {
-            // Calculate minFFD maar update het veld niet, forceer een volledige herberekening
-            autoCalculate(true); // Forceer auto-fill bij handmatige "Controleer" klik
+        locatiesDiv.innerHTML = locatiesLijst;
+        locatiesDiv.style.display = "block";
+      }
 
-            // Scroll to results section
-            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+      function calculateResults() {
+        // Hide and clear the new elements at the start
+
+        document.getElementById("omtrek-calculator").style.display = "none";
+
+        document.getElementById("opname-locaties").style.display = "none";
+
+        document.getElementById("opname-locaties").innerHTML = "";
+
+        // Get all input values
+
+        const procedure = document.getElementById("procedure").value;
+
+        const diameter = getFloatValue("diameter");
+
+        const wanddikte = getFloatValue("wanddikte");
+
+        const ofa = getFloatValue("ofa");
+
+        let sfd = getFloatValue("sfd");
+
+        const source = document.getElementById("source").value;
+
+        const technique = document.getElementById("technique").value;
+
+        const optie = document.getElementById("optie").value;
+
+        const centraal = optie === "1";
+
+        const excentrisch = optie === "2";
+
+        const ovaaltje = document.getElementById("ovaaltje").value;
+
+        const lasbreedte = getFloatValue("lasbreedte");
+
+        const klantprocedureCheckbox = document.getElementById(
+          "klantprocedureCheckbox",
+        ).checked;
+
+        const enBSubProcedure =
+          document.getElementById("enBSubProcedure").value;
+
+        let procedureText = procedure;
+
+        if (klantprocedureCheckbox && enBSubProcedure) {
+          const subProcedureSelect = document.getElementById("enBSubProcedure");
+
+          procedureText =
+            subProcedureSelect.options[subProcedureSelect.selectedIndex].text;
         }
 
-                        function berekenOpnameLocaties() {
-
-                            const diameter = getFloatValue("diameter");
-
-                            const opnamesInput = document.getElementById("aantal-opnames-input");
-
-                            const locatiesDiv = document.getElementById("opname-locaties");
-
-                
-
-                            if (!opnamesInput) return; // Stop if the input doesn't exist
-
-                
-
-                            const opnames = parseInt(opnamesInput.value);
-
-                
-
-                            if (isNaN(diameter) || isNaN(opnames) || opnames <= 0) {
-
-                                locatiesDiv.innerHTML = '';
-
-                                locatiesDiv.style.display = 'none';
-
-                                return;
-
-                            }
-
-                
-
-                            const omtrek = diameter * Math.PI;
-
-                            const afstand = omtrek / opnames;
-
-                            let locatiesLijst = `Effectieve filmlengte: <strong>${afstand.toFixed(2)} mm</strong><br><br>`;
-
-                            let huidigeLocatie = 0;
-
-                
-
-                            for (let i = 1; i <= opnames; i++) {
-
-                                locatiesLijst += `Film ${i} = ${Math.round(huidigeLocatie)} mm<br>`;
-
-                                huidigeLocatie += afstand;
-
-                            }
-
-                
-
-                            locatiesDiv.innerHTML = locatiesLijst;
-
-                            locatiesDiv.style.display = 'block';
-
-                        }
-
-        
-
-                function calculateResults() {
-
-                    // Hide and clear the new elements at the start
-
-                    document.getElementById('omtrek-calculator').style.display = 'none';
-
-                    document.getElementById('opname-locaties').style.display = 'none';
-
-                    document.getElementById('opname-locaties').innerHTML = '';
-
-        
-
-                    // Get all input values
-
-                    const procedure = document.getElementById("procedure").value;
-
-                    const diameter = getFloatValue("diameter");
-
-                    const wanddikte = getFloatValue("wanddikte");
-
-                    const ofa = getFloatValue("ofa");
-
-                    let sfd = getFloatValue("sfd");
-
-                    const source = document.getElementById("source").value;
-
-                    const technique = document.getElementById("technique").value;
-
-                    const optie = document.getElementById("optie").value;
-
-                    const centraal = optie === '1';
-
-                    const excentrisch = optie === '2';
-
-                    const ovaaltje = document.getElementById("ovaaltje").value;
-
-                    const lasbreedte = getFloatValue("lasbreedte");
-
-        
-
-                    const klantprocedureCheckbox = document.getElementById("klantprocedureCheckbox").checked;
-
-                    const enBSubProcedure = document.getElementById("enBSubProcedure").value;
-
-                    let procedureText = procedure;
-
-                    if (klantprocedureCheckbox && enBSubProcedure) {
-
-                        const subProcedureSelect = document.getElementById("enBSubProcedure");
-
-                        procedureText = subProcedureSelect.options[subProcedureSelect.selectedIndex].text;
-
-                    }
-
-                    
-
-                    let summary = "";
-
-                    if (!isNaN(diameter) && !isNaN(wanddikte)) {
-
-                        summary = `${diameter}mm x ${wanddikte}mm volgens ${procedureText} met ${source}`;
-
-                    }
-
-                    document.getElementById("summary-result").innerText = summary;
-
-        
-
-                    // NEW SOURCE WARNING LOGIC
-
-                    const sourceWarningDiv = document.getElementById("source-warning");
-
-                    sourceWarningDiv.style.display = 'none';
-
-                    sourceWarningDiv.innerHTML = '';
-
-        
-
-                    const klantprocedure = document.getElementById("klantprocedureCheckbox").checked;
-
-        
-
-                    if (!klantprocedure && (procedure === "EN-A" || procedure === "EN-B")) {
-
-                        let doorstraaldeDikte = 0;
-
-                        if (technique === "SWSI") {
-
-                            doorstraaldeDikte = wanddikte;
-
-                        } else if (technique === "DWSI" || technique === "DWDI") {
-
-                            doorstraaldeDikte = 2 * wanddikte;
-
-                        }
-
-        
-
-                        if (!isNaN(doorstraaldeDikte)) {
-
-                            let warningMsg = "";
-
-                            if (source === 'Se75') {
-
-                                if (doorstraaldeDikte < 14 || doorstraaldeDikte > 40) {
-
-                                    warningMsg = `Waarschuwing: Het gebruik van Se-75 voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong> is ongebruikelijk (standaardbereik: 14-40 mm). Een lagere dikte is in overleg met de opdrachtgever wel mogelijk.`;
-
-                                }
-
-                            } else if (source === 'Ir192') {
-
-                                if (doorstraaldeDikte < 10) {
-
-                                    warningMsg = `Waarschuwing: Het gebruik van Ir192 is niet toegestaan voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong>.`;
-
-                                } else if (doorstraaldeDikte < 20 || doorstraaldeDikte > 90) {
-
-                                    warningMsg = `Waarschuwing: Het gebruik van Ir-192 voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong> is ongebruikelijk (standaardbereik: 20-90 mm, met uitzondering tot 10 mm). Gebruik is in overleg met de opdrachtgever wel mogelijk.`;
-
-                                }
-
-                            }
-
-        
-
-                            if (warningMsg) {
-
-                                sourceWarningDiv.innerHTML = warningMsg;
-
-                                sourceWarningDiv.style.display = 'block';
-
-                            }
-
-                        }
-
-                    }
-
-                    // END NEW SOURCE WARNING LOGIC
-
-        
-
-                    // Check diameter warning
-
-                    const diameterWarningDiv = document.getElementById("diameter-warning");
-
-                    if (!isNaN(diameter) && diameter < 100 && (procedure === "EN-A" || procedure === "EN-B")) {
-
-                        if (technique !== "DWDI") {
-
-                            diameterWarningDiv.textContent = "Waarschuwing: Bij een diameter kleiner dan 100 mm wordt aanbevolen om de DWDI opstelling te gebruiken.";
-
-                            diameterWarningDiv.style.display = 'block';
-
-                        } else {
-
-                            diameterWarningDiv.style.display = 'none';
-
-                        }
-
-                    } else {
-
-                        diameterWarningDiv.style.display = 'none';
-
-                    }
-
-        
-
-                    // Check if FFD is below minimum and show warning in results
-
-                    const warningDiv = document.getElementById("ffd-result-warning");
-
-                    if (!isNaN(sfd) && !isNaN(minFFD) && minFFD > 0 && sfd < minFFD) {
-
-                        warningDiv.textContent = `Je gekozen FFD is lager dan de minimale FFD: ${minFFD.toFixed(2)} mm`;
-
-                        warningDiv.style.display = 'block';
-
-                    } else {
-
-                        warningDiv.style.display = 'none';
-
-                    }
-
-        
-
-                    // --- 1. Calculate Required Wire ---
-
-                    let wire = "Onbekend";
-
-                    if (procedure === "EN-A") {
-
-                        let penetratedThickness = 0;
-
-                        const source = document.getElementById("source").value; // Get source here
-
-        
-
-                        if (technique === "SWSI") {
-
-                            penetratedThickness = wanddikte;
-
-                            if (penetratedThickness <= 1.2) wire = "W18";
-
-                            else if (penetratedThickness <= 2.0) wire = "W17";
-
-                            else if (penetratedThickness <= 3.5) wire = "W16";
-
-                            else if (penetratedThickness <= 5) wire = "W15";
-
-                            else if (penetratedThickness <= 7) wire = "W14";
-
-                            else if (penetratedThickness <= 10) wire = "W13";
-
-                            else if (penetratedThickness <= 15) wire = "W12";
-
-                            else if (penetratedThickness <= 25) wire = "W11";
-
-                            else if (penetratedThickness <= 32) wire = "W10";
-
-                            else if (penetratedThickness <= 40) wire = "W9";
-
-                            else if (penetratedThickness <= 55) wire = "W8";
-
-                            else if (penetratedThickness <= 85) wire = "W7";
-
-                        } else if (technique === "DWSI") {
-
-                            penetratedThickness = wanddikte * 2;
-
-                            if (penetratedThickness <= 1.2) wire = "W18";
-
-                            else if (penetratedThickness <= 2.0) wire = "W17";
-
-                            else if (penetratedThickness <= 3.5) wire = "W16";
-
-                            else if (penetratedThickness <= 5) wire = "W15";
-
-                            else if (penetratedThickness <= 10) wire = "W14";
-
-                            else if (penetratedThickness <= 15) wire = "W13";
-
-                            else if (penetratedThickness <= 22) wire = "W12";
-
-                            else if (penetratedThickness <= 38) wire = "W11";
-
-                            else if (penetratedThickness <= 48) wire = "W10";
-
-                            else if (penetratedThickness <= 60) wire = "W9";
-
-                            else if (penetratedThickness <= 85) wire = "W8";
-
-                        } else if (technique === "DWDI") {
-
-                            penetratedThickness = wanddikte * 2;
-
-                            if (penetratedThickness <= 1.2) wire = "W18";
-
-                            else if (penetratedThickness <= 2.0) wire = "W17";
-
-                            else if (penetratedThickness <= 3.5) wire = "W16";
-
-                            else if (penetratedThickness <= 5) wire = "W15";
-
-                            else if (penetratedThickness <= 7) wire = "W14";
-
-                            else if (penetratedThickness <= 12) wire = "W13";
-
-                            else if (penetratedThickness <= 18) wire = "W12";
-
-                            else if (penetratedThickness <= 30) wire = "W11";
-
-                            else if (penetratedThickness <= 40) wire = "W10";
-
-                            else if (penetratedThickness <= 50) wire = "W9";
-
-                            else if (penetratedThickness <= 60) wire = "W8";
-
-                            else if (penetratedThickness <= 85) wire = "W7";
-
-                        }
-
-        
-
-                        // Apply edge case rules for EN-A
-
-                        if (source === "Se75") {
-
-                            if (technique === "DWDI" && penetratedThickness <= 12) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            } else if ((technique === "SWSI" || technique === "DWSI") && penetratedThickness <= 20) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            }
-
-                        } else if (source === "Ir192") {
-
-                            if (technique === "DWDI" && penetratedThickness > 10 && penetratedThickness <= 25) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            } else if ((technique === "SWSI" || technique === "DWSI") && penetratedThickness > 10 && penetratedThickness <= 40) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            }
-
-                        }
-
-                    } else if (procedure === "EN-B") {
-
-                        let doorstraaldeDikte;
-
-                        if (technique === "SWSI") {
-
-                            doorstraaldeDikte = wanddikte;
-
-                        } else { // DWSI or DWDI
-
-                            doorstraaldeDikte = 2 * wanddikte;
-
-                        }
-
-        
-
-                        if (technique === "SWSI") {
-
-                            if (doorstraaldeDikte <= 1.5) wire = "W19";
-
-                            else if (doorstraaldeDikte <= 2.5) wire = "W18";
-
-                            else if (doorstraaldeDikte <= 4) wire = "W17";
-
-                            else if (doorstraaldeDikte <= 6) wire = "W16";
-
-                            else if (doorstraaldeDikte <= 8) wire = "W15";
-
-                            else if (doorstraaldeDikte <= 12) wire = "W14";
-
-                            else if (doorstraaldeDikte <= 20) wire = "W13";
-
-                            else if (doorstraaldeDikte <= 30) wire = "W12";
-
-                            else if (doorstraaldeDikte <= 35) wire = "W11";
-
-                            else if (doorstraaldeDikte <= 45) wire = "W10";
-
-                            else if (doorstraaldeDikte <= 65) wire = "W9";
-
-                        } else if (technique === "DWDI") {
-
-                            if (doorstraaldeDikte <= 1.5) wire = "W19";
-
-                            else if (doorstraaldeDikte <= 2.5) wire = "W18";
-
-                            else if (doorstraaldeDikte <= 4) wire = "W17";
-
-                            else if (doorstraaldeDikte <= 6) wire = "W16";
-
-                            else if (doorstraaldeDikte <= 8) wire = "W15";
-
-                            else if (doorstraaldeDikte <= 15) wire = "W14";
-
-                            else if (doorstraaldeDikte <= 25) wire = "W13";
-
-                            else if (doorstraaldeDikte <= 38) wire = "W12";
-
-                            else if (doorstraaldeDikte <= 45) wire = "W11";
-
-                            else if (doorstraaldeDikte <= 55) wire = "W10";
-
-                            else if (doorstraaldeDikte <= 70) wire = "W9";
-
-                        } else if (technique === "DWSI") {
-
-                            if (doorstraaldeDikte <= 1.5) wire = "W19";
-
-                            else if (doorstraaldeDikte <= 2.5) wire = "W18";
-
-                            else if (doorstraaldeDikte <= 4) wire = "W17";
-
-                            else if (doorstraaldeDikte <= 6) wire = "W16";
-
-                            else if (doorstraaldeDikte <= 12) wire = "W15";
-
-                            else if (doorstraaldeDikte <= 18) wire = "W14";
-
-                            else if (doorstraaldeDikte <= 30) wire = "W13";
-
-                            else if (doorstraaldeDikte <= 45) wire = "W12";
-
-                            else if (doorstraaldeDikte <= 55) wire = "W11";
-
-                            else if (doorstraaldeDikte <= 70) wire = "W10";
-
-                        }
-
-        
-
-                        if (source === "Se75") {
-
-                            if (technique === "SWSI"  && doorstraaldeDikte >5 && doorstraaldeDikte <= 20) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            } else if (technique === "DWDI" && doorstraaldeDikte >5 &&  doorstraaldeDikte <= 12) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            } else if (technique === "DWSI" && doorstraaldeDikte >5 && doorstraaldeDikte <= 20) {
-
-                                wire = "W" + (parseInt(wire.substring(1))-1);
-
-                            }
-
-                        } else if (source === "Ir192") {
-
-                            if (technique === "SWSI" && wanddikte >= 10 && wanddikte <= 40) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            } else if (technique === "DWDI" && doorstraaldeDikte > 10 && doorstraaldeDikte <= 25) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1);
-
-                            } else if (technique === "DWSI" && doorstraaldeDikte >10 && doorstraaldeDikte <= 40) {
-
-                                wire = "W" + (parseInt(wire.substring(1)) - 1 );
-
-                            }
-
-                        }
-
-                    } else if (procedure === "ASME") {
-
-                        const asmeTechnique = document.getElementById("asmeTechnique").value;
-
-                        const weldType = document.getElementById("weldType").value;
-
-                        const lasoverdikte = getFloatValue("lasoverdikte");
-
-                        const effectiveWanddikte = wanddikte + (isNaN(lasoverdikte) ? 0 : lasoverdikte);
-
-        
-
-                        if (asmeTechnique === "Sourceside") {
-
-                            if (effectiveWanddikte <= 6.4) wire = "EN W13,ASME 5";
-
-                            else if (effectiveWanddikte <= 9.5) wire = "EN W12, ASME 6";
-
-                            else if (effectiveWanddikte <= 12.7) wire = "EN W11, ASME 7";
-
-                            else if (effectiveWanddikte <= 19) wire = "EN W10, ASME 8";
-
-                            else if (effectiveWanddikte <= 25.4) wire = "EN W9, ASME 9";
-
-                            else if (effectiveWanddikte <= 38.1) wire = "EN W8, ASME 10";
-
-                            else if (effectiveWanddikte <= 50.8) wire = "EN W7, ASME 11";
-
-                            else if (effectiveWanddikte <= 63.5) wire = "EN W6, ASME 12";
-
-                            else wire = "EN W5, ASME 13";
-
-                        } else { // Film side
-
-                            if (effectiveWanddikte <= 6.4) wire = "EN W14,ASME 4";
-
-                            else if (effectiveWanddikte <= 9.5) wire = "EN W13, ASME 5";
-
-                            else if (effectiveWanddikte <= 12.7) wire = "EN W12, ASME 6";
-
-                            else if (effectiveWanddikte <= 19) wire = "EN W11, ASME 7";
-
-                            else if (effectiveWanddikte <= 25.4) wire = "EN W10, ASME 8";
-
-                            else if (effectiveWanddikte <= 38.1) wire = "EN W9, ASME 9";
-
-                            else if (effectiveWanddikte <= 50.8) wire = "EN W8, ASME 10";
-
-                            else if (effectiveWanddikte <= 63.5) wire = "EN W7, ASME 11";
-
-                            else wire = "EN W6, ASME 12";
-
-                        }
-
-                    }
-
-                    document.getElementById("wire-result").innerHTML = "Vereist draadje: <strong>" + wire + "</strong>";
-
-        
-
-                    let minFFDOutput = "Minimale FFD: <strong>" + (isNaN(minFFD) || minFFD === 0 ? "N/A" : minFFD.toFixed(2) + " mm") + "</strong>";
-
-                    if (!isNaN(sfd)) {
-
-                        minFFDOutput += ` , Gekozen FFD: <strong>${sfd}mm</strong>`;
-
-                    }
-
-        
-
-                    // Add Centraal/Excentrisch check if applicable
-
-                    if (centraal && !isNaN(minFFD) && minFFD > 0) {
-
-                        let maxFFDAllowed = diameter / 2;
-
-                        if (minFFD < maxFFDAllowed) {
-
-                            minFFDOutput += `<br>✅ Centrale opstelling is toegestaan (Min. FFD < <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
-
-                        } else {
-
-                            minFFDOutput += `<br>❌ Centrale opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
-
-                        }
-
-                    }
-
-        
-
-                    if (excentrisch && !isNaN(minFFD) && minFFD > 0) {
-
-                        let maxExcentrischFFDAllowed = diameter - (ofa + 10);
-
-                        if (minFFD < maxExcentrischFFDAllowed) {
-
-                            minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
-
-                        } else {
-
-                            minFFDOutput += `<br>❌ Excentrische opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
-
-                        }
-
-                    }
-
-                    document.getElementById("min-ffd-result").innerHTML = minFFDOutput;
-
-        
-
-                    // --- Calculate Max Kv ---
-
-                    const maxKvResultElement = document.getElementById("max-kv-result");
-
-                    let maxKv = 0; // Declare maxKv here
-
-                    if (source === 'X-ray' && !isNaN(wanddikte)) {
-
-                        if (technique === 'SWSI') {
-
-                            maxKv = 100 + (8 * wanddikte);
-
-                        } else if (technique === 'DWDI' || technique === 'DWSI') {
-
-                            maxKv = 100 + (8 * (2 * wanddikte));
-
-                        }
-
-        
-
-                        if (maxKv > 0) {
-
-                            const maxKvUitzondering = maxKv + 50;
-
-                            maxKvResultElement.innerHTML = `Maximale Kv waarde: <strong>${maxKv.toFixed(0)}</strong> (<strong>${maxKvUitzondering.toFixed(0)}</strong> bij uitzondering)`;
-
-                            maxKvResultElement.style.display = 'block';
-
-                        } else {
-
-                            maxKvResultElement.style.display = 'none';
-
-                        }
-
-                    } else {
-
-                        maxKvResultElement.style.display = 'none';
-
-                    }
-
-        
-
-                    // --- Calculate Film Quality ---
-
-                    let filmQualityProcedure = "";
-
-                    let doorstraaldeDikte = 0;
-
-                    const currentSource = document.getElementById("source").value; // Source from test.html
-
-                    let filmQualitySource = currentSource;
-
-        
-
-                    if (technique === "SWSI") {
-
-                        doorstraaldeDikte = wanddikte;
-
-                    } else if (technique === "DWSI" || technique === "DWDI") {
-
-                        doorstraaldeDikte = 2 * wanddikte;
-
-                    }
-
-        
-
-                    if (procedure === "EN-A") {
-
-                        filmQualityProcedure = "RT21013"; // Default EN-B logic for EN-A
-
-                    } else if (procedure === "EN-B") {
-
-                        filmQualityProcedure = document.getElementById("enBSubProcedure").value;
-
-                        if (!filmQualityProcedure) {
-
-                            filmQualityProcedure = "RT21013"; // Default to standard EN-B
-
-                        }
-
-                    } else if (procedure === "ASME") {
-
-                        filmQualityProcedure = "RT21002";
-
-                    }
-
-        
-
-                    // Map X-ray source from test.html to filmkwaliteit.html's source types
-
-                    if (filmQualitySource === "X-ray") {
-
-                        if (maxKv > 0 && maxKv < 150) {
-
-                            filmQualitySource = "X-Ray <150kv";
-
-                        } else {
-
-                            filmQualitySource = "X-Ray >150Kv";
-
-                        }
-
-                    }
-
-        
-
-                    let ovenMateriaal = "Nee";
-
-                    if (filmQualityProcedure === "RT16172") {
-
-                        ovenMateriaal = document.getElementById("ovenMateriaal").value;
-
-                    }
-
-        
-
-                    let filmType = determineFilmQuality(filmQualityProcedure, doorstraaldeDikte, filmQualitySource, ovenMateriaal);
-
-                    document.getElementById("film-quality-result").innerHTML = "Vereist filmtype: <strong>" + filmType + "</strong>";
-
-        
-
-                    const activityResultElement = document.getElementById("activity-result");
-
-                    const schuifjeLinkResultElement = document.getElementById("schuifje-link-result");
-
-                    const brongrootteValue = document.getElementById("brongrootte").value;
-
-                    const selectedBron = bronnenData.find(b => b.label === brongrootteValue);
-
-        
-
-                    if (selectedBron && (selectedBron.type === 'Se75' || selectedBron.type === 'Ir192')) {
-
-                        const today = new Date();
-
-                        const currentActivity = calculateActivityForCSV(selectedBron.initialActivity, selectedBron.type, selectedBron.date, today);
-
-                        activityResultElement.innerHTML = `Bron ${selectedBron.name} is op dit moment: <strong>${currentActivity.toFixed(2)} Ci</strong>.`;
-
-                        activityResultElement.style.display = 'block';
-
-                        maxKvResultElement.style.display = 'none';
-
-        
-
-                        schuifjeLinkResultElement.innerHTML = `<a href="/rt/schuifje.html" style="color: #FFD700; text-decoration: underline;">Ga naar Schuifje voor Stralingstijd</a>`;
-
-                        schuifjeLinkResultElement.style.display = 'block';
-
-                    } else {
-
-                        activityResultElement.style.display = 'none';
-
-                        schuifjeLinkResultElement.style.display = 'none';
-
-                    }
-
-        
-
-                    if (technique !== 'DWDI' && !isNaN(diameter)) {
-
-                        const omtrek = diameter * Math.PI;
-
-                        const omtrekCalculatorElement = document.getElementById('omtrek-calculator');
-
-                        omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
-
-                        omtrekCalculatorElement.style.display = 'block';
-
-                    }
-
-        
-
-                    // --- 3. Plot Exposures ---
-
-                    document.getElementById('container1A').style.display = 'none';
-
-                    document.getElementById('container2A').style.display = 'none';
-
-                    document.getElementById('container1B').style.display = 'none';
-
-                    document.getElementById('container2B').style.display = 'none';
-
-                    document.getElementById('diameterAntwoord').style.display = 'none';
-
-                    document.getElementById('verzet-result').style.display = 'none'; // Hide verzet result by default
-
-        
-
-                    if (!centraal) { // Only show images if Centraal is NOT selected
-
-                        if (technique === "DWDI") {
-
-                            if (ovaaltje === "Ja") {
-
-                                document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 Opnames onder 90 graden</strong>';
-
-                                // Calculate verzet
-
-                                if (!isNaN(diameter) && !isNaN(wanddikte) && !isNaN(lasbreedte) && !isNaN(sfd)) {
-
-                                    // Conditions for Opstelling 11 / F
-
-                                    const verzetResultElement = document.getElementById('verzet-result');
-
-                                    if (diameter > 100 || wanddikte > 8 || lasbreedte > (diameter / 4)) {
-
-                                        verzetResultElement.innerHTML = '<strong class="red-text">Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.</strong>';
-
-                                        verzetResultElement.style.display = 'block';
-
-                                    } else {
-
-                                        const A = sfd - diameter;
-
-                                        const verzet = 1.5 * lasbreedte * (A / diameter);
-
-                                                                            verzetResultElement.innerHTML = `Het benodigde verzet is: <strong>${verzet.toFixed(2)} mm</strong>`;                                verzetResultElement.classList.remove('red-text');
-
-                                        verzetResultElement.style.display = 'block';
-
-                                    }
-
-                                }
-
-                            } else { // Ovaaltje is Nee
-
-                                document.getElementById('diameterAntwoord').innerHTML = '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 3 Opnames onder 60 / 120 graden</strong>';
-
-                            }
-
-                            document.getElementById('diameterAntwoord').style.display = 'block';
-
-                            return;
-
-                        }
-
-        
-
-        
-
-        
-
-                        const klasse = (procedure === 'EN-A' || procedure === 'ASME') ? 'A' : 'B';
-
-                        const t_plot = ofa;
-
-                        const De_plot = diameter;
-
-                        const SFD = sfd;
-
-        
-
-                        if (isNaN(t_plot) || isNaN(De_plot) || isNaN(SFD) || De_plot === 0 || SFD === 0 || (SFD - t_plot) === 0) {
-
-                            // Stop als we geen geldige waarden hebben om deling door nul te voorkomen
-
-                            return;
-
-                        }
-
-        
-
-                        const x_value1 = t_plot / De_plot;
-
-                        const y_value1 = De_plot / SFD;
-
-                        const x_value2 = t_plot / De_plot;
-
-                        const y_value2 = De_plot / (SFD - t_plot);
-
-        
-
-                        let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
-
-        
-
-                        const showContainer1 = !(technique === "SWSI" && optie === "");
-
-        
-
-                        if (klasse === 'B') {
-
-                            x_pixel1 = (x_value1 / 0.25) * 488; y_pixel1 = (y_value1 / 2) * 819; y_scale1 = 819;
-
-                            x_pixel2 = (x_value2 / 0.25) * 488; y_pixel2 = (y_value2 / 4) * 823; y_scale2 = 823;
-
-                            if (showContainer1) {
-
-                                document.getElementById('container1B').style.display = 'block';
-
-                            }
-
-                            // Only show second image if NOT DWSI and not Excentrisch
-
-                            if (technique !== "DWSI" && !excentrisch) {
-
-                                document.getElementById('container2B').style.display = 'block';
-
-                            }
-
-                        } else { // Klasse A or ASME
-
-                            x_pixel1 = (x_value1 / 0.25) * 487; y_pixel1 = (y_value1 / 2) * 823; y_scale1 = 823;
-
-                            x_pixel2 = (x_value2 / 0.25) * 470; y_pixel2 = (y_value2 / 4) * 796; y_scale2 = 796;
-
-                            if (showContainer1) {
-
-                                document.getElementById('container1A').style.display = 'block';
-
-                            }
-
-                            // Only show second image if NOT DWSI and not Excentrisch
-
-                            if (technique !== "DWSI" && !excentrisch) {
-
-                                document.getElementById('container2A').style.display = 'block';
-
-                            }
-
-                        }
-
-        
-
-                        const container1 = document.getElementById(`container1${klasse}`);
-
-                        const container2 = document.getElementById(`container2${klasse}`);
-
-        
-
-                        if (showContainer1) {
-
-                            container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
-
-                            container1.appendChild(createCrosshair(x_pixel1, y_scale1 - y_pixel1));
-
-                        }
-
-        
-
-                        // Only add crosshair to second container if NOT DWSI and not Excentrisch
-
-                        if (technique !== "DWSI" && !excentrisch) {
-
-                            container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
-
-                            container2.appendChild(createCrosshair(x_pixel2, y_scale2 - y_pixel2));
-
-                        }
-
-                    }
-
-                }
-
-        function determineFilmQuality(procedure, w, source, ovenMateriaal = "Nee") {
-            // DIRECTE RETURN VOOR RT20230059 (Haffmans)
-            if (procedure === "RT20230059") {
-                // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
-                if (source !== "Se75") return "Alleen Se75 is toegestaan";
-
-                if (w > 0 && w <= 14) {
-                    /* AANPASSING 1: D4 met Zwarting 2.6 toegevoegd */
-                    return "D4 (Zwarting 2.6)";
-                } else if (w > 14) {
-                    return "D5";
+        let summary = "";
+
+        if (!isNaN(diameter) && !isNaN(wanddikte)) {
+          summary = `${diameter}mm x ${wanddikte}mm volgens ${procedureText} met ${source}`;
+        }
+
+        document.getElementById("summary-result").innerText = summary;
+
+        // --- Calculate and Display Penetrated Thickness ---
+        let penetratedThicknessForDisplay = 0;
+        if (procedure === "EN-A" || procedure === "EN-B") {
+          if (technique === "SWSI") {
+            penetratedThicknessForDisplay = wanddikte;
+          } else if (technique === "DWSI" || technique === "DWDI") {
+            penetratedThicknessForDisplay = 2 * wanddikte;
+          }
+        } else if (procedure === "ASME") {
+          let calculatedWanddikte = 0;
+          if (technique === "SWSI") {
+            calculatedWanddikte = wanddikte;
+          } else if (technique === "DWSI" || technique === "DWDI") {
+            calculatedWanddikte = 2 * wanddikte;
+          }
+          const lasoverdikte = getFloatValue("lasoverdikte");
+          penetratedThicknessForDisplay = calculatedWanddikte + (isNaN(lasoverdikte) ? 0 : lasoverdikte);
+        }
+
+        const penetratedThicknessResultEl = document.getElementById(
+          "penetrated-thickness-result",
+        );
+        if (
+          !isNaN(penetratedThicknessForDisplay) &&
+          penetratedThicknessForDisplay > 0
+        ) {
+          penetratedThicknessResultEl.innerHTML = `Doorstraalde dikte: <strong>${penetratedThicknessForDisplay.toFixed(2)} mm</strong>`;
+          penetratedThicknessResultEl.style.display = "block";
+        } else {
+          penetratedThicknessResultEl.style.display = "none";
+        }
+        // --- End Penetrated Thickness ---
+
+        // NEW SOURCE WARNING LOGIC
+
+        const sourceWarningDiv = document.getElementById("source-warning");
+
+        sourceWarningDiv.style.display = "none";
+
+        sourceWarningDiv.innerHTML = "";
+
+        const klantprocedure = document.getElementById(
+          "klantprocedureCheckbox",
+        ).checked;
+
+        if (!klantprocedure && (procedure === "EN-A" || procedure === "EN-B")) {
+          let doorstraaldeDikte = 0;
+
+          if (technique === "SWSI") {
+            doorstraaldeDikte = wanddikte;
+          } else if (technique === "DWSI" || technique === "DWDI") {
+            doorstraaldeDikte = 2 * wanddikte;
+          }
+
+          if (!isNaN(doorstraaldeDikte)) {
+            let warningMsg = "";
+
+            if (source === "Se75") {
+              if (doorstraaldeDikte < 14 || doorstraaldeDikte > 40) {
+                warningMsg = `Waarschuwing: Het gebruik van Se-75 voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong> is ongebruikelijk (standaardbereik: 14-40 mm). Een lagere dikte is in overleg met de opdrachtgever wel mogelijk.`;
+              }
+            } else if (source === "Ir192") {
+              if (doorstraaldeDikte < 10) {
+                warningMsg = `Waarschuwing: Het gebruik van Ir192 is niet toegestaan voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong>.`;
+              } else if (doorstraaldeDikte < 20 || doorstraaldeDikte > 90) {
+                warningMsg = `Waarschuwing: Het gebruik van Ir-192 voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong> is ongebruikelijk (standaardbereik: 20-90 mm, met uitzondering tot 10 mm). Gebruik is in overleg met de opdrachtgever wel mogelijk.`;
+              }
+            }
+
+            if (warningMsg) {
+              sourceWarningDiv.innerHTML = warningMsg;
+
+              sourceWarningDiv.style.display = "block";
+            }
+          }
+        }
+
+        // END NEW SOURCE WARNING LOGIC
+
+        // Check diameter warning
+
+        const diameterWarningDiv = document.getElementById("diameter-warning");
+
+        if (
+          !isNaN(diameter) &&
+          diameter < 100 &&
+          (procedure === "EN-A" || procedure === "EN-B")
+        ) {
+          if (technique !== "DWDI") {
+            diameterWarningDiv.textContent =
+              "Waarschuwing: Bij een diameter kleiner dan 100 mm wordt aanbevolen om de DWDI opstelling te gebruiken.";
+
+            diameterWarningDiv.style.display = "block";
+          } else {
+            diameterWarningDiv.style.display = "none";
+          }
+        } else {
+          diameterWarningDiv.style.display = "none";
+        }
+
+        // Check if FFD is below minimum and show warning in results
+
+        const warningDiv = document.getElementById("ffd-result-warning");
+
+        if (!isNaN(sfd) && !isNaN(minFFD) && minFFD > 0 && sfd < minFFD) {
+          warningDiv.textContent = `Je gekozen FFD is lager dan de minimale FFD: ${minFFD.toFixed(2)} mm`;
+
+          warningDiv.style.display = "block";
+        } else {
+          warningDiv.style.display = "none";
+        }
+
+        // --- 1. Calculate Required Wire ---
+
+        let wire = "Onbekend";
+
+        if (procedure === "EN-A") {
+          let penetratedThickness = 0;
+
+          const source = document.getElementById("source").value; // Get source here
+
+          if (technique === "SWSI") {
+            penetratedThickness = wanddikte;
+
+            if (penetratedThickness <= 1.2) wire = "W18";
+            else if (penetratedThickness <= 2.0) wire = "W17";
+            else if (penetratedThickness <= 3.5) wire = "W16";
+            else if (penetratedThickness <= 5) wire = "W15";
+            else if (penetratedThickness <= 7) wire = "W14";
+            else if (penetratedThickness <= 10) wire = "W13";
+            else if (penetratedThickness <= 15) wire = "W12";
+            else if (penetratedThickness <= 25) wire = "W11";
+            else if (penetratedThickness <= 32) wire = "W10";
+            else if (penetratedThickness <= 40) wire = "W9";
+            else if (penetratedThickness <= 55) wire = "W8";
+            else if (penetratedThickness <= 85) wire = "W7";
+          } else if (technique === "DWSI") {
+            penetratedThickness = wanddikte * 2;
+
+            if (penetratedThickness <= 1.2) wire = "W18";
+            else if (penetratedThickness <= 2.0) wire = "W17";
+            else if (penetratedThickness <= 3.5) wire = "W16";
+            else if (penetratedThickness <= 5) wire = "W15";
+            else if (penetratedThickness <= 10) wire = "W14";
+            else if (penetratedThickness <= 15) wire = "W13";
+            else if (penetratedThickness <= 22) wire = "W12";
+            else if (penetratedThickness <= 38) wire = "W11";
+            else if (penetratedThickness <= 48) wire = "W10";
+            else if (penetratedThickness <= 60) wire = "W9";
+            else if (penetratedThickness <= 85) wire = "W8";
+          } else if (technique === "DWDI") {
+            penetratedThickness = wanddikte * 2;
+
+            if (penetratedThickness <= 1.2) wire = "W18";
+            else if (penetratedThickness <= 2.0) wire = "W17";
+            else if (penetratedThickness <= 3.5) wire = "W16";
+            else if (penetratedThickness <= 5) wire = "W15";
+            else if (penetratedThickness <= 7) wire = "W14";
+            else if (penetratedThickness <= 12) wire = "W13";
+            else if (penetratedThickness <= 18) wire = "W12";
+            else if (penetratedThickness <= 30) wire = "W11";
+            else if (penetratedThickness <= 40) wire = "W10";
+            else if (penetratedThickness <= 50) wire = "W9";
+            else if (penetratedThickness <= 60) wire = "W8";
+            else if (penetratedThickness <= 85) wire = "W7";
+          }
+
+          // Apply edge case rules for EN-A
+
+          if (source === "Se75") {
+            if (technique === "DWDI" && penetratedThickness <= 12) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            } else if (
+              (technique === "SWSI" || technique === "DWSI") &&
+              penetratedThickness <= 20
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            }
+          } else if (source === "Ir192") {
+            if (
+              technique === "DWDI" &&
+              penetratedThickness > 10 &&
+              penetratedThickness <= 25
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            } else if (
+              (technique === "SWSI" || technique === "DWSI") &&
+              penetratedThickness > 10 &&
+              penetratedThickness <= 40
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            }
+          }
+        } else if (procedure === "EN-B") {
+          let doorstraaldeDikte;
+
+          if (technique === "SWSI") {
+            doorstraaldeDikte = wanddikte;
+          } else {
+            // DWSI or DWDI
+
+            doorstraaldeDikte = 2 * wanddikte;
+          }
+
+          if (technique === "SWSI") {
+            if (doorstraaldeDikte <= 1.5) wire = "W19";
+            else if (doorstraaldeDikte <= 2.5) wire = "W18";
+            else if (doorstraaldeDikte <= 4) wire = "W17";
+            else if (doorstraaldeDikte <= 6) wire = "W16";
+            else if (doorstraaldeDikte <= 8) wire = "W15";
+            else if (doorstraaldeDikte <= 12) wire = "W14";
+            else if (doorstraaldeDikte <= 20) wire = "W13";
+            else if (doorstraaldeDikte <= 30) wire = "W12";
+            else if (doorstraaldeDikte <= 35) wire = "W11";
+            else if (doorstraaldeDikte <= 45) wire = "W10";
+            else if (doorstraaldeDikte <= 65) wire = "W9";
+          } else if (technique === "DWDI") {
+            if (doorstraaldeDikte <= 1.5) wire = "W19";
+            else if (doorstraaldeDikte <= 2.5) wire = "W18";
+            else if (doorstraaldeDikte <= 4) wire = "W17";
+            else if (doorstraaldeDikte <= 6) wire = "W16";
+            else if (doorstraaldeDikte <= 8) wire = "W15";
+            else if (doorstraaldeDikte <= 15) wire = "W14";
+            else if (doorstraaldeDikte <= 25) wire = "W13";
+            else if (doorstraaldeDikte <= 38) wire = "W12";
+            else if (doorstraaldeDikte <= 45) wire = "W11";
+            else if (doorstraaldeDikte <= 55) wire = "W10";
+            else if (doorstraaldeDikte <= 70) wire = "W9";
+          } else if (technique === "DWSI") {
+            if (doorstraaldeDikte <= 1.5) wire = "W19";
+            else if (doorstraaldeDikte <= 2.5) wire = "W18";
+            else if (doorstraaldeDikte <= 4) wire = "W17";
+            else if (doorstraaldeDikte <= 6) wire = "W16";
+            else if (doorstraaldeDikte <= 12) wire = "W15";
+            else if (doorstraaldeDikte <= 18) wire = "W14";
+            else if (doorstraaldeDikte <= 30) wire = "W13";
+            else if (doorstraaldeDikte <= 45) wire = "W12";
+            else if (doorstraaldeDikte <= 55) wire = "W11";
+            else if (doorstraaldeDikte <= 70) wire = "W10";
+          }
+
+          if (source === "Se75") {
+            if (
+              technique === "SWSI" &&
+              doorstraaldeDikte > 5 &&
+              doorstraaldeDikte <= 20
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            } else if (
+              technique === "DWDI" &&
+              doorstraaldeDikte > 5 &&
+              doorstraaldeDikte <= 12
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            } else if (
+              technique === "DWSI" &&
+              doorstraaldeDikte > 5 &&
+              doorstraaldeDikte <= 20
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            }
+          } else if (source === "Ir192") {
+            if (technique === "SWSI" && wanddikte >= 10 && wanddikte <= 40) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            } else if (
+              technique === "DWDI" &&
+              doorstraaldeDikte > 10 &&
+              doorstraaldeDikte <= 25
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            } else if (
+              technique === "DWSI" &&
+              doorstraaldeDikte > 10 &&
+              doorstraaldeDikte <= 40
+            ) {
+              wire = "W" + (parseInt(wire.substring(1)) - 1);
+            }
+          }
+        } else if (procedure === "ASME") {
+          const asmeTechnique = document.getElementById("asmeTechnique").value;
+
+          const weldType = document.getElementById("weldType").value;
+
+          const lasoverdikte = getFloatValue("lasoverdikte");
+
+          const effectiveWanddikte =
+            wanddikte + (isNaN(lasoverdikte) ? 0 : lasoverdikte);
+
+          if (asmeTechnique === "Sourceside") {
+            if (effectiveWanddikte <= 6.4) wire = "EN W13,ASME 5";
+            else if (effectiveWanddikte <= 9.5) wire = "EN W12, ASME 6";
+            else if (effectiveWanddikte <= 12.7) wire = "EN W11, ASME 7";
+            else if (effectiveWanddikte <= 19) wire = "EN W10, ASME 8";
+            else if (effectiveWanddikte <= 25.4) wire = "EN W9, ASME 9";
+            else if (effectiveWanddikte <= 38.1) wire = "EN W8, ASME 10";
+            else if (effectiveWanddikte <= 50.8) wire = "EN W7, ASME 11";
+            else if (effectiveWanddikte <= 63.5) wire = "EN W6, ASME 12";
+            else wire = "EN W5, ASME 13";
+          } else {
+            // Film side
+
+            if (effectiveWanddikte <= 6.4) wire = "EN W14,ASME 4";
+            else if (effectiveWanddikte <= 9.5) wire = "EN W13, ASME 5";
+            else if (effectiveWanddikte <= 12.7) wire = "EN W12, ASME 6";
+            else if (effectiveWanddikte <= 19) wire = "EN W11, ASME 7";
+            else if (effectiveWanddikte <= 25.4) wire = "EN W10, ASME 8";
+            else if (effectiveWanddikte <= 38.1) wire = "EN W9, ASME 9";
+            else if (effectiveWanddikte <= 50.8) wire = "EN W8, ASME 10";
+            else if (effectiveWanddikte <= 63.5) wire = "EN W7, ASME 11";
+            else wire = "EN W6, ASME 12";
+          }
+        }
+
+        document.getElementById("wire-result").innerHTML =
+          "Vereist draadje: <strong>" + wire + "</strong>";
+
+        let minFFDOutput =
+          "Minimale FFD: " +
+          (isNaN(minFFD) || minFFD === 0 ? "N/A" : minFFD.toFixed(2) + " mm");
+
+        if (!isNaN(sfd)) {
+          minFFDOutput += `, Gekozen FFD: <strong>${sfd}mm</strong>`;
+        }
+
+        // Add Centraal/Excentrisch check if applicable
+
+        if (centraal && !isNaN(minFFD) && minFFD > 0) {
+          let maxFFDAllowed = diameter / 2;
+
+          if (minFFD < maxFFDAllowed) {
+            minFFDOutput += `<br>✅ Centrale opstelling is toegestaan (Min. FFD < <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
+          } else {
+            minFFDOutput += `<br>❌ Centrale opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxFFDAllowed.toFixed(2)} mm</strong>)`;
+          }
+        }
+
+        if (excentrisch && !isNaN(minFFD) && minFFD > 0) {
+          let maxExcentrischFFDAllowed = diameter - (ofa + 10);
+
+          if (minFFD < maxExcentrischFFDAllowed) {
+            minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
+          } else {
+            minFFDOutput += `<br>❌ Excentrische opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
+          }
+        }
+
+        document.getElementById("min-ffd-result").innerHTML = minFFDOutput;
+
+        // --- Calculate Max Kv ---
+
+        const maxKvResultElement = document.getElementById("max-kv-result");
+
+        let maxKv = 0; // Declare maxKv here
+
+        if (source === "X-ray" && !isNaN(wanddikte)) {
+          if (technique === "SWSI") {
+            maxKv = 100 + 8 * wanddikte;
+          } else if (technique === "DWDI" || technique === "DWSI") {
+            maxKv = 100 + 8 * (2 * wanddikte);
+          }
+
+          if (maxKv > 0) {
+            const maxKvUitzondering = maxKv + 50;
+
+            maxKvResultElement.innerHTML = `Maximale Kv waarde: <strong>${maxKv.toFixed(0)}</strong> (<strong>${maxKvUitzondering.toFixed(0)}</strong> bij uitzondering)`;
+
+            maxKvResultElement.style.display = "block";
+          } else {
+            maxKvResultElement.style.display = "none";
+          }
+        } else {
+          maxKvResultElement.style.display = "none";
+        }
+
+        // --- Calculate Film Quality ---
+
+        let filmQualityProcedure = "";
+
+        let doorstraaldeDikte = 0;
+
+        const currentSource = document.getElementById("source").value; // Source from test.html
+
+        let filmQualitySource = currentSource;
+
+        if (technique === "SWSI") {
+          doorstraaldeDikte = wanddikte;
+        } else if (technique === "DWSI" || technique === "DWDI") {
+          doorstraaldeDikte = 2 * wanddikte;
+        }
+
+        if (procedure === "EN-A") {
+          filmQualityProcedure = "RT21013"; // Default EN-B logic for EN-A
+        } else if (procedure === "EN-B") {
+          filmQualityProcedure =
+            document.getElementById("enBSubProcedure").value;
+
+          if (!filmQualityProcedure) {
+            filmQualityProcedure = "RT21013"; // Default to standard EN-B
+          }
+        } else if (procedure === "ASME") {
+          filmQualityProcedure = "RT21002";
+        }
+
+        // Map X-ray source from test.html to filmkwaliteit.html's source types
+
+        if (filmQualitySource === "X-ray") {
+          if (maxKv > 0 && maxKv < 150) {
+            filmQualitySource = "X-Ray <150kv";
+          } else {
+            filmQualitySource = "X-Ray >150Kv";
+          }
+        }
+
+        let ovenMateriaal = "Nee";
+
+        if (filmQualityProcedure === "RT16172") {
+          ovenMateriaal = document.getElementById("ovenMateriaal").value;
+        }
+
+        let filmType = determineFilmQuality(
+          filmQualityProcedure,
+          doorstraaldeDikte,
+          filmQualitySource,
+          ovenMateriaal,
+        );
+
+        document.getElementById("film-quality-result").innerHTML =
+          "Vereist filmtype: <strong>" + filmType + "</strong>";
+
+        const activityResultElement =
+          document.getElementById("activity-result");
+
+        const schuifjeLinkResultElement = document.getElementById(
+          "schuifje-link-result",
+        );
+
+        const brongrootteValue = document.getElementById("brongrootte").value;
+
+        const selectedBron = bronnenData.find(
+          (b) => b.label === brongrootteValue,
+        );
+
+        if (
+          selectedBron &&
+          (selectedBron.type === "Se75" || selectedBron.type === "Ir192")
+        ) {
+          const today = new Date();
+
+          const currentActivity = calculateActivityForCSV(
+            selectedBron.initialActivity,
+            selectedBron.type,
+            selectedBron.date,
+            today,
+          );
+
+          activityResultElement.innerHTML = `Bron ${selectedBron.name} is op dit moment: <strong>${currentActivity.toFixed(2)} Ci</strong>.`;
+
+          activityResultElement.style.display = "block";
+
+          maxKvResultElement.style.display = "none";
+
+          schuifjeLinkResultElement.innerHTML = `<a href="/rt/schuifje.html" style="color: #FFD700; text-decoration: underline;">Ga naar Schuifje voor Stralingstijd</a>`;
+
+          schuifjeLinkResultElement.style.display = "block";
+        } else {
+          activityResultElement.style.display = "none";
+
+          schuifjeLinkResultElement.style.display = "none";
+        }
+
+        if (technique !== "DWDI" && !isNaN(diameter)) {
+          const omtrek = diameter * Math.PI;
+          const omtrekCalculatorElement =
+            document.getElementById("omtrek-calculator");
+
+          if (centraal) {
+            const omtrek = diameter * Math.PI;
+
+            const aantalFilms_10x48 = Math.ceil(omtrek / 400);
+            const aantalFilms_10x40 = Math.ceil(omtrek / 320);
+
+            let chosenFilmFormat = "10x48"; // Default
+            let effectiveFilmValue = 400;
+
+            if (aantalFilms_10x48 === aantalFilms_10x40) {
+              chosenFilmFormat = "10x40";
+              effectiveFilmValue = 320;
+            }
+
+            const aantalFilms = Math.ceil(omtrek / effectiveFilmValue);
+
+            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong>. Films: <strong>${aantalFilms} x ${chosenFilmFormat}</strong>`;
+            document.getElementById("opname-locaties").style.display = "none";
+          } else {
+            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
+            berekenOpnameLocaties();
+          }
+          omtrekCalculatorElement.style.display = "block";
+        }
+
+        // Sabic Edge Case for exposures
+        const isSabicEdgeCase =
+          enBSubProcedure === "RT16172" &&
+          diameter >= 88 &&
+          diameter <= 99 &&
+          (source === "Se75" || source === "Ir192");
+
+        if (isSabicEdgeCase) {
+          document.getElementById("technique").value = "DWSI";
+          document.getElementById("ovaaltjeDiv").style.display = "none"; // Hide "Ovaaltje"
+          let exposures = wanddikte < 7.62 ? 4 : 5;
+          const diameterAntwoord = document.getElementById("diameterAntwoord");
+          diameterAntwoord.innerHTML = `<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: ${exposures}, opstelling DWSI</strong>`;
+          diameterAntwoord.style.display = "block";
+
+          // Hide standard plotting elements
+          document.getElementById("container1A").style.display = "none";
+          document.getElementById("container2A").style.display = "none";
+          document.getElementById("container1B").style.display = "none";
+          document.getElementById("container2B").style.display = "none";
+          document.getElementById("verzet-result").style.display = "none";
+          return; // Exit before standard plotting
+        }
+
+        // --- 3. Plot Exposures ---
+
+        document.getElementById("container1A").style.display = "none";
+
+        document.getElementById("container2A").style.display = "none";
+
+        document.getElementById("container1B").style.display = "none";
+
+        document.getElementById("container2B").style.display = "none";
+
+        document.getElementById("diameterAntwoord").style.display = "none";
+
+        document.getElementById("verzet-result").style.display = "none"; // Hide verzet result by default
+
+        if (!centraal) {
+          // Only show images if Centraal is NOT selected
+
+          if (technique === "DWDI") {
+            if (ovaaltje === "Ja") {
+              document.getElementById("diameterAntwoord").innerHTML =
+                '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 Opnames onder 90 graden</strong>';
+
+              // Calculate verzet
+
+              if (
+                !isNaN(diameter) &&
+                !isNaN(wanddikte) &&
+                !isNaN(lasbreedte) &&
+                !isNaN(sfd)
+              ) {
+                // Conditions for Opstelling 11 / F
+
+                const verzetResultElement =
+                  document.getElementById("verzet-result");
+
+                if (
+                  diameter > 100 ||
+                  wanddikte > 8 ||
+                  lasbreedte > diameter / 4
+                ) {
+                  verzetResultElement.innerHTML =
+                    '<strong class="red-text">Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.</strong>';
+
+                  verzetResultElement.style.display = "block";
                 } else {
-                    return "Ongeldige dikte (w moet > 0 zijn)";
+                  const A = sfd - diameter;
+
+                  const verzet = 1.5 * lasbreedte * (A / diameter);
+
+                  verzetResultElement.innerHTML = `Het benodigde verzet is: <strong>${verzet.toFixed(2)} mm</strong>`;
+                  verzetResultElement.classList.remove("red-text");
+
+                  verzetResultElement.style.display = "block";
                 }
-            }
-
-            // DIRECTE RETURN VOOR RT21002
-            if (procedure === "RT21002") {
-                return "D7"; // Altijd D7 voor RT21002
-            }
-
-            var quality = "/";
-
-            // Definitie van de tabellen (gebaseerd op de CSV)
-            var tables = {
-                "RT21013": {
-                    // Diktebereiken zoals in de RT21013 tabel
-                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
-                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0", "Ir192": "/" },
-                    "10-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D7", "Se75": "/", "Ir192": "D5" }
-                },
-                "RT16172": {
-                    // Diktebereiken gesplitst zoals in de RT16172 tabel
-                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
-                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
-                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
-                },
-                "RT14171": {
-                    // Diktebereiken gesplitst zoals in de RT14171 tabel
-                    "0-6mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "/", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "6-10mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D4", "Se75": "D4 (Zwarting 2.6)", "Ir192": "/" },
-                    "10-14mm": { "X-Ray <150kv": "D4", "X-Ray >150Kv": "D5", "Se75": "D4 (Zwarting 2.6)", "Ir192": "D4 (Zwarting 2.6)" },
-                    "14-20mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D4 (Zwarting 2.6)" },
-                    "20-50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "D5", "Ir192": "D5" },
-                    ">50mm": { "X-Ray <150kv": "/", "X-Ray >150Kv": "D5", "Se75": "/", "Ir192": "D5" }
-                }
-            };
-
-            var selectedTable = tables[procedure];
-            var dikteRange;
-
-            // Bepaal de juiste dikte range op basis van procedure en dikte (w)
-            if (w >= 0 && w <= 6) {
-                dikteRange = "0-6mm";
-            } else if (w > 6 && w <= 10) {
-                dikteRange = "6-10mm";
-            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 10 && w <= 14) {
-                // Specifieke bereiken voor RT16172 en RT14171
-                dikteRange = "10-14mm";
-            } else if ((procedure === "RT16172" || procedure === "RT14171") && w > 14 && w <= 20) {
-                // Specifieke bereiken voor RT16172 en RT14171
-                dikteRange = "14-20mm";
-            } else if (procedure === "RT21013" && w > 10 && w <= 20) {
-                // Bereik 10-20mm voor RT21013
-                dikteRange = "10-20mm";
-            } else if (w > 20 && w <= 50) {
-                dikteRange = "20-50mm";
-            } else if (w > 50) {
-                dikteRange = ">50mm";
+              }
             } else {
-                // Als w niet in een bereik valt
-                return "Ongeldige dikte";
+              // Ovaaltje is Nee
+
+              document.getElementById("diameterAntwoord").innerHTML =
+                '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 3 Opnames onder 60 / 120 graden</strong>';
             }
 
-            if (selectedTable && dikteRange && selectedTable[dikteRange] && selectedTable[dikteRange][source]) {
-                quality = selectedTable[dikteRange][source];
+            document.getElementById("diameterAntwoord").style.display = "block";
+
+            return;
+          }
+
+          const klasse =
+            procedure === "EN-A" || procedure === "ASME" ? "A" : "B";
+
+          const t_plot = ofa;
+
+          const De_plot = diameter;
+
+          const SFD = sfd;
+
+          if (
+            isNaN(t_plot) ||
+            isNaN(De_plot) ||
+            isNaN(SFD) ||
+            De_plot === 0 ||
+            SFD === 0 ||
+            SFD - t_plot === 0
+          ) {
+            // Stop als we geen geldige waarden hebben om deling door nul te voorkomen
+
+            return;
+          }
+
+          const x_value1 = t_plot / De_plot;
+
+          const y_value1 = De_plot / SFD;
+
+          const x_value2 = t_plot / De_plot;
+
+          const y_value2 = De_plot / (SFD - t_plot);
+
+          let x_pixel1, y_pixel1, x_pixel2, y_pixel2, y_scale1, y_scale2;
+
+          const showContainer1 = !(technique === "SWSI" && optie === "");
+
+          if (klasse === "B") {
+            x_pixel1 = (x_value1 / 0.25) * 488;
+            y_pixel1 = (y_value1 / 2) * 819;
+            y_scale1 = 819;
+
+            x_pixel2 = (x_value2 / 0.25) * 488;
+            y_pixel2 = (y_value2 / 4) * 823;
+            y_scale2 = 823;
+
+            if (showContainer1) {
+              document.getElementById("container1B").style.display = "block";
             }
 
-            if (quality === "/") {
-                return "deze combinatie van bron en doorstraalde dikte is onlogisch";
+            // Only show second image if NOT DWSI and not Excentrisch
+
+            if (technique !== "DWSI" && !excentrisch) {
+              document.getElementById("container2B").style.display = "block";
+            }
+          } else {
+            // Klasse A or ASME
+
+            x_pixel1 = (x_value1 / 0.25) * 487;
+            y_pixel1 = (y_value1 / 2) * 823;
+            y_scale1 = 823;
+
+            x_pixel2 = (x_value2 / 0.25) * 470;
+            y_pixel2 = (y_value2 / 4) * 796;
+            y_scale2 = 796;
+
+            if (showContainer1) {
+              document.getElementById("container1A").style.display = "block";
             }
 
-            // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
-            if (procedure === "RT16172" && ovenMateriaal === "Ja") {
-                // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja'
-                return "D4";
-            }
+            // Only show second image if NOT DWSI and not Excentrisch
 
-            return quality;
+            if (technique !== "DWSI" && !excentrisch) {
+              document.getElementById("container2A").style.display = "block";
+            }
+          }
+
+          const container1 = document.getElementById(`container1${klasse}`);
+
+          const container2 = document.getElementById(`container2${klasse}`);
+
+          if (showContainer1) {
+            container1.innerHTML = `<h2>Opstelling 5/8/13/14 (Klasse ${klasse})</h2>`;
+
+            container1.appendChild(
+              createCrosshair(x_pixel1, y_scale1 - y_pixel1),
+            );
+          }
+
+          // Only add crosshair to second container if NOT DWSI and not Excentrisch
+
+          if (technique !== "DWSI" && !excentrisch) {
+            container2.innerHTML = `<h2>Opstelling 2 (Klasse ${klasse})</h2>`;
+
+            container2.appendChild(
+              createCrosshair(x_pixel2, y_scale2 - y_pixel2),
+            );
+          }
+        }
+      }
+
+      function determineFilmQuality(
+        procedure,
+        w,
+        source,
+        ovenMateriaal = "Nee",
+      ) {
+        // DIRECTE RETURN VOOR RT20230059 (Haffmans)
+        if (procedure === "RT20230059") {
+          // Check of de bron correct is (hoewel dit ook in de submit handler gebeurt)
+          if (source !== "Se75") return "Alleen Se75 is toegestaan";
+
+          if (w > 0 && w <= 14) {
+            /* AANPASSING 1: D4 met Zwarting 2.6 toegevoegd */
+            return "D4 (Zwarting 2.6)";
+          } else if (w > 14) {
+            return "D5";
+          } else {
+            return "Ongeldige dikte (w moet > 0 zijn)";
+          }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            laadBronnenCSV();
-            document.getElementById("optieDiv").style.display = "none";
-            // Initialiseer de pagina met een berekening en auto-fill
-            autoCalculate(true);
+        // DIRECTE RETURN VOOR RT21002
+        if (procedure === "RT21002") {
+          return "D7"; // Altijd D7 voor RT21002
+        }
 
-            // Zet de FFD-waarde pas *na* de eerste autoCalculate
-            const sfdInput = document.getElementById("sfd");
-            if (!isNaN(minFFD) && minFFD > 0) {
-                 sfdInput.value = minFFD.toFixed(2); // Initialize FFD field with calculated minFFD
-            } else {
-                 sfdInput.value = "0"; // Initialize FFD field with 0 if no minFFD is calculated
-            }
-        });
+        var quality = "/";
+
+        // Definitie van de tabellen (gebaseerd op de CSV)
+        var tables = {
+          RT21013: {
+            // Diktebereiken zoals in de RT21013 tabel
+            "0-6mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "/",
+              Se75: "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0",
+              Ir192: "/",
+            },
+            "6-10mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "D5",
+              Se75: "D5 (D4 recommended) *Als het draadje niet gehaald wordt dan D4 + minimaal zwarting 3.0",
+              Ir192: "/",
+            },
+            "10-20mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "D5",
+              Ir192: "D5",
+            },
+            "20-50mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "D5",
+              Ir192: "D5",
+            },
+            ">50mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D7",
+              Se75: "/",
+              Ir192: "D5",
+            },
+          },
+          RT16172: {
+            // Diktebereiken gesplitst zoals in de RT16172 tabel
+            "0-6mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "/",
+              Se75: "D4 (Zwarting 2.6)",
+              Ir192: "/",
+            },
+            "6-10mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "D4",
+              Se75: "D4 (Zwarting 2.6)",
+              Ir192: "/",
+            },
+            "10-14mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "D5",
+              Se75: "D4 (Zwarting 2.6)",
+              Ir192: "D4 (Zwarting 2.6)",
+            },
+            "14-20mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "D5",
+              Ir192: "D4 (Zwarting 2.6)",
+            },
+            "20-50mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "D5",
+              Ir192: "D5",
+            },
+            ">50mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "/",
+              Ir192: "D5",
+            },
+          },
+          RT14171: {
+            // Diktebereiken gesplitst zoals in de RT14171 tabel
+            "0-6mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "/",
+              Se75: "D4 (Zwarting 2.6)",
+              Ir192: "/",
+            },
+            "6-10mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "D4",
+              Se75: "D4 (Zwarting 2.6)",
+              Ir192: "/",
+            },
+            "10-14mm": {
+              "X-Ray <150kv": "D4",
+              "X-Ray >150Kv": "D5",
+              Se75: "D4 (Zwarting 2.6)",
+              Ir192: "D4 (Zwarting 2.6)",
+            },
+            "14-20mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "D5",
+              Ir192: "D4 (Zwarting 2.6)",
+            },
+            "20-50mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "D5",
+              Ir192: "D5",
+            },
+            ">50mm": {
+              "X-Ray <150kv": "/",
+              "X-Ray >150Kv": "D5",
+              Se75: "/",
+              Ir192: "D5",
+            },
+          },
+        };
+
+        var selectedTable = tables[procedure];
+        var dikteRange;
+
+        // Bepaal de juiste dikte range op basis van procedure en dikte (w)
+        if (w >= 0 && w <= 6) {
+          dikteRange = "0-6mm";
+        } else if (w > 6 && w <= 10) {
+          dikteRange = "6-10mm";
+        } else if (
+          (procedure === "RT16172" || procedure === "RT14171") &&
+          w > 10 &&
+          w <= 14
+        ) {
+          // Specifieke bereiken voor RT16172 en RT14171
+          dikteRange = "10-14mm";
+        } else if (
+          (procedure === "RT16172" || procedure === "RT14171") &&
+          w > 14 &&
+          w <= 20
+        ) {
+          // Specifieke bereiken voor RT16172 en RT14171
+          dikteRange = "14-20mm";
+        } else if (procedure === "RT21013" && w > 10 && w <= 20) {
+          // Bereik 10-20mm voor RT21013
+          dikteRange = "10-20mm";
+        } else if (w > 20 && w <= 50) {
+          dikteRange = "20-50mm";
+        } else if (w > 50) {
+          dikteRange = ">50mm";
+        } else {
+          // Als w niet in een bereik valt
+          return "Ongeldige dikte";
+        }
+
+        if (
+          selectedTable &&
+          dikteRange &&
+          selectedTable[dikteRange] &&
+          selectedTable[dikteRange][source]
+        ) {
+          quality = selectedTable[dikteRange][source];
+        }
+
+        if (quality === "/") {
+          return "deze combinatie van bron en doorstraalde dikte is onlogisch";
+        }
+
+        // Correctie: Pas de ovenmateriaal check toe op de RT16172 procedure
+        if (procedure === "RT16172" && ovenMateriaal === "Ja") {
+          // Regel voor ovenmateriaal: altijd D4 bij RT16172 indien 'Ja'
+          return "D4";
+        }
+
+        return quality;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        laadBronnenCSV();
+        document.getElementById("optieDiv").style.display = "none";
+        // Initialiseer de pagina met een berekening en auto-fill
+        autoCalculate(true);
+
+        // Zet de FFD-waarde pas *na* de eerste autoCalculate
+        const sfdInput = document.getElementById("sfd");
+        if (!isNaN(minFFD) && minFFD > 0) {
+          sfdInput.value = minFFD.toFixed(2); // Initialize FFD field with calculated minFFD
+        } else {
+          sfdInput.value = "0"; // Initialize FFD field with 0 if no minFFD is calculated
+        }
+      });
     </script>
-    <div style="height: 200px;"></div>
-<div style="height: 200px;"></div>
-</body>
+    <div style="height: 200px"></div>
+    <div style="height: 200px"></div>
+    <div id="lascategorieModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('lascategorieModal')">&times;</span>
+            <h3>Lastype Categorieën (ASME)</h3>
+            <img src="Lascategorie.png" alt="Lastype Categorieën" style="max-width: 100%; height: auto;" />
+        </div>
+    </div>
+
+    <div id="easterEggModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('easterEggModal')">&times;</span>
+            <p id="easterEggMessage" style="color: black; text-shadow: none;"></p>
+        </div>
+    </div>
+
+  </body>
 </html>
