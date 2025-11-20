@@ -1217,7 +1217,7 @@
       }
 
       // --- NEW FUNCTION: Calculate Minimum Exposures based on Geometry (ISO 17636 principles) ---
-      function calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure) {
+      function calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure, optie) {
         if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0) return "";
 
         // Allowable thickness variation ratio
@@ -1228,83 +1228,122 @@
 
         const R = diameter / 2.0;
         const r = R - wanddikte;
-        // SFD is typically defined as Source-to-Film.
-        // Assuming Film is wrapped on the back (bottom in this coord system at -R).
-        // Source is at +Y relative to center.
-        const sourceY = sfd - R;
 
-        // Determine if we are calculating for Double Wall Single Image (DWSI)
-        // or Single Wall Single Image (SWSI) non-panoramic.
-        const isDoubleWall = (technique === "DWSI");
+        // Determine specific technique mode
+        // 1. Panoramic (SWSI + Centraal) -> optie === '1' (Covered by manual panoramic calc in another function usually, but here we handle standard loop)
+        // 2. SWSI Contact (Film Inside, Source Outside) -> technique === 'SWSI' && optie === ''
+        // 3. Double Wall / Excentric (Film Outside, Source Outside) -> All others
 
-        // Iterate to find minimum N that satisfies the ratio condition
-        for (let n = 3; n <= 30; n++) {
-            const alpha = Math.PI / n; // Half-angle of coverage (radians)
+        const isContactSWSI = (technique === "SWSI" && optie === "");
 
-            // Target Point P on outer surface at angle alpha
-            const Px = R * Math.sin(alpha);
-            const Py = -R * Math.cos(alpha); // Film side (bottom)
+        if (isContactSWSI) {
+            // SWSI Contact: Ray travels from Source -> Outer Wall -> Inner Wall (Film)
+            // Source S is Outside. Film P is on Inner Surface (r).
+            // We image the wall closest to the Source (The "Top" or "Near" wall).
 
-            // Vector from Source (0, sourceY) to P (Px, Py)
-            const Vx = Px;
-            const Vy = Py - sourceY;
+            // Source relative to center (Assuming film is at -r, Source is at +Y = -r + SFD)
+            // Note: SFD is Source-to-Film.
+            const sourceY = -r + sfd;
 
-            // Intersection parameters for Line: Source + u * V
-            const A = Vx*Vx + Vy*Vy;
-            const B = 2 * (-sourceY * Vy); // Sx is 0
-            const C_outer = sourceY*sourceY - R*R;
-            const C_inner = sourceY*sourceY - r*r;
+            for (let n = 3; n <= 30; n++) {
+                const alpha = Math.PI / n; // Half-angle of coverage on Inner Surface
 
-            // Calculate intersections with outer circle
-            const delta_outer = B*B - 4*A*C_outer;
-            if (delta_outer < 0) continue; // Invalid geometry
+                // Target Point P on Inner Surface (Film)
+                const Px = r * Math.sin(alpha);
+                const Py = -r * Math.cos(alpha);
 
-            const sqrt_outer = Math.sqrt(delta_outer);
-            // u_out1 (near), u_out2 (far/film side)
-            const u_out1 = (-B - sqrt_outer) / (2*A);
-            const u_out2 = (-B + sqrt_outer) / (2*A);
+                // Vector from Source S(0, sourceY) to P(Px, Py)
+                const Vx = Px;
+                const Vy = Py - sourceY;
 
-            // Calculate intersections with inner circle
-            const delta_inner = B*B - 4*A*C_inner;
+                // Coefficients for Line S + u*V
+                const A = Vx*Vx + Vy*Vy;
+                const B = 2 * (0*Vx + sourceY*Vy);
 
-            let pathLength = 0;
+                // 1. Find Intersection with Outer Circle (R) - Near Side
+                const C_outer = sourceY*sourceY - R*R;
+                const delta_outer = B*B - 4*A*C_outer;
+                if (delta_outer < 0) continue;
+                // Smallest positive root u (Near side entrance)
+                const u_out = (-B - Math.sqrt(delta_outer)) / (2*A);
 
-            if (isDoubleWall) {
-                // Double Wall: Path = (OuterChord) - (InnerChord)
-                if (delta_inner < 0) {
-                    // Ray misses ID? Full chord thickness
-                    pathLength = (u_out2 - u_out1) * Math.sqrt(A);
-                } else {
-                    const sqrt_inner = Math.sqrt(delta_inner);
-                    const u_in1 = (-B - sqrt_inner) / (2*A);
-                    const u_in2 = (-B + sqrt_inner) / (2*A);
+                // 2. Find Intersection with Inner Circle (r) - Near Side
+                const C_inner = sourceY*sourceY - r*r;
+                const delta_inner = B*B - 4*A*C_inner;
+                if (delta_inner < 0) continue;
+                // Smallest positive root u (Near side exit)
+                const u_in = (-B - Math.sqrt(delta_inner)) / (2*A);
 
-                    const chordOuter = (u_out2 - u_out1) * Math.sqrt(A);
-                    const chordInner = (u_in2 - u_in1) * Math.sqrt(A);
-                    pathLength = chordOuter - chordInner;
-                }
+                // 3. Calculate Path Length through Near Wall
+                // Ray enters at u_out, exits near wall at u_in.
+                const pathLength = (u_in - u_out) * Math.sqrt(A);
 
-                // Nominal thickness for DWSI is 2 * wall thickness
-                if (pathLength / (2 * wanddikte) <= ratioLimit) return n;
-
-            } else {
-                // SWSI (Source Outside viewing far wall)
-                // Path is the segment on the far side: u_in2 to u_out2
-                if (delta_inner < 0) {
-                    // Tangential or misses ID, effectively unusable for SWSI thickness check
-                    continue;
-                }
-                const sqrt_inner = Math.sqrt(delta_inner);
-                // Assuming standard order u_out1 < u_in1 < u_in2 < u_out2
-                const u_in2 = (-B + sqrt_inner) / (2*A);
-
-                pathLength = (u_out2 - u_in2) * Math.sqrt(A);
-
-                // Nominal thickness for SWSI is 1 * wall thickness
+                // Check Ratio against single wall thickness
                 if (pathLength / wanddikte <= ratioLimit) return n;
             }
+            return ">30";
+
+        } else {
+            // Standard DWSI / Excentric Logic (Film on Outside/Far side)
+            // SFD is typically defined as Source-to-Film.
+            // Film is at -R. Source is at -R + SFD.
+            const sourceY = -R + sfd;
+
+            const isDoubleWall = (technique === "DWSI");
+
+            for (let n = 3; n <= 30; n++) {
+                const alpha = Math.PI / n;
+                // Target Point P on Outer Surface (Film)
+                const Px = R * Math.sin(alpha);
+                const Py = -R * Math.cos(alpha);
+
+                const Vx = Px;
+                const Vy = Py - sourceY;
+
+                const A = Vx*Vx + Vy*Vy;
+                const B = 2 * (-sourceY * Vy);
+                const C_outer = sourceY*sourceY - R*R;
+                const C_inner = sourceY*sourceY - r*r;
+
+                const delta_outer = B*B - 4*A*C_outer;
+                if (delta_outer < 0) continue;
+
+                const sqrt_outer = Math.sqrt(delta_outer);
+                const u_out1 = (-B - sqrt_outer) / (2*A);
+                const u_out2 = (-B + sqrt_outer) / (2*A);
+
+                const delta_inner = B*B - 4*A*C_inner;
+                let pathLength = 0;
+
+                if (isDoubleWall) {
+                    // DWSI: Path = OuterChord - InnerChord
+                    if (delta_inner < 0) {
+                        pathLength = (u_out2 - u_out1) * Math.sqrt(A);
+                    } else {
+                        const sqrt_inner = Math.sqrt(delta_inner);
+                        const u_in1 = (-B - sqrt_inner) / (2*A);
+                        const u_in2 = (-B + sqrt_inner) / (2*A);
+
+                        const chordOuter = (u_out2 - u_out1) * Math.sqrt(A);
+                        const chordInner = (u_in2 - u_in1) * Math.sqrt(A);
+                        pathLength = chordOuter - chordInner;
+                    }
+                    // Nominal: 2 * t
+                    if (pathLength / (2 * wanddikte) <= ratioLimit) return n;
+                } else {
+                    // SWSI Excentric / Standard (Far wall view)
+                    if (delta_inner < 0) continue;
+                    const sqrt_inner = Math.sqrt(delta_inner);
+                    const u_in2 = (-B + sqrt_inner) / (2*A); // Exit inner
+                    // Path from Exit Inner to Exit Outer
+                    pathLength = (u_out2 - u_in2) * Math.sqrt(A);
+
+                    // Nominal: 1 * t
+                    if (pathLength / wanddikte <= ratioLimit) return n;
+                }
+            }
+            return ">30";
         }
-        return ">30";
       }
 
       function calculateResults() {
@@ -1885,10 +1924,20 @@
             document.getElementById("opname-locaties").style.display = "none";
           } else {
             // CALCULATE MINIMUM EXPOSURES
-            let minExposures = calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure);
+            let minExposures = "";
+
+            // Skip calculation for SWSI Contact (SWSI + Optie "Nee")
+            if (!(technique === "SWSI" && optie === "")) {
+                 minExposures = calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure, optie);
+            }
 
             omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${minExposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
-            berekenOpnameLocaties();
+
+            if (minExposures !== "" && minExposures !== ">30") {
+                berekenOpnameLocaties();
+            } else {
+                 document.getElementById("opname-locaties").style.display = "none";
+            }
           }
           omtrekCalculatorElement.style.display = "block";
         }
