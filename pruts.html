@@ -1464,7 +1464,7 @@
 
             if (source === "Se75") {
               if (doorstraaldeDikte < 14 || doorstraaldeDikte > 40) {
-                warningMsg = `Waarschuwing: Het gebruik van Se-75 voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong> is ongebruikelijk (standaardbereik: 14-40 mm). <strong>Een lagere dikte is in overleg met de opdrachtgever wel mogelijk.</strong>`;
+                warningMsg = `Waarschuwing: Het gebruik van Se-75 voor een doorstraalde dikte van <strong>${doorstraaldeDikte.toFixed(2)} mm</strong> is ongebruikelijk (standaardbereik: 14-40 mm). <strong style="color: yellow;">Een lagere dikte is in overleg met de opdrachtgever wel mogelijk.</strong>`;
               }
             } else if (source === "Ir192") {
               if (doorstraaldeDikte < 10) {
