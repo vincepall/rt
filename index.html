@@ -182,6 +182,10 @@
 
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
+    <div style="margin-bottom: 20px;">
+        <input type="text" id="searchBar" placeholder="Zoeken...">
+    </div>
+
     <ul class="link-list">
         <li><a href="focusverandering.html" class="link1"><i class="fa-solid fa-up-down"></i>Focusverandering<i class="fa-solid fa-up-down"></i></a></li>
         <li><a href="filmsoortverandering.html" class="link2"><i class="fa-solid fa-repeat"></i>D4 D5 D7<i class="fa-solid fa-repeat"></i></a></li>
@@ -210,5 +214,59 @@
         Installeer RT Tools als app
     </button>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const searchBar = document.getElementById('searchBar');
+            const list = document.querySelector('.link-list');
+            
+            // Store original local items
+            const localItems = Array.from(list.children);
+            
+            // Initialize allItems with local items
+            let allItems = localItems.map(li => ({ element: li, text: li.textContent.toLowerCase() }));
+
+            // Fetch items from other pages
+            const pages = ['handigelinks.html', 'onstream.html'];
+            let remoteItems = [];
+
+            for (const page of pages) {
+                try {
+                    const res = await fetch(page);
+                    if (res.ok) {
+                        const text = await res.text();
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(text, 'text/html');
+                        const items = Array.from(doc.querySelectorAll('.link-list li'));
+                        
+                        items.forEach(li => {
+                            remoteItems.push({ element: li, text: li.textContent.toLowerCase() });
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch ' + page, e);
+                }
+            }
+
+            searchBar.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                list.innerHTML = '';
+
+                if (term === '') {
+                    // Restore original view (only local items)
+                    localItems.forEach(li => list.appendChild(li));
+                } else {
+                    // Combine local and remote for searching
+                    const combined = [...allItems, ...remoteItems];
+                    const filtered = combined.filter(item => item.text.includes(term));
+                    
+                    if (filtered.length > 0) {
+                        filtered.forEach(item => list.appendChild(item.element));
+                    } else {
+                        list.innerHTML = '<p style="width: 100%; text-align: center;">Geen resultaten gevonden</p>';
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
