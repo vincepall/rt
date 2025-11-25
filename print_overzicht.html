@@ -28,13 +28,13 @@
             border-collapse: collapse;
             margin-top: 20px;
             background-color: white !important;
-            font-size: 12px;
+            font-size: 16px;
             color: black !important;
         }
 
         th, td {
             border: 1px solid black;
-            padding: 6px;
+            padding: 8px;
             text-align: center;
         }
 
@@ -172,7 +172,7 @@
                     const currentMonday = getMonday(today);
                     
                     const weekDates = [];
-                    for (let i = 0; i < 8; i++) {
+                    for (let i = 0; i < 6; i++) {
                         const d = new Date(currentMonday);
                         d.setDate(d.getDate() + (i * 7));
                         weekDates.push(d);
