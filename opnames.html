@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FFD & Opname Visualisatie</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h1 {
+        margin-top: 20px;
+        color: #f5df4d;
+        text-align: center;
+      }
+
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+        width: 100%;
+        max-width: 1200px;
+      }
+
+      .controls {
+        background-color: #2d2d2d;
+        padding: 20px;
+        border-radius: 10px;
+        flex: 1;
+        min-width: 300px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .canvas-container {
+        position: relative;
+        background-color: #000;
+        border: 2px solid #444;
+        border-radius: 10px;
+        flex: 2;
+        min-width: 300px;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      canvas {
+        background-color: #121212;
+      }
+
+      .control-group {
+        margin-bottom: 20px;
+      }
+
+      .input-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #aaa;
+      }
+
+      /* Style for the manual number inputs */
+      .manual-input {
+        width: 80px;
+        padding: 4px 8px;
+        background-color: #444;
+        border: 1px solid #555;
+        color: #f5df4d;
+        border-radius: 4px;
+        text-align: right;
+        font-weight: bold;
+        font-size: 1em;
+      }
+
+      .manual-input:focus {
+        outline: none;
+        border-color: #f5df4d;
+        background-color: #555;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        cursor: pointer;
+        margin-top: 5px;
+      }
+
+      select {
+        width: 100%;
+        padding: 8px;
+        background-color: #333;
+        border: 1px solid #555;
+        color: white;
+        border-radius: 4px;
+      }
+
+      .stats {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #444;
+      }
+
+      .stat-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+
+      .stat-highlight {
+        color: #f5df4d;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+
+      .legend {
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #888;
+      }
+
+      .legend span {
+        display: inline-block;
+        margin-right: 15px;
+      }
+
+      .color-box {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Interactieve Opname Calculator</h1>
+    <p style="text-align: center; color: #aaa; max-width: 600px">
+      Pas de FFD-schuifregelaar aan of voer waarden in om te zien hoe een kortere bronafstand
+      de röntgenstralen dwingt door meer materiaal aan de randen te gaan.
+    </p>
+
+    <div class="container">
+      <div class="controls">
+        <div class="control-group">
+          <label for="classType" style="display:block; margin-bottom:5px;">Procedure Klasse</label>
+          <select id="classType">
+            <option value="1.2">Klasse A / ASME (Max Ratio 1.2)</option>
+            <option value="1.1">Klasse B (Max Ratio 1.1)</option>
+          </select>
+        </div>
+
+        <!-- Diameter Control -->
+        <div class="control-group">
+          <div class="input-header">
+            <label for="diaInput">Diameter (mm)</label>
+            <input type="number" id="diaInput" class="manual-input" value="168" min="100" max="1000">
+          </div>
+          <input type="range" id="diameter" min="100" max="1000" value="168" />
+        </div>
+
+        <!-- Wall Thickness Control -->
+        <div class="control-group">
+          <div class="input-header">
+            <label for="wallInput">Wanddikte (mm)</label>
+            <input type="number" id="wallInput" class="manual-input" value="7.11" min="2" max="50" step="0.01">
+          </div>
+          <input
+            type="range"
+            id="wall"
+            min="2"
+            max="50"
+            step="0.01"
+            value="7.11"
+          />
+        </div>
+
+        <!-- FFD Control -->
+        <div class="control-group">
+          <div class="input-header">
+            <label for="ffdInput">FFD (Bron Afstand) (mm)</label>
+            <input type="number" id="ffdInput" class="manual-input" value="500" min="100" max="2000">
+          </div>
+          <input type="range" id="ffd" min="100" max="2000" value="500" />
+        </div>
+
+        <div class="stats">
+          <div class="stat-item">
+            <span>Aantal Opnames:</span>
+            <span id="resExposures" class="stat-highlight">0</span>
+          </div>
+          <div class="stat-item">
+            <span>Dikte Centrum:</span>
+            <span id="resCenterThick">0 mm</span>
+          </div>
+          <div class="stat-item">
+            <span>Dikte Rand:</span>
+            <span id="resEdgeThick">0 mm</span>
+          </div>
+          <div class="stat-item">
+            <span>Huidige Ratio:</span>
+            <span id="resRatio" style="color: #ff3131">0</span>
+          </div>
+          <div class="stat-item" style="font-size: 0.9em; color: #888">
+            <span>Limiet:</span>
+            <span id="resLimit">1.2</span>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span
+            ><div class="color-box" style="background: #444"></div>
+            Staal</span
+          >
+          <span
+            ><div class="color-box" style="background: #f5df4d"></div>
+            Bron</span
+          >
+          <span
+            ><div class="color-box" style="background: cyan"></div>
+            Film Boog</span
+          >
+          <span
+            ><div class="color-box" style="background: red"></div>
+            Pad door wand</span
+          >
+        </div>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="visualizer" width="600" height="500"></canvas>
+      </div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("visualizer");
+      const ctx = canvas.getContext("2d");
+
+      // Range Elements
+      const rangeDia = document.getElementById("diameter");
+      const rangeWall = document.getElementById("wall");
+      const rangeFFD = document.getElementById("ffd");
+      
+      // Number Input Elements
+      const inputDia = document.getElementById("diaInput");
+      const inputWall = document.getElementById("wallInput");
+      const inputFFD = document.getElementById("ffdInput");
+      
+      const elClass = document.getElementById("classType");
+
+      // Stats Displays
+      const resExposures = document.getElementById("resExposures");
+      const resCenterThick = document.getElementById("resCenterThick");
+      const resEdgeThick = document.getElementById("resEdgeThick");
+      const resRatio = document.getElementById("resRatio");
+      const resLimit = document.getElementById("resLimit");
+
+      // State
+      let state = {
+        diameter: 168,
+        wall: 7.11,
+        ffd: 500,
+        ratioLimit: 1.2,
+      };
+
+      // Synchronization Logic
+      function syncInputs(sourceEl, targetEl) {
+        targetEl.value = sourceEl.value;
+        updateState();
+      }
+
+      // Add listeners for Diameter
+      rangeDia.addEventListener("input", () => syncInputs(rangeDia, inputDia));
+      inputDia.addEventListener("input", () => syncInputs(inputDia, rangeDia));
+
+      // Add listeners for Wall Thickness
+      rangeWall.addEventListener("input", () => syncInputs(rangeWall, inputWall));
+      inputWall.addEventListener("input", () => syncInputs(inputWall, rangeWall));
+
+      // Add listeners for FFD
+      rangeFFD.addEventListener("input", () => syncInputs(rangeFFD, inputFFD));
+      inputFFD.addEventListener("input", () => syncInputs(inputFFD, rangeFFD));
+
+      // Class change listener
+      elClass.addEventListener("change", updateState);
+
+      function updateState() {
+        // We can read from the number inputs as the source of truth
+        state.diameter = parseFloat(inputDia.value) || 0;
+        state.wall = parseFloat(inputWall.value) || 0;
+        state.ffd = parseFloat(inputFFD.value) || 0;
+        state.ratioLimit = parseFloat(elClass.value);
+
+        resLimit.textContent = state.ratioLimit;
+
+        if(state.diameter > 0 && state.wall > 0 && state.ffd > 0) {
+            calculateAndDraw();
+        }
+      }
+
+      function calculateAndDraw() {
+        const R = state.diameter / 2;
+        const r = R - state.wall;
+        const sfd = state.ffd;
+        const limit = state.ratioLimit;
+
+        let optimalN = 30; // Default max
+        let optimalStats = {};
+        let found = false;
+
+        // Loop from 3 to 30 exposures
+        for (let n = 3; n <= 30; n++) {
+          const alpha = Math.PI / n; // Half-angle of coverage
+          const sourceY = R - sfd;
+
+          const Px = R * Math.sin(alpha);
+          const Py = R * Math.cos(alpha);
+
+          const Vx = Px - 0; 
+          const Vy = Py - sourceY;
+
+          const A = Vx * Vx + Vy * Vy;
+          const B = 2 * sourceY * Vy;
+
+          function getIntersections(radius) {
+            const C = sourceY * sourceY - radius * radius;
+            const delta = B * B - 4 * A * C;
+            if (delta < 0) return [];
+            const sqrtD = Math.sqrt(delta);
+            const u1 = (-B - sqrtD) / (2 * A);
+            const u2 = (-B + sqrtD) / (2 * A);
+            return [u1, u2].sort((a, b) => a - b);
+          }
+
+          const hitsOuter = getIntersections(R);
+          const hitsInner = getIntersections(r);
+
+          let pathLength = 0;
+
+          if (hitsOuter.length === 2) {
+            const entryOuter = hitsOuter[0]; 
+            const exitOuter = hitsOuter[1]; 
+
+            let lengthInsideHollow = 0;
+            if (hitsInner.length === 2) {
+              lengthInsideHollow = (hitsInner[1] - hitsInner[0]) * Math.sqrt(A);
+            }
+
+            const totalChord = (exitOuter - entryOuter) * Math.sqrt(A);
+            pathLength = totalChord - lengthInsideHollow;
+          }
+
+          const nominal = 2 * state.wall;
+          const ratio = nominal > 0 ? pathLength / nominal : 999;
+
+          if (ratio <= limit) {
+            optimalN = n;
+            optimalStats = {
+              ratio: ratio,
+              path: pathLength,
+              nominal: nominal,
+              hitsOuter: hitsOuter,
+              hitsInner: hitsInner,
+              sourceY: sourceY
+            };
+            found = true;
+            break;
+          }
+        }
+
+        // Update Stats Display
+        if (found) {
+          resExposures.innerText = optimalN;
+          resCenterThick.innerText = optimalStats.nominal.toFixed(2) + " mm";
+          resEdgeThick.innerText = optimalStats.path.toFixed(2) + " mm";
+          resRatio.innerText = optimalStats.ratio.toFixed(3);
+        } else {
+          resExposures.innerText = "> 30";
+          resRatio.innerText = "Te Hoog";
+          
+          // Even if not found, we want to draw something based on the last loop (n=30)
+          // Use current calculated geometry for visualization
+           const alpha = Math.PI / 30;
+           const sourceY = R - sfd;
+           optimalStats = {
+              hitsOuter: getIntersections(R, sourceY, alpha),
+              hitsInner: getIntersections(r, sourceY, alpha),
+              sourceY: sourceY
+           };
+           // Helper to recalc for drawing just in case
+           function getIntersections(radius, sY, a) {
+              const Px = R * Math.sin(a);
+              const Py = R * Math.cos(a);
+              const Vx = Px; const Vy = Py - sY;
+              const A = Vx*Vx + Vy*Vy; const B = 2*sY*Vy;
+              const C = sY*sY - radius*radius;
+              const delta = B*B - 4*A*C;
+              if (delta < 0) return [];
+              const sqrtD = Math.sqrt(delta);
+              return [(-B - sqrtD) / (2 * A), (-B + sqrtD) / (2 * A)].sort((a, b) => a - b);
+           }
+        }
+
+        // --- DRAWING ---
+        drawVisuals(
+          R,
+          r,
+          sfd,
+          optimalN,
+          optimalStats.hitsOuter,
+          optimalStats.hitsInner,
+          optimalStats.sourceY
+        );
+      }
+
+      function drawVisuals(R, r, sfd, n, hitsOuter, hitsInner, sourceY_coord) {
+        // Clear
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Center coordinates
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+
+        // Auto-scale to fit canvas
+        // We use a slightly different scale logic to keep it centered better
+        // The total height of interest is from SourceY to +R (bottom of pipe)
+        // Pipe Height = 2*R. Source is `sfd` away from film (bottom).
+        // Total range approx = sfd.
+        const scale = Math.min(canvas.width, canvas.height) / (sfd * 1.1);
+        
+        // Offset Y so the middle of the "SFD range" is in the middle of canvas
+        // Source is at sourceY_coord. Film is at +R.
+        // Midpoint = (sourceY_coord + R) / 2
+        // We want Midpoint to be at cy
+        const midY = (sourceY_coord + R) / 2;
+
+        function toCanvas(x, y) {
+          return {
+            x: cx + x * scale,
+            y: cy + (y - midY) * scale,
+          };
+        }
+
+        // Draw Source
+        const sPos = toCanvas(0, sourceY_coord);
+        ctx.beginPath();
+        ctx.arc(sPos.x, sPos.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "#f5df4d";
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.fillText("Bron", sPos.x + 10, sPos.y);
+
+        // Draw Pipe (Outer)
+        // Center of pipe is (0,0) in our world coords
+        const cPos = toCanvas(0, 0);
+        
+        ctx.beginPath();
+        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
+        ctx.strokeStyle = "#444";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw Pipe (Inner)
+        ctx.beginPath();
+        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2);
+        ctx.strokeStyle = "#444";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Fill Pipe Wall
+        ctx.beginPath();
+        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
+        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2, true);
+        ctx.fillStyle = "rgba(100, 100, 100, 0.3)";
+        ctx.fill();
+
+        // Draw Rays for the computed N
+        if (hitsOuter && hitsOuter.length > 0) {
+          const alpha = Math.PI / n;
+
+          // Left and Right Ray angles
+          const angles = [-alpha, alpha]; 
+
+          // Draw Center Line (Reference)
+          const centerFilmP = toCanvas(0, R);
+          ctx.beginPath();
+          ctx.moveTo(sPos.x, sPos.y);
+          ctx.lineTo(centerFilmP.x, centerFilmP.y);
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+          ctx.setLineDash([5, 5]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Draw Edge Rays
+          angles.forEach((ang) => {
+            const filmX = R * Math.sin(ang);
+            const filmY = R * Math.cos(ang);
+            const filmPos = toCanvas(filmX, filmY);
+
+            // Draw Ray
+            ctx.beginPath();
+            ctx.moveTo(sPos.x, sPos.y);
+            ctx.lineTo(filmPos.x, filmPos.y);
+            ctx.strokeStyle = "cyan";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Highlight Path through wall
+            const Vx = filmX;
+            const Vy = filmY - sourceY_coord;
+            const A = Vx * Vx + Vy * Vy;
+            const B = 2 * sourceY_coord * Vy;
+            const C_out = sourceY_coord * sourceY_coord - R * R;
+            const C_in = sourceY_coord * sourceY_coord - r * r;
+
+            const getU = (C) => {
+              const delta = B * B - 4 * A * C;
+              if (delta < 0) return [];
+              return [
+                (-B - Math.sqrt(delta)) / (2 * A),
+                (-B + Math.sqrt(delta)) / (2 * A),
+              ];
+            };
+
+            const uOut = getU(C_out);
+            const uIn = getU(C_in);
+
+            // Draw segment through top wall
+            if (uOut.length === 2) {
+              const u1 = uOut[0]; // Enter outer
+              const u2 = uIn.length === 2 ? uIn[0] : uOut[1]; // Enter inner OR exit outer
+
+              const p1 = toCanvas(0 + u1 * Vx, sourceY_coord + u1 * Vy);
+              const p2 = toCanvas(0 + u2 * Vx, sourceY_coord + u2 * Vy);
+
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = "red";
+              ctx.lineWidth = 3;
+              ctx.stroke();
+
+              // Bottom Wall Segment (if hollow)
+              if (uIn.length === 2) {
+                const u3 = uIn[1]; // Exit inner
+                const u4 = uOut[1]; // Exit outer
+
+                const p3 = toCanvas(0 + u3 * Vx, sourceY_coord + u3 * Vy);
+                const p4 = toCanvas(0 + u4 * Vx, sourceY_coord + u4 * Vy);
+
+                ctx.beginPath();
+                ctx.moveTo(p3.x, p3.y);
+                ctx.lineTo(p4.x, p4.y);
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+              }
+            }
+          });
+
+          // Draw Film Arc representation
+          ctx.beginPath();
+          // We need canvas coords for arc center and start/end angles.
+          // Arc is drawn relative to canvas X,Y.
+          // Our scaling is uniform so circle is circle.
+          // Center is cPos.
+          // Angles need to be rotated because canvas 0 is Right, but our simulation 0 is Down (Y+).
+          // Actually, standard canvas arc 0 is right (3 o'clock).
+          // Our film is at bottom. That corresponds to PI/2 (90 deg).
+          // Angles are +/- alpha relative to PI/2.
+          ctx.arc(
+            cPos.x,
+            cPos.y,
+            R * scale + 5,
+            Math.PI / 2 - alpha,
+            Math.PI / 2 + alpha
+          );
+          ctx.strokeStyle = "cyan";
+          ctx.lineWidth = 4;
+          ctx.stroke();
+          
+          const textPos = toCanvas(0, R);
+          ctx.fillStyle = "cyan";
+          ctx.fillText("Film", textPos.x - 10, textPos.y + 20);
+        }
+      }
+
+      // Initial draw
+      updateState();
+    </script>
+  </body>
+</html>
