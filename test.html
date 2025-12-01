@@ -371,6 +371,16 @@
         </strong>
       </div>
 
+      <div id="visualizer-section" style="display:none; margin: 20px auto; max-width: 600px; text-align: center;">
+          <h2 style="color: #f5df4d;">DWSI Simulatie</h2>
+          <div style="background-color: #000; padding: 10px; border-radius: 10px; border: 2px solid #444;">
+              <canvas id="dwsi-canvas" width="580" height="500" style="background-color: #121212; max-width: 100%;"></canvas>
+              <div id="visualizer-stats" style="color: #e0e0e0; margin-top: 15px; font-family: monospace; text-align: left; padding: 10px;">
+                  <!-- Stats worden hier ingevuld door JS -->
+              </div>
+          </div>
+      </div>
+
       <div
         class="image-container"
         id="container1B"
@@ -418,16 +428,6 @@
         "
       >
         <h2>Opstelling 2 (Klasse A)</h2>
-      </div>
-
-      <div id="visualizer-section" style="display:none; margin: 20px auto; max-width: 600px; text-align: center;">
-          <h2 style="color: #f5df4d;">DWSI Simulatie</h2>
-          <div style="background-color: #000; padding: 10px; border-radius: 10px; border: 2px solid #444;">
-              <canvas id="dwsi-canvas" width="580" height="500" style="background-color: #121212; max-width: 100%;"></canvas>
-              <div id="visualizer-stats" style="color: #e0e0e0; margin-top: 15px; font-family: monospace; text-align: left; padding: 10px;">
-                  <!-- Stats worden hier ingevuld door JS -->
-              </div>
-          </div>
       </div>  
     </div>
 
@@ -2414,7 +2414,7 @@
 
             if (ratio <= ratioLimit) {
                 optimalN = n;
-                optimalStats = { ratio, pathLength, hitsOuter, hitsInner, sourceY, alpha };
+                optimalStats = { ratio, pathLength,centerPAth: 2 * wanddikte, hitsOuter, hitsInner, sourceY, alpha };
                 found = true;
                 break;
             }
@@ -2426,7 +2426,8 @@
             const sourceY = R - sfd;
             optimalStats = { 
                 ratio: "> Limit", 
-                pathLength: 0, 
+                pathLength: 0,
+                centerPath: 2 * wanddikte,
                 hitsOuter: [], 
                 hitsInner: [], 
                 sourceY: sourceY, 
@@ -2456,142 +2457,164 @@
         // --- Draw Canvas ---
         drawCanvas(canvas, R, r, sfd, optimalN, optimalStats);
       }
-
       function drawCanvas(canvas, R, r, sfd, n, stats) {
-        const ctx = canvas.getContext("2d");
-        const w = canvas.width;
-        const h = canvas.height;
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width;
+    const h = canvas.height;
 
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, w, h);
+    // Clear background
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, w, h);
 
-        const cx = w / 2;
-        const cy = h / 2;
-        // Scale logic: Fit (SFD + R) into height with margin
-        const scale = Math.min(w, h) / (sfd * 1.15);
-        
-        const sourceY_coord = stats.sourceY;
-        const midY = (sourceY_coord + R) / 2; // Center view between source and film
+    const cx = w / 2;
+    const cy = h / 2;
+    // Scale logic: Fit (SFD + R) into height with margin
+    const scale = Math.min(w, h) / (sfd * 1.15);
 
-        const toCanvas = (x, y) => ({
-            x: cx + x * scale,
-            y: cy + (y - midY) * scale
-        });
+    const sourceY_coord = stats.sourceY;
+    const midY = (sourceY_coord + R) / 2; 
 
-        // 1. Draw Source
-        const sPos = toCanvas(0, sourceY_coord);
+    const toCanvas = (x, y) => ({
+        x: cx + x * scale,
+        y: cy + (y - midY) * scale
+    });
+
+    // 1. Draw Source
+    const sPos = toCanvas(0, sourceY_coord);
+    ctx.beginPath();
+    ctx.arc(sPos.x, sPos.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "#f5df4d";
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "14px Arial";
+    ctx.fillText("Bron", sPos.x + 10, sPos.y);
+
+    // 2. Draw Pipe
+    const cPos = toCanvas(0, 0);
+
+    // Outer
+    ctx.beginPath();
+    ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
+    ctx.strokeStyle = "#555";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Inner
+    ctx.beginPath();
+    ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2);
+    ctx.strokeStyle = "#555";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Fill pipe walls
+    ctx.beginPath();
+    ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
+    ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2, true);
+    ctx.fillStyle = "rgba(100, 100, 100, 0.3)";
+    ctx.fill();
+
+    // 3. Draw Rays, Film and Text Values
+    if (stats.hitsOuter && stats.hitsOuter.length > 0) {
+        const alpha = Math.PI / n;
+        const angles = [-alpha, alpha];
+
+        // --- A. Center Ray & Text ---
+        const centerFilmP = toCanvas(0, R);
         ctx.beginPath();
-        ctx.arc(sPos.x, sPos.y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = "#f5df4d";
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "14px Arial";
-        ctx.fillText("Bron", sPos.x + 10, sPos.y);
-
-        // 2. Draw Pipe
-        const cPos = toCanvas(0, 0);
-        
-        // Outer
-        ctx.beginPath();
-        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
-        ctx.strokeStyle = "#555";
-        ctx.lineWidth = 2;
+        ctx.moveTo(sPos.x, sPos.y);
+        ctx.lineTo(centerFilmP.x, centerFilmP.y);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.setLineDash([5, 5]);
         ctx.stroke();
+        ctx.setLineDash([]);
 
-        // Inner
-        ctx.beginPath();
-        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2);
-        ctx.strokeStyle = "#555";
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        // Draw Center Thickness Value
+        if (stats.centerPath) {
+            const centerTextPos = toCanvas(5, 0); // Slightly right of center (x=0, y=0)
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 14px Arial";
+            ctx.fillText(stats.centerPath.toFixed(2) + "mm", centerTextPos.x, centerTextPos.y);
+        }
 
-        // Fill
-        ctx.beginPath();
-        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
-        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2, true);
-        ctx.fillStyle = "rgba(100, 100, 100, 0.3)";
-        ctx.fill();
+        // --- B. Edge Rays & Text ---
+        angles.forEach((ang, index) => {
+            const filmX = R * Math.sin(ang);
+            const filmY = R * Math.cos(ang);
+            const filmPos = toCanvas(filmX, filmY);
 
-        // 3. Draw Rays & Film
-        if (stats.hitsOuter && stats.hitsOuter.length > 0) {
-            const alpha = Math.PI / n;
-            const angles = [-alpha, alpha];
-
-            // Center Reference Line
-            const centerFilmP = toCanvas(0, R);
+            // Blue Ray Line (Source to Film)
             ctx.beginPath();
             ctx.moveTo(sPos.x, sPos.y);
-            ctx.lineTo(centerFilmP.x, centerFilmP.y);
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
-            ctx.setLineDash([5, 5]);
+            ctx.lineTo(filmPos.x, filmPos.y);
+            ctx.strokeStyle = "cyan";
+            ctx.lineWidth = 1;
             ctx.stroke();
-            ctx.setLineDash([]);
 
-            // Edge Rays
-            angles.forEach(ang => {
-                const filmX = R * Math.sin(ang);
-                const filmY = R * Math.cos(ang);
-                const filmPos = toCanvas(filmX, filmY);
+            // Red Path through Wall (Highlight)
+            const Vx = filmX;
+            const Vy = filmY - sourceY_coord;
+            const A = Vx*Vx + Vy*Vy;
+            const B = 2 * sourceY_coord * Vy;
+            const C_out = sourceY_coord*sourceY_coord - R*R;
+            const C_in = sourceY_coord*sourceY_coord - r*r;
 
-                // Blue Ray Line
-                ctx.beginPath();
-                ctx.moveTo(sPos.x, sPos.y);
-                ctx.lineTo(filmPos.x, filmPos.y);
-                ctx.strokeStyle = "cyan";
-                ctx.lineWidth = 1;
-                ctx.stroke();
+            const getU = (C) => {
+                const d = B*B - 4*A*C;
+                if (d < 0) return [];
+                return [(-B - Math.sqrt(d))/(2*A), (-B + Math.sqrt(d))/(2*A)];
+            };
 
-                // Red Path through Wall
-                // Recalculate specific segment for drawing
-                const Vx = filmX;
-                const Vy = filmY - sourceY_coord;
-                const A = Vx*Vx + Vy*Vy;
-                const B = 2 * sourceY_coord * Vy;
-                const C_out = sourceY_coord*sourceY_coord - R*R;
-                const C_in = sourceY_coord*sourceY_coord - r*r;
-                
-                const getU = (C) => {
-                    const d = B*B - 4*A*C;
-                    if (d < 0) return [];
-                    return [(-B - Math.sqrt(d))/(2*A), (-B + Math.sqrt(d))/(2*A)];
-                };
-                
-                const uOut = getU(C_out);
-                const uIn = getU(C_in);
+            const uOut = getU(C_out);
+            const uIn = getU(C_in);
 
-                if (uOut.length === 2) {
-                    // Top Wall
-                    let uStart = uOut[0];
-                    let uEnd = (uIn.length === 2) ? uIn[0] : uOut[1];
-                    let p1 = toCanvas(uStart*Vx, sourceY_coord + uStart*Vy);
-                    let p2 = toCanvas(uEnd*Vx, sourceY_coord + uEnd*Vy);
-                    
+            if (uOut.length === 2) {
+                let uStart = uOut[0];
+                let uEnd = (uIn.length === 2) ? uIn[0] : uOut[1];
+                let p1 = toCanvas(uStart*Vx, sourceY_coord + uStart*Vy);
+                let p2 = toCanvas(uEnd*Vx, sourceY_coord + uEnd*Vy);
+
+                // Draw Top Wall path
+                ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = "red"; ctx.lineWidth = 3; ctx.stroke();
+
+                if (uIn.length === 2) {
+                    uStart = uIn[1];
+                    uEnd = uOut[1];
+                    p1 = toCanvas(uStart*Vx, sourceY_coord + uStart*Vy);
+                    p2 = toCanvas(uEnd*Vx, sourceY_coord + uEnd*Vy);
+                    // Draw Bottom Wall path
                     ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
                     ctx.strokeStyle = "red"; ctx.lineWidth = 3; ctx.stroke();
-
-                    // Bottom Wall (if exists)
-                    if (uIn.length === 2) {
-                        uStart = uIn[1];
-                        uEnd = uOut[1];
-                        p1 = toCanvas(uStart*Vx, sourceY_coord + uStart*Vy);
-                        p2 = toCanvas(uEnd*Vx, sourceY_coord + uEnd*Vy);
-                        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = "red"; ctx.lineWidth = 3; ctx.stroke();
-                    }
                 }
-            });
+            }
 
-            // Film Arc
-            ctx.beginPath();
-            ctx.arc(cPos.x, cPos.y, R * scale + 8, Math.PI/2 - alpha, Math.PI/2 + alpha);
-            ctx.strokeStyle = "cyan";
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            
-            const txtPos = toCanvas(0, R);
-            ctx.fillStyle = "cyan";
-            ctx.fillText("Film", txtPos.x - 12, txtPos.y + 25);
-        }
+            // Draw Side Thickness Value (Only on the right side ray to avoid clutter)
+            if (index === 1 && stats.pathLength > 0) {
+                // Position text slightly to the right of the ray passing through the pipe wall
+                const textX = filmX + (R * 0.2); 
+                const textY = 0; // Middle height
+                const sideTextPos = toCanvas(textX, textY);
+                
+                ctx.fillStyle = "yellow"; // Different color for distinction
+                ctx.font = "bold 14px Arial";
+                ctx.fillText(stats.pathLength.toFixed(2) + "mm", sideTextPos.x, sideTextPos.y);
+            }
+        });
+
+        // Film Arc
+        ctx.beginPath();
+        ctx.arc(cPos.x, cPos.y, R * scale + 8, Math.PI/2 - alpha, Math.PI/2 + alpha);
+        ctx.strokeStyle = "cyan";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        const txtPos = toCanvas(0, R);
+        ctx.fillStyle = "cyan";
+        ctx.font = "14px Arial";
+        ctx.fillText("Film", txtPos.x - 12, txtPos.y + 25);
+    }
+
+
       }
     </script>
     <div style="height: 200px"></div>
