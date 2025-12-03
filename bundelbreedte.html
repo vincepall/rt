@@ -1,211 +1,960 @@
-<!DOCTYPE html><html lang="nl">
+<!DOCTYPE html>
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <title>Bundelbreedte & Dikte Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Bundelgrootte</title>
     <style>
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
+        :root {
+            /* Dark Mode Variables */
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --primary: #ecf0f1; /* Lichte tekst voor headers */
+            --accent: #3498db;
+            --accent-green: #27ae60;
+            --accent-orange: #d35400;
+            --text-color: #bdc3c7;
+            --border-color: #444;
+            --input-bg: #2c2c2c;
+            --input-text: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
             padding: 20px;
         }
-        label, select, input {
-            display: block;
-            width: 100%;
-            margin-bottom: 10px;
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        select, input {
-            padding: 8px;
-            font-size: 16px;
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
         }
-        button {
+
+        .panel {
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid #333;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin: 0 0 20px 0;
+            font-size: 1.4rem;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 15px; }
+        
+        label {
             display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+
+        select, input[type="number"] {
             width: 100%;
             padding: 10px;
-            background-color: #646464;
-            color: white;
-            border: none;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            background: var(--input-bg);
+            color: var(--input-text);
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            background: var(--input-bg);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
             cursor: pointer;
-            font-size: 16px;
+            color: var(--text-color);
         }
-        button:hover {
-            background-color: #666;
+
+        /* Mode Switcher */
+        .mode-switch {
+            display: flex;
+            background: #2c2c2c;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
         }
-        .result {
-            margin-top: 20px;
+
+        .mode-btn {
+            flex: 1;
             padding: 10px;
-            color: black;
-            text-shadow: none;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: #888;
         }
-        .hidden {
-            display: none;
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+
+        /* Canvas & Results */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: #ffffff; /* Blijft wit voor de tekening */
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #bdc3c7; 
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .overlay-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: #2c2c2c;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .result-card.highlight { border-left-color: var(--accent-orange); background: #3d291a; }
+        .result-card.success { border-left-color: var(--accent-green); background: #1e3325; }
+
+        .result-label { font-size: 0.85rem; color: #95a5a6; margin-bottom: 5px; }
+        .result-value { font-size: 1.2rem; font-weight: 700; color: #fff; }
+        .result-sub { font-size: 0.8rem; color: #7f8c8d; margin-top: 5px; }
+
+        .hidden { display: none; }
+        .error-text { color: #e74c3c; font-size: 0.9rem; margin-top: 5px; font-weight: bold; }
+
+        hr { border-color: #444; }
     </style>
 </head>
-<body><button class="info-btn" onclick="openModal('myModal')">i</button>
+<body>
 
-<div id="myModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('myModal')">&times;</span>
-        <p>Bundelgrootte berekenen of de benodigde FFD. Deze tool ondersteunt zowel vlakke platen als vaten (van binnen naar buiten, EN-8/ASME-B). Formule voor gebogen plaat: ((alpha - 2 * arcsin(((diameter - 2 * FFD) / diameter) * sin(alpha / 2))) / 360) * pi * diameter.</p>
+<div class="main-container">
+    <!-- LINKER KOLOM: INVOER -->
+    <div class="panel">
+        <h1><i class="fas fa-radiation"></i> Bundelbreedte</h1>
+
+        <!-- Modus Selectie -->
+        <div class="mode-switch">
+            <div class="mode-btn active" onclick="setMode('calc')" id="btn-calc">Bereken Dikte</div>
+            <div class="mode-btn" onclick="setMode('opt')" id="btn-opt">Bereken minimale FFD</div>
+        </div>
+
+        <!-- Stap 1: Bron & Bundel -->
+        <div class="form-group">
+            <label>1. Selecteer Bron:</label>
+            <select id="tubeSelect" onchange="updateTubeOptions(); calculate();">
+                <!-- Data wordt via JS gevuld -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label id="lblBeamType">Bundel (Openingshoek):</label>
+            <div class="radio-group" id="axisContainer">
+                <!-- Radio buttons via JS -->
+            </div>
+        </div>
+
+        <!-- Stap 2: Scenario -->
+        <div class="form-group">
+            <label>2. Opstelling:</label>
+            <select id="scenarioSelect" onchange="updateScenarioUI(); calculate();">
+                <option value="flat">1. Vlakke Plaat</option>
+                <option value="curve_out">2. Bron Buiten / Film Binnen</option>
+                <option value="curve_in">3. Bron Binnen / Film Buiten</option>
+            </select>
+        </div>
+
+        <!-- Stap 3: Object Gegevens -->
+        <div class="form-group">
+            <label for="wallThickness">Wanddikte t (mm):</label>
+            <input type="number" id="wallThickness" value="30" min="1" step="0.5" oninput="calculate()">
+        </div>
+
+        <div class="form-group hidden" id="diameterGroup">
+            <label for="diameter">Buitendiameter (mm):</label>
+            <input type="number" id="diameter" value="1000" min="10" step="1" oninput="calculate()">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- Stap 4: Variabelen (afh van modus) -->
+        
+        <!-- Modus: Berekenen -->
+        <div id="calcInputs">
+            <div class="form-group">
+                <label for="ffd">FFD (mm):</label>
+                <input type="number" id="ffd" value="800" min="50" oninput="calculate()">
+                <small style="color:#7f8c8d">Afstand Bron tot Film.</small>
+            </div>
+            <div class="form-group">
+                <label for="userLength">Te belichten lengte (mm):</label>
+                <input type="number" id="userLength" value="480" min="1" oninput="calculate()">
+                <small style="color:#7f8c8d">effectieve filmlengte</small>
+            </div>
+        </div>
+
+        <!-- Modus: Optimaliseren -->
+        <div id="optInputs" class="hidden">
+            <div class="result-card highlight" style="margin-bottom: 15px;">
+                <div class="result-label">Doel</div>
+                <div class="result-sub">Vind minimale FFD met t' < <b>Max</b>.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="optUserLength">Gewenste filmlengte (mm):</label>
+                <input type="number" id="optUserLength" value="480" min="1" oninput="calculate()">
+            </div>
+
+            <div class="form-group">
+                <label for="maxThickness">Max. doorstraalde dikte (mm):</label>
+                <input type="number" id="maxThickness" value="12" step="0.1" oninput="calculate()">
+                <small style="color:#7f8c8d">Bijv. 120% van wanddikte (K=1.2)</small>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-text"></div>
     </div>
-</div><script>
-    function openModal(id) {
-        document.getElementById(id).style.display = 'block';
-    }
 
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
-    }
-</script><div class="container">
-    <h1 style="color: #F5DF4D; text-align: center;">Bundelgrootte</h1><label for="tubeSelect">Kies een bron:</label>
-<select id="tubeSelect">
-    <option value="yxlon300">Yxlon 300 3mm brandvlek: 40° x 55°</option>
-    <option value="smartEvo300">Yxlon Smart EVO 300DS: 30° x 60°</option>
-    <option value="balteauCeram300">Balteau Ceram 300 Directional: 40° x 50°</option>
-    <option value="Se75breed">Selenium 75 met brede collimator: 90° x 90°</option>
-    <option value="Se75smal">Selenium 75 met smalle collimator: 60° x 60°</option>
-</select>
+    <!-- RECHTER KOLOM: RESULTATEN & VISUALISATIE -->
+    <div class="panel">
+        <div class="canvas-wrapper">
+            <canvas id="simCanvas"></canvas>
+            <div class="overlay-info" id="canvasOverlay">
+                Schaal: Auto-Zoom
+            </div>
+        </div>
 
-<label for="plateType">Opstelling:</label>
-<select id="plateType">
-    <option value="vlak">Vlakke plaat</option>
-    <option value="gebogen">Vat, opstelling EN-8 / ASME-B</option>
-</select>
-
-<label for="calcType">Wat wil je weten:</label>
-<select id="calcType">
-    <option value="" disabled selected>Kies een berekening</option>
-    <option value="size">Bundelgrootte op een bepaalde FFD</option>
-    <option value="ffd">Benodigde FFD</option>
-</select>
-
-<div id="ffdField" class="hidden">
-    <label for="ffd">Film Focus Afstand (FFD) in cm:</label>
-    <input type="number" id="ffd" step="any">
+        <div class="result-grid">
+            <div class="result-card">
+                <div class="result-label">Max. Bundelbreedte</div>
+                <div class="result-value" id="resBeamWidth">-</div>
+            </div>
+            <!-- Dikte Center is hier verwijderd -->
+            <div class="result-card" id="cardTargetThick">
+                <div class="result-label">Dikte Rand <b>(t')</b></div>
+                <div class="result-value" id="resThickUser">-</div>
+                <div class="result-sub" id="resKFactor">K = -</div>
+            </div>
+            <div class="result-card" style="border-left-color: #9b59b6;">
+                <div class="result-label">Afstand tot Rand <b>(FFD')</b></div>
+                <div class="result-value" id="resDistEdge">-</div>
+                <div class="result-sub">Bron tot rand film</div>
+            </div>
+            <div class="result-card success hidden" id="resOptFFDCard">
+                <div class="result-label">Minimale FFD</div>
+                <div class="result-value" id="resOptFFD">-</div>
+                <div class="result-sub">Let op: geen marge!</div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div id="beamSizeField" class="hidden">
-    <label for="beamSize">Gewenste bundelgrootte in cm:</label>
-    <input type="number" id="beamSize" step="any">
-</div>
-
-<div id="diameterField" class="hidden">
-    <label for="diameter">Diameter van het vat in cm:</label>
-    <input type="number" id="diameter" step="any">
-</div>
-
-<button onclick="calculate()">Bereken</button>
-
-<div id="result" class="result"></div>
-
-</div><script>
-    const tubeData = {
-        yxlon300: { narrow: 40, wide: 55 },
-        smartEvo300: { narrow: 30, wide: 60 },
-        balteauCeram300: { narrow: 40, wide: 50 },
-        Se75breed: { narrow: 90, wide: 90 },
-        Se75smal: { narrow: 60, wide: 60 }
+<script>
+    // --- 1. CONFIGURATIE & DATA ---
+    const tubeDB = {
+        yxlon300: { 
+            name: "Yxlon 300 (3mm)", 
+            axes: { small: 40, large: 55 } 
+        },
+        smartEvo300: { 
+            name: "Smart EVO 300DS", 
+            axes: { small: 30, large: 60 } 
+        },
+        balteauCeram300: { 
+            name: "Balteau Ceram 300", 
+            axes: { small: 40, large: 50 } 
+        },
+        Se75: { 
+            name: "Selenium 75", 
+            axes: { small: 60, large: 90 },
+            term: "collimator"
+        }
+        // Iridium verwijderd
     };
 
-    document.getElementById('calcType').addEventListener('change', updateFields);
-    document.getElementById('plateType').addEventListener('change', updateFields);
+    let appState = {
+        mode: 'calc', // 'calc' or 'opt'
+        currentTube: 'yxlon300',
+        currentAxis: 'large',
+        scenario: 'flat'
+    };
 
-    function updateFields() {
-        const calcType = document.getElementById('calcType').value;
-        const plateType = document.getElementById('plateType').value;
-
-        document.getElementById('ffdField').classList.toggle('hidden', calcType !== 'size');
-        document.getElementById('beamSizeField').classList.toggle('hidden', calcType !== 'ffd');
-        document.getElementById('diameterField').classList.toggle('hidden', plateType !== 'gebogen');
+    // --- 2. INITIALISATIE & UI LOGICA ---
+    
+    function init() {
+        const sel = document.getElementById('tubeSelect');
+        sel.innerHTML = '';
+        for (const [key, data] of Object.entries(tubeDB)) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.innerText = data.name;
+            sel.appendChild(opt);
+        }
+        
+        updateTubeOptions();
+        updateScenarioUI();
+        calculate();
     }
 
-    function calculate() {
-        const tube = document.getElementById('tubeSelect').value;
-        const calcType = document.getElementById('calcType').value;
-        const plateType = document.getElementById('plateType').value;
-        const angles = tubeData[tube];
-        const narrowAngleDeg = angles.narrow;
-        const wideAngleDeg = angles.wide;
+    function setMode(m) {
+        appState.mode = m;
+        document.getElementById('btn-calc').className = m === 'calc' ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btn-opt').className = m === 'opt' ? 'mode-btn active' : 'mode-btn';
+        
+        document.getElementById('calcInputs').className = m === 'calc' ? '' : 'hidden';
+        document.getElementById('optInputs').className = m === 'opt' ? '' : 'hidden';
+        
+        document.getElementById('resOptFFDCard').className = m === 'opt' ? 'result-card success' : 'hidden';
+        
+        calculate();
+    }
 
-        const ffd = parseFloat(document.getElementById('ffd').value);
-        const beamSize = parseFloat(document.getElementById('beamSize').value);
-        const diameter = parseFloat(document.getElementById('diameter').value);
+    function updateTubeOptions() {
+        appState.currentTube = document.getElementById('tubeSelect').value;
+        const data = tubeDB[appState.currentTube];
+        const container = document.getElementById('axisContainer');
+        container.innerHTML = '';
+        
+        // Bepaal de naam van de "bundel" (bundel of collimator)
+        const term = data.term || 'bundel';
+        
+        // Update het label boven de radio buttons
+        const lbl = document.getElementById('lblBeamType');
+        lbl.innerText = (term.charAt(0).toUpperCase() + term.slice(1)) + " (Openingshoek):";
 
-        let resultText = '';
+        ['large', 'small'].forEach(axis => {
+            const angle = data.axes[axis];
+            // Gebruik de term in de radio button labels
+            const label = axis === 'large' ? `Brede ${term}` : `Smalle ${term}`;
+            
+            const div = document.createElement('div');
+            div.className = 'radio-option';
+            div.innerHTML = `
+                <input type="radio" name="axis" value="${axis}" id="ax_${axis}" ${appState.currentAxis === axis ? 'checked' : ''} onchange="onAxisChange('${axis}')">
+                <label for="ax_${axis}" style="margin:0; font-weight:normal;">${label} (${angle}°)</label>
+            `;
+            container.appendChild(div);
+        });
+    }
 
-        if (calcType === 'size' && (isNaN(ffd) || ffd <= 0)) {
-            document.getElementById('result').innerHTML = 'Voer een geldige FFD in.';
-            return;
+    function onAxisChange(axis) {
+        appState.currentAxis = axis;
+        calculate();
+    }
+
+    function updateScenarioUI() {
+        appState.scenario = document.getElementById('scenarioSelect').value;
+        const isCurved = appState.scenario !== 'flat';
+        document.getElementById('diameterGroup').className = isCurved ? 'form-group' : 'form-group hidden';
+    }
+
+    // --- 3. WISKUNDIGE KERN (RAY TRACING) ---
+
+    function intersectLineCircle(P, D, C, R) {
+        const cx = C.x; const cy = C.y;
+        const px = P.x; const py = P.y;
+        const dx = D.x; const dy = D.y;
+
+        const Lx = px - cx;
+        const Ly = py - cy;
+
+        const a = dx*dx + dy*dy; 
+        const b = 2 * (Lx*dx + Ly*dy);
+        const c = (Lx*Lx + Ly*Ly) - (R*R);
+
+        const det = b*b - 4*a*c;
+        if (det < 0) return []; 
+        
+        const t1 = (-b - Math.sqrt(det)) / (2*a);
+        const t2 = (-b + Math.sqrt(det)) / (2*a);
+        return [t1, t2].sort((x,y) => x-y); 
+    }
+
+    function getRaySegments(scenario, angleRad, ffd, wallT, rOut) {
+        const rIn = rOut - wallT;
+        const dir = { x: Math.sin(angleRad), y: Math.cos(angleRad) }; 
+        const source = { x: 0, y: 0 };
+        
+        if (scenario === 'flat') {
+            if (Math.abs(angleRad) >= Math.PI/2) return null;
+            const t_exit = ffd / Math.cos(angleRad);
+            const t_enter = (ffd - wallT) / Math.cos(angleRad);
+            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter };
         }
-
-        if (calcType === 'ffd' && (isNaN(beamSize) || beamSize <= 0)) {
-            document.getElementById('result').innerHTML = 'Voer een geldige bundelgrootte in.';
-            return;
+        else if (scenario === 'curve_out') {
+            const center = { x: 0, y: ffd + rIn };
+            const hitsOut = intersectLineCircle(source, dir, center, rOut);
+            const hitsIn = intersectLineCircle(source, dir, center, rIn);
+            
+            if (hitsOut.length < 2) return null;
+            let t_enter = hitsOut[0];
+            let t_exit = (hitsIn.length >= 2) ? hitsIn[0] : hitsOut[1];
+            
+            if (t_exit <= t_enter) return null;
+            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter };
         }
+        else if (scenario === 'curve_in') {
+            const center = { x: 0, y: ffd - rOut };
+            const hitsOut = intersectLineCircle(source, dir, center, rOut);
+            const hitsIn = intersectLineCircle(source, dir, center, rIn);
+            
+            const t_enter = hitsIn.find(t => t > 0.001);
+            const t_exit = hitsOut.find(t => t > 0.001);
 
-        if (plateType === 'gebogen' && (isNaN(diameter) || diameter <= 0)) {
-            document.getElementById('result').innerHTML = 'Voer een geldige diameter in.';
-            return;
-        }
-
-        if (calcType === 'size') {
-            if (plateType === 'vlak') {
-                const narrowBeam = 2 * ffd * Math.tan(narrowAngleDeg * Math.PI / 360);
-                const wideBeam = 2 * ffd * Math.tan(wideAngleDeg * Math.PI / 360);
-                resultText = `Vlakke plaat:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
-            } else {
-                const narrowBeam = curvedBeamSizeAlways(narrowAngleDeg, diameter, ffd);
-                const wideBeam = curvedBeamSizeAlways(wideAngleDeg, diameter, ffd);
-
-                resultText = `Gebogen plaat:<br>Aan de smalle kant: ${narrowBeam.toFixed(2)} cm<br>Aan de brede kant: ${wideBeam.toFixed(2)} cm`;
+            if (t_enter !== undefined && t_exit !== undefined && t_exit > t_enter) {
+                return { enter: t_enter, exit: t_exit, len: t_exit - t_enter };
             }
-        }
-
-        if (calcType === 'ffd') {
-            if (plateType === 'vlak') {
-                const narrowFFD = beamSize / (2 * Math.tan(narrowAngleDeg * Math.PI / 360));
-                const wideFFD = beamSize / (2 * Math.tan(wideAngleDeg * Math.PI / 360));
-                resultText = `Vlakke plaat:<br>Benodigde FFD voor smalle kant: ${narrowFFD.toFixed(2)} cm<br>Benodigde FFD voor brede kant: ${wideFFD.toFixed(2)} cm`;
-            } else {
-                const narrowFFD = findCurvedFFDAlways(narrowAngleDeg, diameter, beamSize);
-                const wideFFD = findCurvedFFDAlways(wideAngleDeg, diameter, beamSize);
-
-                resultText = `Gebogen plaat:<br>`;
-                resultText += `Benodigde FFD voor smalle kant: ${narrowFFD !== null ? narrowFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}<br>`;
-                resultText += `Benodigde FFD voor brede kant: ${wideFFD !== null ? wideFFD.toFixed(2) + ' cm' : 'Niet mogelijk'}`;
-            }
-        }
-
-        document.getElementById('result').innerHTML = resultText;
-    }
-
-    function curvedBeamSizeAlways(angleDeg, diameter, ffd) {
-        const alpha = angleDeg * Math.PI / 180;
-        const sinHalfAlpha = Math.sin(alpha / 2);
-        const inner = ((diameter - 2 * ffd) / diameter) * sinHalfAlpha;
-        const correctedAlpha = alpha - 2 * Math.asin(Math.max(Math.min(inner, 1), -1));
-        return (correctedAlpha / (2 * Math.PI)) * Math.PI * diameter;
-    }
-
-    function findCurvedFFDAlways(angleDeg, diameter, targetBeam) {
-        let low = 0.1, high = diameter, mid;
-        while (high - low > 0.01) {
-            mid = (low + high) / 2;
-            const beam = curvedBeamSizeAlways(angleDeg, diameter, mid);
-            if (beam > targetBeam) high = mid;
-            else low = mid;
-        }
-        if (Math.abs(mid - diameter) < 0.05) {
             return null;
         }
-        return mid;
+        return null;
     }
-</script><div style="height: 200px;"></div>
+
+    function getPathLength(scenario, angleRad, ffd, wallT, rOut) {
+        const seg = getRaySegments(scenario, angleRad, ffd, wallT, rOut);
+        return seg ? seg.len : 0;
+    }
+
+    // --- 4. HOOFDBEREKENING ---
+
+    function calculate() {
+        const errorEl = document.getElementById('errorMessage');
+        errorEl.innerText = '';
+
+        const wt = parseFloat(document.getElementById('wallThickness').value);
+        let diam = parseFloat(document.getElementById('diameter').value);
+        let ffd = parseFloat(document.getElementById('ffd').value); 
+        
+        let targetLen = 0;
+        if (appState.mode === 'calc') {
+            targetLen = parseFloat(document.getElementById('userLength').value);
+        } else {
+            targetLen = parseFloat(document.getElementById('optUserLength').value);
+        }
+
+        const maxThickAllowed = parseFloat(document.getElementById('maxThickness').value);
+
+        const rOut = diam / 2;
+        const rIn = rOut - wt;
+        const tubeAngleDeg = tubeDB[appState.currentTube].axes[appState.currentAxis];
+        const maxAngleRad = (tubeAngleDeg / 2) * (Math.PI / 180);
+
+        if (appState.scenario !== 'flat' && wt >= rOut) {
+            errorEl.innerText = "Fout: Wanddikte groter dan straal.";
+            return;
+        }
+        
+        // Alleen checken in optimalisatie modus, anders kun je niet gewoon dikte berekenen
+        if (appState.mode === 'opt' && wt > maxThickAllowed) {
+            errorEl.innerText = "Fout: Wanddikte zelf is al groter dan Max Dikte.";
+            document.getElementById('resOptFFD').innerText = "Onmogelijk";
+            document.getElementById('resOptFFD').style.color = "red";
+            return; 
+        }
+
+        // --- OPTIMALISATIE MODUS LOGICA ---
+        if (appState.mode === 'opt') {
+            let minStartF = 10;
+            if (appState.scenario === 'curve_in') minStartF = 10;
+            else minStartF = wt + 5;
+            const maxScanF = 5000;
+            
+            const fitsInBeam = (f) => {
+                const reqAngle = calculateAngleForLength(appState.scenario, targetLen, f, rOut);
+                return reqAngle <= maxAngleRad;
+            };
+
+            let geoLow = minStartF, geoHigh = maxScanF;
+            let minFFD_Geo = maxScanF;
+            
+            if (!fitsInBeam(maxScanF)) {
+                document.getElementById('resOptFFD').innerText = "Lengte te groot";
+                document.getElementById('resOptFFD').style.color = "red";
+                ffd = maxScanF;
+            } else {
+                while (geoHigh - geoLow > 1) {
+                    const mid = (geoLow + geoHigh) / 2;
+                    if (fitsInBeam(mid)) {
+                        minFFD_Geo = mid;
+                        geoHigh = mid;
+                    } else {
+                        geoLow = mid;
+                    }
+                }
+
+                let foundValid = false;
+                let finalFFD = minFFD_Geo;
+
+                const startAngle = calculateAngleForLength(appState.scenario, targetLen, minFFD_Geo, rOut);
+                const startThick = getPathLength(appState.scenario, startAngle, minFFD_Geo, wt, rOut);
+
+                if (startThick <= maxThickAllowed) {
+                    foundValid = true;
+                    finalFFD = minFFD_Geo;
+                } else {
+                    let thickLow = minFFD_Geo;
+                    let thickHigh = maxScanF;
+
+                    const angle5000 = calculateAngleForLength(appState.scenario, targetLen, thickHigh, rOut);
+                    const thick5000 = getPathLength(appState.scenario, angle5000, thickHigh, wt, rOut);
+                    
+                    if (thick5000 > maxThickAllowed) {
+                        foundValid = false; 
+                    } else {
+                        foundValid = true;
+                        while (thickHigh - thickLow > 1) {
+                            const mid = (thickLow + thickHigh) / 2;
+                            const ang = calculateAngleForLength(appState.scenario, targetLen, mid, rOut);
+                            const th = getPathLength(appState.scenario, ang, mid, wt, rOut);
+                            
+                            if (th <= maxThickAllowed) {
+                                finalFFD = mid;
+                                thickHigh = mid; 
+                            } else {
+                                thickLow = mid;
+                            }
+                        }
+                    }
+                }
+
+                if (foundValid) {
+                    ffd = finalFFD;
+                    document.getElementById('resOptFFD').innerText = Math.round(ffd) + " mm";
+                    document.getElementById('resOptFFD').style.color = "#2ecc71"; // Bright green for dark mode
+                } else {
+                    ffd = 5000;
+                    document.getElementById('resOptFFD').innerText = "Onmogelijk";
+                    document.getElementById('resOptFFD').style.color = "red";
+                }
+            }
+        }
+
+        // --- RESULTATEN BEREKENEN ---
+        const userAngle = calculateAngleForLength(appState.scenario, targetLen, ffd, rOut);
+        
+        let thicknessAtUserLen = getPathLength(appState.scenario, userAngle, ffd, wt, rOut);
+        let userInBeam = userAngle <= maxAngleRad;
+
+        const maxBeamWidth = calculateLengthForAngle(appState.scenario, maxAngleRad, ffd, rOut);
+        const centerThick = getPathLength(appState.scenario, 0, ffd, wt, rOut);
+
+        // Bepaal FFD' (Afstand tot Rand)
+        let distEdge = 0;
+        if (appState.scenario === 'flat') {
+            distEdge = Math.sqrt(ffd*ffd + (targetLen/2)*(targetLen/2));
+        } 
+        else if (appState.scenario === 'curve_out') {
+            const center = {x:0, y: ffd+rIn};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rIn);
+            if(hits.length > 0) distEdge = hits[0];
+        }
+        else if (appState.scenario === 'curve_in') {
+             const center = {x:0, y: ffd-rOut};
+             const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rOut);
+             if(hits.length > 0) distEdge = hits.find(d => d>0) || 0;
+        }
+
+        document.getElementById('resBeamWidth').innerText = typeof maxBeamWidth === 'number' ? Math.round(maxBeamWidth) + " mm" : maxBeamWidth;
+        // Center thickness removed from output, but variable still needed for other logic if any
+        document.getElementById('resDistEdge').innerText = Math.round(distEdge) + " mm";
+        
+        const resUserEl = document.getElementById('resThickUser');
+        resUserEl.innerText = thicknessAtUserLen.toFixed(2) + " mm";
+        
+        // Update label met t' en lengte
+        const labelEl = document.querySelector('#cardTargetThick .result-label');
+        if (labelEl) labelEl.innerHTML = `Dikte Rand <b>(t')</b> bij ${targetLen}mm`;
+
+        if (!userInBeam) {
+            resUserEl.style.color = "#e74c3c"; // Red
+            resUserEl.innerText += " (Buiten Bundel)";
+        } else {
+            resUserEl.style.color = "#ffffff"; // White for dark mode
+        }
+
+        const k = thicknessAtUserLen / wt;
+        document.getElementById('resKFactor').innerText = `K = ${k.toFixed(2)}`;
+
+        drawSimulation(ffd, wt, rOut, targetLen, maxAngleRad, userAngle);
+    }
+
+    // --- 5. GEOMETRIE HELPERS ---
+
+    function calculateAngleForLength(scenario, L, ffd, rOut) {
+        if (scenario === 'flat') {
+            return Math.atan((L/2) / ffd);
+        } 
+        else if (scenario === 'curve_out') {
+            const rIn = rOut - parseFloat(document.getElementById('wallThickness').value);
+            const betaHalf = (L/2) / rIn;
+            const Px = rIn * Math.sin(betaHalf);
+            const Py = (ffd + rIn) - rIn * Math.cos(betaHalf);
+            return Math.atan2(Px, Py);
+        }
+        else if (scenario === 'curve_in') {
+            const betaHalf = (L/2) / rOut;
+            const Px = rOut * Math.sin(betaHalf);
+            const Py = (ffd - rOut) + rOut * Math.cos(betaHalf);
+            return Math.atan2(Px, Py);
+        }
+        return 0;
+    }
+
+    function calculateLengthForAngle(scenario, angle, ffd, rOut) {
+        if (scenario === 'flat') {
+            return 2 * ffd * Math.tan(angle);
+        }
+        else if (scenario === 'curve_out') {
+            const wt = parseFloat(document.getElementById('wallThickness').value);
+            const rIn = rOut - wt;
+            const center = {x:0, y: ffd+rIn};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(angle), y:Math.cos(angle)}, center, rIn);
+            if (hits.length === 0) return "Beperkt"; 
+            const t = hits[0];
+            const Px = t * Math.sin(angle);
+            const Py = t * Math.cos(angle);
+            const Mx = 0; const My = ffd + rIn;
+            const dx = Px - Mx; const dy = Py - My;
+            const betaRad = Math.atan2(dx, -dy); 
+            return 2 * Math.abs(betaRad) * rIn; 
+        }
+        else if (scenario === 'curve_in') {
+            const center = {x:0, y: ffd - rOut};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(angle), y:Math.cos(angle)}, center, rOut);
+            if (hits.length === 0) return 0;
+            const t = hits.find(h => h > 0);
+            if (!t) return 0;
+            const Px = t * Math.sin(angle);
+            const Py = t * Math.cos(angle);
+            const Mx = 0; const My = ffd - rOut;
+            const dx = Px - Mx; const dy = Py - My;
+            const beta = Math.atan2(dx, dy); 
+            return 2 * Math.abs(beta) * rOut;
+        }
+        return 0;
+    }
+
+    // --- 6. VISUALISATIE (CANVAS) ---
+    
+    function drawSimulation(ffd, wt, rOut, targetLen, maxAngle, userAngle) {
+        const cvs = document.getElementById('simCanvas');
+        const ctx = cvs.getContext('2d');
+        const w = cvs.width = cvs.clientWidth;
+        const h = cvs.height = cvs.clientHeight;
+
+        ctx.clearRect(0,0,w,h);
+        
+        // --- AUTO ZOOM BEREKENING ---
+        let bounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+        const rIn = rOut - wt;
+
+        let filmEdgeX = 0, filmEdgeY = 0;
+        let filmCenterX = 0, filmCenterY = 0;
+        
+        if (appState.scenario === 'flat') {
+            filmEdgeY = ffd;
+            filmEdgeX = (targetLen/2);
+            filmCenterY = ffd;
+            bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: ffd };
+        } 
+        else if (appState.scenario === 'curve_out') {
+            const t = ffd / Math.cos(0); 
+            const center = {x:0, y: ffd+rIn};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rIn);
+            if(hits.length > 0) {
+                const dist = hits[0];
+                filmEdgeX = dist * Math.sin(userAngle);
+                filmEdgeY = dist * Math.cos(userAngle);
+            }
+            // Center punt (loodrecht onder bron)
+            const hitsC = intersectLineCircle({x:0,y:0}, {x:0, y:1}, center, rIn);
+            if(hitsC.length > 0) filmCenterY = hitsC[0];
+            
+            bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: Math.max(filmEdgeY, ffd) };
+        }
+        else if (appState.scenario === 'curve_in') {
+             const center = {x:0, y: ffd-rOut};
+             const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rOut);
+             if(hits.length > 0) {
+                 const dist = hits.find(d => d>0);
+                 if(dist) {
+                    filmEdgeX = dist * Math.sin(userAngle);
+                    filmEdgeY = dist * Math.cos(userAngle);
+                 }
+             }
+             const hitsC = intersectLineCircle({x:0,y:0}, {x:0, y:1}, center, rOut);
+             if(hitsC.length > 0) filmCenterY = hitsC.find(d => d>0);
+             
+             bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: Math.max(filmEdgeY, ffd) };
+        }
+
+        const paddingX = Math.max((bounds.maxX - bounds.minX) * 0.3, 20);
+        const paddingY = Math.max((bounds.maxY - bounds.minY) * 0.1, 20);
+        
+        const contentW = (bounds.maxX - bounds.minX) + paddingX*2;
+        const contentH = (bounds.maxY - bounds.minY) + paddingY*2;
+        
+        const scaleX = w / contentW;
+        const scaleY = h / contentH;
+        const scale = Math.min(scaleX, scaleY);
+        
+        const toPix = (v) => v * scale;
+        
+        const tx = w/2; 
+        const ty = 30; // Beetje marge boven
+
+        ctx.save();
+        ctx.translate(tx, ty);
+
+        // 1. Draw Beam 
+        const beamLen = contentH / scale * 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(Math.sin(maxAngle)*beamLen, Math.cos(maxAngle)*beamLen);
+        ctx.lineTo(Math.sin(-maxAngle)*beamLen, Math.cos(-maxAngle)*beamLen);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(255, 193, 7, 0.2)'; // Geel-oranje
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(211, 84, 0, 0.4)'; // Donkeroranje lijn
+        ctx.setLineDash([5,5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 2. Draw Material & Lines
+        if (appState.scenario === 'flat') {
+            const filmY = toPix(ffd);
+            const matTop = toPix(ffd - wt);
+            const drawW = w/scale * 2; 
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.1)';
+            ctx.fillRect(-drawW/2, matTop, drawW, toPix(wt));
+            ctx.strokeStyle = '#c0392b';
+            ctx.beginPath(); 
+            ctx.moveTo(-drawW/2, matTop); ctx.lineTo(drawW/2, matTop);
+            ctx.moveTo(-drawW/2, filmY); ctx.lineTo(drawW/2, filmY);
+            ctx.stroke();
+
+            // Target Length Marker
+            const halfL = toPix(targetLen/2);
+            ctx.strokeStyle = '#27ae60';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-halfL, filmY+2);
+            ctx.lineTo(halfL, filmY+2);
+            ctx.stroke();
+            
+            // Stippellijn Bron -> Edge (FFD')
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(halfL, filmY);
+            ctx.stroke();
+
+            // Label FFD' (alleen label)
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 12px sans-serif';
+            drawTextRotated(ctx, "FFD'", halfL/2 + 10, filmY/2, Math.atan2(filmY, halfL) - Math.PI/2);
+            
+            // Stippellijn Bron -> Center (FFD)
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(0, filmY);
+            ctx.stroke();
+            // Label FFD
+            drawTextRotated(ctx, "FFD", -15, filmY/2, -Math.PI/2);
+            
+            ctx.setLineDash([]);
+
+        } 
+        else if (appState.scenario === 'curve_out' || appState.scenario === 'curve_in') {
+            const mY = (appState.scenario === 'curve_out') ? toPix(ffd + rIn) : toPix(ffd - rOut);
+            drawPipe(ctx, 0, mY, toPix(rOut), toPix(rIn));
+
+            // Film (Green user part)
+            const beta = (targetLen/2) / ((appState.scenario === 'curve_out')?rIn:rOut);
+            ctx.strokeStyle = '#27ae60';
+            ctx.lineWidth = 4;
+            const rad = (appState.scenario === 'curve_out') ? toPix(rIn)-2 : toPix(rOut)+3;
+            const startA = (appState.scenario === 'curve_out') ? -Math.PI/2 : Math.PI/2;
+            
+            ctx.beginPath();
+            ctx.arc(0, mY, rad, startA - beta, startA + beta);
+            ctx.stroke();
+            
+            // Stippellijn Bron -> Edge
+            const ex = toPix(filmEdgeX);
+            const ey = toPix(filmEdgeY);
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+            
+            // Label FFD'
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 12px sans-serif';
+            drawTextRotated(ctx, "FFD'", ex/2 + 10, ey/2, Math.atan2(ey, ex) - Math.PI/2);
+            
+            // Stippellijn Bron -> Center
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(0, toPix(filmCenterY));
+            ctx.stroke();
+            
+            // Label FFD
+            drawTextRotated(ctx, "FFD", -15, toPix(filmCenterY)/2, -Math.PI/2);
+            
+            ctx.setLineDash([]);
+        }
+        
+        // --- 3. Dikte Indicatoren (t en t') ---
+        
+        // T (Center)
+        const segCenter = getRaySegments(appState.scenario, 0, ffd, wt, rOut);
+        if(segCenter) {
+            const y1 = toPix(segCenter.enter);
+            const y2 = toPix(segCenter.exit);
+            // Rode lijn
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, y1);
+            ctx.lineTo(0, y2);
+            ctx.stroke();
+            // Label t - Zwart
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText("t", 10, (y1+y2)/2);
+        }
+        
+        // T' (Edge - UserAngle)
+        const segEdge = getRaySegments(appState.scenario, userAngle, ffd, wt, rOut);
+        if(segEdge) {
+            const r1 = toPix(segEdge.enter);
+            const r2 = toPix(segEdge.exit);
+            const x1 = r1 * Math.sin(userAngle);
+            const y1 = r1 * Math.cos(userAngle);
+            const x2 = r2 * Math.sin(userAngle);
+            const y2 = r2 * Math.cos(userAngle);
+            
+            // Rode lijn
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            
+             // Label t' - Zwart
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 16px sans-serif';
+            drawTextRotated(ctx, "t'", (x1+x2)/2 - 20, (y1+y2)/2, -userAngle);
+        }
+
+
+        // 4. Draw Source
+        ctx.fillStyle = '#f1c40f';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+
+    function drawPipe(ctx, x, y, ro, ri) {
+        ctx.beginPath();
+        ctx.arc(x, y, ro, 0, Math.PI*2);
+        ctx.arc(x, y, ri, 0, Math.PI*2, true);
+        ctx.fillStyle = 'rgba(231, 76, 60, 0.1)';
+        ctx.fill();
+        ctx.strokeStyle = '#c0392b';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+    
+    function drawTextRotated(ctx, text, x, y, angle) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.textAlign = "center";
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+    }
+
+    // Start
+    window.onload = init;
+    window.onresize = calculate;
+
+</script>
 </body>
 </html>
