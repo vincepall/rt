@@ -1,159 +1,775 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focusverandering en Filmtype verandering</title>
+    <title>Focus & Filmtype Calculator</title>
+    <!-- Font Awesome voor iconen -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            font-family: 'Roboto Condensed', sans-serif;
-            padding: 50px;
-            margin: 0;
-            min-height: 150vh;
+        :root {
+            --primary-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --accent-color: #F5DF4D;
+            --accent-hover: #e6c944;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+            --border-radius: 12px;
+            --picker-height: 150px;
+            --item-height: 50px;
         }
 
-        /* Style for the calculate button */
-        button.calculate-btn {
-            background-color: #F5DF4D;
-            color: black;
-            padding: 15px 30px;
-            font-size: 20px;
-            border: none;
-            border-radius: 5px;
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overscroll-behavior-y: none;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 500px;
+            width: 100%;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        /* Header & Navigatie */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 15px;
+        }
+
+        .home-icon {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .home-icon:hover {
+            color: var(--accent-color);
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin: 0;
+            font-size: 1.8rem;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .info-btn {
+            background: none;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .info-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* Formulier Stijlen */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- TIME PICKER STIJLEN --- */
+        .time-picker-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background-color: #3d3d3d;
+            border-radius: 8px;
+            padding: 10px;
+            position: relative;
+            border: 1px solid #555;
+        }
+
+        .picker-column-wrapper {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .picker-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .picker-wheel {
+            height: var(--picker-height);
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            background: #333;
+            border-radius: 6px;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .picker-wheel::-webkit-scrollbar {
+            display: none; 
+        }
+
+        .picker-item {
+            height: var(--item-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: center;
+            font-size: 1.2rem;
+            color: #888;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .picker-spacer {
+            height: var(--item-height);
+        }
+
+        .highlight-bar {
+            position: absolute;
+            top: calc(var(--item-height) + 26px);
+            left: 10px;
+            right: 10px;
+            height: var(--item-height);
+            background-color: rgba(245, 223, 77, 0.15);
+            border-top: 1px solid var(--accent-color);
+            border-bottom: 1px solid var(--accent-color);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Inputs */
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #3d3d3d;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #3d3d3d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        
+        .toggle-container:hover {
+            border-color: #555;
+        }
+
+        .toggle-label {
+            margin: 0;
+            color: white;
             cursor: pointer;
         }
 
-        button.calculate-btn:hover {
-            background-color: #e6c944;
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-color: #333; 
+        }
+
+        /* Keuze Secties (Focus & Filmtype) */
+        .keuze-sectie {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        /* Specifiek voor Focus inputs, zodat ze op de hoofdpagina niet dubbel ingekaderd lijken */
+        #focus_keuze_wrapper {
+            animation: fadeIn 0.3s ease-in-out;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .radio-option input {
+            margin-right: 8px;
+            accent-color: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        /* Bereken Knop */
+        .calculate-btn {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: #1a1a1a;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .calculate-btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Resultaat Sectie */
+        #resultaat-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #3d3d3d;
+            border-left: 5px solid var(--accent-color);
+            border-radius: 4px;
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        #resultaat-container h3 {
+            margin-top: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        #resultaat-inhoud {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: white;
+        }
+
+        .tijd-highlight {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Nieuwe stijlen voor grote resultaat items */
+        .big-result-item {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #444;
+        }
+        
+        .big-result-label {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Modal */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto; 
+            padding: 30px;
+            border: 1px solid #444;
+            width: 80%; 
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            position: relative;
+            box-shadow: 0 0 20px rgba(245, 223, 77, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 0.8;
+        }
+
+        /* Animaties */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 400px) {
+            .input-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .input-wrapper {
+                margin-bottom: 15px;
+            }
+            .big-result-item {
+                font-size: 1.5rem; /* Iets kleiner op hele smalle schermen */
+            }
         }
     </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="home-icon" title="Terug naar Home"><i class="fas fa-home"></i></a>
+            <h1>FFD & Filmsoort</h1>
+            <button class="info-btn" onclick="toggleModal('myModal')" title="Informatie">i</button>
+        </div>
+
+        <form id="calcForm" onsubmit="event.preventDefault(); bereken();">
+            <!-- Time Picker -->
+            <div class="form-group">
+                <label>Begintijd (Scroll om te kiezen)</label>
+                <div class="time-picker-container">
+                    <div class="highlight-bar"></div>
+                    
+                    <div class="picker-column-wrapper">
+                        <div class="picker-label">Minuten</div>
+                        <div class="picker-wheel" id="minuten-wheel">
+                            <div class="picker-spacer"></div>
+                            <div class="picker-spacer"></div>
+                        </div>
+                    </div>
+
+                    <div class="picker-column-wrapper">
+                        <div class="picker-label">Seconden</div>
+                        <div class="picker-wheel" id="seconden-wheel">
+                            <div class="picker-spacer"></div>
+                            <div class="picker-spacer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Focus Toggle -->
+            <div class="toggle-container" onclick="toggleFocus()">
+                <label class="toggle-label">Verandert de FFD?</label>
+                <label class="switch">
+                    <input type="checkbox" id="focus_veranderd" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Focus Invoer (Standaard zichtbaar) -->
+            <div id="focus_keuze_wrapper">
+                <div class="form-group">
+                    <div class="input-row">
+                        <div class="input-wrapper">
+                            <label for="oude_focus">Oude Focus (FFD)</label>
+                            <!-- Oude focus nu standaard op 80 -->
+                            <input type="number" id="oude_focus" step="any" placeholder="Bijv. 80" value="80">
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="nieuwe_focus">Nieuwe Focus (FFD)</label>
+                            <input type="number" id="nieuwe_focus" step="any" placeholder="Bijv. 100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filmtype Toggle -->
+            <div class="toggle-container" onclick="toggleFilmtype()">
+                <label class="toggle-label">Verandert de Filmsoort?</label>
+                <label class="switch">
+                    <input type="checkbox" id="filmtype_veranderd">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Filmtype Keuze (Verborgen) -->
+            <div id="filmtype_keuze" class="keuze-sectie" style="display: none;">
+                <label style="text-align:center; display:block;">Filmsoort van de BEGINTIJD:</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" id="D4" name="filmtype" value="D4" checked> 
+                        <span>D4</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" id="D5" name="filmtype" value="D5"> 
+                        <span>D5</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" id="D7" name="filmtype" value="D7"> 
+                        <span>D7</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="calculate-btn">
+                <i class="fas fa-calculator"></i> Bereken Tijd
+            </button>
+        </form>
+
+        <!-- Resultaat -->
+        <div id="resultaat-container">
+            <h3>Resultaat</h3>
+            <div id="resultaat-inhoud"></div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="myModal" class="modal" onclick="if(event.target === this) toggleModal('myModal')">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('myModal')">&times;</span>
+            <h2 style="color: var(--accent-color); margin-top:0;">Hoe werkt het?</h2>
+            <p><strong>1. Kies de Tijd:</strong> Stel de huidige belichtingstijd in.</p>
+            <p><strong>2. Focus verandering (Optioneel):</strong> Als de afstand (FFD) verandert, zet de schakelaar aan en vul de afstanden in. De tool gebruikt de kwadratenwet: <code style="background:#444; padding: 2px 5px; border-radius:4px;">t2 = t1 * ((A2 / A1)^2)</code>.</p>
+            <p><strong>3. Filmsoort verandering (Optioneel):</strong> Als je een ander type film gaat gebruiken (bijv. van D4 naar D5), zet deze optie aan om de geconverteerde tijden te zien.</p>
+        </div>
+    </div>
+
     <script>
-        // Functie om minuten en seconden naar totale seconden om te zetten
+        // --- Picker Logic ---
+        const itemHeight = 50; 
+        let selectedMin = 0;
+        let selectedSec = 0;
+
+        function initPicker(elementId, maxVal, type) {
+            const wheel = document.getElementById(elementId);
+            
+            // Items genereren
+            for (let i = 0; i <= maxVal; i++) {
+                const item = document.createElement('div');
+                item.className = 'picker-item';
+                item.innerText = i < 10 ? '0' + i : i;
+                wheel.insertBefore(item, wheel.lastElementChild);
+            }
+
+            // Scroll Listener
+            wheel.addEventListener('scroll', () => {
+                const scrollPosition = wheel.scrollTop;
+                const index = Math.round(scrollPosition / itemHeight);
+                
+                const items = wheel.getElementsByClassName('picker-item');
+                for (let i = 0; i < items.length; i++) {
+                    items[i].style.color = '#888';
+                    items[i].style.transform = 'scale(0.8)';
+                    items[i].style.fontWeight = 'normal';
+                }
+                
+                if (items[index]) {
+                    items[index].style.color = '#fff';
+                    items[index].style.transform = 'scale(1.1)';
+                    items[index].style.fontWeight = 'bold';
+                    
+                    if (type === 'min') selectedMin = index;
+                    if (type === 'sec') selectedSec = index;
+                }
+            });
+
+            // Trigger initiële highlight
+            wheel.dispatchEvent(new Event('scroll'));
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initPicker('minuten-wheel', 180, 'min'); 
+            initPicker('seconden-wheel', 59, 'sec'); 
+        });
+
+        // --- Hulpfuncties ---
         function tijdNaarSeconden(minuten, seconden) {
             return (minuten * 60) + seconden;
         }
 
-        // Functie om seconden om te zetten naar minuten:seconden
-        function secondenNaarTijd(seconden) {
-            const minuten = Math.floor(seconden / 60);
-            const restSeconden = Math.floor(seconden % 60);
-            return `${minuten}:${restSeconden < 10 ? '0' : ''}${restSeconden}`;
+        function secondenNaarTijd(totalSeconds) {
+            const m = Math.floor(totalSeconds / 60);
+            const s = Math.floor(totalSeconds % 60);
+            const sStr = s < 10 ? '0' + s : s;
+            
+            if (m > 0) {
+                return `<span class="tijd-highlight">${m}m ${sStr}s</span>`;
+            }
+            return `<span class="tijd-highlight">${sStr}s</span>`;
         }
 
-        // Functie om de focusverandering te berekenen
+        // --- Helper voor Grote Resultaat Rijen ---
+        function createBigResultRow(label, seconds) {
+            return `
+            <div class="big-result-item">
+                <span class="big-result-label">${label}</span>
+                <span>${secondenNaarTijd(seconds)}</span>
+            </div>`;
+        }
+
+        // --- Toggle Logica ---
+        function toggleFilmtype() {
+            const checkbox = document.getElementById("filmtype_veranderd");
+            setTimeout(() => {
+                const keuzeDiv = document.getElementById('filmtype_keuze');
+                keuzeDiv.style.display = checkbox.checked ? 'block' : 'none';
+            }, 10);
+        }
+
+        function toggleFocus() {
+            const checkbox = document.getElementById("focus_veranderd");
+            setTimeout(() => {
+                const keuzeDiv = document.getElementById('focus_keuze_wrapper');
+                keuzeDiv.style.display = checkbox.checked ? 'block' : 'none';
+            }, 10);
+        }
+
+        // Event listeners direct op inputs voor edge cases
+        document.getElementById("filmtype_veranderd").addEventListener('change', function() {
+            document.getElementById('filmtype_keuze').style.display = this.checked ? 'block' : 'none';
+        });
+        document.getElementById("focus_veranderd").addEventListener('change', function() {
+            document.getElementById('focus_keuze_wrapper').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // --- Berekeningen ---
         function berekenFocusverandering(begintijd, nieuweFocus, oudeFocus) {
             return begintijd * Math.pow(nieuweFocus / oudeFocus, 2);
         }
 
-        // Functies om D5 en D7 te berekenen van D4
         function berekenD5D7VanD4(d4) {
-            const d5 = d4 / 1.6666;
-            const d7 = d4 / 2.44;
-            return { d5, d7 };
+            return { d5: d4 / 1.6666, d7: d4 / 2.44 };
         }
 
-        // Functies om D4 en D7 te berekenen van D5
         function berekenD4D7VanD5(d5) {
             const d4 = d5 * 1.6666;
-            const d7 = d4 / 2.44;
-            return { d4, d7 };
+            return { d4: d4, d7: d4 / 2.44 };
         }
 
-        // Functies om D4 en D5 te berekenen van D7
         function berekenD4D5VanD7(d7) {
             const d4 = d7 * 2.44;
-            const d5 = d4 / 1.6666;
-            return { d4, d5 };
+            return { d4: d4, d5: d4 / 1.6666 };
         }
 
-        // Functie om te berekenen op basis van de invoer
+        // --- Hoofdfunctie ---
         function bereken() {
-            const minuten = parseInt(document.getElementById("minuten").value);
-            const seconden = parseInt(document.getElementById("seconden").value);
+            const minuten = selectedMin;
+            const seconden = selectedSec;
+            
+            const focusVeranderd = document.getElementById("focus_veranderd").checked;
+            const filmtypeVeranderd = document.getElementById("filmtype_veranderd").checked;
+            
             const nieuweFocus = parseFloat(document.getElementById("nieuwe_focus").value);
             const oudeFocus = parseFloat(document.getElementById("oude_focus").value);
-            const filmtypeVeranderd = document.getElementById("filmtype_veranderd").checked;
 
-            if (isNaN(minuten) || isNaN(seconden) || isNaN(nieuweFocus) || isNaN(oudeFocus)) {
-                document.getElementById("resultaat").innerHTML = "Voer geldige waarden in.";
+            const resultContainer = document.getElementById("resultaat-container");
+            const resultInhoud = document.getElementById("resultaat-inhoud");
+
+            // Validatie
+            // 1. Tijd moet ingevuld zijn (niet 0)
+            if (minuten === 0 && seconden === 0) {
+                toonFout(resultContainer, resultInhoud, "Vul a.u.b. een tijd in.");
                 return;
             }
 
-            const begintijdInSeconden = tijdNaarSeconden(minuten, seconden);
-            let nieuweTijd = berekenFocusverandering(begintijdInSeconden, nieuweFocus, oudeFocus);
-
-            if (filmtypeVeranderd) {
-                const filmtype = document.querySelector('input[name="filmtype"]:checked').value;
-
-                if (filmtype === "D4") {
-                    const resultaat = berekenD5D7VanD4(nieuweTijd);
-                    document.getElementById("resultaat").innerHTML =
-                        `Op ${nieuweFocus} FFD is de tijd:<br>D5 = ${secondenNaarTijd(resultaat.d5)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
-                } else if (filmtype === "D5") {
-                    const resultaat = berekenD4D7VanD5(nieuweTijd);
-                    document.getElementById("resultaat").innerHTML =
-                        `Op ${nieuweFocus} FFD is de tijd:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D7 = ${secondenNaarTijd(resultaat.d7)}`;
-                } else if (filmtype === "D7") {
-                    const resultaat = berekenD4D5VanD7(nieuweTijd);
-                    document.getElementById("resultaat").innerHTML =
-                        `Op ${nieuweFocus} FFD is de tijd:<br>D4 = ${secondenNaarTijd(resultaat.d4)}<br>D5 = ${secondenNaarTijd(resultaat.d5)}`;
+            // 2. Als focus verandert, moeten de focusvelden geldig zijn
+            if (focusVeranderd) {
+                if (isNaN(nieuweFocus) || isNaN(oudeFocus) || oudeFocus === 0) {
+                    toonFout(resultContainer, resultInhoud, "Vul geldige focus afstanden in.");
+                    return;
                 }
-            } else {
-                document.getElementById("resultaat").innerHTML =
-                    `De tijd op ${nieuweFocus} FFD is: ${secondenNaarTijd(nieuweTijd)}`;
             }
 
-            // Scroll to the result
-            document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
+            // Reset style (geel)
+            resultContainer.style.borderLeftColor = "#F5DF4D";
+
+            const begintijdInSeconden = tijdNaarSeconden(minuten, seconden);
+            
+            // Stap 1: Focus Berekening
+            let berekendeTijd = begintijdInSeconden;
+            if (focusVeranderd) {
+                berekendeTijd = berekenFocusverandering(begintijdInSeconden, nieuweFocus, oudeFocus);
+            }
+
+            let outputHTML = "";
+
+            // Stap 2: Resultaat opbouwen
+            if (focusVeranderd && !filmtypeVeranderd) {
+                // Scenario A: Alleen Focus verandert
+                outputHTML = `Op <strong>${nieuweFocus} FFD</strong> is de stralingstijd:<br>`;
+                outputHTML += `<div style="font-size: 2rem; margin-top: 10px;">${secondenNaarTijd(berekendeTijd)}</div>`;
+            } 
+            else if (!focusVeranderd && !filmtypeVeranderd) {
+                // Scenario B: Niets verandert
+                outputHTML = "Je hebt geen veranderingen geselecteerd.<br>De tijd blijft: " + secondenNaarTijd(begintijdInSeconden);
+            }
+            else {
+                // Scenario C: Filmtype verandert (en mogelijk ook focus)
+                const filmtype = document.querySelector('input[name="filmtype"]:checked').value;
+                
+                if (focusVeranderd) {
+                     outputHTML += `Op <strong>${nieuweFocus} FFD</strong> is de tijd bij wissel van <strong>${filmtype}</strong> naar:<br>`;
+                } else {
+                     outputHTML += `Bij wissel van <strong>${filmtype}</strong> naar:<br>`;
+                }
+               
+                outputHTML += `<div style="margin-top:20px;">`; // Container voor blokken
+
+                if (filmtype === "D4") {
+                    const res = berekenD5D7VanD4(berekendeTijd);
+                    outputHTML += createBigResultRow("D5", res.d5);
+                    outputHTML += createBigResultRow("D7", res.d7);
+                } else if (filmtype === "D5") {
+                    const res = berekenD4D7VanD5(berekendeTijd);
+                    outputHTML += createBigResultRow("D4", res.d4);
+                    outputHTML += createBigResultRow("D7", res.d7);
+                } else if (filmtype === "D7") {
+                    const res = berekenD4D5VanD7(berekendeTijd);
+                    outputHTML += createBigResultRow("D4", res.d4);
+                    outputHTML += createBigResultRow("D5", res.d5);
+                }
+                outputHTML += `</div>`;
+            }
+
+            resultInhoud.innerHTML = outputHTML;
+            resultContainer.style.display = "block";
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function toonFout(container, inhoud, bericht) {
+            container.style.display = "block";
+            container.style.borderLeftColor = "#ff4444";
+            inhoud.innerHTML = `<span style='color:#ff4444'>${bericht}</span>`;
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.style.display = (modal.style.display === "block") ? "none" : "block";
         }
     </script>
-</head>
-<body>
-    <h1 style="color: #F5DF4D; text-align: center;">Focusverandering</h1>
-
-    <!-- De knop om het pop-up venster te openen -->
-    <button class="info-btn" onclick="openModal('myModal')">i</button>
-
-    <!-- Het pop-up venster -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>De tijd na de verandering van bron-film afstand wordt berekend door de kwadratenwet toe te passen t2=t1*((A2/A1)^2). Kies het filmtype dat hoort bij de begintijd om te zien wat de tijd is na verandering van filmsoort.</p>
-        </div>
-    </div>
-
-    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
-
-    <form>
-        <label for="minuten">Begintijd:</label><br>
-        Minuten: <input type="number" id="minuten" placeholder="Minuten" min="0"><br>
-        Seconden: <input type="number" id="seconden" placeholder="Seconden" min="0" max="59"><br><br>
-
-        <label for="nieuwe_focus">Nieuwe focus:</label><br>
-        <input type="number" id="nieuwe_focus" step="any" placeholder="Nieuwe focus"><br><br>
-
-        <label for="oude_focus">Oude focus:</label><br>
-        <input type="number" id="oude_focus" step="any" placeholder="Oude focus"><br><br>
-
-        <label for="filmtype_veranderd">Filmsoort verandert</label>
-        <input type="checkbox" id="filmtype_veranderd" onchange="document.getElementById('filmtype_keuze').style.display = this.checked ? 'block' : 'none';"><br><br>
-
-        <div id="filmtype_keuze" style="display: none;">
-            <label for="filmtype">Filmsoort van de begintijd:</label><br>
-            <input type="radio" id="D4" name="filmtype" value="D4" checked> D4<br>
-            <input type="radio" id="D5" name="filmtype" value="D5"> D5<br>
-            <input type="radio" id="D7" name="filmtype" value="D7"> D7<br><br>
-        </div>
-
-        <!-- Modified calculate button -->
-        <button type="button" class="calculate-btn" onclick="bereken()">Bereken</button>
-    </form>
-
-    <h2>Resultaat</h2>
-    <h2 id="resultaat" style="color: #F5DF4D;"></h2>
-<div style="height: 200px;"></div>
 </body>
 </html>
