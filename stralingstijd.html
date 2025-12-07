@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stralingstijd Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background-color: #4a4a4a;
+            color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #F5DF4D;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .calculator-card {
+            background: #333;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #555;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #f4f4f4;
+            font-size: 1rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #F5DF4D;
+            box-shadow: 0 0 5px rgba(245, 223, 77, 0.5);
+        }
+
+        .result-box {
+            margin-top: 25px;
+            background-color: #222;
+            border: 2px solid #F5DF4D;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .time-big {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #F5DF4D;
+            display: block;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .debug-info {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .formula-note {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #888;
+            border-top: 1px solid #444;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        /* Adjust home icon specifically for this page if needed, 
+           but styles.css should handle it generally */
+        .home-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 24px;
+            text-decoration: none;
+            z-index: 10;
+        }
+        
+        .home-icon:hover {
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .calculator-card {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin-top: 40px; /* Space for home icon */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Gamma Stralingstijd</h1>
+
+<div class="calculator-card">
+    <div class="input-group">
+        <label for="sourceSelect">Kies een bron</label>
+        <select id="sourceSelect" onchange="onSourceChanged()">
+            <option value="" disabled selected>Laden...</option>
+        </select>
+    </div>
+
+    <!-- Hidden field for calculation logic -->
+    <input type="hidden" id="isotope" value="Ir192">
+
+    <div class="input-group" id="ciInputGroup"> 
+        <label>Activiteit (Ci)</label>
+        <input type="number" id="ci" step="0.1" oninput="calculate()">
+    </div>
+    <!-- Display current activity nicely for CSV sources (optional, but input is now visible) -->
+    <div style="margin-bottom: 15px; color: #aaa; font-size: 0.9rem; display:none;" id="activityInfoText">
+        Automatisch berekend op basis van verval.
+    </div>
+
+    <div class="input-group">
+        <label for="thickness">Dikte(mm), zoals op schuifje</label>
+        <input type="number" id="thickness" value="20" step="1" oninput="calculate()">
+    </div>
+
+    <div class="input-group">
+        <label for="ffd">Film Focus Afstand (cm)</label>
+        <input type="number" id="ffd" value="60" step="1" oninput="calculate()">
+    </div>
+    
+    <div class="input-group">
+        <label>Film Type(s)</label>
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="checkD4" value="D4" checked onchange="calculate()"> D4
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="checkD5" value="D5" checked onchange="calculate()"> D5
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="checkD7" value="D7" checked onchange="calculate()"> D7
+            </label>
+        </div>
+    </div>
+
+    <div class="result-box">
+        <div id="resultsContainer">
+            <!-- Results will be injected here -->
+            <div class="result-item">Selecteer een bron...</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .checkbox-group {
+        display: flex;
+        gap: 20px; /* Increased gap */
+        justify-content: center;
+        background: #333; /* Darker background */
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #555;
+    }
+    .checkbox-label {
+        color: #fff; /* White text */
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 1.2rem; /* Larger text */
+        font-weight: bold;
+    }
+    .checkbox-label input {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        cursor: pointer;
+    }
+    .result-item {
+        font-size: 1.2rem;
+        margin: 8px 0;
+        color: #f4f4f4;
+    }
+    .result-time {
+        color: #F5DF4D;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+</style>
+
+<script>
+    // --- CONFIGURATION ---
+    const CONFIG = {
+        Ir192: { k: 0.13, hvl: 13.68, ff: 17.10 },
+        Se75: { k: 0.054, hvl: 10.33, ff: 13.26 }
+    };
+
+    let sourcesData = [];
+
+    // Load CSV on start
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadSources();
+    });
+
+    async function loadSources() {
+        try {
+            const select = document.getElementById('sourceSelect');
+            select.innerHTML = '<option value="" disabled selected>Kies een bron...</option>';
+
+            // Add Manual Options first
+            const manualIr = document.createElement('option');
+            manualIr.value = "manual_Ir192";
+            manualIr.text = "Ir192 (Handmatig)";
+            select.appendChild(manualIr);
+
+            const manualSe = document.createElement('option');
+            manualSe.value = "manual_Se75";
+            manualSe.text = "Se75 (Handmatig)";
+            select.appendChild(manualSe);
+
+            // Divider
+            const divider = document.createElement('option');
+            divider.disabled = true;
+            divider.text = "--- Opgeslagen Bronnen ---";
+            select.appendChild(divider);
+
+            const response = await fetch('bronnen.csv');
+            const text = await response.text();
+            const lines = text.trim().split('\n').slice(1); // Skip header
+
+            sourcesData = lines.map(line => {
+                const cols = line.split(',');
+                if (cols.length < 4) return null;
+                return {
+                    name: cols[0].trim(),
+                    type: cols[1].trim(),
+                    initialActivity: parseFloat(cols[2].trim()),
+                    date: cols[3].trim()
+                };
+            }).filter(x => x);
+
+            sourcesData.forEach((src, index) => {
+                const opt = document.createElement('option');
+                opt.value = index; // Use index to retrieve data later
+                opt.text = `${src.name} (${src.type})`;
+                select.appendChild(opt);
+            });
+            
+        } catch (err) {
+            console.error("Error loading CSV:", err);
+            // Even on error, keep manual options
+        }
+    }
+
+    function calculateCurrentActivity(initialCi, type, dateStr) {
+        // Parse date DD-MM-YYYY
+        const parts = dateStr.split('-');
+        const sourceDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`); // YYYY-MM-DD
+        const today = new Date();
+        
+        // Calculate diff in days (positive or negative)
+        const days = (today - sourceDate) / (1000 * 60 * 60 * 24);
+
+        let halfLife = (type === 'Se75') ? 120 : 74;
+        return initialCi / Math.pow(2, days / halfLife);
+    }
+
+    function onSourceChanged() {
+        const val = document.getElementById('sourceSelect').value;
+        const ciInput = document.getElementById('ci');
+        const activityInfo = document.getElementById('activityInfoText');
+        
+        if (val === "manual_Ir192") {
+            document.getElementById('isotope').value = "Ir192";
+            ciInput.readOnly = false;
+            ciInput.style.backgroundColor = "#f4f4f4";
+            ciInput.style.color = "#333";
+            ciInput.value = ""; // Clear for user input
+            ciInput.placeholder = "Vul activiteit in";
+            activityInfo.style.display = "none";
+        } else if (val === "manual_Se75") {
+            document.getElementById('isotope').value = "Se75";
+            ciInput.readOnly = false;
+            ciInput.style.backgroundColor = "#f4f4f4";
+            ciInput.style.color = "#333";
+            ciInput.value = "";
+            ciInput.placeholder = "Vul activiteit in";
+            activityInfo.style.display = "none";
+        } else if (val !== "") {
+            // CSV Source
+            const src = sourcesData[parseInt(val)];
+            const currentCi = calculateCurrentActivity(src.initialActivity, src.type, src.date);
+            
+            document.getElementById('isotope').value = src.type;
+            
+            ciInput.value = currentCi.toFixed(2);
+            ciInput.readOnly = true;
+            ciInput.style.backgroundColor = "#e0e0e0"; // Grey out
+            ciInput.style.color = "#555";
+            
+            activityInfo.style.display = "block";
+            calculate();
+        }
+    }
+
+    function calculate() {
+        const iso = document.getElementById('isotope').value;
+        const ci = parseFloat(document.getElementById('ci').value);
+        const thick = parseFloat(document.getElementById('thickness').value);
+        const ffd_cm = parseFloat(document.getElementById('ffd').value);
+
+        if (!ci || !thick || !ffd_cm) {
+             // Optional: clear results or show placeholder
+             return;
+        }
+
+        const consts = CONFIG[iso];
+        const ffd_m = ffd_cm / 100.0; 
+        
+        let base_exposure = (consts.ff * (ffd_m * ffd_m)) / (ci * consts.k);
+        let attenuation = Math.pow(2, (thick / consts.hvl));
+        
+        let time_d7 = base_exposure * attenuation;
+
+        if (iso === 'Se75') time_d7 *= 1.05;
+
+        // Calculate for types
+        // D7 = Base
+        // D4 = D7 * 2.44
+        // D5 = D4 / 1.6666
+        const t_d7 = time_d7;
+        const t_d4 = t_d7 * 2.44;
+        const t_d5 = t_d4 / 1.6666;
+
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.innerHTML = '';
+
+        const types = [
+            { id: 'checkD4', name: 'D4', val: t_d4 },
+            { id: 'checkD5', name: 'D5', val: t_d5 },
+            { id: 'checkD7', name: 'D7', val: t_d7 }
+        ];
+
+        let hasChecked = false;
+
+        types.forEach(type => {
+            if (document.getElementById(type.id).checked) {
+                hasChecked = true;
+                resultsContainer.innerHTML += `
+                    <div class="result-item">
+                        ${type.name}: <span class="result-time">${formatTime(type.val)}</span>
+                    </div>
+                `;
+            }
+        });
+
+        if (!hasChecked) {
+            resultsContainer.innerHTML = '<div class="result-item" style="color:#aaa">Vink een filmtype aan.</div>';
+        }
+    }
+
+    function formatTime(minutesFloat) {
+        let m = Math.floor(minutesFloat);
+        let s = Math.round((minutesFloat - m) * 60);
+        if (s === 60) { m++; s = 0; }
+        return `${m}m ${s}s`;
+    }
+</script>
+
+</body>
+</html>

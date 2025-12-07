@@ -355,6 +355,7 @@
       <p id="wire-result"></p>
       <p id="min-ffd-result"></p>
       <p id="film-quality-result"></p>
+      <p id="exposure-time-result"></p>
       <p id="verzet-result"></p>
       <p id="max-kv-result"></p>
       <p id="activity-result"></p>
@@ -1880,10 +1881,75 @@
           schuifjeLinkResultElement.innerHTML = `<a href="/rt/schuifje.html" style="color: #FFD700; text-decoration: underline;">Ga naar Schuifje voor Stralingstijd</a>`;
 
           schuifjeLinkResultElement.style.display = "block";
+
+          // --- Exposure Time Calculation ---
+          const exposureTimeElement = document.getElementById("exposure-time-result");
+          if (exposureTimeElement) {
+             exposureTimeElement.style.display = "none";
+             exposureTimeElement.innerHTML = "";
+
+             if (!isNaN(currentActivity) && currentActivity > 0 && !isNaN(sfd) && sfd > 0 && !isNaN(penetratedThicknessForDisplay)) {
+                 const CONFIG = {
+                     Ir192: { k: 0.13, hvl: 13.68, ff: 17.10 },
+                     Se75: { k: 0.054, hvl: 10.33, ff: 13.26 }
+                 };
+                 const consts = CONFIG[selectedBron.type];
+
+                 if (consts) {
+                     const ffd_m = sfd / 1000.0;
+                     let base_exposure = (consts.ff * (ffd_m * ffd_m)) / (currentActivity * consts.k);
+                     // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus 4mm
+                     let exposureThickness = (technique === "SWSI") ? wanddikte : (2 * wanddikte);
+                     let attenuation = Math.pow(2, ((exposureThickness + 4) / consts.hvl));
+                     let time_minutes_d7 = base_exposure * attenuation;
+
+                     // Adjust time for Se75 by 5 percent (user request)
+                     if (selectedBron.type === "Se75") {
+                         time_minutes_d7 *= 1.05;
+                     }
+
+                     function formatTime(mins) {
+                         let m = Math.floor(mins);
+                         let s = Math.round((mins - m) * 60);
+                         if (s === 60) { m++; s = 0; }
+                         return `${m}m${s}s`;
+                     }
+
+                     let showD4 = false;
+                     let showD5 = false;
+                     let showD7 = false;
+
+                     const ft = filmType.toUpperCase();
+                     if (ft.includes("D7")) {
+                         showD7 = true; showD5 = true; showD4 = true;
+                     } else if (ft.includes("D5")) {
+                         showD5 = true; showD4 = true;
+                     } else if (ft.includes("D4")) {
+                         showD4 = true;
+                     }
+
+                     const time_d4 = time_minutes_d7 * 2.44;
+                     const time_d5 = time_d4 / 1.6666;
+
+                     let results = [];
+                     if (showD4) results.push(`D4≈ ${formatTime(time_d4)}`);
+                     if (showD5) results.push(`D5≈ ${formatTime(time_d5)}`);
+                     if (showD7) results.push(`D7≈ ${formatTime(time_minutes_d7)}`);
+
+                     if (results.length > 0) {
+                         exposureTimeElement.innerHTML = "Stralingstijd: <strong>" + results.join(", ") + "</strong>";
+                         exposureTimeElement.style.display = "block";
+                     }
+                 }
+             }
+          }
         } else {
           activityResultElement.style.display = "none";
 
           schuifjeLinkResultElement.style.display = "none";
+
+          const exposureTimeElement = document.getElementById("exposure-time-result");
+          if (exposureTimeElement) exposureTimeElement.style.display = "none";
         }
 
         // Sabic Edge Case for exposures
