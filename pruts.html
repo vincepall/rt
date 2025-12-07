@@ -178,7 +178,12 @@
     </style>
   </head>
   <body>
-    <img src="pruts.png" id="pruts-image" alt="P.R.U.T.S. Mascot" onclick="showEasterEgg()" />
+    <img
+      src="pruts.png"
+      id="pruts-image"
+      alt="P.R.U.T.S. Mascot"
+      onclick="showEasterEgg()"
+    />
     <h1>
       Hallo, Ik ben P.R.U.T.S <br />
       (Pijplas Radiografie Ultieme Technische Sidekick)
@@ -371,17 +376,6 @@
           Aantal opnames: 2 bij opstelling 11/F , 3 bij opstelling 12/G
         </strong>
       </div>
-
-      <div id="visualizer-section" style="display:none; margin: 20px auto; max-width: 600px; text-align: center;">
-          <h2 style="color: #f5df4d;">DWSI Simulatie</h2>
-          <div style="background-color: #000; padding: 10px; border-radius: 10px; border: 2px solid #444;">
-              <canvas id="dwsi-canvas" width="580" height="500" style="background-color: #121212; max-width: 100%;"></canvas>
-              <div id="visualizer-stats" style="color: #e0e0e0; margin-top: 15px; font-family: monospace; text-align: left; padding: 10px;">
-                  <!-- Stats worden hier ingevuld door JS -->
-              </div>
-          </div>
-      </div>
-
       <div
         class="image-container"
         id="container1B"
@@ -429,7 +423,45 @@
         "
       >
         <h2>Opstelling 2 (Klasse A)</h2>
-      </div>  
+      </div>
+      <div
+        id="visualizer-section"
+        style="
+          display: none;
+          margin: 20px auto;
+          max-width: 600px;
+          text-align: center;
+        "
+      >
+        <h2 style="color: #f5df4d">DWSI Simulatie</h2>
+        <div
+          style="
+            background-color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #444;
+          "
+        >
+          <canvas
+            id="dwsi-canvas"
+            width="580"
+            height="500"
+            style="background-color: #121212; max-width: 100%"
+          ></canvas>
+          <div
+            id="visualizer-stats"
+            style="
+              color: #e0e0e0;
+              margin-top: 15px;
+              font-family: monospace;
+              text-align: left;
+              padding: 10px;
+            "
+          >
+            <!-- Stats worden hier ingevuld door JS -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -461,32 +493,34 @@
       }
 
       const easterEggSentences = [
-          "Ga voor een strakke ovaal, een lasbreedte ertussen is optimaal!",
-          "Een test te veel is een film te veel, een test te weinig is een reshoot.",
-          "Waarom por je me? Ga werken!",
-          "Voor elk draadje bestaat een gaatje... Bij ASME tenminste",
-          "Als de tape niet plakt gebruik je niet genoeg tape",
-          "Vergeet je DTS niet!",
-          "Denk je dat de buis hard straalt? De diameter is straal x 2!",
-          "Alweer aan het werk?!",
-          "Nu even niet! kunnen jullie helemaal niks alleen?!",
-          "Ah...de \"Iridiumseleen\" zeker? ~knipoog~",
-          "\"excentrisch\" maar dan in het midden ~knipoog~",
-          "ach.. je had ook tvt kunnen hebben!",
-          "na regen komt... ontwikkelen, rapporteren",
-          "Beter een film te veel dan overlap te weinig!",
-          "Daar zit het draadje toch?!",
-          "zwarting is relatief, op een log schaal",
-          "2x D4 = D8 toch?",
-          "vergeet je de backscatter B niet?",
-          "Heb je een \"F-je\" op je BKI bij DWSI?"
+        "Ga voor een strakke ovaal, een lasbreedte ertussen is optimaal!",
+        "Een test te veel is een film te veel, een test te weinig is een reshoot.",
+        "Waarom por je me? Ga werken!",
+        "Voor elk draadje bestaat een gaatje... Bij ASME tenminste",
+        "Als de tape niet plakt gebruik je niet genoeg tape",
+        "Vergeet je DTS niet!",
+        "Denk je dat de buis hard straalt? De diameter is straal x 2!",
+        "Alweer aan het werk?!",
+        "Nu even niet! kunnen jullie helemaal niks alleen?!",
+        'Ah...de "Iridiumseleen" zeker? ~knipoog~',
+        '"excentrisch" maar dan in het midden ~knipoog~',
+        "ach.. je had ook tvt kunnen hebben!",
+        "na regen komt... ontwikkelen, rapporteren",
+        "Beter een film te veel dan overlap te weinig!",
+        "Daar zit het draadje toch?!",
+        "zwarting is relatief, op een log schaal",
+        "2x D4 = D8 toch?",
+        "vergeet je de backscatter B niet?",
+        'Heb je een "F-je" op je BKI bij DWSI?',
       ];
 
       function showEasterEgg() {
-          const randomIndex = Math.floor(Math.random() * easterEggSentences.length);
-          const message = easterEggSentences[randomIndex];
-          document.getElementById('easterEggMessage').innerText = message;
-          openModal('easterEggModal');
+        const randomIndex = Math.floor(
+          Math.random() * easterEggSentences.length,
+        );
+        const message = easterEggSentences[randomIndex];
+        document.getElementById("easterEggMessage").innerText = message;
+        openModal("easterEggModal");
       }
 
       let bronnenData = [];
@@ -1228,13 +1262,21 @@
       }
 
       // --- NEW FUNCTION: Calculate Minimum Exposures based on Geometry (ISO 17636 principles) ---
-      function calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure, optie) {
-        if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0) return "";
+      function calculateMinimumExposures(
+        diameter,
+        wanddikte,
+        sfd,
+        technique,
+        procedure,
+        optie,
+      ) {
+        if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0)
+          return "";
 
         // Allowable thickness variation ratio
         let ratioLimit = 1.2; // Default Class A / ASME
         if (procedure === "EN-B") {
-            ratioLimit = 1.1;
+          ratioLimit = 1.1;
         }
 
         const R = diameter / 2.0;
@@ -1245,115 +1287,114 @@
         // 2. SWSI Contact (Film Inside, Source Outside) -> technique === 'SWSI' && optie === ''
         // 3. Double Wall / Excentric (Film Outside, Source Outside) -> All others
 
-        const isContactSWSI = (technique === "SWSI" && optie === "");
+        const isContactSWSI = technique === "SWSI" && optie === "";
 
         if (isContactSWSI) {
-            // SWSI Contact: Ray travels from Source -> Outer Wall -> Inner Wall (Film)
-            // Source S is Outside. Film P is on Inner Surface (r).
-            // We image the wall closest to the Source (The "Top" or "Near" wall).
+          // SWSI Contact: Ray travels from Source -> Outer Wall -> Inner Wall (Film)
+          // Source S is Outside. Film P is on Inner Surface (r).
+          // We image the wall closest to the Source (The "Top" or "Near" wall).
 
-            // Source relative to center (Assuming film is at -r, Source is at +Y = -r + SFD)
-            // Note: SFD is Source-to-Film.
-            const sourceY = -r + sfd;
+          // Source relative to center (Assuming film is at -r, Source is at +Y = -r + SFD)
+          // Note: SFD is Source-to-Film.
+          const sourceY = -r + sfd;
 
-            for (let n = 3; n <= 30; n++) {
-                const alpha = Math.PI / n; // Half-angle of coverage on Inner Surface
+          for (let n = 3; n <= 30; n++) {
+            const alpha = Math.PI / n; // Half-angle of coverage on Inner Surface
 
-                // Target Point P on Inner Surface (Film)
-                const Px = r * Math.sin(alpha);
-                const Py = -r * Math.cos(alpha);
+            // Target Point P on Inner Surface (Film)
+            const Px = r * Math.sin(alpha);
+            const Py = -r * Math.cos(alpha);
 
-                // Vector from Source S(0, sourceY) to P(Px, Py)
-                const Vx = Px;
-                const Vy = Py - sourceY;
+            // Vector from Source S(0, sourceY) to P(Px, Py)
+            const Vx = Px;
+            const Vy = Py - sourceY;
 
-                // Coefficients for Line S + u*V
-                const A = Vx*Vx + Vy*Vy;
-                const B = 2 * (0*Vx + sourceY*Vy);
+            // Coefficients for Line S + u*V
+            const A = Vx * Vx + Vy * Vy;
+            const B = 2 * (0 * Vx + sourceY * Vy);
 
-                // 1. Find Intersection with Outer Circle (R) - Near Side
-                const C_outer = sourceY*sourceY - R*R;
-                const delta_outer = B*B - 4*A*C_outer;
-                if (delta_outer < 0) continue;
-                // Smallest positive root u (Near side entrance)
-                const u_out = (-B - Math.sqrt(delta_outer)) / (2*A);
+            // 1. Find Intersection with Outer Circle (R) - Near Side
+            const C_outer = sourceY * sourceY - R * R;
+            const delta_outer = B * B - 4 * A * C_outer;
+            if (delta_outer < 0) continue;
+            // Smallest positive root u (Near side entrance)
+            const u_out = (-B - Math.sqrt(delta_outer)) / (2 * A);
 
-                // 2. Find Intersection with Inner Circle (r) - Near Side
-                const C_inner = sourceY*sourceY - r*r;
-                const delta_inner = B*B - 4*A*C_inner;
-                if (delta_inner < 0) continue;
-                // Smallest positive root u (Near side exit)
-                const u_in = (-B - Math.sqrt(delta_inner)) / (2*A);
+            // 2. Find Intersection with Inner Circle (r) - Near Side
+            const C_inner = sourceY * sourceY - r * r;
+            const delta_inner = B * B - 4 * A * C_inner;
+            if (delta_inner < 0) continue;
+            // Smallest positive root u (Near side exit)
+            const u_in = (-B - Math.sqrt(delta_inner)) / (2 * A);
 
-                // 3. Calculate Path Length through Near Wall
-                // Ray enters at u_out, exits near wall at u_in.
-                const pathLength = (u_in - u_out) * Math.sqrt(A);
+            // 3. Calculate Path Length through Near Wall
+            // Ray enters at u_out, exits near wall at u_in.
+            const pathLength = (u_in - u_out) * Math.sqrt(A);
 
-                // Check Ratio against single wall thickness
-                if (pathLength / wanddikte <= ratioLimit) return n;
-            }
-            return ">30";
-
+            // Check Ratio against single wall thickness
+            if (pathLength / wanddikte <= ratioLimit) return n;
+          }
+          return ">30";
         } else {
-            // Standard DWSI / Excentric Logic (Film on Outside/Far side)
-            // SFD is typically defined as Source-to-Film.
-            // Film is at -R. Source is at -R + SFD.
-            const sourceY = -R + sfd;
+          // Standard DWSI / Excentric Logic (Film on Outside/Far side)
+          // SFD is typically defined as Source-to-Film.
+          // Film is at -R. Source is at -R + SFD.
+          const sourceY = -R + sfd;
 
-            const isDoubleWall = (technique === "DWSI");
+          const isDoubleWall = technique === "DWSI";
 
-            for (let n = 3; n <= 30; n++) {
-                const alpha = Math.PI / n;
-                // Target Point P on Outer Surface (Film)
-                const Px = R * Math.sin(alpha);
-                const Py = -R * Math.cos(alpha);
+          for (let n = 3; n <= 30; n++) {
+            const alpha = Math.PI / n;
+            // Target Point P on Outer Surface (Film)
+            const Px = R * Math.sin(alpha);
+            const Py = -R * Math.cos(alpha);
 
-                const Vx = Px;
-                const Vy = Py - sourceY;
+            const Vx = Px;
+            const Vy = Py - sourceY;
 
-                const A = Vx*Vx + Vy*Vy;
-                const B = 2 * (-sourceY * Vy);
-                const C_outer = sourceY*sourceY - R*R;
-                const C_inner = sourceY*sourceY - r*r;
+            const A = Vx * Vx + Vy * Vy;
+            const B = 2 * (-sourceY * Vy);
+            const C_outer = sourceY * sourceY - R * R;
+            const C_inner = sourceY * sourceY - r * r;
 
-                const delta_outer = B*B - 4*A*C_outer;
-                if (delta_outer < 0) continue;
+            const delta_outer = B * B - 4 * A * C_outer;
+            if (delta_outer < 0) continue;
 
-                const sqrt_outer = Math.sqrt(delta_outer);
-                const u_out1 = (-B - sqrt_outer) / (2*A);
-                const u_out2 = (-B + sqrt_outer) / (2*A);
+            const sqrt_outer = Math.sqrt(delta_outer);
+            const u_out1 = (-B - sqrt_outer) / (2 * A);
+            const u_out2 = (-B + sqrt_outer) / (2 * A);
 
-                const delta_inner = B*B - 4*A*C_inner;
-                let pathLength = 0;
+            const delta_inner = B * B - 4 * A * C_inner;
+            let pathLength = 0;
 
-                if (isDoubleWall) {
-                    // DWSI: Path = OuterChord - InnerChord
-                    if (delta_inner < 0) {
-                        pathLength = (u_out2 - u_out1) * Math.sqrt(A);
-                    } else {
-                        const sqrt_inner = Math.sqrt(delta_inner);
-                        const u_in1 = (-B - sqrt_inner) / (2*A);
-                        const u_in2 = (-B + sqrt_inner) / (2*A);
+            if (isDoubleWall) {
+              // DWSI: Path = OuterChord - InnerChord
+              if (delta_inner < 0) {
+                pathLength = (u_out2 - u_out1) * Math.sqrt(A);
+              } else {
+                const sqrt_inner = Math.sqrt(delta_inner);
+                const u_in1 = (-B - sqrt_inner) / (2 * A);
+                const u_in2 = (-B + sqrt_inner) / (2 * A);
 
-                        const chordOuter = (u_out2 - u_out1) * Math.sqrt(A);
-                        const chordInner = (u_in2 - u_in1) * Math.sqrt(A);
-                        pathLength = chordOuter - chordInner;
-                    }
-                    // Nominal: 2 * t
-                    if (pathLength / (2 * wanddikte) <= ratioLimit) return n;
-                } else {
-                    // SWSI Excentric / Standard (Far wall view)
-                    if (delta_inner < 0) continue;
-                    const sqrt_inner = Math.sqrt(delta_inner);
-                    const u_in2 = (-B + sqrt_inner) / (2*A); // Exit inner
-                    // Path from Exit Inner to Exit Outer
-                    pathLength = (u_out2 - u_in2) * Math.sqrt(A);
+                const chordOuter = (u_out2 - u_out1) * Math.sqrt(A);
+                const chordInner = (u_in2 - u_in1) * Math.sqrt(A);
+                pathLength = chordOuter - chordInner;
+              }
+              // Nominal: 2 * t
+              if (pathLength / (2 * wanddikte) <= ratioLimit) return n;
+            } else {
+              // SWSI Excentric / Standard (Far wall view)
+              if (delta_inner < 0) continue;
+              const sqrt_inner = Math.sqrt(delta_inner);
+              const u_in2 = (-B + sqrt_inner) / (2 * A); // Exit inner
+              // Path from Exit Inner to Exit Outer
+              pathLength = (u_out2 - u_in2) * Math.sqrt(A);
 
-                    // Nominal: 1 * t
-                    if (pathLength / wanddikte <= ratioLimit) return n;
-                }
+              // Nominal: 1 * t
+              if (pathLength / wanddikte <= ratioLimit) return n;
             }
-            return ">30";
+          }
+          return ">30";
         }
       }
 
@@ -1432,7 +1473,8 @@
             calculatedWanddikte = 2 * wanddikte;
           }
           const lasoverdikte = getFloatValue("lasoverdikte");
-          penetratedThicknessForDisplay = calculatedWanddikte + (isNaN(lasoverdikte) ? 0 : lasoverdikte);
+          penetratedThicknessForDisplay =
+            calculatedWanddikte + (isNaN(lasoverdikte) ? 0 : lasoverdikte);
         }
 
         const penetratedThicknessResultEl = document.getElementById(
@@ -1489,9 +1531,9 @@
               sourceWarningDiv.innerHTML = warningMsg;
 
               sourceWarningDiv.style.display = "block";
-            }    
+            }
           }
-          updateVisualizer();    
+          updateVisualizer();
         }
 
         // END NEW SOURCE WARNING LOGIC
@@ -1883,72 +1925,96 @@
           schuifjeLinkResultElement.style.display = "block";
 
           // --- Exposure Time Calculation ---
-          const exposureTimeElement = document.getElementById("exposure-time-result");
+          const exposureTimeElement = document.getElementById(
+            "exposure-time-result",
+          );
           if (exposureTimeElement) {
-             exposureTimeElement.style.display = "none";
-             exposureTimeElement.innerHTML = "";
+            exposureTimeElement.style.display = "none";
+            exposureTimeElement.innerHTML = "";
 
-             if (!isNaN(currentActivity) && currentActivity > 0 && !isNaN(sfd) && sfd > 0 && !isNaN(penetratedThicknessForDisplay)) {
-                 const CONFIG = {
-                     Ir192: { k: 0.13, hvl: 13.68, ff: 17.10 },
-                     Se75: { k: 0.054, hvl: 10.33, ff: 13.26 }
-                 };
-                 const consts = CONFIG[selectedBron.type];
+            if (
+              !isNaN(currentActivity) &&
+              currentActivity > 0 &&
+              !isNaN(sfd) &&
+              sfd > 0 &&
+              !isNaN(penetratedThicknessForDisplay)
+            ) {
+              const CONFIG = {
+                Ir192: { k: 0.13, hvl: 13.68, ff: 17.1 },
+                Se75: { k: 0.054, hvl: 10.33, ff: 13.26 },
+              };
+              const consts = CONFIG[selectedBron.type];
 
-                 if (consts) {
-                     const ffd_m = sfd / 1000.0;
-                     let base_exposure = (consts.ff * (ffd_m * ffd_m)) / (currentActivity * consts.k);
-                     // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus 4mm
-                     let exposureThickness = (technique === "SWSI") ? wanddikte : (2 * wanddikte);
-                     let attenuation = Math.pow(2, ((exposureThickness + 4) / consts.hvl));
-                     let time_minutes_d7 = base_exposure * attenuation;
+              if (consts) {
+                const ffd_m = sfd / 1000.0;
+                let base_exposure =
+                  (consts.ff * (ffd_m * ffd_m)) / (currentActivity * consts.k);
+                // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus 4mm
+                let exposureThickness =
+                  technique === "SWSI" ? wanddikte : 2 * wanddikte;
+                let attenuation = Math.pow(
+                  2,
+                  (exposureThickness + 4) / consts.hvl,
+                );
+                let time_minutes_d7 = base_exposure * attenuation;
 
-                     // Adjust time for Se75 by 5 percent (user request)
-                     if (selectedBron.type === "Se75") {
-                         time_minutes_d7 *= 1.05;
-                     }
+                // Adjust time for Se75 by 5 percent (user request)
+                if (selectedBron.type === "Se75") {
+                  time_minutes_d7 *= 1.05;
+                }
 
-                     function formatTime(mins) {
-                         let m = Math.floor(mins);
-                         let s = Math.round((mins - m) * 60);
-                         if (s === 60) { m++; s = 0; }
-                         return `${m}m${s}s`;
-                     }
+                function formatTime(mins) {
+                  let m = Math.floor(mins);
+                  let s = Math.round((mins - m) * 60);
+                  if (s === 60) {
+                    m++;
+                    s = 0;
+                  }
+                  return `${m}m${s}s`;
+                }
 
-                     let showD4 = false;
-                     let showD5 = false;
-                     let showD7 = false;
+                let showD4 = false;
+                let showD5 = false;
+                let showD7 = false;
 
-                     const ft = filmType.toUpperCase();
-                     if (ft.includes("D7")) {
-                         showD7 = true; showD5 = true; showD4 = true;
-                     } else if (ft.includes("D5")) {
-                         showD5 = true; showD4 = true;
-                     } else if (ft.includes("D4")) {
-                         showD4 = true;
-                     }
+                const ft = filmType.toUpperCase();
+                if (ft.includes("D7")) {
+                  showD7 = true;
+                  showD5 = true;
+                  showD4 = true;
+                } else if (ft.includes("D5")) {
+                  showD5 = true;
+                  showD4 = true;
+                } else if (ft.includes("D4")) {
+                  showD4 = true;
+                }
 
-                     const time_d4 = time_minutes_d7 * 2.44;
-                     const time_d5 = time_d4 / 1.6666;
+                const time_d4 = time_minutes_d7 * 2.44;
+                const time_d5 = time_d4 / 1.6666;
 
-                     let results = [];
-                     if (showD4) results.push(`D4≈ ${formatTime(time_d4)}`);
-                     if (showD5) results.push(`D5≈ ${formatTime(time_d5)}`);
-                     if (showD7) results.push(`D7≈ ${formatTime(time_minutes_d7)}`);
+                let results = [];
+                if (showD4) results.push(`D4≈ ${formatTime(time_d4)}`);
+                if (showD5) results.push(`D5≈ ${formatTime(time_d5)}`);
+                if (showD7) results.push(`D7≈ ${formatTime(time_minutes_d7)}`);
 
-                     if (results.length > 0) {
-                         exposureTimeElement.innerHTML = "Stralingstijd: <strong>" + results.join(", ") + "</strong>";
-                         exposureTimeElement.style.display = "block";
-                     }
-                 }
-             }
+                if (results.length > 0) {
+                  exposureTimeElement.innerHTML =
+                    "Stralingstijd: <strong>" +
+                    results.join(", ") +
+                    "</strong>";
+                  exposureTimeElement.style.display = "block";
+                }
+              }
+            }
           }
         } else {
           activityResultElement.style.display = "none";
 
           schuifjeLinkResultElement.style.display = "none";
 
-          const exposureTimeElement = document.getElementById("exposure-time-result");
+          const exposureTimeElement = document.getElementById(
+            "exposure-time-result",
+          );
           if (exposureTimeElement) exposureTimeElement.style.display = "none";
         }
 
@@ -2005,15 +2071,22 @@
 
             // Skip calculation for SWSI Contact (SWSI + Optie "Nee")
             if (!(technique === "SWSI" && optie === "")) {
-                 minExposures = calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure, optie);
+              minExposures = calculateMinimumExposures(
+                diameter,
+                wanddikte,
+                sfd,
+                technique,
+                procedure,
+                optie,
+              );
             }
 
             omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${minExposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
 
             if (minExposures !== "" && minExposures !== ">30") {
-                berekenOpnameLocaties();
+              berekenOpnameLocaties();
             } else {
-                 document.getElementById("opname-locaties").style.display = "none";
+              document.getElementById("opname-locaties").style.display = "none";
             }
           }
           omtrekCalculatorElement.style.display = "block";
@@ -2397,14 +2470,14 @@
           sfdInput.value = "0"; // Initialize FFD field with 0 if no minFFD is calculated
         }
       });
-            function updateVisualizer() {
+      function updateVisualizer() {
         const technique = document.getElementById("technique").value;
         const section = document.getElementById("visualizer-section");
-        
+
         // Show only for DWSI
         if (technique !== "DWSI") {
-            section.style.display = "none";
-            return;
+          section.style.display = "none";
+          return;
         }
 
         const diameter = getFloatValue("diameter");
@@ -2414,8 +2487,8 @@
 
         // Basic validation
         if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0) {
-            section.style.display = "none";
-            return;
+          section.style.display = "none";
+          return;
         }
 
         section.style.display = "block";
@@ -2425,85 +2498,96 @@
         // Determine ratio limit based on procedure
         let ratioLimit = 1.2; // Default Class A / ASME
         if (procedure === "EN-B") {
-            ratioLimit = 1.1;
+          ratioLimit = 1.1;
         }
 
         // --- Calculation Logic (Same as standalone tool) ---
         const R = diameter / 2.0;
         const r = R - wanddikte;
-        
+
         let optimalN = 30;
         let optimalStats = {};
         let found = false;
 
         for (let n = 3; n <= 30; n++) {
-            const alpha = Math.PI / n;
-            const sourceY = R - sfd; // Top of canvas logic relative to center
+          const alpha = Math.PI / n;
+          const sourceY = R - sfd; // Top of canvas logic relative to center
 
-            // Target Point P on Outer Surface (Film side)
-            const Px = R * Math.sin(alpha);
-            const Py = R * Math.cos(alpha); // Bottom (positive Y in math usually, but let's stick to geometric calc)
+          // Target Point P on Outer Surface (Film side)
+          const Px = R * Math.sin(alpha);
+          const Py = R * Math.cos(alpha); // Bottom (positive Y in math usually, but let's stick to geometric calc)
 
-            // Vector
-            const Vx = Px;
-            const Vy = Py - sourceY;
+          // Vector
+          const Vx = Px;
+          const Vy = Py - sourceY;
 
-            const A = Vx*Vx + Vy*Vy;
-            const B = 2 * sourceY * Vy;
+          const A = Vx * Vx + Vy * Vy;
+          const B = 2 * sourceY * Vy;
 
-            // Intersections
-            const getIntersections = (radius) => {
-                const C = sourceY*sourceY - radius*radius;
-                const delta = B*B - 4*A*C;
-                if (delta < 0) return [];
-                const sqrtD = Math.sqrt(delta);
-                return [(-B - Math.sqrt(delta)) / (2*A), (-B + Math.sqrt(delta)) / (2*A)].sort((a,b)=>a-b);
+          // Intersections
+          const getIntersections = (radius) => {
+            const C = sourceY * sourceY - radius * radius;
+            const delta = B * B - 4 * A * C;
+            if (delta < 0) return [];
+            const sqrtD = Math.sqrt(delta);
+            return [
+              (-B - Math.sqrt(delta)) / (2 * A),
+              (-B + Math.sqrt(delta)) / (2 * A),
+            ].sort((a, b) => a - b);
+          };
+
+          const hitsOuter = getIntersections(R);
+          const hitsInner = getIntersections(r);
+
+          let pathLength = 0;
+          if (hitsOuter.length === 2) {
+            const entryOuter = hitsOuter[0];
+            const exitOuter = hitsOuter[1];
+            let lengthInsideHollow = 0;
+            if (hitsInner.length === 2) {
+              lengthInsideHollow = (hitsInner[1] - hitsInner[0]) * Math.sqrt(A);
+            }
+            const totalChord = (exitOuter - entryOuter) * Math.sqrt(A);
+            pathLength = totalChord - lengthInsideHollow;
+          }
+
+          const nominal = 2 * wanddikte;
+          const ratio = pathLength / nominal;
+
+          if (ratio <= ratioLimit) {
+            optimalN = n;
+            optimalStats = {
+              ratio,
+              pathLength,
+              centerPAth: 2 * wanddikte,
+              hitsOuter,
+              hitsInner,
+              sourceY,
+              alpha,
             };
-
-            const hitsOuter = getIntersections(R);
-            const hitsInner = getIntersections(r);
-
-            let pathLength = 0;
-            if (hitsOuter.length === 2) {
-                const entryOuter = hitsOuter[0];
-                const exitOuter = hitsOuter[1];
-                let lengthInsideHollow = 0;
-                if (hitsInner.length === 2) {
-                    lengthInsideHollow = (hitsInner[1] - hitsInner[0]) * Math.sqrt(A);
-                }
-                const totalChord = (exitOuter - entryOuter) * Math.sqrt(A);
-                pathLength = totalChord - lengthInsideHollow;
-            }
-
-            const nominal = 2 * wanddikte;
-            const ratio = pathLength / nominal;
-
-            if (ratio <= ratioLimit) {
-                optimalN = n;
-                optimalStats = { ratio, pathLength,centerPAth: 2 * wanddikte, hitsOuter, hitsInner, sourceY, alpha };
-                found = true;
-                break;
-            }
+            found = true;
+            break;
+          }
         }
 
         // Fallback for drawing if not found (draw n=30 state)
         if (!found) {
-            const alpha = Math.PI / 30;
-            const sourceY = R - sfd;
-            optimalStats = { 
-                ratio: "> Limit", 
-                pathLength: 0,
-                centerPath: 2 * wanddikte,
-                hitsOuter: [], 
-                hitsInner: [], 
-                sourceY: sourceY, 
-                alpha: alpha 
-            };
+          const alpha = Math.PI / 30;
+          const sourceY = R - sfd;
+          optimalStats = {
+            ratio: "> Limit",
+            pathLength: 0,
+            centerPath: 2 * wanddikte,
+            hitsOuter: [],
+            hitsInner: [],
+            sourceY: sourceY,
+            alpha: alpha,
+          };
         }
 
         // --- Update Stats Text ---
         const arcLength = (diameter * Math.PI) / optimalN;
-        
+
         statsDiv.innerHTML = `
             <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between;">
                 <div><strong>Diameter:</strong> <span style="color: #f5df4d">${diameter} mm</span></div>
@@ -2524,86 +2608,90 @@
         drawCanvas(canvas, R, r, sfd, optimalN, optimalStats);
       }
       function drawCanvas(canvas, R, r, sfd, n, stats) {
-    const ctx = canvas.getContext("2d");
-    const w = canvas.width;
-    const h = canvas.height;
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width;
+        const h = canvas.height;
 
-    // Clear background
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, w, h);
+        // Clear background
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, w, h);
 
-    const cx = w / 2;
-    const cy = h / 2;
-    // Scale logic: Fit (SFD + R) into height with margin
-    const scale = Math.min(w, h) / (sfd * 1.15);
+        const cx = w / 2;
+        const cy = h / 2;
+        // Scale logic: Fit (SFD + R) into height with margin
+        const scale = Math.min(w, h) / (sfd * 1.15);
 
-    const sourceY_coord = stats.sourceY;
-    const midY = (sourceY_coord + R) / 2; 
+        const sourceY_coord = stats.sourceY;
+        const midY = (sourceY_coord + R) / 2;
 
-    const toCanvas = (x, y) => ({
-        x: cx + x * scale,
-        y: cy + (y - midY) * scale
-    });
+        const toCanvas = (x, y) => ({
+          x: cx + x * scale,
+          y: cy + (y - midY) * scale,
+        });
 
-    // 1. Draw Source
-    const sPos = toCanvas(0, sourceY_coord);
-    ctx.beginPath();
-    ctx.arc(sPos.x, sPos.y, 6, 0, Math.PI * 2);
-    ctx.fillStyle = "#f5df4d";
-    ctx.fill();
-    ctx.fillStyle = "#fff";
-    ctx.font = "14px Arial";
-    ctx.fillText("Bron", sPos.x + 10, sPos.y);
-
-    // 2. Draw Pipe
-    const cPos = toCanvas(0, 0);
-
-    // Outer
-    ctx.beginPath();
-    ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
-    ctx.strokeStyle = "#555";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Inner
-    ctx.beginPath();
-    ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2);
-    ctx.strokeStyle = "#555";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Fill pipe walls
-    ctx.beginPath();
-    ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
-    ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2, true);
-    ctx.fillStyle = "rgba(100, 100, 100, 0.3)";
-    ctx.fill();
-
-    // 3. Draw Rays, Film and Text Values
-    if (stats.hitsOuter && stats.hitsOuter.length > 0) {
-        const alpha = Math.PI / n;
-        const angles = [-alpha, alpha];
-
-        // --- A. Center Ray & Text ---
-        const centerFilmP = toCanvas(0, R);
+        // 1. Draw Source
+        const sPos = toCanvas(0, sourceY_coord);
         ctx.beginPath();
-        ctx.moveTo(sPos.x, sPos.y);
-        ctx.lineTo(centerFilmP.x, centerFilmP.y);
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-        ctx.setLineDash([5, 5]);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        ctx.arc(sPos.x, sPos.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = "#f5df4d";
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Arial";
+        ctx.fillText("Bron", sPos.x + 10, sPos.y);
 
-        // Draw Center Thickness Value
-        if (stats.centerPath) {
+        // 2. Draw Pipe
+        const cPos = toCanvas(0, 0);
+
+        // Outer
+        ctx.beginPath();
+        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
+        ctx.strokeStyle = "#555";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Inner
+        ctx.beginPath();
+        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2);
+        ctx.strokeStyle = "#555";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Fill pipe walls
+        ctx.beginPath();
+        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
+        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2, true);
+        ctx.fillStyle = "rgba(100, 100, 100, 0.3)";
+        ctx.fill();
+
+        // 3. Draw Rays, Film and Text Values
+        if (stats.hitsOuter && stats.hitsOuter.length > 0) {
+          const alpha = Math.PI / n;
+          const angles = [-alpha, alpha];
+
+          // --- A. Center Ray & Text ---
+          const centerFilmP = toCanvas(0, R);
+          ctx.beginPath();
+          ctx.moveTo(sPos.x, sPos.y);
+          ctx.lineTo(centerFilmP.x, centerFilmP.y);
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+          ctx.setLineDash([5, 5]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Draw Center Thickness Value
+          if (stats.centerPath) {
             const centerTextPos = toCanvas(5, 0); // Slightly right of center (x=0, y=0)
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 14px Arial";
-            ctx.fillText(stats.centerPath.toFixed(2) + "mm", centerTextPos.x, centerTextPos.y);
-        }
+            ctx.fillText(
+              stats.centerPath.toFixed(2) + "mm",
+              centerTextPos.x,
+              centerTextPos.y,
+            );
+          }
 
-        // --- B. Edge Rays & Text ---
-        angles.forEach((ang, index) => {
+          // --- B. Edge Rays & Text ---
+          angles.forEach((ang, index) => {
             const filmX = R * Math.sin(ang);
             const filmY = R * Math.cos(ang);
             const filmPos = toCanvas(filmX, filmY);
@@ -2619,86 +2707,112 @@
             // Red Path through Wall (Highlight)
             const Vx = filmX;
             const Vy = filmY - sourceY_coord;
-            const A = Vx*Vx + Vy*Vy;
+            const A = Vx * Vx + Vy * Vy;
             const B = 2 * sourceY_coord * Vy;
-            const C_out = sourceY_coord*sourceY_coord - R*R;
-            const C_in = sourceY_coord*sourceY_coord - r*r;
+            const C_out = sourceY_coord * sourceY_coord - R * R;
+            const C_in = sourceY_coord * sourceY_coord - r * r;
 
             const getU = (C) => {
-                const d = B*B - 4*A*C;
-                if (d < 0) return [];
-                return [(-B - Math.sqrt(d))/(2*A), (-B + Math.sqrt(d))/(2*A)];
+              const d = B * B - 4 * A * C;
+              if (d < 0) return [];
+              return [
+                (-B - Math.sqrt(d)) / (2 * A),
+                (-B + Math.sqrt(d)) / (2 * A),
+              ];
             };
 
             const uOut = getU(C_out);
             const uIn = getU(C_in);
 
             if (uOut.length === 2) {
-                let uStart = uOut[0];
-                let uEnd = (uIn.length === 2) ? uIn[0] : uOut[1];
-                let p1 = toCanvas(uStart*Vx, sourceY_coord + uStart*Vy);
-                let p2 = toCanvas(uEnd*Vx, sourceY_coord + uEnd*Vy);
+              let uStart = uOut[0];
+              let uEnd = uIn.length === 2 ? uIn[0] : uOut[1];
+              let p1 = toCanvas(uStart * Vx, sourceY_coord + uStart * Vy);
+              let p2 = toCanvas(uEnd * Vx, sourceY_coord + uEnd * Vy);
 
-                // Draw Top Wall path
-                ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-                ctx.strokeStyle = "red"; ctx.lineWidth = 3; ctx.stroke();
+              // Draw Top Wall path
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = "red";
+              ctx.lineWidth = 3;
+              ctx.stroke();
 
-                if (uIn.length === 2) {
-                    uStart = uIn[1];
-                    uEnd = uOut[1];
-                    p1 = toCanvas(uStart*Vx, sourceY_coord + uStart*Vy);
-                    p2 = toCanvas(uEnd*Vx, sourceY_coord + uEnd*Vy);
-                    // Draw Bottom Wall path
-                    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-                    ctx.strokeStyle = "red"; ctx.lineWidth = 3; ctx.stroke();
-                }
+              if (uIn.length === 2) {
+                uStart = uIn[1];
+                uEnd = uOut[1];
+                p1 = toCanvas(uStart * Vx, sourceY_coord + uStart * Vy);
+                p2 = toCanvas(uEnd * Vx, sourceY_coord + uEnd * Vy);
+                // Draw Bottom Wall path
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+              }
             }
 
             // Draw Side Thickness Value (Only on the right side ray to avoid clutter)
             if (index === 1 && stats.pathLength > 0) {
-                // Position text slightly to the right of the ray passing through the pipe wall
-                const textX = filmX + (R * 0.2); 
-                const textY = 0; // Middle height
-                const sideTextPos = toCanvas(textX, textY);
-                
-                ctx.fillStyle = "yellow"; // Different color for distinction
-                ctx.font = "bold 14px Arial";
-                ctx.fillText(stats.pathLength.toFixed(2) + "mm", sideTextPos.x, sideTextPos.y);
+              // Position text slightly to the right of the ray passing through the pipe wall
+              const textX = filmX + R * 0.2;
+              const textY = 0; // Middle height
+              const sideTextPos = toCanvas(textX, textY);
+
+              ctx.fillStyle = "yellow"; // Different color for distinction
+              ctx.font = "bold 14px Arial";
+              ctx.fillText(
+                stats.pathLength.toFixed(2) + "mm",
+                sideTextPos.x,
+                sideTextPos.y,
+              );
             }
-        });
+          });
 
-        // Film Arc
-        ctx.beginPath();
-        ctx.arc(cPos.x, cPos.y, R * scale + 8, Math.PI/2 - alpha, Math.PI/2 + alpha);
-        ctx.strokeStyle = "cyan";
-        ctx.lineWidth = 4;
-        ctx.stroke();
+          // Film Arc
+          ctx.beginPath();
+          ctx.arc(
+            cPos.x,
+            cPos.y,
+            R * scale + 8,
+            Math.PI / 2 - alpha,
+            Math.PI / 2 + alpha,
+          );
+          ctx.strokeStyle = "cyan";
+          ctx.lineWidth = 4;
+          ctx.stroke();
 
-        const txtPos = toCanvas(0, R);
-        ctx.fillStyle = "cyan";
-        ctx.font = "14px Arial";
-        ctx.fillText("Film", txtPos.x - 12, txtPos.y + 25);
-    }
-
-
+          const txtPos = toCanvas(0, R);
+          ctx.fillStyle = "cyan";
+          ctx.font = "14px Arial";
+          ctx.fillText("Film", txtPos.x - 12, txtPos.y + 25);
+        }
       }
     </script>
     <div style="height: 200px"></div>
     <div style="height: 200px"></div>
     <div id="lascategorieModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('lascategorieModal')">&times;</span>
-            <h3>Lastype Categorieën (ASME)</h3>
-            <img src="Lascategorie.png" alt="Lastype Categorieën" style="max-width: 100%; height: auto;" />
-        </div>
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('lascategorieModal')"
+          >&times;</span
+        >
+        <h3>Lastype Categorieën (ASME)</h3>
+        <img
+          src="Lascategorie.png"
+          alt="Lastype Categorieën"
+          style="max-width: 100%; height: auto"
+        />
+      </div>
     </div>
 
     <div id="easterEggModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('easterEggModal')">&times;</span>
-            <p id="easterEggMessage" style="color: black; text-shadow: none;"></p>
-        </div>
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('easterEggModal')"
+          >&times;</span
+        >
+        <p id="easterEggMessage" style="color: black; text-shadow: none"></p>
+      </div>
     </div>
-
   </body>
 </html>

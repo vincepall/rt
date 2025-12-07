@@ -1,272 +1,423 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>"RT Tools"</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Handlee&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
-    <link rel="manifest" href="/rt/manifest.json">
-    <link rel="stylesheet" href="styles.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Handlee&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    />
+    <link rel="manifest" href="/rt/manifest.json" />
+    <link rel="stylesheet" href="styles.css" />
     <style>
-        :root {
-            --primary-color: #007BFF;
-            --secondary-color: #0056b3;
-            --bg-color: #4a4a4a;
-            --text-color: #f4f4f4;
-            --button-color: #333;
-            --button-hover-color: #444;
-            --download-color: #666;
-            --download-hover-color: #888;
-        }
+      :root {
+        --primary-color: #007bff;
+        --secondary-color: #0056b3;
+        --bg-color: #4a4a4a;
+        --text-color: #f4f4f4;
+        --button-color: #333;
+        --button-hover-color: #444;
+        --download-color: #666;
+        --download-hover-color: #888;
+      }
 
-        body {
-            font-family: 'Handlee', sans-serif;
-            background-color: var(--bg-color);
-            text-align: center;
-            padding: 60px;
-            margin: 0;
-            color: var(--text-color);
-        }
+      body {
+        font-family: "Handlee", sans-serif;
+        background-color: var(--bg-color);
+        text-align: center;
+        padding: 60px;
+        margin: 0;
+        color: var(--text-color);
+      }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
 
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-        }
+      p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+      }
 
+      .link-list {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .link-list li {
+        margin: 5px;
+      }
+
+      .link-list a {
+        text-decoration: none;
+        color: #000000;
+        padding: 10px 30px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        transition: transform 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+        background-position: center;
+        background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+        width: 200px;
+        height: 50px;
+        background-color: transparent;
+        gap: 10px;
+      }
+
+      .link-list a:hover {
+        transform: scale(1.05);
+        background-color: transparent;
+      }
+
+      /* Specifieke achtergrondafbeeldingen voor elke link */
+      .link1 {
+        background-image: url("tape1.PNG");
+      }
+
+      .link2 {
+        background-image: url("tape2.PNG");
+      }
+
+      .link3 {
+        background-image: url("tape3.PNG");
+      }
+
+      .link4 {
+        background-image: url("tape4.PNG");
+      }
+
+      .install-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 8px 16px;
+        background-color: var(--download-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        transition:
+          background-color 0.3s,
+          transform 0.3s;
+        cursor: pointer;
+      }
+
+      .install-button:hover {
+        background-color: var(--download-hover-color);
+        transform: scale(1.02);
+      }
+
+      @media (max-width: 768px) {
         .link-list {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+          flex-direction: column;
         }
-
-        .link-list li {
-            margin: 5px;
-        }
-
-        .link-list a {
-            text-decoration: none;
-            color: #000000;
-            padding: 10px 30px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: transform 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
-            background-position: center;
-            background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
-            width: 200px;
-            height: 50px;
-            background-color: transparent;
-            gap: 10px;
-
-        }
-
-        .link-list a:hover {
-            transform: scale(1.05);
-            background-color: transparent;
-        }
-
-
-
-
-        /* Specifieke achtergrondafbeeldingen voor elke link */
-        .link1 {
-            background-image: url('tape1.PNG');
-        }
-
-        .link2 {
-            background-image: url('tape2.PNG');
-        }
-
-        .link3 {
-            background-image: url('tape3.PNG');
-        }
-
-        .link4 {
-            background-image: url('tape4.PNG');
-        }
-
-
-        .install-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 8px 16px;
-            background-color: var(--download-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            transition: background-color 0.3s, transform 0.3s;
-            cursor: pointer;
-        }
-
-        .install-button:hover {
-            background-color: var(--download-hover-color);
-            transform: scale(1.02);
-        }
-
-        @media (max-width: 768px) {
-            .link-list {
-                flex-direction: column;
-            }
-        }
+      }
     </style>
     <script>
-        let deferredPrompt;
+      let deferredPrompt;
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Voorkom dat de standaard prompt wordt weergegeven
-            e.preventDefault();
-            // Sla het event op zodat het later kan worden gebruikt
-            deferredPrompt = e;
-            // Maak de install-knop zichtbaar
-            const installButton = document.querySelector('.install-button');
-            installButton.style.display = 'inline-block';
-        });
+      window.addEventListener("beforeinstallprompt", (e) => {
+        // Voorkom dat de standaard prompt wordt weergegeven
+        e.preventDefault();
+        // Sla het event op zodat het later kan worden gebruikt
+        deferredPrompt = e;
+        // Maak de install-knop zichtbaar
+        const installButton = document.querySelector(".install-button");
+        installButton.style.display = "inline-block";
+      });
 
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('Gebruiker accepteerde de installatie');
-                    } else {
-                        console.log('Gebruiker weigerde de installatie');
-                    }
-                    deferredPrompt = null;
-                });
+      function installPWA() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === "accepted") {
+              console.log("Gebruiker accepteerde de installatie");
+            } else {
+              console.log("Gebruiker weigerde de installatie");
             }
+            deferredPrompt = null;
+          });
         }
+      }
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/rt/service-worker.js')
-                    .then((registration) => {
-                        console.log('Service Worker geregistreerd met scope:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.log('Service Worker registratie mislukt:', error);
-                    });
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/rt/service-worker.js")
+            .then((registration) => {
+              console.log(
+                "Service Worker geregistreerd met scope:",
+                registration.scope,
+              );
+            })
+            .catch((error) => {
+              console.log("Service Worker registratie mislukt:", error);
             });
-        }
+        });
+      }
     </script>
-
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
     <!-- Het pop-up venster -->
     <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('myModal')">&times;</span>
-            <p>Door deze pagina als app te installeren is deze ook te gebruiken als er geen internetverbinding is.
-            De app zal altijd eerst proberen via internetverbinding te werken, op die manier maak je zo vaak als mogelijk gebruik van de laatste versie.
-            Er kunnen fouten in de tools zitten die ik heb gemist, als je me er op wijst kan ik het misschien verhelpen,
-            vincepall@gmail.com</p>
-        </div>
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('myModal')">&times;</span>
+        <p>
+          Door deze pagina als app te installeren is deze ook te gebruiken als
+          er geen internetverbinding is. De app zal altijd eerst proberen via
+          internetverbinding te werken, op die manier maak je zo vaak als
+          mogelijk gebruik van de laatste versie. Er kunnen fouten in de tools
+          zitten die ik heb gemist, als je me er op wijst kan ik het misschien
+          verhelpen, vincepall@gmail.com
+        </p>
+      </div>
     </div>
 
-    <script src="script.js"></script> <!-- Link naar externe JavaScript -->
+    <script src="script.js"></script>
+    <!-- Link naar externe JavaScript -->
 
-    <div style="margin-bottom: 20px;">
-        <input type="text" id="searchBar" placeholder="Zoeken...">
+    <div style="margin-bottom: 20px">
+      <input type="text" id="searchBar" placeholder="Zoeken..." />
     </div>
 
     <ul class="link-list">
-        <li><a href="focusverandering.html" class="link1"><i class="fa-solid fa-up-down"></i>FFD & Filmtype<i class="fa-solid fa-up-down"></i></a></li>
-        <li><a href="verval2.html" class="link3"><i class="fa-solid fa-radiation"></i>Bronsterkte<i class="fa-solid fa-radiation"></i></a></li>
-        <li><a href="pruts.html" class="link4"><i class="fa-solid fa-robot"></i>P.R.U.T.S<i class="fa-solid fa-robot"></i></a></li>
-        <li><a href="stralingstijd.html" class="link2"><i class="fa-solid fa-hourglass"></i>Gamma stralingstijd<i class="fa-solid fa-hourglass"></i></a></li>
-        <li><a href="schuifje.html" class= "link1"><i class="fa-solid fa-ruler-horizontal"></i>Schuifje<i class="fa-solid fa-ruler-horizontal"></i></a></li>
-        <li><a href="opnamesklasseb.html" class="link4"><i class="fa-solid fa-star-of-life"></i>Aantal opnames<i class="fa-solid fa-star-of-life"></i></a></li>
-        <li><a href="cw2.html" class= "link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
-        <li><a href="LW_Verdeler.html" class="link1"><i class="fa-solid fa-tape"></i>Langsnaad tool<i class="fa-solid fa-tape"></i></a></li>
-        <li><a href="MinFFD.html" class="link4"><i class="fa-solid fa-ruler"></i>Minimale FFD<i class="fa-solid fa-ruler"></i></a></li>
-        <li><a href="Draadjesv2.html" class= "link3"><i class="fa-solid fa-grip-lines-vertical"></i>Draadvereiste EN & ASME<i class="fa-solid fa-grip-lines-vertical"></i></a></li>
-        <li><a href="filmkwaliteit.html" class="link1"><i class="fa-solid fa-film"></i>Filmtype<i class="fa-solid fa-film"></i></a></li>
-        <li><a href="bundelbreedte.html" class= "link2"><i class="fa-solid fa-less-than"></i>Bundelgrootte<i class="fa-solid fa-less-than"></i></a></li>
-        <li><a href="afzettinggamma.html" class= "link1"><i class="fa-solid fa-road-barrier"></i>Afzetting Gamma<i class="fa-solid fa-road-barrier"></i></a></li>
-        <li><a href="handigelinks.html" class= "link4"><i class="fa-solid fa-link"></i>Handige links<i class="fa-solid fa-link"></i></a></li>
-        <li><a href="buistabel.html" class= "link2"><i class="fa-solid fa-chart-line"></i>Buis-tabellen<i class="fa-solid fa-chart-line"></i></a></li>
-        <li><a href="onstream.html" class= "link3"><i class="fa-solid fa-x-ray"></i>Onstream Tools<i class="fa-solid fa-x-ray"></i></a></li>
-        <li><a href="zinnen.html" class= "link2"><i class="fa-solid fa-comment"></i>Rapportage zinnen<i class="fa-solid fa-comment"></i></a></li>
-        <li><a href="tekens.html" class= "link4"><i class="fa-solid fa-keyboard"></i>Rapportage Speciale Tekens<i class="fa-solid fa-keyboard"></i></a></li>
-        <li><a href="verzet.html" class= "link1"><i class="fa-solid fa-ring"></i>Verzet van ovaaltje<i class="fa-solid fa-ring"></i></a></li>
-        <li><a href="kvregel.html" class= "link4"><i class="fa-solid fa-bolt"></i>KV Regel<i class="fa-solid fa-bolt"></i></a></li>
-        <li><a href="timer.html" class="link3"><i class="fa-solid fa-stopwatch"></i>Gamma Timers<i class="fa-solid fa-stopwatch"></i></a></li>
+      <li>
+        <a href="focusverandering.html" class="link1"
+          ><i class="fa-solid fa-up-down"></i>FFD & Filmtype<i
+            class="fa-solid fa-up-down"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="verval2.html" class="link3"
+          ><i class="fa-solid fa-radiation"></i>Bronsterkte<i
+            class="fa-solid fa-radiation"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="pruts.html" class="link4"
+          ><i class="fa-solid fa-robot"></i>P.R.U.T.S<i
+            class="fa-solid fa-robot"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="stralingstijd.html" class="link2"
+          ><i class="fa-solid fa-hourglass"></i>Gamma stralingstijd<i
+            class="fa-solid fa-hourglass"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="schuifje.html" class="link1"
+          ><i class="fa-solid fa-ruler-horizontal"></i>Schuifje<i
+            class="fa-solid fa-ruler-horizontal"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="opnamesklasseb.html" class="link4"
+          ><i class="fa-solid fa-star-of-life"></i>Aantal opnames<i
+            class="fa-solid fa-star-of-life"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="cw2.html" class="link2"
+          ><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i
+            class="fa-solid fa-circle-radiation"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="LW_Verdeler.html" class="link1"
+          ><i class="fa-solid fa-tape"></i>Langsnaad tool<i
+            class="fa-solid fa-tape"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="MinFFD.html" class="link4"
+          ><i class="fa-solid fa-ruler"></i>Minimale FFD<i
+            class="fa-solid fa-ruler"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="Draadjesv2.html" class="link3"
+          ><i class="fa-solid fa-grip-lines-vertical"></i>Draadvereiste EN &
+          ASME<i class="fa-solid fa-grip-lines-vertical"></i
+        ></a>
+      </li>
+      <li>
+        <a href="filmkwaliteit.html" class="link1"
+          ><i class="fa-solid fa-film"></i>Filmtype<i
+            class="fa-solid fa-film"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="bundelbreedte.html" class="link2"
+          ><i class="fa-solid fa-less-than"></i>Bundelgrootte<i
+            class="fa-solid fa-less-than"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="afzettinggamma.html" class="link1"
+          ><i class="fa-solid fa-road-barrier"></i>Afzetting Gamma<i
+            class="fa-solid fa-road-barrier"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="handigelinks.html" class="link4"
+          ><i class="fa-solid fa-link"></i>Handige links<i
+            class="fa-solid fa-link"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="buistabel.html" class="link2"
+          ><i class="fa-solid fa-chart-line"></i>Buis-tabellen<i
+            class="fa-solid fa-chart-line"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="onstream.html" class="link3"
+          ><i class="fa-solid fa-x-ray"></i>Onstream Tools<i
+            class="fa-solid fa-x-ray"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="zinnen.html" class="link2"
+          ><i class="fa-solid fa-comment"></i>Rapportage zinnen<i
+            class="fa-solid fa-comment"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="tekens.html" class="link4"
+          ><i class="fa-solid fa-keyboard"></i>Rapportage Speciale Tekens<i
+            class="fa-solid fa-keyboard"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="verzet.html" class="link1"
+          ><i class="fa-solid fa-ring"></i>Verzet van ovaaltje<i
+            class="fa-solid fa-ring"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="kvregel.html" class="link4"
+          ><i class="fa-solid fa-bolt"></i>KV Regel<i
+            class="fa-solid fa-bolt"
+          ></i
+        ></a>
+      </li>
+      <li>
+        <a href="timer.html" class="link3"
+          ><i class="fa-solid fa-stopwatch"></i>Gamma Timers<i
+            class="fa-solid fa-stopwatch"
+          ></i
+        ></a>
+      </li>
     </ul>
 
-    <button class="install-button" onclick="installPWA()" style="display: none;">
-        Installeer RT Tools als app
+    <button class="install-button" onclick="installPWA()" style="display: none">
+      Installeer RT Tools als app
     </button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const searchBar = document.getElementById('searchBar');
-            const list = document.querySelector('.link-list');
-            
-            // Store original local items
-            const localItems = Array.from(list.children);
-            
-            // Initialize allItems with local items
-            let allItems = localItems.map(li => ({ element: li, text: li.textContent.toLowerCase() }));
+      document.addEventListener("DOMContentLoaded", async () => {
+        const searchBar = document.getElementById("searchBar");
+        const list = document.querySelector(".link-list");
 
-            // Fetch items from other pages
-            const pages = ['handigelinks.html', 'onstream.html', 'opnamesklasseb.html'];
-            let remoteItems = [];
+        // Store original local items
+        const localItems = Array.from(list.children);
 
-            for (const page of pages) {
-                try {
-                    const res = await fetch(page);
-                    if (res.ok) {
-                        const text = await res.text();
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(text, 'text/html');
-                        const items = Array.from(doc.querySelectorAll('.link-list li'));
-                        
-                        items.forEach(li => {
-                            remoteItems.push({ element: li, text: li.textContent.toLowerCase() });
-                        });
-                    }
-                } catch (e) {
-                    console.warn('Could not fetch ' + page, e);
-                }
+        // Initialize allItems with local items
+        let allItems = localItems.map((li) => ({
+          element: li,
+          text: li.textContent.toLowerCase(),
+        }));
+
+        // Fetch items from other pages
+        const pages = [
+          "handigelinks.html",
+          "onstream.html",
+          "opnamesklasseb.html",
+        ];
+        let remoteItems = [];
+
+        for (const page of pages) {
+          try {
+            const res = await fetch(page);
+            if (res.ok) {
+              const text = await res.text();
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(text, "text/html");
+              const items = Array.from(doc.querySelectorAll(".link-list li"));
+
+              items.forEach((li) => {
+                remoteItems.push({
+                  element: li,
+                  text: li.textContent.toLowerCase(),
+                });
+              });
             }
+          } catch (e) {
+            console.warn("Could not fetch " + page, e);
+          }
+        }
 
-            searchBar.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase().trim();
-                list.innerHTML = '';
+        searchBar.addEventListener("input", (e) => {
+          const term = e.target.value.toLowerCase().trim();
+          list.innerHTML = "";
 
-                if (term === '') {
-                    // Restore original view (only local items)
-                    localItems.forEach(li => list.appendChild(li));
-                } else {
-                    // Combine local and remote for searching
-                    const combined = [...allItems, ...remoteItems];
-                    const filtered = combined.filter(item => item.text.includes(term));
-                    
-                    if (filtered.length > 0) {
-                        filtered.forEach(item => list.appendChild(item.element));
-                    } else {
-                        list.innerHTML = '<p style="width: 100%; text-align: center;">Geen resultaten gevonden</p>';
-                    }
-                }
-            });
+          if (term === "") {
+            // Restore original view (only local items)
+            localItems.forEach((li) => list.appendChild(li));
+          } else {
+            // Combine local and remote for searching
+            const combined = [...allItems, ...remoteItems];
+            const filtered = combined.filter((item) =>
+              item.text.includes(term),
+            );
+
+            if (filtered.length > 0) {
+              filtered.forEach((item) => list.appendChild(item.element));
+            } else {
+              list.innerHTML =
+                '<p style="width: 100%; text-align: center;">Geen resultaten gevonden</p>';
+            }
+          }
         });
+      });
     </script>
-</body>
+  </body>
 </html>
