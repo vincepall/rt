@@ -175,6 +175,24 @@
         width: 150px;
         z-index: 1;
       }
+      .results-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+        text-align: left;
+      }
+      .results-grid > * {
+        background-color: rgba(0, 0, 0, 0.6);
+        padding: 10px;
+        border-radius: 8px;
+        margin: 0; /* Override default p margin */
+      }
+      @media (max-width: 600px) {
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
@@ -356,17 +374,19 @@
       <div id="source-warning" class="diameter-warning"></div>
       <div class="diameter-warning" id="diameter-warning"></div>
       <div class="ffd-warning" id="ffd-result-warning"></div>
-      <p id="penetrated-thickness-result"></p>
-      <p id="wire-result"></p>
-      <p id="min-ffd-result"></p>
-      <p id="film-quality-result"></p>
-      <p id="exposure-time-result"></p>
-      <p id="verzet-result"></p>
-      <p id="max-kv-result"></p>
-      <p id="activity-result"></p>
-      <p id="omtrek-calculator" style="display: none"></p>
-      <div id="opname-locaties" style="color: yellow; display: none"></div>
-      <p id="schuifje-link-result" style="color: #ffd700; display: none"></p>
+      <div class="results-grid">
+        <p id="penetrated-thickness-result"></p>
+        <p id="wire-result"></p>
+        <p id="min-ffd-result"></p>
+        <p id="film-quality-result"></p>
+        <p id="exposure-time-result"></p>
+        <p id="verzet-result"></p>
+        <p id="max-kv-result"></p>
+        <p id="activity-result"></p>
+        <p id="omtrek-calculator" style="display: none"></p>
+        <div id="opname-locaties" style="color: yellow; display: none"></div>
+        <p id="schuifje-link-result" style="color: #ffd700; display: none"></p>
+      </div>
 
       <div
         id="diameterAntwoord"
@@ -2000,7 +2020,7 @@
                 if (results.length > 0) {
                   exposureTimeElement.innerHTML =
                     "Stralingstijd: <strong>" +
-                    results.join(", ") +
+                    results.join("<br>") +
                     "</strong>";
                   exposureTimeElement.style.display = "block";
                 }
