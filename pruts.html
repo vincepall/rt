@@ -1213,7 +1213,9 @@
               const datum = columns[3].trim();
               const bronGrootte = columns[4].trim();
               if (bronNaam && bronGrootte) {
-                const label = `${bronNaam} (${bronGrootte} mm)`;
+                const today = new Date();
+                const currentActivity = calculateActivityForCSV(activiteit, bronType, datum, today);
+                const label = `${bronNaam} (${bronGrootte} mm) [${currentActivity.toFixed(2)} Ci]`;
                 bronnenData.push({
                   name: bronNaam,
                   type: bronType,
