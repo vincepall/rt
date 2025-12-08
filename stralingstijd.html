@@ -278,7 +278,8 @@
             sourcesData.forEach((src, index) => {
                 const opt = document.createElement('option');
                 opt.value = index; // Use index to retrieve data later
-                opt.text = `${src.name} (${src.type})`;
+                const currentCi = calculateCurrentActivity(src.initialActivity, src.type, src.date);
+                opt.text = `${src.name} (${src.type}) [${currentCi.toFixed(2)} Ci]`;
                 select.appendChild(opt);
             });
             
