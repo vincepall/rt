@@ -107,74 +107,38 @@
             letter-spacing: 1px;
         }
 
-        /* --- TIME PICKER STIJLEN --- */
-        .time-picker-container {
+        /* --- TAB STIJLEN --- */
+        .tabs {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            background-color: #3d3d3d;
+            margin-bottom: 20px;
+            background: #333;
             border-radius: 8px;
-            padding: 10px;
-            position: relative;
-            border: 1px solid #555;
+            padding: 5px;
+            gap: 5px;
+            border: 1px solid #444;
         }
 
-        .picker-column-wrapper {
+        .tab-btn {
             flex: 1;
-            text-align: center;
-            position: relative;
-        }
-
-        .picker-label {
-            font-size: 0.8rem;
+            background: transparent;
+            border: none;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            padding: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
-        .picker-wheel {
-            height: var(--picker-height);
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            background: #333;
-            border-radius: 6px;
-            scrollbar-width: none; 
-            -ms-overflow-style: none;
-            position: relative;
-            z-index: 1;
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: #1a1a1a;
         }
 
-        .picker-wheel::-webkit-scrollbar {
-            display: none; 
-        }
-
-        .picker-item {
-            height: var(--item-height);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            scroll-snap-align: center;
-            font-size: 1.2rem;
-            color: #888;
-            transition: color 0.2s, transform 0.2s;
-        }
-
-        .picker-spacer {
-            height: var(--item-height);
-        }
-
-        .highlight-bar {
-            position: absolute;
-            top: calc(var(--item-height) + 26px);
-            left: 10px;
-            right: 10px;
-            height: var(--item-height);
-            background-color: rgba(245, 223, 77, 0.15);
-            border-top: 1px solid var(--accent-color);
-            border-bottom: 1px solid var(--accent-color);
-            border-radius: 4px;
-            pointer-events: none;
-            z-index: 0;
+        .tab-content {
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         /* Inputs */
@@ -311,9 +275,14 @@
             transform: scale(1.2);
         }
 
-        /* Bereken Knop */
+        /* Bereken & Save Knop Container */
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
         .calculate-btn {
-            width: 100%;
+            flex: 1;
             background-color: var(--accent-color);
             color: #1a1a1a;
             padding: 15px;
@@ -331,6 +300,24 @@
             gap: 10px;
         }
 
+        .save-btn {
+            background-color: #444;
+            color: var(--accent-color);
+            width: 60px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .save-btn:hover {
+            background-color: #555;
+        }
+
         .calculate-btn:hover {
             background-color: var(--accent-hover);
             transform: translateY(-2px);
@@ -338,6 +325,91 @@
 
         .calculate-btn:active {
             transform: translateY(0);
+        }
+
+        /* Save Modal Specifiek */
+        .save-option-group {
+            margin-bottom: 15px;
+            background: #333;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .save-option-group h4 {
+            margin-top: 0;
+            color: var(--accent-color);
+            border-bottom: 1px solid #555;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .save-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .save-input-full {
+            width: 100%;
+        }
+        
+        select.modal-select {
+            width: 100%;
+            padding: 10px;
+            background-color: #444;
+            border: 1px solid #666;
+            color: white;
+            border-radius: 4px;
+        }
+
+        /* Saved Items List */
+        #saved-list-container {
+            margin-top: 40px;
+            border-top: 1px solid #444;
+            padding-top: 20px;
+        }
+
+        .saved-item-card {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--accent-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .saved-item-card:hover {
+            transform: translateX(5px);
+            background-color: #3a3a3a;
+        }
+
+        .saved-item-title {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .saved-item-details {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .delete-saved-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+        }
+        
+        .delete-saved-btn:hover {
+            color: #ff6666;
         }
 
         /* Resultaat Sectie */
@@ -399,14 +471,15 @@
             height: 100%; 
             background-color: rgba(0,0,0,0.8); 
             backdrop-filter: blur(3px);
+            overflow-y: auto; /* Enable scrolling if content is tall */
         }
 
         .modal-content {
             background-color: var(--card-bg);
-            margin: 15% auto; 
+            margin: 50px auto; /* Fixed top margin instead of % to prevent push-off */
             padding: 30px;
             border: 1px solid #444;
-            width: 80%; 
+            width: 90%; /* Slightly wider on mobile */
             max-width: 500px;
             border-radius: var(--border-radius);
             position: relative;
@@ -456,27 +529,82 @@
         </div>
 
         <form id="calcForm" onsubmit="event.preventDefault(); bereken();">
-            <!-- Time Picker -->
-            <div class="form-group">
-                <label>Begintijd (Scroll om te kiezen)</label>
-                <div class="time-picker-container">
-                    <div class="highlight-bar"></div>
-                    
-                    <div class="picker-column-wrapper">
-                        <div class="picker-label">Minuten</div>
-                        <div class="picker-wheel" id="minuten-wheel">
-                            <div class="picker-spacer"></div>
-                            <div class="picker-spacer"></div>
+            <!-- Tabs voor Invoer -->
+            <div class="tabs">
+                <button type="button" class="tab-btn active" onclick="switchTab('time')" id="btn-time">Tijd</button>
+                <button type="button" class="tab-btn" onclick="switchTab('mamin')" id="btn-mamin">mA x min</button>
+                <button type="button" class="tab-btn" onclick="switchTab('ci')" id="btn-ci">Ci Wissel</button>
+            </div>
+
+            <!-- TAB 1: Directe Tijd -->
+            <div id="tab-time" class="tab-content">
+                <div class="form-group">
+                    <div class="input-row">
+                        <div class="input-wrapper">
+                            <label for="input_min">Minuten</label>
+                            <input type="number" id="input_min" placeholder="0" min="0" inputmode="numeric">
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="input_sec">Seconden</label>
+                            <input type="number" id="input_sec" placeholder="0" min="0" max="59" inputmode="numeric">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: mA x min -->
+            <div id="tab-mamin" class="tab-content" style="display:none;">
+                <div class="form-group">
+                    <div class="input-row">
+                        <div class="input-wrapper">
+                            <label for="input_mamin">mA * min</label>
+                            <input type="number" id="input_mamin" placeholder="Bijv. 8" step="any" inputmode="decimal">
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="input_ma">Gebruikte mA</label>
+                            <input type="number" id="input_ma" placeholder="Bijv. 3" step="any" inputmode="decimal">
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #888; text-align: center; margin-top: 5px; margin-bottom: 0;">
+                        Tijd = (mA * min) / mA
+                    </p>
+                </div>
+            </div>
+
+            <!-- TAB 3: Ci Wissel -->
+            <div id="tab-ci" class="tab-content" style="display:none;">
+                <div class="form-group">
+                    <label style="color: var(--accent-color); margin-bottom: 10px;">1. Oude Situatie</label>
+                    <div class="input-row">
+                        <div class="input-wrapper">
+                            <label>Oude Tijd (Min)</label>
+                            <input type="number" id="ci_old_min" placeholder="0" inputmode="numeric">
+                        </div>
+                        <div class="input-wrapper">
+                            <label>(Sec)</label>
+                            <input type="number" id="ci_old_sec" placeholder="0" inputmode="numeric">
+                        </div>
+                        <div class="input-wrapper">
+                            <label>Oude Ci</label>
+                            <input type="number" id="ci_old_val" placeholder="Bijv. 50" step="any" inputmode="decimal">
                         </div>
                     </div>
 
-                    <div class="picker-column-wrapper">
-                        <div class="picker-label">Seconden</div>
-                        <div class="picker-wheel" id="seconden-wheel">
-                            <div class="picker-spacer"></div>
-                            <div class="picker-spacer"></div>
-                        </div>
+                    <label style="color: var(--accent-color); margin-top: 15px; margin-bottom: 10px;">2. Nieuwe Bron</label>
+                    <div style="margin-bottom: 10px;">
+                        <select id="ci_new_select" class="modal-select" onchange="onCiTabSourceSelect()">
+                            <option value="manual">Handmatig invoeren...</option>
+                            <option disabled>--- Uit Database ---</option>
+                        </select>
                     </div>
+                    <div class="input-wrapper">
+                        <label>Nieuwe Ci</label>
+                        <input type="number" id="ci_new_val" placeholder="Vul in of kies bron" step="any" inputmode="decimal">
+                    </div>
+                    
+                    <p style="font-size: 0.8rem; color: #888; text-align: center; margin-top: 10px; margin-bottom: 0;">
+                        Nieuwe Tijd = Oude Tijd * (Oude Ci / Nieuwe Ci)
+                    </p>
                 </div>
             </div>
 
@@ -534,15 +662,114 @@
                 </div>
             </div>
 
-            <button type="submit" class="calculate-btn">
-                <i class="fas fa-calculator"></i> Bereken Tijd
-            </button>
+            <div class="button-group">
+                <button type="submit" class="calculate-btn">
+                    <i class="fas fa-calculator"></i> Bereken
+                </button>
+                <button type="button" class="save-btn" onclick="openSaveModal()" title="Opslaan">
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
         </form>
 
         <!-- Resultaat -->
         <div id="resultaat-container">
             <h3>Resultaat</h3>
             <div id="resultaat-inhoud"></div>
+        </div>
+        
+        <!-- Saved Items List -->
+        <div id="saved-list-container">
+            <h3 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.9rem;">Opgeslagen Situaties</h3>
+            <div id="saved-list">
+                <div style="color: #666; font-style: italic;">Nog geen opgeslagen items...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Modal -->
+    <div id="saveModal" class="modal" onclick="if(event.target === this) toggleModal('saveModal')">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('saveModal')">&times;</span>
+            <h2 style="color: var(--accent-color); margin-top:0;">Situatie Opslaan</h2>
+            
+            <div class="save-option-group">
+                <h4>1. Bron Type</h4>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="saveSrcType" value="X-ray" onclick="toggleSaveFields()" checked> X-ray
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="saveSrcType" value="Se75" onclick="toggleSaveFields()"> Se75
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="saveSrcType" value="Ir192" onclick="toggleSaveFields()"> Ir192
+                    </label>
+                </div>
+            </div>
+
+            <!-- X-ray Fields -->
+            <div id="save-xray-fields" class="save-option-group">
+                <h4>Instellingen</h4>
+                <div class="save-input-row">
+                    <div class="input-wrapper">
+                        <label>kV</label>
+                        <input type="number" id="saveKv" placeholder="Bijv. 200" oninput="updateSummary()">
+                    </div>
+                    <div class="input-wrapper">
+                        <label>mA</label>
+                        <input type="number" id="saveMa" placeholder="Bijv. 5" oninput="updateSummary()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gamma Fields -->
+            <div id="save-gamma-fields" class="save-option-group" style="display:none;">
+                <h4>Bron Selectie</h4>
+                <div style="margin-bottom: 10px;">
+                    <select id="saveSourceSelect" class="modal-select" onchange="onSaveSourceSelect()">
+                        <option value="manual">Handmatig invoeren...</option>
+                        <option disabled>--- Uit Database ---</option>
+                    </select>
+                </div>
+                <div class="input-wrapper">
+                    <label>Activiteit (Ci)</label>
+                    <input type="number" id="saveCi" placeholder="Huidige Ci" step="0.01" oninput="updateSummary()">
+                </div>
+            </div>
+
+            <!-- Common Fields -->
+            <div class="save-option-group">
+                <h4>Object & Film</h4>
+                <div class="save-input-row">
+                    <div class="input-wrapper">
+                        <label>Dikte (mm)</label>
+                        <input type="number" id="saveThickness" placeholder="Doorstraald" oninput="updateSummary()">
+                    </div>
+                    <div class="input-wrapper">
+                        <label>Filmtype</label>
+                        <select id="saveFilm" class="modal-select" onchange="updateSummary()">
+                            <option value="D4">D4</option>
+                            <option value="D5">D5</option>
+                            <option value="D7">D7</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary & Confirm -->
+            <div style="margin-top: 20px;">
+                <label>Naam (aanpasbaar):</label>
+                <input type="text" id="saveName" class="save-input-full" style="font-weight: bold; color: var(--accent-color);">
+                
+                <div style="margin-top: 10px; font-size: 0.85rem; color: #aaa;" id="saveContextSummary">
+                    Context: ...
+                </div>
+
+                <button class="calculate-btn" style="margin-top: 15px;" onclick="saveCalculation()">
+                    <i class="fas fa-check"></i> Opslaan
+                </button>
+            </div>
         </div>
     </div>
 
@@ -558,52 +785,363 @@
     </div>
 
     <script>
-        // --- Picker Logic ---
-        const itemHeight = 50; 
-        let selectedMin = 0;
-        let selectedSec = 0;
+        // --- Tab Logic ---
+        let currentTab = 'time';
 
-        function initPicker(elementId, maxVal, type) {
-            const wheel = document.getElementById(elementId);
-            
-            // Items genereren
-            for (let i = 0; i <= maxVal; i++) {
-                const item = document.createElement('div');
-                item.className = 'picker-item';
-                item.innerText = i < 10 ? '0' + i : i;
-                wheel.insertBefore(item, wheel.lastElementChild);
+        // --- GLOBAL STATE FOR SAVING ---
+        let csvSources = [];
+        const STORAGE_KEY = 'rt_focus_saved_items_v1';
+
+        // Load on startup
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderSavedList();
+            await loadCsvSources();
+        });
+
+        async function loadCsvSources() {
+            try {
+                const response = await fetch('bronnen.csv');
+                const text = await response.text();
+                const lines = text.trim().split('\n').slice(1); // skip header
+                
+                csvSources = lines.map(line => {
+                    const cols = line.split(',');
+                    if (cols.length < 4) return null;
+                    return {
+                        name: cols[0].trim(),
+                        type: cols[1].trim(), // Ir192 or Se75
+                        initialCi: parseFloat(cols[2]),
+                        date: cols[3].trim() // DD-MM-YYYY
+                    };
+                }).filter(x => x);
+
+                populateCiTabDropdown();
+
+            } catch (e) {
+                console.warn("CSV load failed", e);
             }
-
-            // Scroll Listener
-            wheel.addEventListener('scroll', () => {
-                const scrollPosition = wheel.scrollTop;
-                const index = Math.round(scrollPosition / itemHeight);
-                
-                const items = wheel.getElementsByClassName('picker-item');
-                for (let i = 0; i < items.length; i++) {
-                    items[i].style.color = '#888';
-                    items[i].style.transform = 'scale(0.8)';
-                    items[i].style.fontWeight = 'normal';
-                }
-                
-                if (items[index]) {
-                    items[index].style.color = '#fff';
-                    items[index].style.transform = 'scale(1.1)';
-                    items[index].style.fontWeight = 'bold';
-                    
-                    if (type === 'min') selectedMin = index;
-                    if (type === 'sec') selectedSec = index;
-                }
-            });
-
-            // Trigger initiële highlight
-            wheel.dispatchEvent(new Event('scroll'));
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            initPicker('minuten-wheel', 180, 'min'); 
-            initPicker('seconden-wheel', 59, 'sec'); 
-        });
+        function populateCiTabDropdown() {
+            const select = document.getElementById('ci_new_select');
+            // Keep first two options
+            select.innerHTML = '<option value="manual">Handmatig invoeren...</option><option disabled>--- Uit Database ---</option>';
+            
+            csvSources.forEach((src, idx) => {
+                const currentCi = calculateCurrentCi(src.initialCi, src.type, src.date);
+                const opt = document.createElement('option');
+                opt.value = idx; 
+                opt.text = `${src.type} ${src.name} (${currentCi.toFixed(2)} Ci)`;
+                select.appendChild(opt);
+            });
+        }
+
+        function onCiTabSourceSelect() {
+            const idx = document.getElementById('ci_new_select').value;
+            const ciInput = document.getElementById('ci_new_val');
+            
+            if (idx === 'manual') {
+                ciInput.value = '';
+                ciInput.readOnly = false;
+                ciInput.style.backgroundColor = '#3d3d3d';
+                ciInput.style.color = 'white';
+            } else {
+                const src = csvSources[idx];
+                const currentCi = calculateCurrentCi(src.initialCi, src.type, src.date);
+                ciInput.value = currentCi.toFixed(2);
+                ciInput.readOnly = true;
+                ciInput.style.backgroundColor = '#555'; 
+                ciInput.style.color = '#ccc';
+            }
+        }
+
+        // --- SAVE MODAL LOGIC ---
+        function openSaveModal() {
+            // Pre-fill "Old Focus" from main form if available
+            // Note: We don't change inputs, just context
+            updateSummary();
+            toggleSaveFields(); // Ensure correct view
+            toggleModal('saveModal');
+        }
+
+        function toggleSaveFields() {
+            const type = document.querySelector('input[name="saveSrcType"]:checked').value;
+            const xrayDiv = document.getElementById('save-xray-fields');
+            const gammaDiv = document.getElementById('save-gamma-fields');
+            const sourceSelect = document.getElementById('saveSourceSelect');
+            
+            if (type === 'X-ray') {
+                xrayDiv.style.display = 'block';
+                gammaDiv.style.display = 'none';
+            } else {
+                xrayDiv.style.display = 'none';
+                gammaDiv.style.display = 'block';
+                
+                // Populate Select with relevant isotopes
+                sourceSelect.innerHTML = '<option value="manual">Handmatig invoeren...</option><option disabled>--- Uit Database ---</option>';
+                
+                csvSources.forEach((src, idx) => {
+                    if (src.type === type) {
+                        const currentCi = calculateCurrentCi(src.initialCi, src.type, src.date);
+                        const opt = document.createElement('option');
+                        opt.value = idx; // Store index to retrieve full obj
+                        opt.text = `${src.name} (${currentCi.toFixed(2)} Ci)`;
+                        sourceSelect.appendChild(opt);
+                    }
+                });
+            }
+            updateSummary();
+        }
+
+        function onSaveSourceSelect() {
+            const idx = document.getElementById('saveSourceSelect').value;
+            const ciInput = document.getElementById('saveCi');
+            
+            if (idx === 'manual') {
+                ciInput.value = '';
+                ciInput.readOnly = false;
+                ciInput.style.backgroundColor = '#3d3d3d';
+                ciInput.style.color = 'white';
+            } else {
+                const src = csvSources[idx];
+                const currentCi = calculateCurrentCi(src.initialCi, src.type, src.date);
+                ciInput.value = currentCi.toFixed(2);
+                ciInput.readOnly = true;
+                ciInput.style.backgroundColor = '#555'; // Greyed out
+                ciInput.style.color = '#ccc';
+            }
+            updateSummary();
+        }
+
+        function calculateCurrentCi(initialCi, type, dateStr) {
+            const parts = dateStr.split('-');
+            // JS Month is 0-indexed
+            const srcDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            const today = new Date();
+            const daysDiff = (today - srcDate) / (1000 * 60 * 60 * 24);
+            const halfLife = (type === 'Se75') ? 120 : 74;
+            return initialCi / Math.pow(2, daysDiff / halfLife);
+        }
+
+        function updateSummary() {
+            // Gather Data
+            const type = document.querySelector('input[name="saveSrcType"]:checked').value;
+            const thick = document.getElementById('saveThickness').value || '?';
+            const film = document.getElementById('saveFilm').value;
+            
+            // Get current context from Main App
+            const oldFocus = document.getElementById('oude_focus').value || '?';
+            
+            // Calculate Time context
+            let timeStr = "0s";
+            if (currentTab === 'time') {
+                const m = document.getElementById('input_min').value || 0;
+                const s = document.getElementById('input_sec').value || 0;
+                if (m>0 || s>0) timeStr = `${m}m ${s}s`;
+            } else if (currentTab === 'mamin') {
+                const mamin = document.getElementById('input_mamin').value;
+                const ma = document.getElementById('input_ma').value;
+                if(mamin && ma) {
+                    const min = mamin/ma;
+                    timeStr = `${Math.floor(min)}m ${Math.round((min%1)*60)}s`;
+                }
+            } else {
+                 // Ci tab context... slightly harder but let's just use what's there
+                 const m = document.getElementById('ci_old_min').value || 0;
+                 const s = document.getElementById('ci_old_sec').value || 0;
+                 timeStr = `${m}m ${s}s (Oud)`;
+            }
+
+            let sourceInfo = "";
+            if (type === 'X-ray') {
+                const kv = document.getElementById('saveKv').value || '?';
+                const ma = document.getElementById('saveMa').value || '?';
+                sourceInfo = `${kv}kV ${ma}mA`;
+            } else {
+                const ci = document.getElementById('saveCi').value || '?';
+                sourceInfo = `${type} ${ci}Ci`;
+            }
+
+            // Update Name Field if user hasn't heavily customized it (simple check)
+            // Or just always overwrite for prototype simplicity, 
+            // but prompt said "allow user to ... change the default name".
+            // We'll generate a default and set it only if empty or looks like a default.
+            const newName = `[${sourceInfo}][${thick}mm][${film}]`;
+            
+            // Auto-update ONLY if currently empty or starts with [
+            const nameInput = document.getElementById('saveName');
+            if (nameInput.value === '' || nameInput.value.startsWith('[')) {
+                nameInput.value = newName;
+            }
+
+            document.getElementById('saveContextSummary').innerText = 
+                `Context: ${timeStr} op ${oldFocus} FFD (Oude Focus)`;
+        }
+
+        function saveCalculation() {
+            // Get Data
+            const name = document.getElementById('saveName').value;
+            if (!name) return alert("Geef een naam op.");
+
+            // Capture Main App State
+            const oldFocus = document.getElementById('oude_focus').value;
+            const film = document.getElementById('saveFilm').value; // Saved preference overrides main app?
+            // "if they click it all the info should be filled ... change FFD and filmtype."
+            // So we save the 'start' state.
+            
+            let timeData = {};
+            if (currentTab === 'time') {
+                timeData = {
+                    type: 'time',
+                    min: document.getElementById('input_min').value || 0,
+                    sec: document.getElementById('input_sec').value || 0
+                };
+            } else if (currentTab === 'mamin') {
+                timeData = {
+                    type: 'mamin',
+                    mamin: document.getElementById('input_mamin').value || 0,
+                    ma: document.getElementById('input_ma').value || 0
+                };
+            } else {
+                // Should we save "Ci Correction" state? 
+                // Probably better to save the RESULTING time as 'time'.
+                // But let's just save what we have. 
+                // For simplicity, let's treat it as a Manual Time entry for now?
+                // Or save specific data.
+                timeData = {
+                    type: 'ci',
+                    oldMin: document.getElementById('ci_old_min').value || 0,
+                    oldSec: document.getElementById('ci_old_sec').value || 0,
+                    oldCi: document.getElementById('ci_old_val').value || 1,
+                    newCi: document.getElementById('ci_new_val').value || 1
+                };
+            }
+
+            const item = {
+                id: Date.now(),
+                name: name,
+                oldFocus: oldFocus,
+                startFilm: film, // The film type used for this exposure
+                timeData: timeData,
+                // Metadata for display/reference
+                details: document.getElementById('saveContextSummary').innerText
+            };
+
+            // Save
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            saved.push(item);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+
+            renderSavedList();
+            toggleModal('saveModal');
+        }
+
+        function renderSavedList() {
+            const list = document.getElementById('saved-list');
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            
+            if (saved.length === 0) {
+                list.innerHTML = '<div style="color: #666; font-style: italic;">Nog geen opgeslagen items...</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            saved.slice().reverse().forEach(item => { // Newest first
+                const div = document.createElement('div');
+                div.className = 'saved-item-card';
+                div.onclick = (e) => loadSavedItem(item.id);
+                
+                div.innerHTML = `
+                    <div class="saved-item-title">${item.name}</div>
+                    <div class="saved-item-details">${item.details}</div>
+                    <button class="delete-saved-btn" onclick="event.stopPropagation(); deleteSavedItem(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function deleteSavedItem(id) {
+            if(!confirm("Verwijderen?")) return;
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const newSaved = saved.filter(i => i.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newSaved));
+            renderSavedList();
+        }
+
+        function loadSavedItem(id) {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const item = saved.find(i => i.id === id);
+            if (!item) return;
+
+            // Restore Fields
+            document.getElementById('oude_focus').value = item.oldFocus;
+            
+            // Restore Tab & Time
+            if (item.timeData.type === 'mamin') {
+                switchTab('mamin');
+                document.getElementById('input_mamin').value = item.timeData.mamin;
+                document.getElementById('input_ma').value = item.timeData.ma;
+            } else if (item.timeData.type === 'ci') {
+                 switchTab('ci');
+                 document.getElementById('ci_old_min').value = item.timeData.oldMin;
+                 document.getElementById('ci_old_sec').value = item.timeData.oldSec;
+                 document.getElementById('ci_old_val').value = item.timeData.oldCi;
+                 document.getElementById('ci_new_val').value = item.timeData.newCi;
+            } else {
+                switchTab('time');
+                document.getElementById('input_min').value = item.timeData.min;
+                document.getElementById('input_sec').value = item.timeData.sec;
+            }
+            
+            // Logic says "change default name if they want ...[Filmtype]". 
+            // This implies the saved item HAS a filmtype associated (e.g. D4).
+            // Main app has radio buttons for "Filmsoort van de BEGINTIJD".
+            // We should set that radio.
+            if (item.startFilm) {
+                const radio = document.querySelector(`input[name="filmtype"][value="${item.startFilm}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    // Trigger any change logic if needed, but display logic handles checkbox
+                }
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Optional: flash UI to indicate load?
+            const container = document.querySelector('.container');
+            container.style.boxShadow = '0 0 20px rgba(245, 223, 77, 0.5)';
+            setTimeout(() => container.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)', 500);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + tab).classList.add('active');
+            
+            // Update content
+            document.getElementById('tab-time').style.display = tab === 'time' ? 'block' : 'none';
+            document.getElementById('tab-mamin').style.display = tab === 'mamin' ? 'block' : 'none';
+            document.getElementById('tab-ci').style.display = tab === 'ci' ? 'block' : 'none';
+
+            // Feature: Pre-fill Ci inputs if empty when switching
+            if (tab === 'ci') {
+                const oldM = document.getElementById('ci_old_min').value;
+                const oldS = document.getElementById('ci_old_sec').value;
+                if (!oldM && !oldS) {
+                    // Try to get from Time Tab
+                    const m = document.getElementById('input_min').value;
+                    const s = document.getElementById('input_sec').value;
+                    if (m || s) {
+                        document.getElementById('ci_old_min').value = m || 0;
+                        document.getElementById('ci_old_sec').value = s || 0;
+                    }
+                }
+            }
+        }
 
         // --- Hulpfuncties ---
         function tijdNaarSeconden(minuten, seconden) {
@@ -612,7 +1150,7 @@
 
         function secondenNaarTijd(totalSeconds) {
             const m = Math.floor(totalSeconds / 60);
-            const s = Math.floor(totalSeconds % 60);
+            const s = Math.round(totalSeconds % 60); // Round to avoid .9999
             const sStr = s < 10 ? '0' + s : s;
             
             if (m > 0) {
@@ -676,24 +1214,67 @@
 
         // --- Hoofdfunctie ---
         function bereken() {
-            const minuten = selectedMin;
-            const seconden = selectedSec;
+            let begintijdInSeconden = 0;
+            let maminMsg = "";
+
+            const resultContainer = document.getElementById("resultaat-container");
+            const resultInhoud = document.getElementById("resultaat-inhoud");
+
+            // Input Ophalen op basis van TAB
+            if (currentTab === 'time') {
+                const min = parseFloat(document.getElementById('input_min').value) || 0;
+                const sec = parseFloat(document.getElementById('input_sec').value) || 0;
+                
+                if (min === 0 && sec === 0) {
+                    toonFout(resultContainer, resultInhoud, "Vul a.u.b. een tijd in.");
+                    return;
+                }
+                begintijdInSeconden = (min * 60) + sec;
+
+            } else if (currentTab === 'mamin') {
+                const mamin = parseFloat(document.getElementById('input_mamin').value);
+                const ma = parseFloat(document.getElementById('input_ma').value);
+
+                if (!mamin || !ma || ma === 0) {
+                    toonFout(resultContainer, resultInhoud, "Vul geldige waarden in voor mA*min en mA.");
+                    return;
+                }
+                
+                // Bereken tijd: (mA*min) / mA = minuten
+                const minutenDecimaal = mamin / ma;
+                begintijdInSeconden = minutenDecimaal * 60;
+                
+                maminMsg = `<div style="font-size: 1rem; color: #ccc; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 10px;">
+                    ${mamin.toString()} mA*min, ${ma.toString()} mA gekozen = ${secondenNaarTijd(begintijdInSeconden)}
+                </div>`;
+
+            } else {
+                // CI TAB
+                const oldMin = parseFloat(document.getElementById('ci_old_min').value) || 0;
+                const oldSec = parseFloat(document.getElementById('ci_old_sec').value) || 0;
+                const oldCi = parseFloat(document.getElementById('ci_old_val').value);
+                const newCi = parseFloat(document.getElementById('ci_new_val').value);
+
+                if ((oldMin === 0 && oldSec === 0) || !oldCi || !newCi) {
+                    toonFout(resultContainer, resultInhoud, "Vul alle Ci-velden en oude tijd in.");
+                    return;
+                }
+
+                const oldTimeSec = (oldMin * 60) + oldSec;
+                // New Time = Old Time * (Old Ci / New Ci)
+                begintijdInSeconden = oldTimeSec * (oldCi / newCi);
+
+                maminMsg = `<div style="font-size: 1rem; color: #ccc; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 10px;">
+                    Wissel van ${oldCi}Ci naar ${newCi}Ci<br>
+                    ${secondenNaarTijd(oldTimeSec)} -> ${secondenNaarTijd(begintijdInSeconden)}
+                </div>`;
+            }
             
             const focusVeranderd = document.getElementById("focus_veranderd").checked;
             const filmtypeVeranderd = document.getElementById("filmtype_veranderd").checked;
             
             const nieuweFocus = parseFloat(document.getElementById("nieuwe_focus").value);
             const oudeFocus = parseFloat(document.getElementById("oude_focus").value);
-
-            const resultContainer = document.getElementById("resultaat-container");
-            const resultInhoud = document.getElementById("resultaat-inhoud");
-
-            // Validatie
-            // 1. Tijd moet ingevuld zijn (niet 0)
-            if (minuten === 0 && seconden === 0) {
-                toonFout(resultContainer, resultInhoud, "Vul a.u.b. een tijd in.");
-                return;
-            }
 
             // 2. Als focus verandert, moeten de focusvelden geldig zijn
             if (focusVeranderd) {
@@ -704,27 +1285,33 @@
             }
 
             // Reset style (geel)
+            resultContainer.style.display = "block";
             resultContainer.style.borderLeftColor = "#F5DF4D";
 
-            const begintijdInSeconden = tijdNaarSeconden(minuten, seconden);
-            
             // Stap 1: Focus Berekening
             let berekendeTijd = begintijdInSeconden;
             if (focusVeranderd) {
                 berekendeTijd = berekenFocusverandering(begintijdInSeconden, nieuweFocus, oudeFocus);
             }
 
-            let outputHTML = "";
+            let outputHTML = maminMsg; // Start met mA info indien van toepassing
 
             // Stap 2: Resultaat opbouwen
             if (focusVeranderd && !filmtypeVeranderd) {
                 // Scenario A: Alleen Focus verandert
-                outputHTML = `Op <strong>${nieuweFocus} FFD</strong> is de stralingstijd:<br>`;
+                outputHTML += `Op <strong>${nieuweFocus} FFD</strong> is de stralingstijd:<br>`;
                 outputHTML += `<div style="font-size: 2rem; margin-top: 10px;">${secondenNaarTijd(berekendeTijd)}</div>`;
             } 
             else if (!focusVeranderd && !filmtypeVeranderd) {
                 // Scenario B: Niets verandert
-                outputHTML = "Je hebt geen veranderingen geselecteerd.<br>De tijd blijft: " + secondenNaarTijd(begintijdInSeconden);
+                // Als mA*min tab is gebruikt, is de info al getoond in maminMsg.
+                // We voegen nog een bevestiging toe of als het Time tab was:
+                if (currentTab === 'time') {
+                    outputHTML += "Je hebt geen veranderingen geselecteerd.<br>De tijd blijft: " + secondenNaarTijd(begintijdInSeconden);
+                } else {
+                     // Voor mA*min is de bovenstaande msg genoeg, maar misschien duidelijkheid:
+                     outputHTML += "Geen verdere aanpassingen (Focus/Film).";
+                }
             }
             else {
                 // Scenario C: Filmtype verandert (en mogelijk ook focus)
@@ -755,7 +1342,6 @@
             }
 
             resultInhoud.innerHTML = outputHTML;
-            resultContainer.style.display = "block";
             resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
