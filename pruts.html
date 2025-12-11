@@ -512,6 +512,11 @@
         return NaN;
       }
 
+      function formatMmToCm(value) {
+        if (isNaN(value)) return "N/A";
+        return (value / 10).toFixed(1) + " cm";
+      }
+
       const easterEggSentences = [
         "Ga voor een strakke ovaal, een lasbreedte ertussen is optimaal!",
         "Een test te veel is een film te veel, een test te weinig is een reshoot.",
@@ -846,6 +851,7 @@
         const hardRuleDWDI =
           (procedure === "EN-A" || procedure === "EN-B") &&
           technique === "DWDI" &&
+          !isNaN(diameter) &&
           diameter < 100;
 
         if (procedure === "ASME") {
@@ -855,6 +861,7 @@
         } else if (technique === "SWSI" || technique === "DWSI") {
           autoOFA = wanddikte;
         } else if (technique === "DWDI") {
+          if (isNaN(diameter)) return;
           autoOFA = diameter;
         }
 
@@ -872,7 +879,7 @@
           else if (wanddikte <= 4.8) maxOverdikte = 1.5;
           else if (wanddikte <= 25) maxOverdikte = 2.5;
           else maxOverdikte = 3;
-        } else if (weldType === "B" || weldType === "C") {
+        } else if (weldType === "B" || weldikte === "C") {
           if (wanddikte <= 2.4) maxOverdikte = 2.5;
           else if (wanddikte <= 4.8) maxOverdikte = 3;
           else if (wanddikte <= 13) maxOverdikte = 4;
@@ -1058,6 +1065,8 @@
 
         if (!isNaN(userFFD) && userFFD < minFFD) {
           warningSpan.innerText = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
+
+          warningSpan.style.display = "block";
         } else {
           warningSpan.innerText = "";
         }
@@ -1271,11 +1280,11 @@
 
         const omtrek = diameter * Math.PI;
         const afstand = omtrek / opnames;
-        let locatiesLijst = `Effectieve filmlengte: <strong>${afstand.toFixed(2)} mm</strong><br><br>`;
+        let locatiesLijst = `Effectieve filmlengte: <strong>${formatMmToCm(afstand)}</strong><br><br>`;
         let huidigeLocatie = 0;
 
         for (let i = 1; i <= opnames; i++) {
-          locatiesLijst += `Film ${i} = ${Math.round(huidigeLocatie)} mm<br>`;
+          locatiesLijst += `Film ${i} = ${formatMmToCm(huidigeLocatie)}<br>`;
           huidigeLocatie += afstand;
         }
 
@@ -1586,11 +1595,11 @@
         const warningDiv = document.getElementById("ffd-result-warning");
 
         if (!isNaN(sfd) && !isNaN(minFFD) && minFFD > 0 && sfd < minFFD) {
-          warningDiv.textContent = `Je gekozen FFD is lager dan de minimale FFD: ${minFFD.toFixed(2)} mm`;
+          warningDiv.textContent = `Waarschuwing: FFD is lager dan het minimum van ${minFFD.toFixed(2)} mm`;
 
           warningDiv.style.display = "block";
         } else {
-          warningDiv.style.display = "none";
+          warningDiv.innerText = "";
         }
 
         // --- 1. Calculate Required Wire ---
@@ -2085,7 +2094,7 @@
 
             const aantalFilms = Math.ceil(omtrek / effectiveFilmValue);
 
-            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong>. Films: <strong>${aantalFilms} x ${chosenFilmFormat}</strong>`;
+            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${formatMmToCm(omtrek)}</strong>. Films: <strong>${aantalFilms} x ${chosenFilmFormat}</strong>`;
             document.getElementById("opname-locaties").style.display = "none";
           } else {
             // CALCULATE MINIMUM EXPOSURES
@@ -2103,7 +2112,7 @@
               );
             }
 
-            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${omtrek.toFixed(2)} mm</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${minExposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
+            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${formatMmToCm(omtrek)}</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${minExposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
 
             if (minExposures !== "" && minExposures !== ">30") {
               berekenOpnameLocaties();
@@ -2113,6 +2122,8 @@
           }
           omtrekCalculatorElement.style.display = "block";
         }
+
+        updateVisualizer();
 
         // --- 3. Plot Exposures ---
 
@@ -2277,6 +2288,7 @@
             );
           }
         }
+        updateVisualizer();
       }
 
       function determineFilmQuality(
