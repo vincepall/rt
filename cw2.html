@@ -8,6 +8,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Effectieve Filmlengte Berekenen</title>
     <script>
+        function formatMmToCm(value) {
+            if (isNaN(value)) return "N/A";
+            return (value / 10).toFixed(1) + " cm";
+        }
+
         function berekenFilmlengte() {
             var diameter = parseFloat(document.getElementById("diameter").value);
             var rondnaadCentraal = document.getElementById("rondnaadCentraal").checked;
@@ -29,24 +34,24 @@
 
                 // Bereken de filmlengte per opname
                 var antwoord = omtrek / opnames;
-                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + omtrek.toFixed(2) + " mm";
-                document.getElementById("antwoordResultaat").innerText = "Nuttige filmlengte: " + antwoord.toFixed(2) + " mm";
+                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + formatMmToCm(omtrek);
+                document.getElementById("antwoordResultaat").innerText = "Nuttige filmlengte: " + formatMmToCm(antwoord);
                 document.getElementById("filmlengteResultaat").innerText = "";
 
                 // Maak de lijst van filmlengtes (Film 1, Film 2, etc.)
                 var filmlengtesLijst = "";
                 var huidigFilmlengte = 0;
                 for (var i = 1; i <= opnames; i++) {
-                    filmlengtesLijst += "Film " + i + " = " + huidigFilmlengte.toFixed(2) + " mm<br>";
+                    filmlengtesLijst += "Film " + i + " = " + formatMmToCm(huidigFilmlengte) + "<br>";
                     huidigFilmlengte += antwoord;
                 }
                 document.getElementById("filmlengtesLijst").innerHTML = filmlengtesLijst;
             } else {
-                var aantalFilms = Math.ceil(omtrek / 400);
+                var aantalFilms = Math.ceil(omtrek / 400); // Max effective length is 400mm
                 var effectieveFilmlengte = omtrek / aantalFilms;
-                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + omtrek.toFixed(2) + " mm";
+                document.getElementById("omtrekResultaat").innerText = "De omtrek is: " + formatMmToCm(omtrek);
                 document.getElementById("antwoordResultaat").innerText = "Aantal films dat nodig is: " + aantalFilms;
-                document.getElementById("filmlengteResultaat").innerText = "Effectieve filmlengte per film: " + effectieveFilmlengte.toFixed(2) + " mm";
+                document.getElementById("filmlengteResultaat").innerText = "Effectieve filmlengte per film: " + formatMmToCm(effectieveFilmlengte);
                 document.getElementById("filmlengtesLijst").innerHTML = ""; // Verwijder de filmlijst als rondnaad centraal is aangevinkt
             }
 
