@@ -507,15 +507,25 @@
 
         @media (max-width: 400px) {
             .input-row {
-                flex-direction: column;
-                gap: 0;
+                /* Removed flex-direction: column; to keep inputs side-by-side */
+                gap: 5px; /* Smaller gap on very small screens */
             }
             .input-wrapper {
-                margin-bottom: 15px;
+                margin-bottom: 0; /* No extra margin when side-by-side */
             }
             .big-result-item {
                 font-size: 1.5rem; /* Iets kleiner op hele smalle schermen */
             }
+            .input-wrapper.small-input {
+                flex: 0 1 60px; /* Even smaller width for these inputs on tiny screens */
+                max-width: 60px;
+            }
+        }
+        
+        /* New class for smaller inputs within input-row */
+        .input-wrapper.small-input {
+            flex: 0 1 80px; /* Fixed width for these inputs */
+            max-width: 80px; /* Ensure it doesn't get too wide */
         }
     </style>
 </head>
@@ -540,11 +550,11 @@
             <div id="tab-time" class="tab-content">
                 <div class="form-group">
                     <div class="input-row">
-                        <div class="input-wrapper">
+                        <div class="input-wrapper small-input">
                             <label for="input_min">Minuten</label>
                             <input type="number" id="input_min" placeholder="0" min="0" inputmode="numeric">
                         </div>
-                        <div class="input-wrapper">
+                        <div class="input-wrapper small-input">
                             <label for="input_sec">Seconden</label>
                             <input type="number" id="input_sec" placeholder="0" min="0" max="59" inputmode="numeric">
                         </div>
@@ -576,11 +586,11 @@
                 <div class="form-group">
                     <label style="color: var(--accent-color); margin-bottom: 10px;">1. Oude Situatie</label>
                     <div class="input-row">
-                        <div class="input-wrapper">
+                        <div class="input-wrapper small-input">
                             <label>Oude Tijd (Min)</label>
                             <input type="number" id="ci_old_min" placeholder="0" inputmode="numeric">
                         </div>
-                        <div class="input-wrapper">
+                        <div class="input-wrapper small-input">
                             <label>(Sec)</label>
                             <input type="number" id="ci_old_sec" placeholder="0" inputmode="numeric">
                         </div>
@@ -621,12 +631,12 @@
             <div id="focus_keuze_wrapper">
                 <div class="form-group">
                     <div class="input-row">
-                        <div class="input-wrapper">
+                        <div class="input-wrapper small-input">
                             <label for="oude_focus">Oude Focus (FFD)</label>
                             <!-- Oude focus nu standaard op 80 -->
                             <input type="number" id="oude_focus" step="any" placeholder="Bijv. 80" value="80">
                         </div>
-                        <div class="input-wrapper">
+                        <div class="input-wrapper small-input">
                             <label for="nieuwe_focus">Nieuwe Focus (FFD)</label>
                             <input type="number" id="nieuwe_focus" step="any" placeholder="Bijv. 100">
                         </div>
