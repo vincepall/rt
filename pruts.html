@@ -694,6 +694,7 @@
         });
 
       function updateBronGrootteOptions() {
+        document.getElementById("brongrootte").value = ""; // Clear brongrootte when source changes
         const procedure = document.getElementById("procedure").value;
         const source = document.getElementById("source").value;
         const bronKeuzesDatalist = document.getElementById("bronKeuzes");
