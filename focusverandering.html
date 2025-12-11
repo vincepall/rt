@@ -507,7 +507,6 @@
 
         @media (max-width: 400px) {
             .input-row {
-                /* Removed flex-direction: column; to keep inputs side-by-side */
                 gap: 5px; /* Smaller gap on very small screens */
             }
             .input-wrapper {
@@ -517,15 +516,15 @@
                 font-size: 1.5rem; /* Iets kleiner op hele smalle schermen */
             }
             .input-wrapper.small-input {
-                flex: 0 1 60px; /* Even smaller width for these inputs on tiny screens */
-                max-width: 60px;
+                flex: 0 1 161.5px; /* Adjusted width for these inputs on tiny screens */
+                max-width: 161.5px;
             }
         }
         
         /* New class for smaller inputs within input-row */
         .input-wrapper.small-input {
-            flex: 0 1 80px; /* Fixed width for these inputs */
-            max-width: 80px; /* Ensure it doesn't get too wide */
+            flex: 0 1 196.5px; /* Calculated width to match toggle container (desktop/larger) */
+            max-width: 196.5px; /* Ensure it doesn't get too wide */
         }
     </style>
 </head>
