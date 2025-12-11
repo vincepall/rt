@@ -784,6 +784,7 @@
         const wanddikte = getFloatValue("wanddikte");
         const sfdInput = document.getElementById("sfd");
         const ofaInput = document.getElementById("ofa");
+        const source = document.getElementById("source").value;
 
         if (optie === "1") {
           // Centraal
@@ -806,7 +807,11 @@
           // Excentrisch
           if (sfdManuallyEdited) return;
           if (!isNaN(diameter) && !isNaN(wanddikte)) {
-            sfdInput.value = (diameter - wanddikte - 10).toFixed(2);
+            let offset = 10;
+            if (source === "X-ray") {
+              offset = 170;
+            }
+            sfdInput.value = (diameter - wanddikte - offset).toFixed(2);
           }
         }
       }
@@ -1827,12 +1832,24 @@
         }
 
         if (excentrisch && !isNaN(minFFD) && minFFD > 0) {
-          let maxExcentrischFFDAllowed = diameter - (ofa + 10);
+          let offset = 10;
+          if (source === "X-ray") {
+            offset = 170;
+          }
+          let maxExcentrischFFDAllowed = diameter - (ofa + offset);
 
           if (minFFD < maxExcentrischFFDAllowed) {
-            minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
+            if (source === "X-ray") {
+              minFFDOutput += `<br>✅ excentrisch is toegestaan met de X-ray buis min. FFD < gekozen FFD`;
+            } else {
+              minFFDOutput += `<br>✅ Excentrische opstelling is toegestaan (Min. FFD < <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
+            }
           } else {
-            minFFDOutput += `<br>❌ Excentrische opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
+            if (source === "X-ray") {
+              minFFDOutput += `<br>❌ excentrisch is <strong>niet</strong> toegestaan met de X-ray buis (min. FFD ≥ gekozen FFD)`;
+            } else {
+              minFFDOutput += `<br>❌ Excentrische opstelling is <strong>niet</strong> toegestaan (Min. FFD ≥ <strong>${maxExcentrischFFDAllowed.toFixed(2)} mm</strong>)`;
+            }
           }
         }
 
