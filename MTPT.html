@@ -35,13 +35,14 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 10mm;
+                margin: 5mm; 
             }
             body {
                 background-color: white !important;
                 color: black !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+                font-size: 10pt;
             }
             .no-print {
                 display: none !important;
@@ -49,17 +50,13 @@
             .print-only {
                 display: block !important;
             }
-            /* Reset tailwind shadows/backgrounds for print */
             .shadow-md, .shadow-sm { box-shadow: none !important; }
-            
-            /* Ensure background graphics (black dots) are printed */
             * {
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
             }
         }
         
-        /* Hide print content on screen normally */
         .print-only {
             display: none;
         }
@@ -79,7 +76,7 @@
         MT: {
             ISO: {
                 name: "MT 21202 (EN-ISO 17638 / 23278)",
-                relevant_note: "Niet specifiek gedefinieerd in procedure (zie norm)",
+                relevant_note: "Niet specifiek gedefinieerd (zie norm)",
                 levels: {
                     "1": { linear: 1.5, rounded: 2, note: "Strikt acceptatieniveau" },
                     "2": { linear: 3, rounded: 3, note: "Normaal acceptatieniveau" },
@@ -129,7 +126,7 @@
         PT: {
             ISO: {
                 name: "PT 21302 (EN-ISO 3452-1 / 23277)",
-                relevant_note: "Niet specifiek gedefinieerd in procedure (zie norm)",
+                relevant_note: "Niet specifiek gedefinieerd (zie norm)",
                 levels: {
                     "1": { linear: 2, rounded: 4, note: "Strikt acceptatieniveau" },
                     "2": { linear: 4, rounded: 6, note: "Normaal acceptatieniveau" },
@@ -222,35 +219,6 @@
                     {method === 'MT' ? 'Magnetisch (MT)' : 'Penetrant (PT)'}
                 </button>
             ))}
-        </div>
-    );
-
-    const ViewModeToggle = ({ mode, setMode, isDark }) => (
-        <div className="flex justify-center mb-6">
-            <div className={`p-1 rounded-lg border inline-flex shadow-sm ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                <button 
-                    onClick={() => setMode('zoomed')} 
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        mode === 'zoomed' 
-                        ? 'bg-blue-600 text-white shadow-sm' 
-                        : isDark ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-50'
-                    }`}
-                >
-                    <Icon name="zoom-in" className="w-4 h-4" />
-                    <span>Vergroot</span>
-                </button>
-                <button 
-                    onClick={() => setMode('real')} 
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        mode === 'real' 
-                        ? 'bg-blue-600 text-white shadow-sm' 
-                        : isDark ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-50'
-                    }`}
-                >
-                    <Icon name="ruler" className="w-4 h-4" />
-                    <span>Ware grootte (1:1)</span>
-                </button>
-            </div>
         </div>
     );
 
@@ -353,7 +321,7 @@
         );
     };
 
-    const VisualCircle = ({ size, viewMode, isDark }) => {
+    const VisualCircle = ({ size, isDark }) => {
         if (size === 0) {
             return (
                 <div className="relative w-24 h-24 flex items-center justify-center mb-4">
@@ -363,13 +331,9 @@
             );
         }
         
-        let style = {};
-        if (viewMode === 'real') {
-            style = { width: `${size}mm`, height: `${size}mm` };
-        } else {
-            const pxSize = Math.min(Math.max(size * 10, 20), 100); 
-            style = { width: `${pxSize}px`, height: `${pxSize}px` };
-        }
+        // Scale: Fixed zoom for clear visualization (not 1:1)
+        const pxSize = Math.min(Math.max(size * 10, 20), 100); 
+        const style = { width: `${pxSize}px`, height: `${pxSize}px` };
 
         return (
             <div className={`relative w-full h-32 flex items-center justify-center mb-4 border rounded-lg transition-colors ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-100'}`}>
@@ -378,13 +342,13 @@
                     className="rounded-full bg-red-500 border border-red-300 shadow-sm transition-all duration-500 opacity-90"
                 ></div>
                 <div className={`absolute top-2 right-2 text-xs px-1 rounded shadow-sm border ${isDark ? 'bg-gray-800 text-gray-400 border-gray-600' : 'bg-white text-gray-400 border-gray-200'}`}>
-                    {viewMode === 'real' ? '1:1' : 'Zoom'}
+                    Indicatie
                 </div>
             </div>
         );
     };
 
-    const VisualLine = ({ size, viewMode, isDark }) => {
+    const VisualLine = ({ size, isDark }) => {
         if (size === 0) {
              return (
                 <div className="relative w-full h-24 flex items-center justify-center mb-4">
@@ -394,17 +358,10 @@
             );
         }
 
-        let style = {};
-        let height = '12px'; 
-
-        if (viewMode === 'real') {
-            style = { width: `${size}mm` };
-            const calculatedHeight = size / 4; 
-            height = `${calculatedHeight}mm`;
-        } else {
-            const widthPct = Math.min(Math.max(size * 10, 20), 90);
-            style = { width: `${widthPct}%` };
-        }
+        // Percentage based for Zoomed visualization
+        const widthPct = Math.min(Math.max(size * 10, 20), 90);
+        const style = { width: `${widthPct}%` };
+        const height = '12px'; 
 
         return (
             <div className={`relative w-full h-32 flex items-center justify-center mb-4 border rounded-lg px-4 transition-colors ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-100'}`}>
@@ -413,7 +370,7 @@
                     className="bg-red-500 rounded-full shadow-sm border border-red-300 transition-all duration-500 opacity-90"
                 ></div>
                  <div className={`absolute top-2 right-2 text-xs px-1 rounded shadow-sm border ${isDark ? 'bg-gray-800 text-gray-400 border-gray-600' : 'bg-white text-gray-400 border-gray-200'}`}>
-                    {viewMode === 'real' ? '1:1' : 'Zoom'}
+                    Indicatie
                 </div>
             </div>
         );
@@ -422,44 +379,61 @@
     // --- Print Components ---
 
     const PrintableStrip = ({ data }) => {
-        const { method, name, subCat, linear, rounded, note } = data;
+        const { method, name, subCat, linear, rounded, note, relevantText, standard } = data;
         
+        const normLabel = standard === 'ISO' ? 'EN ISO' : 'ASME';
+
         return (
-            <div className="grid grid-cols-12 border-b border-gray-300 border-dashed py-3 items-center break-inside-avoid min-h-[16mm]">
-                {/* Info Block - 5 columns */}
-                <div className="col-span-5 pr-4 flex flex-col justify-center">
-                    <div className="flex items-baseline gap-2 mb-1">
+            <div className="grid grid-cols-12 border-b border-gray-300 border-dashed py-2 items-stretch break-inside-avoid min-h-[16mm]">
+                
+                {/* Info Block - 3 columns */}
+                <div className="col-span-3 pr-2 flex flex-col justify-center border-r border-gray-100">
+                    <span className="text-[8px] text-gray-400 uppercase font-bold mb-0.5">Procedure</span>
+                    <div className="flex items-baseline gap-2 mb-0.5">
                         <span className="font-bold uppercase text-black w-8">{method}</span>
                         <span className="font-bold text-black text-sm">{subCat}</span>
                     </div>
-                    <div className="text-[10px] text-gray-600 truncate">{name.split('(')[0]}</div>
+                    <div className="text-[9px] text-gray-600 leading-tight">
+                        <span className="font-bold text-gray-700">{normLabel}</span> <br/>
+                        {name.split('(')[0]}
+                    </div>
+                </div>
+
+                {/* Relevant Indication - 3 columns (NEW) */}
+                <div className="col-span-3 px-2 flex flex-col justify-start items-center text-center border-r border-gray-100">
+                     <span className="text-[8px] text-gray-400 uppercase font-bold mb-1">Relevante Ind.</span>
+                    <div className="flex-grow flex items-center">
+                        <span className="text-xs font-bold text-black">{relevantText}</span>
+                    </div>
                 </div>
 
                 {/* Rounded - 3 columns */}
-                <div className="col-span-3 border-l border-gray-300 flex flex-col items-center justify-center h-full">
-                    <div className="flex items-center justify-center flex-grow">
+                <div className="col-span-3 px-1 flex flex-col items-center justify-between border-r border-gray-100">
+                    <span className="text-[8px] text-gray-400 uppercase font-bold mb-1">Rond (Ø)</span>
+                    <div className="flex items-center justify-center flex-grow py-1">
                         {rounded > 0 ? (
                             <div style={{ width: `${rounded}mm`, height: `${rounded}mm` }} className="bg-black rounded-full"></div>
                         ) : (
-                            <span className="text-gray-400 text-lg">-</span>
+                            <span className="text-red-600 font-bold text-[9px] leading-tight text-center px-1">N.Acc. als relevant</span>
                         )}
                     </div>
-                    <div className="text-xs font-mono mt-1 text-black text-center w-full bg-gray-50">
-                        {rounded > 0 ? `Ø ${rounded}mm` : 'N.v.t.'}
+                    <div className="text-xs font-mono text-black text-center w-full bg-gray-50 rounded px-1">
+                        {rounded > 0 ? `max ${rounded}mm` : ''}
                     </div>
                 </div>
 
-                {/* Linear - 4 columns */}
-                <div className="col-span-4 border-l border-gray-300 flex flex-col items-center justify-center h-full">
-                    <div className="flex items-center justify-center w-full px-2 flex-grow">
+                {/* Linear - 3 columns */}
+                <div className="col-span-3 px-1 flex flex-col items-center justify-between">
+                    <span className="text-[8px] text-gray-400 uppercase font-bold mb-1">Lineair (L)</span>
+                    <div className="flex items-center justify-center w-full px-2 flex-grow py-1">
                          {linear > 0 ? (
                             <div style={{ width: `${linear}mm`, height: `${Math.max(linear/4, 0.5)}mm` }} className="bg-black rounded-sm"></div>
                         ) : (
-                             <span className="text-gray-400 text-lg">-</span>
+                             <span className="text-red-600 font-bold text-[9px] leading-tight text-center px-1">N.Acc. als relevant</span>
                         )}
                     </div>
-                    <div className="text-xs font-mono mt-1 text-black text-center w-full bg-gray-50">
-                        {linear > 0 ? `L ${linear}mm` : 'N.v.t.'}
+                    <div className="text-xs font-mono text-black text-center w-full bg-gray-50 rounded px-1">
+                        {linear > 0 ? `max ${linear}mm` : ''}
                     </div>
                 </div>
 
@@ -475,9 +449,17 @@
                 ['ISO', 'ASME'].forEach(std => {
                     const data = DATA[method][std];
                     const subcats = std === 'ISO' ? data.levels : data.codes;
+                    
+                    // Determine relevant indication text based on standard
+                    let relText = "";
+                    if (std === 'ASME') {
+                        relText = `> ${data.relevant_threshold}mm`;
+                    } else {
+                        relText = "Zie norm"; // Keeping it short for the table
+                    }
+
                     Object.keys(subcats).forEach(key => {
                         const item = subcats[key];
-                        // Special display name for subcat
                         let displaySubCat = key;
                         if(std === 'ISO') displaySubCat = `Level ${key}`;
                         
@@ -489,7 +471,8 @@
                             name: data.name,
                             linear: item.linear,
                             rounded: item.rounded,
-                            note: item.desc || item.note
+                            note: item.desc || item.note,
+                            relevantText: relText
                         });
                     });
                 });
@@ -516,7 +499,7 @@
                 </div>
 
                 {/* Printable Content */}
-                <div className="pt-20 px-8 pb-10 print:pt-0 print:px-0 print:pb-0 max-w-[210mm] mx-auto">
+                <div className="pt-20 px-4 pb-10 print:pt-0 print:px-0 print:pb-0 max-w-[210mm] mx-auto">
                     
                     {/* Header */}
                     <div className="border-b-2 border-black pb-4 mb-4">
@@ -530,11 +513,12 @@
                         </p>
                     </div>
 
-                    {/* Table Headers */}
+                    {/* Table Headers (Still useful for overview before cutting) */}
                     <div className="grid grid-cols-12 border-b-2 border-black font-bold text-sm uppercase mb-2 pb-1">
-                        <div className="col-span-5">Procedure / Criterium</div>
+                        <div className="col-span-3">Procedure</div>
+                        <div className="col-span-3 text-center border-l border-gray-300">Relevante Ind.</div>
                         <div className="col-span-3 text-center border-l border-gray-300">Rond (Ø)</div>
-                        <div className="col-span-4 text-center border-l border-gray-300">Lineair (L)</div>
+                        <div className="col-span-3 text-center border-l border-gray-300">Lineair (L)</div>
                     </div>
 
                     {/* Strips */}
@@ -558,7 +542,6 @@
         const [standard, setStandard] = useState('ISO'); 
         const [subCat, setSubCat] = useState('2');
         const [useSuffixX, setUseSuffixX] = useState(false);
-        const [viewMode, setViewMode] = useState('zoomed');
         const [isDark, setIsDark] = useState(true); 
         const [showPrintView, setShowPrintView] = useState(false); // State for print view
 
@@ -625,10 +608,8 @@
                         isDark={isDark}
                     />
 
-                    {/* View Mode & Print Button Container */}
+                    {/* Print Button Container */}
                     <div className="flex flex-col md:flex-row justify-center items-center mb-6 gap-4">
-                        <ViewModeToggle mode={viewMode} setMode={setViewMode} isDark={isDark} />
-                        
                         <button 
                             onClick={() => setShowPrintView(true)}
                             className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm ${
@@ -645,7 +626,7 @@
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         
                         <ResultCard title="Ronde Fout (Rounded)" icon="circle" color="orange" delay={100} isDark={isDark}>
-                            <VisualCircle size={currentLimits.rounded} viewMode={viewMode} isDark={isDark} />
+                            <VisualCircle size={currentLimits.rounded} isDark={isDark} />
                             <div className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 {currentLimits.roundedLabel}
                             </div>
@@ -654,7 +635,7 @@
                         </ResultCard>
 
                         <ResultCard title="Lineaire Fout (Linear)" icon="minus" color="red" delay={200} isDark={isDark}>
-                            <VisualLine size={currentLimits.linear} viewMode={viewMode} isDark={isDark} />
+                            <VisualLine size={currentLimits.linear} isDark={isDark} />
                             <div className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 {currentLimits.linearLabel}
                             </div>
@@ -692,7 +673,7 @@
 
                     <footer className={`mt-12 text-center text-xs border-t pt-6 ${isDark ? 'text-gray-500 border-gray-700' : 'text-gray-400 border-gray-200'}`}>
                         <p>Referentie documenten: MT 21201 (ASME), MT 21202 (ISO), PT 21301 (ASME), PT 21302 (ISO).</p>
-                        <p>Waarschuwing: Deze tool is een hulpmiddel. 1:1 Schaal is afhankelijk van schermkalibratie.</p>
+                        <p>Waarschuwing: Deze tool is een hulpmiddel. Raadpleeg altijd de officiële en meest recente procedure/norm voor kritische beoordelingen.</p>
                     </footer>
                 </div>
             </div>
