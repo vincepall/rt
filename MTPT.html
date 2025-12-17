@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MT & PT Acceptatie Criteria</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Print Styles */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+            body {
+                background-color: white !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            /* Reset tailwind shadows/backgrounds for print */
+            .shadow-md, .shadow-sm { box-shadow: none !important; }
+            
+            /* Ensure background graphics (black dots) are printed */
+            * {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+        
+        /* Hide print content on screen normally */
+        .print-only {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+    const { useState, useEffect } = React;
+
+    // --- Data Definitions based on Uploaded PDFs ---
+
+    const DATA = {
+        MT: {
+            ISO: {
+                name: "MT 21202 (EN-ISO 17638 / 23278)",
+                relevant_note: "Niet specifiek gedefinieerd in procedure (zie norm)",
+                levels: {
+                    "1": { linear: 1.5, rounded: 2, note: "Strikt acceptatieniveau" },
+                    "2": { linear: 3, rounded: 3, note: "Normaal acceptatieniveau" },
+                    "3": { linear: 6, rounded: 4, note: "Grof acceptatieniveau" }
+                },
+                suffix_x_rule: true, 
+                linear_definition: "L > 3W",
+                rounded_definition: "L ≤ 3W"
+            },
+            ASME: {
+                name: "MT 21201 (ASME BPVC V Art. 7)",
+                relevant_threshold: 1.5, 
+                codes: {
+                    "VIII Div 1": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn, gescheiden door ≤ 1.5mm (rand-tot-rand)",
+                        desc: "Appendix 6"
+                    },
+                    "VIII Div 2": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn, gescheiden door ≤ 1.5mm",
+                        desc: "Part 7 - Alternative Rules"
+                    },
+                    "B31.1": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn. >10 indicaties in elk oppervlak van 3870 mm² (max 150mm major dim).",
+                        desc: "Power Piping (Sect. 136.4.3)"
+                    },
+                    "B31.3": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn, gescheiden door ≤ 1.5mm",
+                        desc: "Process Piping (Sect. 344.3)"
+                    },
+                    "B31.12": { 
+                        linear: 0, 
+                        rounded: 0, 
+                        aligned_rule: "Geen indicaties toegestaan.",
+                        desc: "Hydrogen Piping (Table IP-10.4.3-1)"
+                    }
+                }
+            }
+        },
+        PT: {
+            ISO: {
+                name: "PT 21302 (EN-ISO 3452-1 / 23277)",
+                relevant_note: "Niet specifiek gedefinieerd in procedure (zie norm)",
+                levels: {
+                    "1": { linear: 2, rounded: 4, note: "Strikt acceptatieniveau" },
+                    "2": { linear: 4, rounded: 6, note: "Normaal acceptatieniveau" },
+                    "3": { linear: 8, rounded: 8, note: "Grof acceptatieniveau" }
+                },
+                suffix_x_rule: true,
+                linear_definition: "L > 3W",
+                rounded_definition: "L ≤ 3W"
+            },
+            ASME: {
+                name: "PT 21301 (ASME BPVC V Art. 6)",
+                relevant_threshold: 1.5, 
+                codes: {
+                    "VIII Div 1": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn, gescheiden door ≤ 1.5mm",
+                        desc: "Appendix 8"
+                    },
+                    "VIII Div 2": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn, gescheiden door ≤ 1.5mm. Scheur-achtige indicaties niet toegestaan.",
+                        desc: "Part 7 - Alternative Rules"
+                    },
+                    "Section IX": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn, gescheiden door ≤ 1.5mm",
+                        desc: "Welding Qualifications (QW-195.2)"
+                    },
+                    "B31.1": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn. >10 indicaties in elk oppervlak van 3870 mm².",
+                        desc: "Power Piping (Sect. 136.4.4)"
+                    },
+                    "B31.3": { 
+                        linear: 0, 
+                        rounded: 5.0, 
+                        aligned_rule: "4 of meer relevante indicaties op een lijn, gescheiden door ≤ 1.5mm",
+                        desc: "Process Piping (Sect. 344.4)"
+                    },
+                    "B31.12": { 
+                        linear: 0, 
+                        rounded: 0, 
+                        aligned_rule: "Geen indicaties toegestaan.",
+                        desc: "Hydrogen Piping (Table IP-10.4.3-1)"
+                    }
+                }
+            }
+        }
+    };
+
+    // --- Components ---
+
+    const Icon = ({ name, className }) => {
+        useEffect(() => {
+            lucide.createIcons();
+        }, [name]);
+        return <i data-lucide={name} className={className}></i>;
+    };
+
+    const ThemeToggle = ({ isDark, toggle }) => (
+        <button 
+            onClick={toggle}
+            className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${
+                isDark ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
+            }`}
+            title="Wissel thema"
+        >
+            <Icon name={isDark ? "sun" : "moon"} className="w-5 h-5" />
+        </button>
+    );
+
+    const MethodSelector = ({ selected, onSelect, isDark }) => (
+        <div className="flex space-x-4 mb-6 justify-center">
+            {['MT', 'PT'].map((method) => (
+                <button
+                    key={method}
+                    onClick={() => onSelect(method)}
+                    className={`px-8 py-3 rounded-lg font-bold text-lg shadow-md transition-all duration-200 ${
+                        selected === method 
+                        ? 'bg-blue-600 text-white scale-105 ring-2 ring-blue-400' 
+                        : isDark 
+                            ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700' 
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                    }`}
+                >
+                    {method === 'MT' ? 'Magnetisch (MT)' : 'Penetrant (PT)'}
+                </button>
+            ))}
+        </div>
+    );
+
+    const ViewModeToggle = ({ mode, setMode, isDark }) => (
+        <div className="flex justify-center mb-6">
+            <div className={`p-1 rounded-lg border inline-flex shadow-sm ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <button 
+                    onClick={() => setMode('zoomed')} 
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        mode === 'zoomed' 
+                        ? 'bg-blue-600 text-white shadow-sm' 
+                        : isDark ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                >
+                    <Icon name="zoom-in" className="w-4 h-4" />
+                    <span>Vergroot</span>
+                </button>
+                <button 
+                    onClick={() => setMode('real')} 
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        mode === 'real' 
+                        ? 'bg-blue-600 text-white shadow-sm' 
+                        : isDark ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                >
+                    <Icon name="ruler" className="w-4 h-4" />
+                    <span>Ware grootte (1:1)</span>
+                </button>
+            </div>
+        </div>
+    );
+
+    const ControlPanel = ({ method, standard, setStandard, subCat, setSubCat, useSuffixX, setUseSuffixX, isDark }) => {
+        const standards = Object.keys(DATA[method]);
+        
+        useEffect(() => {
+            if (standard === 'ISO') setSubCat('2'); 
+            if (standard === 'ASME') setSubCat('VIII Div 1'); 
+        }, [standard, method]);
+
+        const cardClass = isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100';
+        const labelClass = isDark ? 'text-gray-300' : 'text-gray-700';
+        const selectClass = isDark 
+            ? 'bg-gray-700 border-gray-600 text-white focus:ring-blue-500' 
+            : 'bg-gray-50 border-gray-200 text-gray-900 focus:ring-blue-500';
+
+        return (
+            <div className={`p-6 rounded-xl shadow-sm border mb-8 transition-colors ${cardClass}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className={`block text-sm font-semibold mb-2 uppercase tracking-wide ${labelClass}`}>Procedure / Standaard</label>
+                        <select 
+                            value={standard} 
+                            onChange={(e) => setStandard(e.target.value)}
+                            className={`w-full p-3 border rounded-lg focus:ring-2 focus:outline-none transition-shadow ${selectClass}`}
+                        >
+                            {standards.map(s => (
+                                <option key={s} value={s}>{DATA[method][s].name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className={`block text-sm font-semibold mb-2 uppercase tracking-wide ${labelClass}`}>
+                            {standard === 'ISO' ? 'Acceptatie Niveau' : 'Specifieke Code / Sectie'}
+                        </label>
+                        <select 
+                            value={subCat} 
+                            onChange={(e) => setSubCat(e.target.value)}
+                            className={`w-full p-3 border rounded-lg focus:ring-2 focus:outline-none transition-shadow ${selectClass}`}
+                        >
+                            {standard === 'ISO' ? (
+                                Object.keys(DATA[method].ISO.levels).map(lvl => (
+                                    <option key={lvl} value={lvl}>Level {lvl}</option>
+                                ))
+                            ) : (
+                                Object.keys(DATA[method].ASME.codes).map(code => (
+                                    <option key={code} value={code}>{code} - {DATA[method].ASME.codes[code].desc}</option>
+                                ))
+                            )}
+                        </select>
+                    </div>
+                </div>
+
+                {standard === 'ISO' && DATA[method].ISO.suffix_x_rule && (subCat === '2' || subCat === '3') && (
+                    <div className={`mt-4 flex items-center p-3 rounded-lg border ${isDark ? 'bg-blue-900/30 border-blue-800' : 'bg-blue-50 border-blue-100'}`}>
+                        <input 
+                            type="checkbox" 
+                            id="suffixX" 
+                            checked={useSuffixX} 
+                            onChange={(e) => setUseSuffixX(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                        />
+                        <label htmlFor="suffixX" className={`ml-3 font-medium cursor-pointer select-none ${isDark ? 'text-blue-200' : 'text-gray-700'}`}>
+                            Toevoeging Suffix "X" (Lineaire indicaties beoordelen volgens Level 1)
+                        </label>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    const ResultCard = ({ title, icon, color, children, delay, isDark }) => {
+        let headerBg, headerText, iconColor;
+        
+        if (isDark) {
+            headerBg = `bg-${color}-900` 
+            if(color === 'blue') { headerBg = 'bg-blue-900/30 border-blue-800'; iconColor = 'text-blue-400'; }
+            else if(color === 'orange') { headerBg = 'bg-orange-900/30 border-orange-800'; iconColor = 'text-orange-400'; }
+            else if(color === 'red') { headerBg = 'bg-red-900/30 border-red-800'; iconColor = 'text-red-400'; }
+            else if(color === 'purple') { headerBg = 'bg-purple-900/30 border-purple-800'; iconColor = 'text-purple-400'; }
+        } else {
+             if(color === 'blue') { headerBg = 'bg-blue-50 border-gray-100'; iconColor = 'text-blue-600'; }
+            else if(color === 'orange') { headerBg = 'bg-orange-50 border-gray-100'; iconColor = 'text-orange-600'; }
+            else if(color === 'red') { headerBg = 'bg-red-50 border-gray-100'; iconColor = 'text-red-600'; }
+            else if(color === 'purple') { headerBg = 'bg-purple-50 border-gray-100'; iconColor = 'text-purple-600'; }
+        }
+
+        return (
+            <div className={`rounded-xl shadow-sm border overflow-hidden fade-in h-full flex flex-col transition-colors ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`} style={{animationDelay: `${delay}ms`}}>
+                <div className={`px-4 py-3 border-b flex items-center space-x-2 ${headerBg}`}>
+                    <div className={iconColor}><Icon name={icon} className="w-5 h-5" /></div>
+                    <h3 className={`font-bold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>{title}</h3>
+                </div>
+                <div className="p-6 flex-grow flex flex-col justify-center items-center text-center">
+                    {children}
+                </div>
+            </div>
+        );
+    };
+
+    const VisualCircle = ({ size, viewMode, isDark }) => {
+        if (size === 0) {
+            return (
+                <div className="relative w-24 h-24 flex items-center justify-center mb-4">
+                     <div className="w-20 h-20 rounded-full border-4 border-red-500 opacity-50"></div>
+                     <Icon name="ban" className="absolute w-12 h-12 text-red-500" />
+                </div>
+            );
+        }
+        
+        let style = {};
+        if (viewMode === 'real') {
+            style = { width: `${size}mm`, height: `${size}mm` };
+        } else {
+            const pxSize = Math.min(Math.max(size * 10, 20), 100); 
+            style = { width: `${pxSize}px`, height: `${pxSize}px` };
+        }
+
+        return (
+            <div className={`relative w-full h-32 flex items-center justify-center mb-4 border rounded-lg transition-colors ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-100'}`}>
+                <div 
+                    style={style} 
+                    className="rounded-full bg-red-500 border border-red-300 shadow-sm transition-all duration-500 opacity-90"
+                ></div>
+                <div className={`absolute top-2 right-2 text-xs px-1 rounded shadow-sm border ${isDark ? 'bg-gray-800 text-gray-400 border-gray-600' : 'bg-white text-gray-400 border-gray-200'}`}>
+                    {viewMode === 'real' ? '1:1' : 'Zoom'}
+                </div>
+            </div>
+        );
+    };
+
+    const VisualLine = ({ size, viewMode, isDark }) => {
+        if (size === 0) {
+             return (
+                <div className="relative w-full h-24 flex items-center justify-center mb-4">
+                     <div className="w-3/4 h-2 bg-red-200 rounded"></div>
+                     <Icon name="ban" className="absolute w-12 h-12 text-red-600" />
+                </div>
+            );
+        }
+
+        let style = {};
+        let height = '12px'; 
+
+        if (viewMode === 'real') {
+            style = { width: `${size}mm` };
+            const calculatedHeight = size / 4; 
+            height = `${calculatedHeight}mm`;
+        } else {
+            const widthPct = Math.min(Math.max(size * 10, 20), 90);
+            style = { width: `${widthPct}%` };
+        }
+
+        return (
+            <div className={`relative w-full h-32 flex items-center justify-center mb-4 border rounded-lg px-4 transition-colors ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-100'}`}>
+                 <div 
+                    style={{...style, height: height}} 
+                    className="bg-red-500 rounded-full shadow-sm border border-red-300 transition-all duration-500 opacity-90"
+                ></div>
+                 <div className={`absolute top-2 right-2 text-xs px-1 rounded shadow-sm border ${isDark ? 'bg-gray-800 text-gray-400 border-gray-600' : 'bg-white text-gray-400 border-gray-200'}`}>
+                    {viewMode === 'real' ? '1:1' : 'Zoom'}
+                </div>
+            </div>
+        );
+    };
+
+    // --- Print Components ---
+
+    const PrintableStrip = ({ data }) => {
+        const { method, name, subCat, linear, rounded, note } = data;
+        
+        return (
+            <div className="grid grid-cols-12 border-b border-gray-300 border-dashed py-3 items-center break-inside-avoid min-h-[16mm]">
+                {/* Info Block - 5 columns */}
+                <div className="col-span-5 pr-4 flex flex-col justify-center">
+                    <div className="flex items-baseline gap-2 mb-1">
+                        <span className="font-bold uppercase text-black w-8">{method}</span>
+                        <span className="font-bold text-black text-sm">{subCat}</span>
+                    </div>
+                    <div className="text-[10px] text-gray-600 truncate">{name.split('(')[0]}</div>
+                </div>
+
+                {/* Rounded - 3 columns */}
+                <div className="col-span-3 border-l border-gray-300 flex flex-col items-center justify-center h-full">
+                    <div className="flex items-center justify-center flex-grow">
+                        {rounded > 0 ? (
+                            <div style={{ width: `${rounded}mm`, height: `${rounded}mm` }} className="bg-black rounded-full"></div>
+                        ) : (
+                            <span className="text-gray-400 text-lg">-</span>
+                        )}
+                    </div>
+                    <div className="text-xs font-mono mt-1 text-black text-center w-full bg-gray-50">
+                        {rounded > 0 ? `Ø ${rounded}mm` : 'N.v.t.'}
+                    </div>
+                </div>
+
+                {/* Linear - 4 columns */}
+                <div className="col-span-4 border-l border-gray-300 flex flex-col items-center justify-center h-full">
+                    <div className="flex items-center justify-center w-full px-2 flex-grow">
+                         {linear > 0 ? (
+                            <div style={{ width: `${linear}mm`, height: `${Math.max(linear/4, 0.5)}mm` }} className="bg-black rounded-sm"></div>
+                        ) : (
+                             <span className="text-gray-400 text-lg">-</span>
+                        )}
+                    </div>
+                    <div className="text-xs font-mono mt-1 text-black text-center w-full bg-gray-50">
+                        {linear > 0 ? `L ${linear}mm` : 'N.v.t.'}
+                    </div>
+                </div>
+
+            </div>
+        );
+    };
+
+    const PrintSheet = ({ onBack }) => {
+        // Flatten all data for the list
+        const getAllCriteria = () => {
+            const list = [];
+            ['MT', 'PT'].forEach(method => {
+                ['ISO', 'ASME'].forEach(std => {
+                    const data = DATA[method][std];
+                    const subcats = std === 'ISO' ? data.levels : data.codes;
+                    Object.keys(subcats).forEach(key => {
+                        const item = subcats[key];
+                        // Special display name for subcat
+                        let displaySubCat = key;
+                        if(std === 'ISO') displaySubCat = `Level ${key}`;
+                        
+                        list.push({
+                            id: `${method}-${std}-${key}`,
+                            method,
+                            standard: std,
+                            subCat: displaySubCat,
+                            name: data.name,
+                            linear: item.linear,
+                            rounded: item.rounded,
+                            note: item.desc || item.note
+                        });
+                    });
+                });
+            });
+            return list;
+        };
+
+        const list = getAllCriteria();
+
+        return (
+            <div className="bg-white text-black min-h-screen">
+                {/* Print Controls - Hidden when printing */}
+                <div className="no-print fixed top-0 left-0 right-0 bg-gray-800 p-4 flex justify-between items-center shadow-lg z-50">
+                    <button onClick={onBack} className="text-white flex items-center hover:text-gray-300">
+                        <Icon name="arrow-left" className="w-5 h-5 mr-2" /> Terug naar App
+                    </button>
+                    <div className="text-white font-bold">Afdrukvoorbeeld</div>
+                    <button 
+                        onClick={() => window.print()} 
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold flex items-center"
+                    >
+                        <Icon name="printer" className="w-5 h-5 mr-2" /> Afdrukken
+                    </button>
+                </div>
+
+                {/* Printable Content */}
+                <div className="pt-20 px-8 pb-10 print:pt-0 print:px-0 print:pb-0 max-w-[210mm] mx-auto">
+                    
+                    {/* Header */}
+                    <div className="border-b-2 border-black pb-4 mb-4">
+                        <h1 className="text-2xl font-bold uppercase text-black">NDT Vergelijkingskaarten (MT & PT)</h1>
+                        <p className="text-sm mt-2 text-red-600 font-bold border border-red-600 p-2 inline-block">
+                            ⚠️ BELANGRIJK: Print deze pagina op 100% schaal (Niet schalen/Fit to page).
+                            Controleer de afmetingen na het printen.
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Instructie: Knip de stroken uit en lamineer ze voor gebruik in het veld. Vergelijk indicaties direct naast de zwarte vlakken.
+                        </p>
+                    </div>
+
+                    {/* Table Headers */}
+                    <div className="grid grid-cols-12 border-b-2 border-black font-bold text-sm uppercase mb-2 pb-1">
+                        <div className="col-span-5">Procedure / Criterium</div>
+                        <div className="col-span-3 text-center border-l border-gray-300">Rond (Ø)</div>
+                        <div className="col-span-4 text-center border-l border-gray-300">Lineair (L)</div>
+                    </div>
+
+                    {/* Strips */}
+                    <div className="flex flex-col">
+                        {list.map(item => (
+                            <PrintableStrip key={item.id} data={item} />
+                        ))}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-8 text-center text-xs text-gray-400 border-t pt-2">
+                        Gegenereerd door NDT Acceptatie Criteria Tool. Controleer altijd de officiële norm bij twijfel.
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const App = () => {
+        const [method, setMethod] = useState('MT');
+        const [standard, setStandard] = useState('ISO'); 
+        const [subCat, setSubCat] = useState('2');
+        const [useSuffixX, setUseSuffixX] = useState(false);
+        const [viewMode, setViewMode] = useState('zoomed');
+        const [isDark, setIsDark] = useState(true); 
+        const [showPrintView, setShowPrintView] = useState(false); // State for print view
+
+        // --- View Logic Switch ---
+        if (showPrintView) {
+            return <PrintSheet onBack={() => setShowPrintView(false)} />;
+        }
+
+        let currentLimits = { linear: 0, rounded: 0, relevantText: '', alignedText: '' };
+
+        if (standard === 'ISO') {
+            const isoData = DATA[method].ISO;
+            const levelData = isoData.levels[subCat] || isoData.levels['2'];
+            
+            let linearLimit = levelData.linear;
+            if (useSuffixX && (subCat === '2' || subCat === '3')) {
+                linearLimit = isoData.levels['1'].linear;
+            }
+
+            currentLimits = {
+                linear: linearLimit,
+                rounded: levelData.rounded,
+                relevantText: isoData.relevant_note,
+                alignedText: "Zie definitie: Lineair L > 3W, Rond L ≤ 3W. Grote groepen indicaties kunnen leiden tot afkeur (zie ISO norm).",
+                linearLabel: `≤ ${linearLimit} mm`,
+                roundedLabel: `≤ ${levelData.rounded} mm`
+            };
+        } else {
+            const asmeData = DATA[method].ASME;
+            const codeData = asmeData.codes[subCat] || asmeData.codes['VIII Div 1'];
+
+            currentLimits = {
+                linear: codeData.linear,
+                rounded: codeData.rounded,
+                relevantText: `> ${asmeData.relevant_threshold} mm`,
+                alignedText: codeData.aligned_rule,
+                linearLabel: codeData.linear === 0 ? "Niet toegestaan" : `≤ ${codeData.linear} mm`,
+                roundedLabel: codeData.rounded === 0 ? "Niet toegestaan" : `≤ ${codeData.rounded} mm`
+            };
+        }
+
+        return (
+            <div className={`min-h-screen p-4 md:p-8 transition-colors duration-300 no-print ${isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+                <div className="max-w-6xl mx-auto relative">
+                    
+                    <ThemeToggle isDark={isDark} toggle={() => setIsDark(!isDark)} />
+
+                    <header className="mb-6 text-center">
+                        <h1 className={`text-4xl font-extrabold mb-2 tracking-tight ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                            <span className="text-blue-500">MT & PT</span> Acceptatie Criteria
+                        </h1>
+                    </header>
+
+                    <MethodSelector selected={method} onSelect={setMethod} isDark={isDark} />
+                    
+                    <ControlPanel 
+                        method={method} 
+                        standard={standard} 
+                        setStandard={setStandard}
+                        subCat={subCat}
+                        setSubCat={setSubCat}
+                        useSuffixX={useSuffixX}
+                        setUseSuffixX={setUseSuffixX}
+                        isDark={isDark}
+                    />
+
+                    {/* View Mode & Print Button Container */}
+                    <div className="flex flex-col md:flex-row justify-center items-center mb-6 gap-4">
+                        <ViewModeToggle mode={viewMode} setMode={setViewMode} isDark={isDark} />
+                        
+                        <button 
+                            onClick={() => setShowPrintView(true)}
+                            className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm ${
+                                isDark 
+                                ? 'bg-indigo-600 text-white hover:bg-indigo-500' 
+                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                            }`}
+                        >
+                            <Icon name="printer" className="w-4 h-4" />
+                            <span>Print Vergelijkingskaarten</span>
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        
+                        <ResultCard title="Ronde Fout (Rounded)" icon="circle" color="orange" delay={100} isDark={isDark}>
+                            <VisualCircle size={currentLimits.rounded} viewMode={viewMode} isDark={isDark} />
+                            <div className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                                {currentLimits.roundedLabel}
+                            </div>
+                            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Maximale diameter (d)</p>
+                            {standard === 'ISO' && <p className="text-xs text-gray-500 mt-1">Definitie: L ≤ 3W</p>}
+                        </ResultCard>
+
+                        <ResultCard title="Lineaire Fout (Linear)" icon="minus" color="red" delay={200} isDark={isDark}>
+                            <VisualLine size={currentLimits.linear} viewMode={viewMode} isDark={isDark} />
+                            <div className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                                {currentLimits.linearLabel}
+                            </div>
+                            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Maximale lengte (l)</p>
+                            {standard === 'ISO' && <p className="text-xs text-gray-500 mt-1">Definitie: L > 3W</p>}
+                        </ResultCard>
+
+                        <ResultCard title="Overige / Groepering" icon="layers" color="purple" delay={300} isDark={isDark}>
+                            <div className="text-left w-full">
+                                <ul className={`list-disc list-inside text-sm space-y-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    <li className={`p-2 rounded-md border ${isDark ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-100'}`}>
+                                        <span className={`font-semibold ${isDark ? 'text-blue-300' : 'text-blue-800'}`}>Relevante Indicatie:</span><br/>
+                                        <span className={isDark ? 'text-blue-200' : 'text-blue-700'}>
+                                            {currentLimits.relevantText.includes('>') 
+                                             ? `${currentLimits.relevantText}` 
+                                             : currentLimits.relevantText}
+                                        </span>
+                                    </li>
+                                    
+                                    <li>
+                                        <span className={`font-semibold ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Uitlijning:</span><br/>
+                                        {currentLimits.alignedText}
+                                    </li>
+                                    {standard === 'ASME' && (
+                                        <li>
+                                            <span className={`font-semibold ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Opmerking:</span><br/>
+                                            Defecten die de grens overschrijden zijn niet toegestaan.
+                                        </li>
+                                    )}
+                                </ul>
+                            </div>
+                        </ResultCard>
+
+                    </div>
+
+                    <footer className={`mt-12 text-center text-xs border-t pt-6 ${isDark ? 'text-gray-500 border-gray-700' : 'text-gray-400 border-gray-200'}`}>
+                        <p>Referentie documenten: MT 21201 (ASME), MT 21202 (ISO), PT 21301 (ASME), PT 21302 (ISO).</p>
+                        <p>Waarschuwing: Deze tool is een hulpmiddel. 1:1 Schaal is afhankelijk van schermkalibratie.</p>
+                    </footer>
+                </div>
+            </div>
+        );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+
+</script>
+
+</body>
+</html>
