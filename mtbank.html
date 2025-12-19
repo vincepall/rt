@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magneet Bank Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111827; /* gray-900 */
+            color: #e5e7eb; /* gray-200 */
+        }
+        /* Dark Theme Table Styles */
+        .report-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            background: #1f2937; /* gray-800 */
+            color: #e5e7eb; /* gray-200 */
+        }
+        .report-table td, .report-table th {
+            border: 1px solid #4b5563; /* gray-600 */
+            padding: 8px;
+            text-align: left;
+        }
+        .report-table th {
+            background-color: #374151; /* gray-700 */
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        /* Custom scrollbar for dark mode aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gray-800 rounded-t-xl shadow-md p-6 border-b border-gray-700 flex items-center gap-5">
+            <!-- Back Button (Styled as a real button) -->
+            <a href="mtptlijst.html" class="bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white rounded-lg w-12 h-12 flex items-center justify-center transition-all shadow-md hover:shadow-lg active:scale-95 group" title="Terug naar lijst">
+                <i class="fa-solid fa-arrow-left text-lg group-hover:-translate-x-1 transition-transform"></i>
+            </a>
+            
+            <div>
+                <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-magnet text-blue-400"></i>
+                    Magneet Bank Calculator
+                </h1>
+                <p class="text-sm text-gray-400 mt-1">Conform EN 10228-1 (Klasse 4)</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            
+            <!-- Left Column: Inputs Only -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Input Section -->
+                <div class="bg-gray-800 rounded-xl shadow-md p-6 border border-gray-700">
+                    <h2 class="text-lg font-semibold text-white mb-4 border-b border-gray-700 pb-2">1. Gegevens</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Stroomtype Selection -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Stroomtype</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="cursor-pointer border border-gray-600 rounded-md p-3 flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors has-[:checked]:bg-blue-900/30 has-[:checked]:border-blue-500 has-[:checked]:ring-1 has-[:checked]:ring-blue-500">
+                                    <input type="radio" name="currentType" value="AC" checked class="w-4 h-4 text-blue-500 bg-gray-700 border-gray-500" onchange="calculate()">
+                                    <span class="text-sm font-medium text-gray-200">Wisselstroom (AC)</span>
+                                </label>
+                                <label class="cursor-pointer border border-gray-600 rounded-md p-3 flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors has-[:checked]:bg-blue-900/30 has-[:checked]:border-blue-500 has-[:checked]:ring-1 has-[:checked]:ring-blue-500">
+                                    <input type="radio" name="currentType" value="DC" class="w-4 h-4 text-blue-500 bg-gray-700 border-gray-500" onchange="calculate()">
+                                    <span class="text-sm font-medium text-gray-200">Gelijkstroom (DC)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Lengte Object (mm)</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="number" id="lengthInput" value="180" class="block w-full rounded-md bg-gray-700 border-gray-600 text-white pl-3 pr-12 py-2 border focus:ring-blue-500 focus:border-blue-500 sm:text-sm placeholder-gray-400" placeholder="180">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-400 sm:text-sm">mm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Diameter Object (mm)</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="number" id="diameterInput" value="21" class="block w-full rounded-md bg-gray-700 border-gray-600 text-white pl-3 pr-12 py-2 border focus:ring-blue-500 focus:border-blue-500 sm:text-sm placeholder-gray-400" placeholder="21">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-400 sm:text-sm">mm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Column: Calculations -->
+            <div class="lg:col-span-1 bg-gray-800 rounded-xl shadow-md p-6 flex flex-col h-full border border-gray-700">
+                <h2 class="text-lg font-semibold text-white mb-4 border-b border-gray-700 pb-2">2. Instelwaardes</h2>
+                
+                <div class="space-y-4 flex-grow">
+                    <!-- Row 1 -->
+                    <div class="flex justify-between items-center p-2 bg-gray-700/50 rounded border border-gray-600">
+                        <span class="text-sm text-gray-400">Omtrek</span>
+                        <span id="calcPerimeter" class="font-mono font-bold text-gray-100">-</span>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="p-2 bg-gray-700/50 rounded border border-gray-600">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-400">L/D Verhouding</span>
+                            <span id="calcLDRatio" class="font-mono font-bold text-gray-100">-</span>
+                        </div>
+                        <!-- L/D Warning/Info Message -->
+                        <div id="ldMessage" class="text-xs mt-1 font-medium hidden"></div>
+                    </div>
+
+                    <div class="border-t border-gray-700 my-4"></div>
+
+                    <!-- Results Highligted -->
+                    <div class="space-y-4">
+                        <!-- Current Flow Block -->
+                        <div class="p-4 bg-green-900/20 border-l-4 border-green-500 rounded-r-lg shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-xs text-green-400 uppercase tracking-wider font-bold">Stroomdoorgang</div>
+                                    <div class="text-xs text-green-300/70">Totale Stroom (I)</div>
+                                </div>
+                                <i class="fa-solid fa-bolt text-green-500/50 text-xl"></i>
+                            </div>
+                            <div class="text-3xl font-bold text-green-400 mt-2">
+                                <span id="resCurrentFlow">0</span> <span class="text-base font-normal text-green-300/70">Amp</span>
+                            </div>
+                            <div class="text-xs text-green-300/50 mt-1">Norm: H > 2 kA/m</div>
+                        </div>
+
+                        <!-- Coil Block (UPDATED: NI is now primary) -->
+                        <div class="p-4 bg-indigo-900/20 border-l-4 border-indigo-500 rounded-r-lg shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-xs text-indigo-400 uppercase tracking-wider font-bold">Spoel <span id="coilTypeLabel" class="text-[10px] bg-indigo-500/30 text-indigo-200 px-1 rounded ml-1">AC</span></div>
+                                    <div class="text-xs text-indigo-300/70">Instellen op machine (NI)</div>
+                                </div>
+                                <i class="fa-solid fa-circle-notch text-indigo-500/50 text-xl"></i>
+                            </div>
+                            
+                            <!-- Primary Value: Machine Setting (NI) -->
+                            <div class="text-3xl font-bold text-indigo-400 mt-2 transition-colors duration-300">
+                                <span id="resMachineSetting">0</span> <span class="text-base font-normal text-indigo-300/70">Amp/wdg</span>
+                            </div>
+                            
+                            <!-- Coil Calculator Sub-section -->
+                            <div class="mt-3 pt-3 border-t border-indigo-500/30">
+                                <div class="flex items-center justify-between gap-2 mb-2">
+                                    <label class="text-sm font-semibold text-indigo-300">Aantal windingen:</label>
+                                    <input type="number" id="coilTurns" value="5" min="1" class="w-16 text-center text-sm rounded bg-gray-900 border-indigo-500/50 text-indigo-200 focus:ring-indigo-500 focus:border-indigo-500 font-bold">
+                                </div>
+                                <!-- Calculated Amps (I) is now secondary -->
+                                <div class="flex justify-between items-center bg-gray-900/40 p-2 rounded">
+                                    <span class="text-xs text-indigo-300 font-medium">Stroom door spoel (I):</span>
+                                    <span class="text-sm font-bold text-indigo-400 transition-colors duration-300"><span id="resCoilAmps">0</span> <span class="text-xs">Amp</span></span>
+                                </div>
+                                <div class="mt-1 text-right">
+                                     <span id="kFactorDisplay" class="text-[10px] text-indigo-500/60">K=22000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Demagnetisation Info (UPDATED with calculation) -->
+                 <div class="mt-6 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-bold text-red-400 mb-1">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> Demagnetiseren
+                            </h3>
+                            <p class="text-xs text-red-300 mb-2 max-w-[200px]">
+                                Instellen op 'Current' met grote spoel (6 wdg).
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-red-300/80 uppercase">Benodigde Stroom</div>
+                            <div class="text-xl font-bold text-red-400">
+                                <span id="resDemag">0</span> <span class="text-sm font-normal">Amp</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-gray-900/40 p-2 rounded border border-red-500/20 mt-1">
+                        <span class="text-xs font-semibold text-gray-400">Max Restveld:</span>
+                        <span class="text-sm font-bold text-red-400">&lt; 0.4 kA/m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Report -->
+            <div class="lg:col-span-1 bg-gray-900 rounded-xl shadow-lg border border-gray-700 overflow-hidden flex flex-col">
+                <div class="p-4 border-b border-gray-700 bg-gray-800">
+                    <h2 class="text-white font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-file-lines"></i>
+                        3. Rapportage
+                    </h2>
+                </div>
+                
+                <div class="p-6 flex flex-col flex-grow relative bg-gray-900">
+                    <p class="text-sm text-gray-400 mb-4">
+                        Gebruik onderstaande tabel voor de rapportage. Waarden zijn afgerond op gehele getallen.
+                    </p>
+                    
+                    <!-- Visual Table Preview -->
+                    <div class="bg-gray-800 p-2 rounded border border-gray-700 shadow-inner mb-4 overflow-x-auto">
+                        <table class="report-table" id="visualTable">
+                            <thead>
+                                <tr>
+                                    <th>Current</th>
+                                    <th style="width: 40px;"></th>
+                                    <th>Flux (<span id="tblFluxType">AC</span>)</th>
+                                    <th style="width: 40px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="tblCurrent" class="font-mono">132</td>
+                                    <td style="color:#9ca3af; font-size: 0.8em;">Amp</td>
+                                    <td id="tblFlux" class="font-mono">2053</td>
+                                    <td style="color:#9ca3af; font-size: 0.8em;">Amp/wdg</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-auto">
+                        <button onclick="copyTable()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2 shadow-lg active:scale-95">
+                            <i class="fa-regular fa-copy"></i>
+                            Kopieer Tabel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-4 rounded-lg shadow-xl transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-4 border-l-4 border-green-500 border border-gray-700">
+        <div class="bg-green-500 rounded-full p-1">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+        </div>
+        <div>
+            <h4 class="font-bold text-sm">Gekopieerd!</h4>
+            <p class="text-xs text-gray-400">Plak de tabel nu in uw rapport (Ctrl+V).</p>
+        </div>
+    </div>
+
+    <script>
+        // Constants from Excel & PDF (EN 10228-1 Class 4)
+        const H_FIELD_STRENGTH = 2; // kA/m
+        const DEMAG_COIL_TURNS = 6; // Fixed number of turns for the "grote spoel" used in demag
+        
+        // Input Elements
+        const lengthInput = document.getElementById('lengthInput');
+        const diameterInput = document.getElementById('diameterInput');
+        const coilTurnsInput = document.getElementById('coilTurns');
+
+        // Display Elements
+        const elPerimeter = document.getElementById('calcPerimeter');
+        const elLDRatio = document.getElementById('calcLDRatio');
+        const elLDMessage = document.getElementById('ldMessage');
+        const elResCurrent = document.getElementById('resCurrentFlow');
+        
+        // Updated Display Elements for Swapped Logic
+        const elResMachineSetting = document.getElementById('resMachineSetting'); // Now displays NI
+        const elResCoilAmps = document.getElementById('resCoilAmps'); // Now displays I
+        const elResDemag = document.getElementById('resDemag'); // New Demag display
+
+        const elKFactorDisplay = document.getElementById('kFactorDisplay');
+        const elCoilTypeLabel = document.getElementById('coilTypeLabel');
+        
+        // Table Elements
+        const tblCurrent = document.getElementById('tblCurrent');
+        const tblFlux = document.getElementById('tblFlux');
+        const tblFluxType = document.getElementById('tblFluxType');
+
+        function calculate() {
+            const L = parseFloat(lengthInput.value) || 0;
+            const D = parseFloat(diameterInput.value) || 0;
+            const turns = parseInt(coilTurnsInput.value) || 5; // Default to 5 per manual
+
+            // Determine Current Type (AC/DC)
+            const currentType = document.querySelector('input[name="currentType"]:checked').value;
+            const K_FACTOR = currentType === 'AC' ? 22000 : 11000;
+
+            // Update UI for Type
+            elKFactorDisplay.textContent = `K=${K_FACTOR}`;
+            elCoilTypeLabel.textContent = currentType;
+            tblFluxType.textContent = currentType;
+
+
+            if (D === 0) return; // Avoid divide by zero
+
+            // 1. Calculations
+            
+            // Perimeter (Omtrek)
+            const perimeter = Math.PI * D;
+            
+            // L/D Ratio
+            const ldRatio = L / D;
+            let effectiveLDRatio = ldRatio;
+
+            // L/D Logic (EN 10228-1)
+            let ldMsg = "";
+            let ldClass = "text-gray-400"; // default dark mode text
+            elLDMessage.classList.add('hidden');
+
+            // Reset visual states
+            elResMachineSetting.classList.remove('text-gray-600', 'opacity-40');
+            elResMachineSetting.classList.add('text-indigo-400');
+            elResCoilAmps.classList.remove('text-gray-600', 'opacity-40');
+            elResCoilAmps.classList.add('text-indigo-400');
+            tblFlux.classList.remove('text-gray-600', 'opacity-40', 'line-through');
+
+
+            if (ldRatio < 2) {
+                // Too small
+                ldMsg = "Let op: L/D < 2. Gebruik verlengstukken!";
+                ldClass = "text-red-400";
+                elLDMessage.classList.remove('hidden');
+
+                // Grey out the Coil results
+                elResMachineSetting.classList.remove('text-indigo-400');
+                elResMachineSetting.classList.add('text-gray-600', 'opacity-40');
+                
+                elResCoilAmps.classList.remove('text-indigo-400');
+                elResCoilAmps.classList.add('text-gray-600', 'opacity-40');
+
+                tblFlux.classList.add('text-gray-600', 'opacity-40', 'line-through');
+
+            } else if (ldRatio > 15) {
+                // Cap at 15
+                ldMsg = "L/D > 15. Maximaal 15 gebruikt in berekening.";
+                ldClass = "text-orange-400";
+                effectiveLDRatio = 15;
+                elLDMessage.classList.remove('hidden');
+            } else {
+                // Valid range 2-15
+                ldMsg = "L/D OK (2 - 15)";
+                ldClass = "text-green-400";
+                elLDMessage.classList.remove('hidden');
+            }
+
+            elLDMessage.textContent = ldMsg;
+            elLDMessage.className = "text-xs mt-1 font-bold " + ldClass;
+
+
+            // Current Flow (Stroomdoorgang)
+            // Formula: I = H * p
+            const currentFlow = H_FIELD_STRENGTH * perimeter;
+
+            // Coil (Spoel / Amp-Windingen)
+            // Formula derived from sheet: K / (L/D * 1.25)
+            // This is the Ampere Turns (NI)
+            const coilNI = K_FACTOR / (effectiveLDRatio * 1.25);
+
+            // Coil Current (I)
+            // I = NI / N_turns
+            const coilCurrent = coilNI / turns;
+
+            // Demagnetisation Current
+            // Uses the "Grote Spoel" (6 windings) in 'Current' mode.
+            // Formula: I_demag = NI / 6
+            const demagCurrent = coilNI / DEMAG_COIL_TURNS;
+
+            // 2. Update UI
+            
+            // Format numbers 
+            elPerimeter.textContent = perimeter.toFixed(2) + " mm";
+            elLDRatio.textContent = ldRatio.toFixed(2);
+            
+            // Round to whole numbers
+            const currentFlowRounded = Math.round(currentFlow);
+            const coilNIRounded = Math.round(coilNI);
+            const coilCurrentRounded = Math.round(coilCurrent);
+            const demagCurrentRounded = Math.round(demagCurrent);
+
+            elResCurrent.textContent = currentFlowRounded;
+            
+            // SWAPPED: Main display is now NI (Machine Setting)
+            elResMachineSetting.textContent = coilNIRounded; 
+            
+            // SWAPPED: Small display is now I (Coil Current)
+            elResCoilAmps.textContent = coilCurrentRounded;
+
+            // NEW: Demag Current
+            elResDemag.textContent = demagCurrentRounded;
+
+            // Update Table
+            // Table shows Stroomdoorgang (Amps) and Flux (Amp/wdg)
+            tblCurrent.textContent = currentFlowRounded;
+            tblFlux.textContent = coilNIRounded;
+        }
+
+        function copyTable() {
+            // Select the visual table
+            const table = document.getElementById('visualTable');
+            const range = document.createRange();
+            range.selectNode(table);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Kopiëren mislukt', err);
+                alert('Kon niet automatisch kopiëren. Selecteer de tabel handmatig.');
+            }
+            selection.removeAllRanges();
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // Event Listeners
+        lengthInput.addEventListener('input', calculate);
+        diameterInput.addEventListener('input', calculate);
+        coilTurnsInput.addEventListener('input', calculate);
+
+        // Initial Calc
+        calculate();
+
+    </script>
+</body>
+</html>
