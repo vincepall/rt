@@ -378,6 +378,8 @@
           "handigelinks.html",
           "onstream.html",
           "opnamesklasseb.html",
+          "mtptlijst.html",
+          "buistabel.html",
         ];
         let remoteItems = [];
 
@@ -417,7 +419,19 @@
             );
 
             if (filtered.length > 0) {
-              filtered.forEach((item) => list.appendChild(item.element));
+              // Deduplicate by href
+              const seenHrefs = new Set();
+              filtered.forEach((item) => {
+                const link = item.element.querySelector("a");
+                const href = link ? link.getAttribute("href") : null;
+                if (href && !seenHrefs.has(href)) {
+                  seenHrefs.add(href);
+                  list.appendChild(item.element);
+                } else if (!href) {
+                  // Fallback for items without links (though there shouldn't be any in .link-list)
+                  list.appendChild(item.element);
+                }
+              });
             } else {
               list.innerHTML =
                 '<p style="width: 100%; text-align: center;">Geen resultaten gevonden</p>';

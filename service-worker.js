@@ -48,10 +48,10 @@ const FILES_TO_CACHE = [
   "/rt/tape3.PNG",
   "/rt/tape4.PNG",
   "/rt/bglight.png",
-  "/rt/schuifje1.png",
-  "/rt/schuifje2.png",
-  "/rt/schuifje3.png",
-  "/rt/schuifje4.png",
+  "/rt/schuif1.png",
+  "/rt/schuif2.png",
+  "/rt/schuif3.png",
+  "/rt/schuif4.png",
   "/rt/schuifje.html",
   "/rt/kvregel.html",
   "/rt/onstream.html",
@@ -59,6 +59,13 @@ const FILES_TO_CACHE = [
   "/rt/gevuldeleiding.html",
   "/rt/bronkeuze2.html",
   "/rt/onstreamffd.html",
+  "/rt/mtptlijst.html",
+  "/rt/MTPT.html",
+  "/rt/mtbank.html",
+  "/rt/zinnen.html",
+  "/rt/tekens.html",
+  "/rt/opnames.html",
+  "/rt/print_overzicht.html",
 ];
 
 // Installeer de service worker en cache de essentiële bestanden
