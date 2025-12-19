@@ -361,6 +361,11 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
+        // Pre-update bronnen.csv in the background so it's fresh for other tools
+        fetch("/rt/bronnen.csv", { cache: "no-cache" })
+          .then(() => console.log("Background update for bronnen.csv triggered"))
+          .catch((err) => console.log("Background update failed (offline)"));
+
         const searchBar = document.getElementById("searchBar");
         const list = document.querySelector(".link-list");
 
