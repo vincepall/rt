@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RadioCalc | NDT Exposure Corrector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #171717;
+            color: #e5e5e5;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #a3a3a3;
+            margin-bottom: 0.5rem;
+        }
+        .input-group input {
+            width: 100%;
+            background-color: #262626;
+            border: 1px solid #404040;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #3b82f6;
+            background-color: #303030;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .btn-radio {
+            cursor: pointer;
+            border: 1px solid #404040;
+            background-color: #262626;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-radio.active {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+        .result-card {
+            background: linear-gradient(145deg, #1f1f1f, #171717);
+            border: 1px solid #333;
+        }
+        .scroller::-webkit-scrollbar { width: 6px; }
+        .scroller::-webkit-scrollbar-thumb { background-color: #404040; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center py-6 px-4">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- HEADER (Mobile) -->
+        <div class="lg:col-span-12 lg:hidden text-center mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Radio<span class="text-blue-500">Calc</span></h1>
+        </div>
+
+        <!-- LEFT COLUMN: Inputs & Calibration -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <div class="hidden lg:block mb-2">
+                <h1 class="text-3xl font-bold text-white tracking-tight">Radio<span class="text-blue-500">Calc</span></h1>
+                <p class="text-gray-500 text-sm">Characteristic Curve Exposure Calculator</p>
+            </div>
+
+            <!-- Film Selection -->
+            <div class="bg-neutral-800 p-6 rounded-2xl border border-neutral-700/50 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Select Film</label>
+                    <button onclick="resetToFactory()" class="text-[10px] text-blue-400 hover:text-blue-300 underline">Reset Curves</button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div id="btn-d4" class="btn-radio" onclick="selectFilm('D4')">D4</div>
+                    <div id="btn-d5" class="btn-radio" onclick="selectFilm('D5')">D5</div>
+                    <div id="btn-d7" class="btn-radio" onclick="selectFilm('D7')">D7</div>
+                </div>
+
+                <!-- Curve Data Table -->
+                <div class="bg-neutral-900/50 rounded-lg border border-neutral-700/50 overflow-hidden">
+                    <div onclick="toggleCalibration()" class="p-3 bg-neutral-800 border-b border-neutral-700 flex justify-between items-center cursor-pointer hover:bg-neutral-700 transition">
+                        <div>
+                            <span class="text-xs font-bold text-blue-400 block">Curve Calibration (From Screenshot)</span>
+                            <span class="text-[10px] text-gray-500">Edit X (Log E) and Y (Density) points</span>
+                        </div>
+                        <svg id="arrow-icon" class="w-4 h-4 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    
+                    <div id="calibration-panel" class="hidden p-3 bg-neutral-900">
+                        <div class="flex text-[10px] text-gray-500 uppercase font-bold mb-2 px-2">
+                            <div class="w-1/2">Log Exposure (X)</div>
+                            <div class="w-1/2">Density (Y)</div>
+                            <div class="w-8"></div>
+                        </div>
+                        <div id="curve-points" class="space-y-2 max-h-40 overflow-y-auto scroller mb-3">
+                            <!-- JS generates inputs here -->
+                        </div>
+                        <button onclick="addPoint()" class="w-full py-2 text-xs text-center border border-dashed border-gray-700 text-gray-500 hover:text-white hover:border-gray-500 rounded transition">+ Add Data Point</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parameters -->
+            <div class="bg-neutral-800 p-6 rounded-2xl border border-neutral-700/50 shadow-xl space-y-5">
+                <div class="input-group">
+                    <label>Current Exposure Time</label>
+                    <div class="relative">
+                        <input type="number" id="timeOld" placeholder="60" oninput="calculate()">
+                        <span class="absolute right-4 top-3.5 text-gray-500 text-sm">sec/min</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="input-group">
+                        <label>Measured Density</label>
+                        <input type="number" id="densityMeasured" placeholder="4.00" step="0.01" oninput="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label>Target Density</label>
+                        <input type="number" id="densityTarget" placeholder="2.00" step="0.01" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Output & Visualization -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Result Card -->
+            <div class="result-card p-6 lg:p-8 rounded-2xl shadow-2xl relative overflow-hidden flex flex-col justify-center">
+                <div class="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500 via-transparent to-transparent"></div>
+                
+                <div class="relative z-10">
+                    <h2 class="text-blue-500 text-xs font-bold uppercase tracking-widest mb-2">Calculated Exposure Time</h2>
+                    <div class="flex items-baseline gap-3 mb-6">
+                        <span id="resultTime" class="text-6xl lg:text-7xl font-mono font-bold text-white tracking-tighter">0.0</span>
+                        <span class="text-xl lg:text-2xl text-gray-500 font-light">sec/min</span>
+                    </div>
+
+                    <!-- Calculated Gradient Display -->
+                    <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                        <div class="bg-black/20 p-3 rounded">
+                            <span class="block text-[10px] text-gray-500 uppercase">Effective Gradient (Slope)</span>
+                            <span class="text-[10px] text-gray-600 block mb-1">Calculated from curve between points</span>
+                            <span id="gradUsed" class="text-2xl font-mono text-blue-400 font-bold">-</span>
+                        </div>
+                        <div class="bg-black/20 p-3 rounded">
+                            <span class="block text-[10px] text-gray-500 uppercase">Log Exposure Shift</span>
+                            <span class="text-[10px] text-gray-600 block mb-1">&Delta; Log E</span>
+                            <span id="logShift" class="text-2xl font-mono text-gray-300 font-bold">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph -->
+            <div class="bg-neutral-800 p-4 rounded-2xl border border-neutral-700/50 shadow-xl min-h-[350px] flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Curve Visualization</h3>
+                    <div class="text-[10px] text-gray-600">X: Log Rel. Exposure | Y: Density</div>
+                </div>
+                <div class="flex-grow relative w-full h-full">
+                    <canvas id="filmChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STRUCTURES ---
+        
+        // REVISED DEFAULT CURVES (CORRECTED GRADIENTS)
+        // D4 (G ~5.4): Steeper slope.
+        // D5 (G ~4.6): Medium slope.
+        // D7 (G ~4.3): Flatter slope.
+        const FACTORY_DATA = {
+            'D4': [
+                { x: 1.65, y: 0.5 }, { x: 1.82, y: 1.0 }, { x: 1.91, y: 1.5 },
+                { x: 2.00, y: 2.0 }, { x: 2.09, y: 2.5 }, { x: 2.19, y: 3.0 },
+                { x: 2.28, y: 3.5 }, { x: 2.37, y: 4.0 }, { x: 2.46, y: 4.5 }
+            ],
+            'D5': [
+                { x: 1.50, y: 0.5 }, { x: 1.70, y: 1.0 }, { x: 1.89, y: 1.5 },
+                { x: 2.00, y: 2.0 }, { x: 2.11, y: 2.5 }, { x: 2.22, y: 3.0 },
+                { x: 2.33, y: 3.5 }, { x: 2.43, y: 4.0 }, { x: 2.54, y: 4.5 }
+            ],
+            'D7': [
+                { x: 1.40, y: 0.5 }, { x: 1.65, y: 1.0 }, { x: 1.88, y: 1.5 },
+                { x: 2.00, y: 2.0 }, { x: 2.12, y: 2.5 }, { x: 2.23, y: 3.0 },
+                { x: 2.35, y: 3.5 }, { x: 2.47, y: 4.0 }, { x: 2.58, y: 4.5 }
+            ]
+        };
+
+        // Runtime State
+        let currentFilm = 'D4';
+        let filmCurves = JSON.parse(JSON.stringify(FACTORY_DATA)); // Deep copy
+        let chartInstance = null;
+
+        // --- INIT ---
+
+        function init() {
+            loadData();
+            selectFilm('D7');
+            initChart();
+            renderCalibrationTable();
+        }
+
+        function loadData() {
+            // Updated version key to v4 to force refresh of corrected data
+            const saved = localStorage.getItem('radiocalc_curves_v4');
+            if (saved) {
+                try { filmCurves = JSON.parse(saved); } 
+                catch (e) { console.error("Data Load Error", e); }
+            } else {
+                // If no v4 data, use factory defaults immediately
+                filmCurves = JSON.parse(JSON.stringify(FACTORY_DATA));
+                saveData(); 
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('radiocalc_curves_v4', JSON.stringify(filmCurves));
+            renderCalibrationTable();
+            calculate();
+            updateChart();
+        }
+
+        function resetToFactory() {
+            if(confirm("Reset curve points to corrected default data?")) {
+                filmCurves = JSON.parse(JSON.stringify(FACTORY_DATA));
+                saveData();
+            }
+        }
+
+        // --- UI INTERACTION ---
+
+        function selectFilm(film) {
+            currentFilm = film;
+            ['D4', 'D5', 'D7'].forEach(f => {
+                const btn = document.getElementById(`btn-${f.toLowerCase()}`);
+                if (f === film) {
+                    btn.classList.add('active');
+                    btn.classList.remove('text-gray-400');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+            renderCalibrationTable();
+            calculate();
+            updateChart();
+        }
+
+        function toggleCalibration() {
+            const panel = document.getElementById('calibration-panel');
+            const arrow = document.getElementById('arrow-icon');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                panel.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        // --- CALIBRATION TABLE LOGIC ---
+
+        function renderCalibrationTable() {
+            const container = document.getElementById('curve-points');
+            container.innerHTML = '';
+            
+            // Sort by Density (Y) to keep table orderly
+            filmCurves[currentFilm].sort((a, b) => a.y - b.y);
+
+            filmCurves[currentFilm].forEach((point, index) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2';
+                row.innerHTML = `
+                    <input type="number" step="0.05" value="${point.x}" onchange="updatePoint(${index}, 'x', this.value)" class="w-1/2 bg-neutral-800 border border-neutral-600 rounded px-2 py-1 text-white text-xs text-center focus:border-blue-500 focus:outline-none">
+                    <input type="number" step="0.1" value="${point.y}" onchange="updatePoint(${index}, 'y', this.value)" class="w-1/2 bg-neutral-800 border border-neutral-600 rounded px-2 py-1 text-white text-xs text-center focus:border-blue-500 focus:outline-none">
+                    <button onclick="removePoint(${index})" class="w-8 text-red-500 hover:text-red-300 text-lg leading-none">&times;</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addPoint() {
+            // Add a point near the last one or at 0,0
+            const len = filmCurves[currentFilm].length;
+            const last = len > 0 ? filmCurves[currentFilm][len-1] : {x:2.0, y:2.0};
+            filmCurves[currentFilm].push({ x: Number((last.x + 0.1).toFixed(2)), y: Number((last.y + 0.5).toFixed(1)) });
+            saveData();
+        }
+
+        function updatePoint(index, field, value) {
+            filmCurves[currentFilm][index][field] = parseFloat(value);
+            saveData(); 
+        }
+
+        function removePoint(index) {
+            filmCurves[currentFilm].splice(index, 1);
+            saveData();
+        }
+
+        // --- CORE CALCULATION ---
+
+        // We need to find Log Exposure (X) for a given Density (Y)
+        function getLogExposureAtDensity(density) {
+            const data = filmCurves[currentFilm];
+            // Sort by Density (Y) for interpolation
+            data.sort((a, b) => a.y - b.y);
+
+            if (data.length < 2) return 0;
+
+            // Extrapolation / Interpolation
+            for (let i = 0; i < data.length - 1; i++) {
+                const p1 = data[i];
+                const p2 = data[i+1];
+                
+                // If density is between two points
+                if (density >= p1.y && density <= p2.y) {
+                    const ratio = (density - p1.y) / (p2.y - p1.y);
+                    return p1.x + ratio * (p2.x - p1.x);
+                }
+            }
+
+            // If outside range, extrapolate using the last known slope
+            if (density < data[0].y) {
+                const p1 = data[0]; const p2 = data[1];
+                const slope = (p2.y - p1.y) / (p2.x - p1.x); // Density per LogE
+                const dy = density - p1.y;
+                return p1.x + (dy / slope);
+            }
+            if (density > data[data.length-1].y) {
+                const p1 = data[data.length-2]; const p2 = data[data.length-1];
+                const slope = (p2.y - p1.y) / (p2.x - p1.x);
+                const dy = density - p2.y;
+                return p2.x + (dy / slope);
+            }
+            
+            return 0;
+        }
+
+        function calculate() {
+            const tOld = parseFloat(document.getElementById('timeOld').value);
+            const dMeasured = parseFloat(document.getElementById('densityMeasured').value);
+            const dTarget = parseFloat(document.getElementById('densityTarget').value);
+
+            if (!tOld || isNaN(dMeasured) || isNaN(dTarget)) return;
+
+            // 1. Find Log Exposure positions on the curve
+            const logEMeasured = getLogExposureAtDensity(dMeasured);
+            const logETarget = getLogExposureAtDensity(dTarget);
+            
+            // 2. Calculate Shift
+            const deltaLogE = logETarget - logEMeasured;
+            
+            // 3. Calculate New Time
+            // t_new = t_old * 10^(DeltaLogE)
+            const factor = Math.pow(10, deltaLogE);
+            const tNew = tOld * factor;
+
+            // 4. Calculate Effective Gradient (Slope) used
+            // Gradient = Change in Density / Change in Log Exposure
+            const dDiff = dTarget - dMeasured;
+            // Prevent divide by zero if measured == target
+            let gradient = 0;
+            if (Math.abs(deltaLogE) > 0.001) {
+                gradient = dDiff / deltaLogE;
+            } else {
+                // If 0 shift, estimate gradient at that point
+                gradient = (filmCurves[currentFilm].length > 1) ? 
+                    (dMeasured > 1 ? 5.0 : 3.0) : 0; // rough fallback
+            }
+
+            // 5. Update UI
+            document.getElementById('resultTime').innerText = formatResult(tNew);
+            document.getElementById('gradUsed').innerText = gradient.toFixed(2);
+            document.getElementById('logShift').innerText = (deltaLogE > 0 ? "+" : "") + deltaLogE.toFixed(3);
+
+            updateChart(tOld, dMeasured, tNew, dTarget);
+        }
+
+        function formatResult(num) {
+            if (num >= 100) return Math.round(num);
+            if (Math.abs(num - Math.round(num)) < 0.01) return Math.round(num);
+            return num.toFixed(1);
+        }
+
+        // --- CHARTS ---
+
+        function initChart() {
+            const ctx = document.getElementById('filmChart').getContext('2d');
+            Chart.defaults.color = '#737373';
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Characteristic Curve',
+                            data: [],
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#1d4ed8'
+                        },
+                        {
+                            label: 'Measured',
+                            data: [],
+                            pointBackgroundColor: '#ef4444',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 8,
+                            showLine: false
+                        },
+                        {
+                            label: 'Target',
+                            data: [],
+                            pointBackgroundColor: '#22c55e',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 8,
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear', // We plot LogE linearly on the X axis
+                            title: { display: true, text: 'Log Relative Exposure', color: '#a3a3a3' },
+                            grid: { color: '#262626' },
+                            ticks: { color: '#737373' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Density', color: '#a3a3a3' },
+                            grid: { color: '#262626' },
+                            ticks: { color: '#737373' },
+                            min: 0,
+                            max: 5
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#171717',
+                            borderColor: '#404040',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(ctx) {
+                                    return `Log E: ${ctx.parsed.x.toFixed(2)}, Density: ${ctx.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(tOld, dMeasured, tNew, dTarget) {
+            if (!chartInstance) return;
+
+            // Plot the curve points
+            // Sort by X for Chart.js
+            const curvePoints = [...filmCurves[currentFilm]].sort((a,b) => a.x - b.x);
+            chartInstance.data.datasets[0].data = curvePoints;
+
+            // Plot User Points
+            // We need to know the calculated X (Log E) positions for the points
+            if (dMeasured !== undefined && dTarget !== undefined) {
+                 const xMeasured = getLogExposureAtDensity(dMeasured);
+                 const xTarget = getLogExposureAtDensity(dTarget);
+                 
+                 chartInstance.data.datasets[1].data = [{x: xMeasured, y: dMeasured}];
+                 chartInstance.data.datasets[2].data = [{x: xTarget, y: dTarget}];
+            }
+            
+            chartInstance.update();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
