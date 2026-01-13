@@ -25,64 +25,72 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 h-screen flex flex-col text-slate-200 font-sans overflow-hidden">
+<body class="bg-slate-900 h-screen flex flex-col text-slate-100 font-sans overflow-hidden">
 
-    <div class="flex-none p-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between z-10 shadow-sm">
-        <a href="https://vincepall.github.io/rt/index.html" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 transition-colors text-xs font-medium shadow-md touch-manipulation">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Compact Top Navigation -->
+    <div class="flex-none p-3 bg-slate-900 border-b border-slate-700 flex items-center justify-between z-10 shadow-md">
+        <a href="https://vincepall.github.io/rt/index.html" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-white transition-colors text-sm font-bold shadow-sm touch-manipulation">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
             </svg>
             Home
         </a>
-        <h1 class="text-base font-bold text-white">Voorraad</h1>
-        <div class="w-[60px]"></div> </div>
+        <h1 class="text-lg font-bold text-white tracking-wide">VOORRAAD</h1>
+        <div class="w-[80px]"></div> <!-- Spacer for centering -->
+    </div>
 
+    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col p-2 overflow-hidden max-w-lg mx-auto w-full">
         
-        <div class="flex-none mb-2 text-center">
-            <div class="flex justify-center gap-2 text-[10px] font-medium flex-wrap">
-                <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-1 rounded-full border border-slate-700">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                    <span class="text-slate-300">Genoeg</span>
+        <!-- Compact Legend & Actions - High Contrast -->
+        <div class="flex-none mb-3 text-center">
+            <div class="flex justify-center items-center gap-2 text-xs font-bold flex-wrap">
+                <!-- Groen -->
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-600 shadow-sm">
+                    <div class="w-3 h-3 rounded-full bg-emerald-500 border border-white/20"></div>
+                    <span class="text-emerald-400">Genoeg</span>
                 </div>
-                <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-1 rounded-full border border-slate-700">
-                    <div class="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"></div>
-                    <span class="text-slate-300">Bijna op</span>
+                <!-- Oranje -->
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-600 shadow-sm">
+                    <div class="w-3 h-3 rounded-full bg-orange-500 border border-white/20"></div>
+                    <span class="text-orange-400">Bijna op</span>
                 </div>
-                <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-1 rounded-full border border-slate-700">
-                    <div class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
-                    <span class="text-slate-300">Leeg</span>
+                <!-- Rood -->
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-600 shadow-sm">
+                    <div class="w-3 h-3 rounded-full bg-red-600 border border-white/20"></div>
+                    <span class="text-red-400">Leeg</span>
                 </div>
-                <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-1 rounded-full border border-slate-700">
-                    <div class="w-2 h-2 rounded-full bg-slate-500"></div>
-                    <span class="text-slate-300">N.V.T.</span>
-                </div>
+
+                <!-- Reset Button (Small) -->
+                <button onclick="resetStock()" class="flex items-center gap-1.5 bg-slate-700 active:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-500 hover:border-emerald-500 hover:text-emerald-400 transition-colors shadow-sm ml-1" title="Alles aanvullen">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+                   <span>Reset</span>
+                </button>
             </div>
         </div>
 
-        <div class="flex-1 bg-slate-800 rounded-lg shadow-lg border border-slate-700 ring-1 ring-white/5 relative overflow-hidden flex flex-col">
+        <!-- Table Container -->
+        <div class="flex-1 bg-slate-800 rounded-xl shadow-xl border border-slate-600 relative overflow-hidden flex flex-col">
             <div class="flex-1 overflow-y-auto overscroll-contain">
                 <table class="w-full text-center border-collapse h-full">
-                    <thead class="sticky top-0 z-20 bg-slate-950">
-                        <tr class="shadow-sm text-white text-xs">
-                            <th class="py-2 px-1 sticky left-0 z-30 bg-slate-950 border-r border-slate-800 w-1/4 font-semibold text-left pl-3">Afm.</th>
-                            <th class="py-2 px-1 w-1/4 border-l border-slate-800 font-semibold text-slate-300">D4</th>
-                            <th class="py-2 px-1 w-1/4 border-l border-slate-800 font-semibold text-slate-300">D5</th>
-                            <th class="py-2 px-1 w-1/4 border-l border-slate-800 font-semibold text-slate-300">D7</th>
+                    <thead class="sticky top-0 z-20 bg-slate-900 shadow-md">
+                        <tr class="text-white text-sm">
+                            <th class="py-3 px-2 sticky left-0 z-30 bg-slate-900 border-r border-b border-slate-600 w-1/4 font-bold text-left pl-4 tracking-wider">AFM.</th>
+                            <th class="py-3 px-2 w-1/4 border-l border-b border-slate-600 font-bold text-slate-200">D4</th>
+                            <th class="py-3 px-2 w-1/4 border-l border-b border-slate-600 font-bold text-slate-200">D5</th>
+                            <th class="py-3 px-2 w-1/4 border-l border-b border-slate-600 font-bold text-slate-200">D7</th>
                         </tr>
                     </thead>
                     <tbody id="inventoryTableBody">
-                        </tbody>
+                        <!-- Rows generated by JS -->
+                    </tbody>
                 </table>
             </div>
         </div>
-
-        <div class="flex-none mt-2 text-center pb-safe">
-            <button onclick="resetStock()" class="px-4 py-2 text-xs text-slate-500 active:text-slate-300 hover:text-emerald-400 transition-colors touch-manipulation">
-                Herbevoorraad (Reset Rood & Oranje)
-            </button>
-        </div>
+        
+        <!-- Bottom spacing for aesthetics -->
+        <div class="h-2"></div>
 
     </div>
 
@@ -96,7 +104,7 @@
         
         // State Management
         // States: undefined (Green), 'low' (Orange), 'empty' (Red), 'na' (Grey)
-        const STORAGE_KEY = 'inventory_tracker_v3'; // Bumped version
+        const STORAGE_KEY = 'inventory_tracker_v4'; 
         let stockState = {}; 
         
         // Default Configuration for N.V.T items
@@ -152,7 +160,7 @@
 
         // Reset Red AND Orange fields back to Green
         function resetStock() {
-            if(confirm("Alle 'Leeg' en 'Bijna op' velden terugzetten naar 'Genoeg'?\n(N.V.T. velden blijven ongewijzigd)")) {
+            if(confirm("Alles aanvullen? 'Leeg' en 'Bijna op' worden weer groen.")) {
                 for (const key in stockState) {
                     if (stockState[key] === 'empty' || stockState[key] === 'low' || stockState[key] === true) {
                         delete stockState[key];
@@ -170,11 +178,11 @@
 
             rowLabels.forEach((rowLabel, rowIndex) => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-700 last:border-b-0 h-10";
+                tr.className = "border-b border-slate-600 last:border-b-0 h-12"; // Taller rows for better touch targets
 
                 // Dimension Header Column
                 const th = document.createElement('th');
-                th.className = "text-left font-medium text-slate-300 bg-slate-800 border-r border-slate-700 sticky left-0 z-10 pl-3 text-xs whitespace-nowrap";
+                th.className = "text-left font-bold text-white bg-slate-800 border-r border-slate-600 sticky left-0 z-10 pl-4 text-sm whitespace-nowrap shadow-[2px_0_5px_rgba(0,0,0,0.3)]";
                 th.textContent = rowLabel;
                 tr.appendChild(th);
 
@@ -185,39 +193,39 @@
                     const state = stockState[key];
 
                     // Base classes
-                    td.className = "border-r border-slate-700 last:border-r-0 cursor-pointer cell-transition select-none touch-manipulation relative";
+                    td.className = "border-r border-slate-600 last:border-r-0 cursor-pointer cell-transition select-none touch-manipulation relative";
                     
-                    // State Logic
+                    // State Logic - HIGH CONTRAST COLORS
                     if (state === 'low') {
-                        // ORANGE - Bijna op
-                        td.classList.add('bg-orange-900/40', 'text-orange-400');
+                        // ORANGE - Bijna op (Solid)
+                        td.classList.add('bg-orange-500', 'text-white');
                         td.innerHTML = `
                             <div class="flex flex-col items-center justify-center h-full w-full">
-                                <span class="font-bold text-base">!</span>
+                                <span class="font-bold text-lg drop-shadow-md">!</span>
                             </div>
                         `;
                     } else if (state === 'empty' || state === true) {
-                        // RED - Leeg
-                        td.classList.add('bg-red-900/40', 'text-red-400');
+                        // RED - Leeg (Solid)
+                        td.classList.add('bg-red-600', 'text-white');
                         td.innerHTML = `
                             <div class="flex flex-col items-center justify-center h-full w-full">
-                                <span class="font-bold text-base">✕</span>
+                                <span class="font-bold text-xl drop-shadow-md">✕</span>
                             </div>
                         `;
                     } else if (state === 'na') {
-                        // GREY - N.V.T.
-                        td.classList.add('bg-slate-800/80', 'text-slate-600');
+                        // GREY - N.V.T. (Dark/Subtle)
+                        td.classList.add('bg-slate-900', 'text-slate-700');
                         td.innerHTML = `
-                            <div class="flex flex-col items-center justify-center h-full w-full">
-                                <span class="text-xs font-medium opacity-50">N.V.T.</span>
+                            <div class="flex flex-col items-center justify-center h-full w-full bg-[radial-gradient(circle,_#334155_1px,_transparent_1px)] bg-[length:4px_4px]">
+                                <!-- Pattern background to indicate void -->
                             </div>
                         `;
                     } else {
-                        // GREEN - Genoeg (Default)
-                        td.classList.add('bg-emerald-900/10', 'text-emerald-500/50', 'active:bg-emerald-900/30');
+                        // GREEN - Genoeg (Default - Solid but slightly darker than neon to be easy on eyes)
+                        td.classList.add('bg-emerald-600', 'text-white');
                         td.innerHTML = `
                             <div class="flex flex-col items-center justify-center h-full w-full">
-                                <span class="font-bold text-base opacity-30">✓</span>
+                                <span class="font-bold text-lg drop-shadow-md">✓</span>
                             </div>
                         `;
                     }
