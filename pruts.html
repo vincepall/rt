@@ -1809,8 +1809,15 @@
           }
         }
 
+        let bkiPositie = "";
+        if (technique === "SWSI" || technique === "DWDI") {
+          bkiPositie = " (BKI bronzijde)";
+        } else if (technique === "DWSI") {
+          bkiPositie = " (BKI filmzijde)";
+        }
+
         document.getElementById("wire-result").innerHTML =
-          "Vereist draadje: <strong>" + wire + "</strong>";
+          "Vereist draadje: <strong>" + wire + "</strong>" + bkiPositie;
 
         let minFFDOutput =
           "Minimale FFD: " +
