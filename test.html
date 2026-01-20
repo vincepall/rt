@@ -2,190 +2,321 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PWA Snipper Pro - Rotatie & Fix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PWA Smart Scanner</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <style>
-        body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #333; }
+        /* CSS Variabelen voor makkelijke aanpassing */
+        :root { --bg: #212529; --panel: #f8f9fa; --accent: #0d6efd; --border: #dee2e6; }
         
-        /* Toolbar bovenaan */
-        .toolbar { background: #fff; padding: 10px; display: flex; gap: 10px; align-items: center; border-bottom: 2px solid #000; z-index: 100; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--bg); 
+            overscroll-behavior: none; /* Voorkomt 'pull-to-refresh' op mobiel */
+        }
         
-        /* De container voor het document */
-        .viewport { flex: 1; overflow: auto; position: relative; padding: 20px; display: flex; justify-content: center; }
+        /* --- TOOLBAR --- */
+        .toolbar { 
+            background: var(--panel); padding: 10px; display: flex; gap: 10px; align-items: center; 
+            border-bottom: 1px solid var(--border); z-index: 100; flex-wrap: wrap; 
+        }
+        .btn-group { display: flex; gap: 5px; }
         
-        .canvas-container { position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); background: white; height: fit-content; }
+        button { 
+            padding: 8px 12px; cursor: pointer; background: #e9ecef; border: 1px solid #ced4da; 
+            border-radius: 4px; font-weight: 600; font-size: 14px; 
+        }
+        button:active { background: #dde2e6; transform: translateY(1px); }
+        button.primary { background: var(--accent); color: white; border-color: var(--accent); }
         
-        canvas { display: block; cursor: crosshair; }
+        /* --- VIEWPORT --- */
+        .viewport { 
+            flex: 1; overflow: auto; padding: 20px; 
+            display: flex; align-items: flex-start; justify-content: flex-start; /* Fix voor scrollen */
+            position: relative;
+        }
         
-        /* Selectie kader */
+        .canvas-wrapper { 
+            position: relative; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+            background: white; touch-action: none; /* Cruciaal: voorkomt scrollen tijdens tekenen op mobiel */
+        }
+        
+        canvas { display: block; max-width: none; }
+        
+        /* --- SELECTIE KADER --- */
         #selection-box { 
-            position: absolute; border: 2px solid #007bff; background: rgba(0, 123, 255, 0.2); 
-            display: none; pointer-events: none; z-index: 50;
+            position: absolute; border: 2px solid var(--accent); 
+            background: rgba(13, 110, 253, 0.2); display: none; pointer-events: none; z-index: 50; 
         }
 
-        /* Resultaat balk onderaan */
-        .footer { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #000; }
-        #ocr-output { font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #007bff; }
-        .btn { padding: 8px 15px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
-        .btn-secondary { background: #6c757d; }
+        /* --- FOOTER --- */
+        .footer { 
+            background: var(--panel); padding: 15px; border-top: 1px solid var(--border); 
+            display: flex; gap: 10px; align-items: center; 
+        }
+        .result-box { 
+            flex: 1; font-family: monospace; background: white; border: 1px solid var(--border); 
+            padding: 10px; border-radius: 4px; font-size: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
+        
+        /* Mobiele aanpassing */
+        @media (max-width: 600px) {
+            .viewport { padding: 10px; }
+            .toolbar { justify-content: space-between; }
+            #file-input { width: 100%; margin-bottom: 5px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="toolbar">
-    <input type="file" id="file-input" accept="image/*,application/pdf">
-    <button class="btn btn-secondary" onclick="rotateDocument()">🔄 Draaien</button>
-    <span id="status" style="font-size: 0.8em;">Kies een bestand</span>
+    <input type="file" id="file-input" accept="image/*,application/pdf" style="font-size:0.9em;">
+    <div class="btn-group">
+        <button onclick="changePage(-1)" id="prev-btn" disabled>❮</button>
+        <span id="page-indicator" style="padding: 5px; font-size: 0.9em; align-self: center;">-</span>
+        <button onclick="changePage(1)" id="next-btn" disabled>❯</button>
+    </div>
+    <button onclick="rotateDocument()">↻ Draai</button>
 </div>
 
-<div class="viewport">
-    <div class="canvas-container" id="container">
+<div class="viewport" id="viewport">
+    <div class="canvas-wrapper" id="wrapper">
         <canvas id="main-canvas"></canvas>
         <div id="selection-box"></div>
     </div>
 </div>
 
 <div class="footer">
-    <div>Gescand: <span id="ocr-output">...</span></div>
-    <button class="btn" onclick="copyText()">Kopieer</button>
+    <div class="result-box" id="ocr-result">Selecteer tekst...</div>
+    <button class="primary" onclick="copyText()">KOPIEER</button>
 </div>
 
 <script>
+    // PDF.js instellen (gebruikt CDN voor demo, download lokaal voor offline PWA)
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
+    // State Variabelen
+    let pdfDoc = null;
+    let pageNum = 1;
+    let pageRendering = false;
+    let rotation = 0;
+    let scale = 2.5; // Hoge kwaliteit voor OCR
+    let currentImage = null; // Als het een foto is ipv PDF
+
     const canvas = document.getElementById('main-canvas');
     const ctx = canvas.getContext('2d');
-    const container = document.getElementById('container');
+    const wrapper = document.getElementById('wrapper');
     const selectionBox = document.getElementById('selection-box');
-    const ocrOutput = document.getElementById('ocr-output');
-    
-    let currentRotation = 0;
-    let currentFile = null;
-    let isDrawing = false;
-    let startX, startY;
+    const ocrResult = document.getElementById('ocr-result');
 
-    // --- BESTANDSVERWERKING ---
-    document.getElementById('file-input').onchange = (e) => {
-        currentFile = e.target.files[0];
-        currentRotation = 0;
-        loadFile();
-    };
+    // --- BESTAND LADEN ---
+    document.getElementById('file-input').onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    async function loadFile() {
-        if (!currentFile) return;
-        document.getElementById('status').innerText = "Laden...";
-
-        if (currentFile.type === "application/pdf") {
-            const arrayBuffer = await currentFile.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-            const page = await pdf.getPage(1);
-            
-            // Gebruik rotatie instelling
-            const viewport = page.getViewport({ scale: 2.0, rotation: currentRotation });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        resetState();
+        
+        if (file.type === "application/pdf") {
+            const arrayBuffer = await file.arrayBuffer();
+            pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            document.getElementById('page-indicator').innerText = `1 / ${pdfDoc.numPages}`;
+            updatePaginationButtons();
+            renderPage(pageNum);
         } else {
+            // Het is een afbeelding
             const img = new Image();
             img.onload = () => {
-                // Afbeelding draaien op canvas
-                if (currentRotation % 180 !== 0) {
-                    canvas.width = img.height;
-                    canvas.height = img.width;
-                } else {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                }
-                ctx.save();
-                ctx.translate(canvas.width / 2, canvas.height / 2);
-                ctx.rotate((currentRotation * Math.PI) / 180);
-                ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                ctx.restore();
+                currentImage = img;
+                renderImage();
             };
-            img.src = URL.createObjectURL(currentFile);
+            img.src = URL.createObjectURL(file);
+            document.getElementById('page-indicator').innerText = "IMG";
         }
-        document.getElementById('status').innerText = "Gereed. Trek een kader.";
+    };
+
+    function resetState() {
+        pdfDoc = null;
+        currentImage = null;
+        pageNum = 1;
+        rotation = 0;
+        selectionBox.style.display = 'none';
+        ocrResult.innerText = "Selecteer tekst...";
+    }
+
+    // --- RENDERING ---
+    async function renderPage(num) {
+        pageRendering = true;
+        const page = await pdfDoc.getPage(num);
+        const viewport = page.getViewport({ scale: scale, rotation: rotation });
+        
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        updateWrapperSize();
+
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        pageRendering = false;
+        document.getElementById('page-indicator').innerText = `${num} / ${pdfDoc.numPages}`;
+    }
+
+    function renderImage() {
+        if (!currentImage) return;
+        const isRotated = rotation % 180 !== 0;
+        
+        canvas.width = isRotated ? currentImage.height : currentImage.width;
+        canvas.height = isRotated ? currentImage.width : currentImage.height;
+        updateWrapperSize();
+
+        ctx.save();
+        ctx.translate(canvas.width/2, canvas.height/2);
+        ctx.rotate(rotation * Math.PI / 180);
+        ctx.drawImage(currentImage, -currentImage.width/2, -currentImage.height/2);
+        ctx.restore();
+    }
+
+    function updateWrapperSize() {
+        wrapper.style.width = canvas.width + "px";
+        wrapper.style.height = canvas.height + "px";
+    }
+
+    // --- NAVIGATIE & ROTATIE ---
+    function changePage(offset) {
+        if (!pdfDoc || pageRendering) return;
+        const newPage = pageNum + offset;
+        if (newPage >= 1 && newPage <= pdfDoc.numPages) {
+            pageNum = newPage;
+            renderPage(pageNum);
+            updatePaginationButtons();
+        }
+    }
+
+    function updatePaginationButtons() {
+        if(!pdfDoc) return;
+        document.getElementById('prev-btn').disabled = pageNum <= 1;
+        document.getElementById('next-btn').disabled = pageNum >= pdfDoc.numPages;
     }
 
     function rotateDocument() {
-        currentRotation = (currentRotation + 90) % 360;
-        loadFile();
+        rotation = (rotation + 90) % 360;
+        if (pdfDoc) renderPage(pageNum);
+        else renderImage();
     }
 
-    // --- COÖRDINATEN EN SELECTIE ---
-    // Gebruik de container voor muis-events om scroll-fouten te voorkomen
-    container.onmousedown = (e) => {
+    // --- SELECTIE LOGICA (MUIS + TOUCH) ---
+    let isDrawing = false;
+    let startX, startY;
+
+    // Helper om positie te berekenen onafhankelijk van muis of touch
+    function getPointerPos(e) {
+        const rect = wrapper.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function startDraw(e) {
         if (e.target !== canvas && e.target !== selectionBox) return;
+        // Bij touch events, voorkom dat de browser gaat scrollen
+        if(e.type === 'touchstart') document.body.style.overflow = 'hidden'; 
+        
         isDrawing = true;
+        const pos = getPointerPos(e);
+        startX = pos.x;
+        startY = pos.y;
         
-        // layerX/Y geeft de positie relatief aan de container
-        startX = e.layerX;
-        startY = e.layerY;
+        selectionBox.style.display = 'block';
+        selectionBox.style.width = '0px';
+        selectionBox.style.height = '0px';
+    }
 
-        selectionBox.style.left = startX + "px";
-        selectionBox.style.top = startY + "px";
-        selectionBox.style.width = "0px";
-        selectionBox.style.height = "0px";
-        selectionBox.style.display = "block";
-    };
-
-    container.onmousemove = (e) => {
+    function moveDraw(e) {
         if (!isDrawing) return;
-        
-        const currentX = e.layerX;
-        const currentY = e.layerY;
+        e.preventDefault(); // Voorkom scrollen tijdens slepen
+
+        const pos = getPointerPos(e);
+        const currentX = pos.x;
+        const currentY = pos.y;
 
         const width = currentX - startX;
         const height = currentY - startY;
 
-        selectionBox.style.width = Math.abs(width) + "px";
-        selectionBox.style.height = Math.abs(height) + "px";
-        selectionBox.style.left = (width < 0 ? currentX : startX) + "px";
-        selectionBox.style.top = (height < 0 ? currentY : startY) + "px";
-    };
+        selectionBox.style.width = Math.abs(width) + 'px';
+        selectionBox.style.height = Math.abs(height) + 'px';
+        selectionBox.style.left = (width < 0 ? currentX : startX) + 'px';
+        selectionBox.style.top = (height < 0 ? currentY : startY) + 'px';
+    }
 
-    window.onmouseup = async (e) => {
+    function endDraw(e) {
         if (!isDrawing) return;
         isDrawing = false;
+        document.body.style.overflow = ''; // Scrollen weer aanzetten
 
+        // OCR Uitvoeren
         const rect = selectionBox.getBoundingClientRect();
-        const canvRect = canvas.getBoundingClientRect();
-
-        // Bereken de schaling tussen scherm-pixels en canvas-pixels
-        const scaleX = canvas.width / canvRect.width;
-        const scaleY = canvas.height / canvRect.height;
-
-        const x = (rect.left - canvRect.left) * scaleX;
-        const y = (rect.top - canvRect.top) * scaleY;
-        const w = rect.width * scaleX;
-        const h = rect.height * scaleY;
+        const wrapperRect = wrapper.getBoundingClientRect();
+        
+        // Bereken positie relatief aan canvas resolutie
+        const x = rect.left - wrapperRect.left;
+        const y = rect.top - wrapperRect.top;
+        const w = rect.width;
+        const h = rect.height;
 
         if (w > 5 && h > 5) {
             doOCR(x, y, w, h);
         }
-    };
+    }
 
+    // Event Listeners Muis
+    wrapper.addEventListener('mousedown', startDraw);
+    window.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+
+    // Event Listeners Touch (Mobiel)
+    wrapper.addEventListener('touchstart', startDraw, {passive: false});
+    window.addEventListener('touchmove', moveDraw, {passive: false});
+    window.addEventListener('touchend', endDraw);
+
+
+    // --- OCR VERWERKING ---
     async function doOCR(x, y, w, h) {
-        ocrOutput.innerText = "Bezig...";
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = w;
-        tempCanvas.height = h;
-        const tempCtx = tempCanvas.getContext('2d');
+        ocrResult.innerText = "⏳ Bezig met scannen...";
+        ocrResult.style.color = "#666";
         
-        tempCtx.drawImage(canvas, x, y, w, h, 0, 0, w, h);
+        try {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = w;
+            tempCanvas.height = h;
+            const tCtx = tempCanvas.getContext('2d');
+            
+            tCtx.drawImage(canvas, x, y, w, h, 0, 0, w, h);
 
-        const result = await Tesseract.recognize(tempCanvas.toDataURL(), 'nld+eng');
-        const text = result.data.text.trim();
-        ocrOutput.innerText = text || "[Geen tekst]";
-        if(text) navigator.clipboard.writeText(text);
+            const result = await Tesseract.recognize(tempCanvas.toDataURL(), 'nld+eng');
+            const cleanText = result.data.text.trim().replace(/\n/g, ' ');
+            
+            ocrResult.innerText = cleanText || "(Geen tekst herkend)";
+            ocrResult.style.color = "#000";
+            
+            // Optioneel: Automatisch kopiëren
+            if (cleanText) navigator.clipboard.writeText(cleanText);
+            
+        } catch (err) {
+            ocrResult.innerText = "Fout bij scannen";
+            console.error(err);
+        }
     }
 
     function copyText() {
-        navigator.clipboard.writeText(ocrOutput.innerText);
-        alert("Gekopieerd!");
+        const text = ocrResult.innerText;
+        if(text && text !== "..." && text !== "Selecteer tekst...") {
+            navigator.clipboard.writeText(text);
+            const originalBtnText = document.querySelector('.primary').innerText;
+            document.querySelector('.primary').innerText = "✔";
+            setTimeout(() => document.querySelector('.primary').innerText = originalBtnText, 1000);
+        }
     }
 </script>
 
