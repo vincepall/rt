@@ -2,79 +2,188 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>Lokale AI OCR (Transformer)</title>
-    <script type="module">
-        // We importeren de AI-bibliotheek direct
-        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gevoelige Data Snipper PWA</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 
-        let recognizer;
-        const status = document.getElementById('status');
-        const segmentsContainer = document.getElementById('segments');
-
-        // Initialiseer het AI-model
-        async function initAI() {
-            status.innerText = "AI-model laden... (dit gebeurt alleen de eerste keer)";
-            try {
-                // We gebruiken het TrOCR-model (Printed) - zeer accuraat voor documenten
-                recognizer = await pipeline('image-to-text', 'Xenova/trocr-small-printed');
-                status.innerText = "AI is klaar voor gebruik. Upload een foto.";
-            } catch (e) {
-                status.innerText = "Fout bij laden AI: " + e.message;
-            }
-        }
-
-        async function processImage(file) {
-            if (!recognizer) return;
-            
-            status.innerText = "AI analyseert de afbeelding... (dit gebruikt je processor/GPU)";
-            segmentsContainer.innerHTML = "";
-
-            const url = URL.createObjectURL(file);
-            
-            // De AI voert de herkenning uit
-            // TrOCR werkt het best op regels, we kunnen de hele afbeelding sturen
-            const output = await recognizer(url);
-            
-            status.innerText = "Analyse voltooid.";
-            displayResult(output[0].generated_text);
-        }
-
-        function displayResult(text) {
-            // De AI geeft vaak een zeer schone zin terug. 
-            // We splitsen deze voor het gemak op in logische brokken.
-            const blocks = text.split(/(?=[A-Z][a-z]+:)/); // Splitst op woorden die eindigen met een dubbele punt (labels)
-
-            blocks.forEach(block => {
-                if(block.trim().length < 2) return;
-                const div = document.createElement('div');
-                div.className = 'segment';
-                div.onclick = () => {
-                    navigator.clipboard.writeText(block.trim());
-                    alert("Gekopieerd: " + block.trim());
-                };
-                div.innerHTML = `<span>${block.trim()}</span> <small>AI GECONTROLEERD</small>`;
-                segmentsContainer.appendChild(div);
-            });
-        }
-
-        document.getElementById('fileInput').onchange = (e) => processImage(e.target.files[0]);
-        initAI();
-    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #fdfdfd; padding: 40px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border: 1px solid #e1e4e8; padding: 20px; border-radius: 12px; }
-        .segment { padding: 15px; border: 1px solid #eee; margin: 10px 0; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fafafa; transition: 0.2s; }
-        .segment:hover { border-color: #007bff; background: #f0f7ff; }
-        #status { color: #666; font-size: 0.9em; margin-bottom: 20px; text-align: center; }
-        .segment small { color: #28a745; font-weight: bold; font-size: 0.7em; }
+        :root { --primary: #007bff; }
+        body { font-family: -apple-system, sans-serif; margin: 0; padding: 20px; background: #f8f9fa; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        #canvas-wrapper { 
+            position: relative; 
+            margin-top: 20px; 
+            border: 2px solid #ddd; 
+            overflow: auto; 
+            max-height: 70vh;
+            background: #525659; /* PDF viewer look */
+        }
+        
+        canvas { display: block; margin: 0 auto; cursor: crosshair; }
+        
+        #selection-rect { 
+            position: absolute; 
+            border: 2px solid var(--primary); 
+            background: rgba(0, 123, 255, 0.2); 
+            display: none; 
+            pointer-events: none; 
+        }
+
+        .output-zone { 
+            position: sticky; bottom: 20px; 
+            background: white; border: 2px solid var(--primary); 
+            padding: 15px; border-radius: 8px; margin-top: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #status { font-size: 0.9em; color: #666; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Lokale AI Document Scanner</h2>
-        <div id="status">AI initialiseren...</div>
-        <input type="file" id="fileInput" accept="image/*" style="width: 100%; padding: 20px; border: 2px dashed #ccc;">
-        <div id="segments"></div>
+
+<div class="container">
+    <h2>Document Data Snipper</h2>
+    <input type="file" id="file-upload" accept="image/*,application/pdf">
+    <span id="status">Wacht op bestand...</span>
+
+    <div id="canvas-wrapper">
+        <canvas id="main-canvas"></canvas>
+        <div id="selection-rect"></div>
     </div>
+
+    <div class="output-zone">
+        <div>
+            <strong>Gescande Tekst:</strong>
+            <div id="ocr-result" style="font-family: monospace; font-size: 1.2em; margin-top: 5px;">...</div>
+        </div>
+        <button class="btn" onclick="copyResult()">Kopieer</button>
+    </div>
+</div>
+
+<script>
+    // PDF.js instellen
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+    const canvas = document.getElementById('main-canvas');
+    const ctx = canvas.getContext('2d');
+    const selectionRect = document.getElementById('selection-rect');
+    const ocrResult = document.getElementById('ocr-result');
+    const status = document.getElementById('status');
+
+    let isDrawing = false;
+    let startX, startY;
+
+    // --- BESTANDSVERWERKING ---
+    document.getElementById('file-upload').onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        status.innerText = "Laden...";
+        
+        if (file.type === "application/pdf") {
+            const arrayBuffer = await file.arrayBuffer();
+            renderPDF(arrayBuffer);
+        } else {
+            const url = URL.createObjectURL(file);
+            renderImage(url);
+        }
+    };
+
+    function renderImage(url) {
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            status.innerText = "Foto geladen. Trek een kader.";
+        };
+        img.src = url;
+    }
+
+    async function renderPDF(data) {
+        const pdf = await pdfjsLib.getDocument({data}).promise;
+        const page = await pdf.getPage(1); // We pakken pagina 1
+        const viewport = page.getViewport({scale: 2.0}); // Hoge kwaliteit scan
+        
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        
+        await page.render({canvasContext: ctx, viewport: viewport}).promise;
+        status.innerText = "PDF geladen. Trek een kader.";
+    }
+
+    // --- SELECTIE LOGICA ---
+    canvas.onmousedown = (e) => {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        startX = (e.clientX - rect.left) * (canvas.width / rect.width);
+        startY = (e.clientY - rect.top) * (canvas.height / rect.height);
+        selectionRect.style.display = 'block';
+    };
+
+    window.onmousemove = (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const currentX = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const currentY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        // Visuele weergave van het kader
+        const boxX = Math.min(e.pageX, startX * (rect.width / canvas.width) + rect.left + scrollLeft);
+        const boxY = Math.min(e.pageY, startY * (rect.height / canvas.height) + rect.top + scrollTop);
+        const boxW = Math.abs(currentX - startX) * (rect.width / canvas.width);
+        const boxH = Math.abs(currentY - startY) * (rect.height / canvas.height);
+
+        selectionRect.style.left = boxX + 'px';
+        selectionRect.style.top = boxY + 'px';
+        selectionRect.style.width = boxW + 'px';
+        selectionRect.style.height = boxH + 'px';
+    };
+
+    window.onmouseup = async (e) => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        
+        const rect = canvas.getBoundingClientRect();
+        const endX = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const endY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+        processCrop(startX, startY, endX - startX, endY - startY);
+    };
+
+    // --- OCR VERWERKING ---
+    async function processCrop(x, y, w, h) {
+        if (Math.abs(w) < 5 || Math.abs(h) < 5) return;
+
+        ocrResult.innerText = "Scannen...";
+        
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = Math.abs(w);
+        tempCanvas.height = Math.abs(h);
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        tempCtx.drawImage(canvas, x, y, w, h, 0, 0, w, h);
+
+        // Voer de OCR uit op het kleine stukje
+        const result = await Tesseract.recognize(tempCanvas.toDataURL(), 'nld+eng');
+        const text = result.data.text.trim();
+        
+        ocrResult.innerText = text || "[Geen tekst gevonden]";
+        if (text) navigator.clipboard.writeText(text);
+    }
+
+    function copyResult() {
+        navigator.clipboard.writeText(ocrResult.innerText);
+        alert("Gekopieerd!");
+    }
+</script>
+
 </body>
 </html>
