@@ -3,107 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Scanner: Fixed Layout</title>
+    <title>Smart Scanner Dark</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <style>
-        :root { --bg: #212529; --panel: #f8f9fa; --accent: #0d6efd; --border: #dee2e6; }
-        
+        /* --- MODERN DARK THEME VARIABLES --- */
+        :root {
+            --bg-app: #121212;       /* Diep zwart/grijs achtergrond */
+            --bg-panel: #1e1e1e;     /* Iets lichter voor balken */
+            --text-main: #e0e0e0;    /* Bijna wit voor tekst */
+            --text-muted: #a0a0a0;   /* Grijs voor secundaire tekst */
+            --accent: #3b82f6;       /* Modern felblauw */
+            --accent-hover: #2563eb;
+            --border: #333333;
+            --selection: rgba(59, 130, 246, 0.3);
+        }
+
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--bg); 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; display: flex; flex-direction: column; height: 100vh; 
+            background: var(--bg-app); color: var(--text-main);
             overscroll-behavior: none;
         }
-        
+
         /* --- TOOLBAR --- */
         .toolbar { 
-            background: var(--panel); padding: 8px; display: flex; gap: 8px; align-items: center; 
-            border-bottom: 1px solid var(--border); z-index: 100; flex-wrap: wrap; justify-content: space-between;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: var(--bg-panel); padding: 12px; 
+            display: flex; gap: 10px; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        .group { display: flex; gap: 5px; align-items: center; }
-        
-        button { 
-            padding: 6px 12px; cursor: pointer; background: #e9ecef; border: 1px solid #ced4da; 
-            border-radius: 4px; font-weight: 600; font-size: 14px; min-width: 32px;
+
+        .group { display: flex; gap: 8px; align-items: center; }
+
+        /* Moderne Knoppen */
+        button, .icon-btn { 
+            padding: 8px 12px; cursor: pointer; 
+            background: #2d2d2d; border: 1px solid var(--border); 
+            border-radius: 6px; color: var(--text-main);
+            font-weight: 500; font-size: 14px; min-width: 36px;
+            transition: all 0.2s ease;
+            text-decoration: none; display: inline-flex; justify-content: center; align-items: center;
         }
-        button:active { background: #dde2e6; transform: translateY(1px); }
-        button.primary { background: var(--accent); color: white; border-color: var(--accent); }
-        
-        /* --- VIEWPORT (Het scrollbare gebied) --- */
+        button:hover, .icon-btn:hover { background: #3d3d3d; border-color: #555; }
+        button:active { transform: translateY(1px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Primaire Actie Knop */
+        button.primary { 
+            background: var(--accent); color: white; border: none; 
+            font-weight: bold; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+        button.primary:hover { background: var(--accent-hover); }
+        button.primary:focus { outline: 2px solid white; outline-offset: 2px; }
+
+        /* Home Knop Specifiek */
+        .home-btn { font-size: 1.2em; padding: 6px 10px; }
+
+        /* File Input Styling */
+        input[type="file"] {
+            font-size: 0.85em; color: var(--text-muted);
+            max-width: 200px;
+        }
+        input[type="file"]::file-selector-button {
+            background: #2d2d2d; color: var(--text-main); border: 1px solid var(--border);
+            padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 10px;
+        }
+
+        /* --- VIEWPORT --- */
         .viewport { 
-            flex: 1; 
-            overflow: auto; /* Zorgt voor scrollbalken */
-            padding: 20px; 
-            display: flex; 
-            align-items: flex-start; /* Belangrijk: forceert start linksboven */
-            justify-content: flex-start;
-            position: relative;
-            background: #404040; /* Donkere achtergrond voor contrast */
+            flex: 1; overflow: auto; padding: 20px; 
+            display: flex; align-items: flex-start; justify-content: flex-start;
+            position: relative; background: #0a0a0a; /* Donkerder canvas achtergrond */
         }
-        
-        /* --- WRAPPER (De container van het plaatje) --- */
+
         .canvas-wrapper { 
-            position: relative; 
-            background: white; 
-            touch-action: none; 
-            /* CRUCIAAL: Voorkomt dat flexbox dit element verkleint */
-            flex-shrink: 0; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            /* Margin auto zorgt voor centreren als er ruimte over is, 
-               maar laat het links uitlijnen als het te groot is */
-            margin: auto; 
+            position: relative; background: white; /* Document blijft wit */
+            touch-action: none; flex-shrink: 0; margin: auto; 
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
         }
-        
-        /* Canvas mag GEEN 100% width hebben in CSS, want dat veroorzaakt de vervorming.
-           De grootte wordt nu puur door JS (style.width) bepaald. */
-        canvas { 
-            display: block; 
-        }
-        
+
+        canvas { display: block; }
+
         #selection-box { 
             position: absolute; border: 2px solid var(--accent); 
-            background: rgba(13, 110, 253, 0.2); display: none; pointer-events: none; z-index: 50; 
+            background: var(--selection); display: none; pointer-events: none; z-index: 50; 
         }
 
         /* --- FOOTER --- */
         .footer { 
-            background: var(--panel); padding: 10px; border-top: 1px solid var(--border); 
-            display: flex; flex-direction: column; gap: 8px; z-index: 100;
+            background: var(--bg-panel); padding: 15px; border-top: 1px solid var(--border); 
+            display: flex; flex-direction: column; gap: 10px; z-index: 100;
         }
-        
+
         textarea#ocr-result { 
-            width: 100%; height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
-            font-family: monospace; font-size: 1.1em; resize: none; box-sizing: border-box;
+            width: 100%; height: 60px; padding: 10px; 
+            background: #2d2d2d; color: white; border: 1px solid var(--border); 
+            border-radius: 6px; font-family: 'Courier New', monospace; font-size: 1.1em; 
+            resize: none; box-sizing: border-box;
         }
         textarea#ocr-result:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
         .footer-row { display: flex; justify-content: space-between; align-items: center; }
-        .status { font-size: 0.8em; color: #666; }
+        .status { font-size: 0.85em; color: var(--text-muted); font-style: italic; }
 
-        /* Mobiele optimalisatie */
+        /* Mobiel */
         @media (max-width: 600px) {
             .viewport { padding: 10px; }
-            #file-input { max-width: 160px; font-size: 0.75em; }
-            .toolbar { gap: 4px; padding: 5px; }
-            button { padding: 5px 8px; font-size: 12px; }
+            .toolbar { flex-wrap: wrap; gap: 8px; }
+            input[type="file"] { width: 100%; max-width: none; }
+            .group { flex-grow: 1; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
 <div class="toolbar">
+    <a href="https://vincepall.github.io/rt/index.html" class="icon-btn home-btn" title="Terug naar Home">🏠</a>
+
     <div class="group">
         <input type="file" id="file-input" accept="image/*,application/pdf">
     </div>
+
     <div class="group">
         <button onclick="changeZoom(-0.2)">－</button>
-        <span id="zoom-level" style="font-size: 0.8em; min-width: 35px; text-align: center; color: #333;">100%</span>
+        <span id="zoom-level" style="font-size: 0.8em; min-width: 40px; text-align: center; color: var(--text-muted);">100%</span>
         <button onclick="changeZoom(0.2)">＋</button>
     </div>
+
     <div class="group">
         <button onclick="changePage(-1)" id="prev-btn" disabled>❮</button>
-        <span id="page-indicator" style="font-size: 0.8em; color: #333;">-</span>
+        <span id="page-indicator" style="font-size: 0.8em; color: var(--text-muted);">-</span>
         <button onclick="changePage(1)" id="next-btn" disabled>❯</button>
         <button onclick="rotateDocument()" title="Draaien">↻</button>
     </div>
@@ -117,10 +147,10 @@
 </div>
 
 <div class="footer">
-    <textarea id="ocr-result" placeholder="Trek een vakje om tekst te kopiëren..."></textarea>
+    <textarea id="ocr-result" placeholder="Trek een vakje..."></textarea>
     <div class="footer-row">
-        <span class="status" id="status-msg">Wacht op bestand...</span>
-        <button class="primary" onclick="copyText()">KOPIEER</button>
+        <span class="status" id="status-msg">Klaar voor start</span>
+        <button id="copy-btn" class="primary" onclick="copyText()">KOPIEER (Enter)</button>
     </div>
 </div>
 
@@ -128,20 +158,19 @@
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-    // State
     let pdfDoc = null;
     let pageNum = 1;
     let rotation = 0;
     let currentZoom = 1.0; 
     let currentImage = null;
     
-    // DOM Elements
     const canvas = document.getElementById('main-canvas');
     const ctx = canvas.getContext('2d');
     const wrapper = document.getElementById('wrapper');
     const selectionBox = document.getElementById('selection-box');
     const resultBox = document.getElementById('ocr-result');
     const statusMsg = document.getElementById('status-msg');
+    const copyBtn = document.getElementById('copy-btn');
 
     // --- BESTAND LADEN ---
     document.getElementById('file-input').onchange = async (e) => {
@@ -172,21 +201,18 @@
         currentImage = null;
         pageNum = 1;
         rotation = 0;
-        currentZoom = 1.0; // Reset naar 100% bij nieuw bestand
+        currentZoom = 1.0;
         updateZoomDisplay();
         selectionBox.style.display = 'none';
         resultBox.value = "";
     }
 
-    // --- ZOOM LOGICA ---
+    // --- ZOOM ---
     function changeZoom(delta) {
         if (!pdfDoc && !currentImage) return;
         const newZoom = Math.max(0.1, Math.min(5.0, currentZoom + delta));
         currentZoom = parseFloat(newZoom.toFixed(1));
-        
         updateZoomDisplay();
-        
-        // Alleen de CSS aanpassen, niet opnieuw renderen (sneller)
         updateVisualSize(); 
     }
 
@@ -199,15 +225,10 @@
         if(!pdfDoc) return;
         statusMsg.innerText = "Renderen...";
         const page = await pdfDoc.getPage(num);
-        
-        // We renderen ALTIJD op hoge resolutie (scale 2.0 of 3.0) voor de OCR
-        // De 'zoom' is puur visueel via CSS
-        const viewport = page.getViewport({ scale: 2.0, rotation: rotation });
+        const viewport = page.getViewport({ scale: 2.0, rotation: rotation }); // Hoge kwaliteit voor OCR
         
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-        
-        // Pas de CSS grootte aan op basis van zoom
         updateVisualSize();
 
         await page.render({ canvasContext: ctx, viewport: viewport }).promise;
@@ -218,11 +239,8 @@
     function renderImage() {
         if (!currentImage) return;
         const isRotated = rotation % 180 !== 0;
-        
-        // Interne resolutie
         canvas.width = isRotated ? currentImage.height : currentImage.width;
         canvas.height = isRotated ? currentImage.width : currentImage.height;
-        
         updateVisualSize();
 
         ctx.save();
@@ -234,19 +252,15 @@
     }
 
     function updateVisualSize() {
-        // Dit is de fix voor de vervorming:
-        // We stellen harde pixels in op de style.
         const visualWidth = Math.floor(canvas.width * currentZoom);
         const visualHeight = Math.floor(canvas.height * currentZoom);
-
-        // Stel grootte in op wrapper én canvas style
         wrapper.style.width = visualWidth + "px";
         wrapper.style.height = visualHeight + "px";
         canvas.style.width = visualWidth + "px";
         canvas.style.height = visualHeight + "px";
     }
 
-    // --- NAVIGATIE & ROTATIE ---
+    // --- NAVIGATIE ---
     function changePage(offset) {
         if (!pdfDoc) return;
         const newPage = pageNum + offset;
@@ -269,7 +283,7 @@
         else renderImage();
     }
 
-    // --- SELECTIE LOGICA ---
+    // --- SELECTIE & OCR LOGICA ---
     let isDrawing = false;
     let startX, startY;
 
@@ -277,12 +291,7 @@
         const rect = wrapper.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        // Positie binnen de wrapper
-        return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-        };
+        return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
     function startDraw(e) {
@@ -295,20 +304,18 @@
         startY = pos.y;
         
         selectionBox.style.display = 'block';
-        selectionBox.style.left = startX + 'px';
-        selectionBox.style.top = startY + 'px';
         selectionBox.style.width = '0px';
         selectionBox.style.height = '0px';
+        selectionBox.style.left = startX + 'px';
+        selectionBox.style.top = startY + 'px';
     }
 
     function moveDraw(e) {
         if (!isDrawing) return;
         e.preventDefault(); 
-
         const pos = getPointerPos(e);
         const w = pos.x - startX;
         const h = pos.y - startY;
-
         selectionBox.style.width = Math.abs(w) + 'px';
         selectionBox.style.height = Math.abs(h) + 'px';
         selectionBox.style.left = (w < 0 ? pos.x : startX) + 'px';
@@ -320,12 +327,8 @@
         isDrawing = false;
         document.body.style.overflow = ''; 
 
-        // Reken terug van scherm-pixels naar echte canvas-pixels
         const rect = selectionBox.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect();
-        
-        // De scale factor is nu simpelweg 1 / currentZoom
-        // (Bijvoorbeeld: als zoom 200% (2.0) is, is 1 pixel op scherm 0.5 pixel in canvas)
         const scale = 1 / currentZoom;
 
         const x = (rect.left - wrapperRect.left) * scale;
@@ -345,7 +348,6 @@
     window.addEventListener('touchmove', moveDraw, {passive: false});
     window.addEventListener('touchend', endDraw);
 
-    // --- OCR ---
     async function doOCR(x, y, w, h) {
         statusMsg.innerText = "⏳ Lezen...";
         resultBox.value = "...";
@@ -355,15 +357,20 @@
             tempCanvas.width = w;
             tempCanvas.height = h;
             const tCtx = tempCanvas.getContext('2d');
-            
             tCtx.drawImage(canvas, x, y, w, h, 0, 0, w, h);
 
             const result = await Tesseract.recognize(tempCanvas.toDataURL(), 'nld+eng');
             const cleanText = result.data.text.trim();
             
             resultBox.value = cleanText;
-            statusMsg.innerText = cleanText ? "Gevonden!" : "Geen tekst.";
-            if(cleanText) resultBox.focus();
+            statusMsg.innerText = cleanText ? "Gevonden! Druk op Enter om te kopiëren." : "Geen tekst.";
+            
+            // --- AUTO FOCUS LOGICA ---
+            // We zetten de focus op de kopieer knop
+            // Hierdoor hoeft de gebruiker alleen op 'Enter' te drukken
+            if(cleanText) {
+                copyBtn.focus();
+            }
             
         } catch (err) {
             statusMsg.innerText = "Fout";
@@ -375,8 +382,14 @@
         const text = resultBox.value;
         if(text) {
             navigator.clipboard.writeText(text);
-            statusMsg.innerText = "✔ Gekopieerd!";
-            setTimeout(() => statusMsg.innerText = "Klaar.", 2000);
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = "✔ GEKOPIEERD";
+            copyBtn.style.backgroundColor = "#22c55e"; // Groen
+            
+            setTimeout(() => {
+                copyBtn.innerText = originalText;
+                copyBtn.style.backgroundColor = ""; // Reset kleur
+            }, 1500);
         }
     }
 </script>
