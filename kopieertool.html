@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kopieertool</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        /* --- MODERN DARK THEME VARIABLES --- */
+        :root {
+            --bg-app: #121212;       /* Diep zwart/grijs achtergrond */
+            --bg-panel: #1e1e1e;     /* Iets lichter voor balken */
+            --text-main: #e0e0e0;    /* Bijna wit voor tekst */
+            --text-muted: #a0a0a0;   /* Grijs voor secundaire tekst */
+            --accent: #3b82f6;       /* Modern felblauw */
+            --accent-hover: #2563eb;
+            --border: #333333;
+            --selection: rgba(59, 130, 246, 0.3);
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; display: flex; flex-direction: column; height: 100vh; 
+            background: var(--bg-app); color: var(--text-main);
+            overscroll-behavior: none;
+        }
+
+        /* --- TOOLBAR --- */
+        .toolbar { 
+            background: var(--bg-panel); padding: 12px; 
+            display: flex; gap: 10px; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .group { display: flex; gap: 8px; align-items: center; }
+
+        /* Moderne Knoppen */
+        button, .icon-btn { 
+            padding: 8px 12px; cursor: pointer; 
+            background: #2d2d2d; border: 1px solid var(--border); 
+            border-radius: 6px; color: var(--text-main);
+            font-weight: 500; font-size: 14px; min-width: 36px;
+            transition: all 0.2s ease;
+            text-decoration: none; display: inline-flex; justify-content: center; align-items: center;
+        }
+        button:hover, .icon-btn:hover { background: #3d3d3d; border-color: #555; }
+        button:active { transform: translateY(1px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Primaire Actie Knop */
+        button.primary { 
+            background: var(--accent); color: white; border: none; 
+            font-weight: bold; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+        button.primary:hover { background: var(--accent-hover); }
+        button.primary:focus { outline: 2px solid white; outline-offset: 2px; }
+
+        /* Home Knop Specifiek */
+        .home-btn { font-size: 1.2em; padding: 6px 10px; }
+
+        /* File Input Styling */
+        input[type="file"] {
+            font-size: 0.85em; color: var(--text-muted);
+            max-width: 200px;
+        }
+        input[type="file"]::file-selector-button {
+            background: #2d2d2d; color: var(--text-main); border: 1px solid var(--border);
+            padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 10px;
+        }
+
+        /* --- VIEWPORT --- */
+        .viewport { 
+            flex: 1; overflow: auto; padding: 20px; 
+            display: flex; align-items: flex-start; justify-content: flex-start;
+            position: relative; background: #0a0a0a; /* Donkerder canvas achtergrond */
+        }
+
+        .canvas-wrapper { 
+            position: relative; background: white; /* Document blijft wit */
+            touch-action: none; flex-shrink: 0; margin: auto; 
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+        }
+
+        canvas { display: block; }
+
+        #selection-box { 
+            position: absolute; border: 2px solid var(--accent); 
+            background: var(--selection); display: none; pointer-events: none; z-index: 50; 
+        }
+
+        /* --- FOOTER --- */
+        .footer { 
+            background: var(--bg-panel); padding: 15px; border-top: 1px solid var(--border); 
+            display: flex; flex-direction: column; gap: 10px; z-index: 100;
+        }
+
+        textarea#ocr-result { 
+            width: 100%; height: 60px; padding: 10px; 
+            background: #2d2d2d; color: white; border: 1px solid var(--border); 
+            border-radius: 6px; font-family: 'Courier New', monospace; font-size: 1.1em; 
+            resize: none; box-sizing: border-box;
+        }
+        textarea#ocr-result:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+        .footer-row { display: flex; justify-content: space-between; align-items: center; }
+        .status { font-size: 0.85em; color: var(--text-muted); font-style: italic; }
+
+        /* Mobiel */
+        @media (max-width: 600px) {
+            .viewport { padding: 10px; }
+            .toolbar { flex-wrap: wrap; gap: 8px; }
+            input[type="file"] { width: 100%; max-width: none; }
+            .group { flex-grow: 1; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toolbar">
+    <a href="https://vincepall.github.io/rt/index.html" class="icon-btn home-btn" title="Terug naar Home">🏠</a>
+
+    <div class="group">
+        <input type="file" id="file-input" accept="image/*,application/pdf">
+    </div>
+
+    <div class="group">
+        <button onclick="changeZoom(-0.2)">－</button>
+        <span id="zoom-level" style="font-size: 0.8em; min-width: 40px; text-align: center; color: var(--text-muted);">100%</span>
+        <button onclick="changeZoom(0.2)">＋</button>
+    </div>
+
+    <div class="group">
+        <button onclick="changePage(-1)" id="prev-btn" disabled>❮</button>
+        <span id="page-indicator" style="font-size: 0.8em; color: var(--text-muted);">-</span>
+        <button onclick="changePage(1)" id="next-btn" disabled>❯</button>
+        <button onclick="rotateDocument()" title="Draaien">↻</button>
+    </div>
+</div>
+
+<div class="viewport" id="viewport">
+    <div class="canvas-wrapper" id="wrapper">
+        <canvas id="main-canvas"></canvas>
+        <div id="selection-box"></div>
+    </div>
+</div>
+
+<div class="footer">
+    <textarea id="ocr-result" placeholder="Trek een vakje..."></textarea>
+    <div class="footer-row">
+        <span class="status" id="status-msg">Klaar voor start</span>
+        <button id="copy-btn" class="primary" onclick="copyText()">KOPIEER (Enter)</button>
+    </div>
+</div>
+
+<script>
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+    let pdfDoc = null;
+    let pageNum = 1;
+    let rotation = 0;
+    let currentZoom = 1.0; 
+    let currentImage = null;
+    
+    const canvas = document.getElementById('main-canvas');
+    const ctx = canvas.getContext('2d');
+    const wrapper = document.getElementById('wrapper');
+    const selectionBox = document.getElementById('selection-box');
+    const resultBox = document.getElementById('ocr-result');
+    const statusMsg = document.getElementById('status-msg');
+    const copyBtn = document.getElementById('copy-btn');
+
+    // --- BESTAND LADEN ---
+    document.getElementById('file-input').onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        resetState();
+        statusMsg.innerText = "Bezig met laden...";
+
+        if (file.type === "application/pdf") {
+            const arrayBuffer = await file.arrayBuffer();
+            pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            document.getElementById('page-indicator').innerText = `1 / ${pdfDoc.numPages}`;
+            updatePaginationButtons();
+            renderPage(pageNum);
+        } else {
+            const img = new Image();
+            img.onload = () => {
+                currentImage = img;
+                renderImage();
+            };
+            img.src = URL.createObjectURL(file);
+            document.getElementById('page-indicator').innerText = "IMG";
+        }
+    };
+
+    function resetState() {
+        pdfDoc = null;
+        currentImage = null;
+        pageNum = 1;
+        rotation = 0;
+        currentZoom = 1.0;
+        updateZoomDisplay();
+        selectionBox.style.display = 'none';
+        resultBox.value = "";
+    }
+
+    // --- ZOOM ---
+    function changeZoom(delta) {
+        if (!pdfDoc && !currentImage) return;
+        const newZoom = Math.max(0.1, Math.min(5.0, currentZoom + delta));
+        currentZoom = parseFloat(newZoom.toFixed(1));
+        updateZoomDisplay();
+        updateVisualSize(); 
+    }
+
+    function updateZoomDisplay() {
+        document.getElementById('zoom-level').innerText = Math.round(currentZoom * 100) + "%";
+    }
+
+    // --- RENDERING ---
+    async function renderPage(num) {
+        if(!pdfDoc) return;
+        statusMsg.innerText = "Renderen...";
+        const page = await pdfDoc.getPage(num);
+        const viewport = page.getViewport({ scale: 2.0, rotation: rotation }); // Hoge kwaliteit voor OCR
+        
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        updateVisualSize();
+
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        document.getElementById('page-indicator').innerText = `${num} / ${pdfDoc.numPages}`;
+        statusMsg.innerText = "Klaar. Selecteer tekst.";
+    }
+
+    function renderImage() {
+        if (!currentImage) return;
+        const isRotated = rotation % 180 !== 0;
+        canvas.width = isRotated ? currentImage.height : currentImage.width;
+        canvas.height = isRotated ? currentImage.width : currentImage.height;
+        updateVisualSize();
+
+        ctx.save();
+        ctx.translate(canvas.width/2, canvas.height/2);
+        ctx.rotate(rotation * Math.PI / 180);
+        ctx.drawImage(currentImage, -currentImage.width/2, -currentImage.height/2);
+        ctx.restore();
+        statusMsg.innerText = "Klaar. Selecteer tekst.";
+    }
+
+    function updateVisualSize() {
+        const visualWidth = Math.floor(canvas.width * currentZoom);
+        const visualHeight = Math.floor(canvas.height * currentZoom);
+        wrapper.style.width = visualWidth + "px";
+        wrapper.style.height = visualHeight + "px";
+        canvas.style.width = visualWidth + "px";
+        canvas.style.height = visualHeight + "px";
+    }
+
+    // --- NAVIGATIE ---
+    function changePage(offset) {
+        if (!pdfDoc) return;
+        const newPage = pageNum + offset;
+        if (newPage >= 1 && newPage <= pdfDoc.numPages) {
+            pageNum = newPage;
+            renderPage(pageNum);
+            updatePaginationButtons();
+        }
+    }
+
+    function updatePaginationButtons() {
+        if(!pdfDoc) return;
+        document.getElementById('prev-btn').disabled = pageNum <= 1;
+        document.getElementById('next-btn').disabled = pageNum >= pdfDoc.numPages;
+    }
+
+    function rotateDocument() {
+        rotation = (rotation + 90) % 360;
+        if (pdfDoc) renderPage(pageNum);
+        else renderImage();
+    }
+
+    // --- SELECTIE & OCR LOGICA ---
+    let isDrawing = false;
+    let startX, startY;
+
+    function getPointerPos(e) {
+        const rect = wrapper.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function startDraw(e) {
+        if (e.target !== canvas && e.target !== selectionBox) return;
+        if(e.type === 'touchstart') document.body.style.overflow = 'hidden'; 
+        
+        isDrawing = true;
+        const pos = getPointerPos(e);
+        startX = pos.x;
+        startY = pos.y;
+        
+        selectionBox.style.display = 'block';
+        selectionBox.style.width = '0px';
+        selectionBox.style.height = '0px';
+        selectionBox.style.left = startX + 'px';
+        selectionBox.style.top = startY + 'px';
+    }
+
+    function moveDraw(e) {
+        if (!isDrawing) return;
+        e.preventDefault(); 
+        const pos = getPointerPos(e);
+        const w = pos.x - startX;
+        const h = pos.y - startY;
+        selectionBox.style.width = Math.abs(w) + 'px';
+        selectionBox.style.height = Math.abs(h) + 'px';
+        selectionBox.style.left = (w < 0 ? pos.x : startX) + 'px';
+        selectionBox.style.top = (h < 0 ? pos.y : startY) + 'px';
+    }
+
+    function endDraw(e) {
+        if (!isDrawing) return;
+        isDrawing = false;
+        document.body.style.overflow = ''; 
+
+        const rect = selectionBox.getBoundingClientRect();
+        const wrapperRect = wrapper.getBoundingClientRect();
+        const scale = 1 / currentZoom;
+
+        const x = (rect.left - wrapperRect.left) * scale;
+        const y = (rect.top - wrapperRect.top) * scale;
+        const w = rect.width * scale;
+        const h = rect.height * scale;
+
+        if (w > 5 && h > 5) {
+            doOCR(x, y, w, h);
+        }
+    }
+
+    wrapper.addEventListener('mousedown', startDraw);
+    window.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+    wrapper.addEventListener('touchstart', startDraw, {passive: false});
+    window.addEventListener('touchmove', moveDraw, {passive: false});
+    window.addEventListener('touchend', endDraw);
+
+    async function doOCR(x, y, w, h) {
+        statusMsg.innerText = "⏳ Lezen...";
+        resultBox.value = "...";
+        
+        try {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = w;
+            tempCanvas.height = h;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.drawImage(canvas, x, y, w, h, 0, 0, w, h);
+
+            const result = await Tesseract.recognize(tempCanvas.toDataURL(), 'nld+eng');
+            const cleanText = result.data.text.trim();
+            
+            resultBox.value = cleanText;
+            statusMsg.innerText = cleanText ? "Gevonden! Druk op Enter om te kopiëren." : "Geen tekst.";
+            
+            // --- AUTO FOCUS LOGICA ---
+            // We zetten de focus op de kopieer knop
+            // Hierdoor hoeft de gebruiker alleen op 'Enter' te drukken
+            if(cleanText) {
+                copyBtn.focus();
+            }
+            
+        } catch (err) {
+            statusMsg.innerText = "Fout";
+            console.error(err);
+        }
+    }
+
+    function copyText() {
+        const text = resultBox.value;
+        if(text) {
+            navigator.clipboard.writeText(text);
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = "✔ GEKOPIEERD";
+            copyBtn.style.backgroundColor = "#22c55e"; // Groen
+            
+            setTimeout(() => {
+                copyBtn.innerText = originalText;
+                copyBtn.style.backgroundColor = ""; // Reset kleur
+            }, 1500);
+        }
+    }
+</script>
+
+</body>
+</html>
