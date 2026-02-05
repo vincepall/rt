@@ -143,7 +143,8 @@
                                 <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-dark-400 uppercase tracking-wider">X-Ray Indicatie</th>
                             </tr>
                         </thead>
-                        <tbody id="defects-body" class="divide-y divide-dark-700">
+                        <!-- Changed divide-y to divide-y-2 and divide-dark-700 to divide-dark-600 for bolder lines -->
+                        <tbody id="defects-body" class="divide-y-2 divide-dark-600">
                             <!-- Rows inserted via JS -->
                         </tbody>
                     </table>
@@ -259,13 +260,13 @@
                 "en3": "Niet toegestaan" // Corrected: Cracks are not permitted in any level.
             },
             "2011": { // Gas Pore
-                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "asme": "t≤50: 1/4t (max 4mm) | Geïsoleerd (>25mm): 1/3t (max 6mm) | t>50: 10mm",
                 "en1": "A ≤ 1%, d ≤ 0.2s (max 3mm)",
                 "en2": "A ≤ 1.5%, d ≤ 0.3s (max 4mm)",
                 "en3": "A ≤ 2.5%, d ≤ 0.4s (max 5mm)"
             },
             "2013": { // Clustered Porosity
-                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "asme": "t≤50: 1/4t (max 4mm) | Geïsoleerd (>25mm): 1/3t (max 6mm) | t>50: 10mm",
                 "en1": "dA ≤ Wp/2 (max 15mm)",
                 "en2": "dA ≤ Wp (max 20mm)",
                 "en3": "dA ≤ Wp (max 25mm)"
@@ -295,7 +296,7 @@
                 "en3": "h < 0.4s (max 4mm), Σl ≤ s, max 75mm"
             },
             "304": { // Tungsten
-                "asme": "Zie Par. 7.1.2 (Rounded Indications)",
+                "asme": "t≤50: 1/4t (max 4mm) | Geïsoleerd (>25mm): 1/3t (max 6mm) | t>50: 10mm",
                 "en1": "l ≤ 0.2s (max 2mm)",
                 "en2": "l ≤ 0.3s (max 3mm)",
                 "en3": "l ≤ 0.4s (max 4mm)"
@@ -404,16 +405,32 @@
                     const row = document.createElement('tr');
                     row.className = 'defect-row group animate-fade-in';
                     
-                    // Retrieve Criteria text if active
-                    let criteriaText = "";
+                    // Retrieve and Format Criteria text if active
+                    let criteriaContent = "-";
                     if (currentNorm !== 'none' && criteria[defect.code]) {
-                        criteriaText = criteria[defect.code][currentNorm] || "-";
+                        const rawText = criteria[defect.code][currentNorm] || "-";
+                        
+                        // Split by | for line breaks
+                        const parts = rawText.split('|').map(p => p.trim());
+                        
+                        if (parts.length > 1) {
+                            // Map parts to divs separated by a horizontal line
+                            criteriaContent = parts.map((part, index) => {
+                                // Add a horizontal separator line between items (not after the last one)
+                                if (index < parts.length - 1) {
+                                    return `<div>${part}</div><div class="h-px w-full bg-white/10 my-2"></div>`;
+                                }
+                                return `<div>${part}</div>`;
+                            }).join('');
+                        } else {
+                            criteriaContent = rawText;
+                        }
                     }
 
                     // Build Criteria Cell HTML
                     const criteriaCell = currentNorm === 'none' ? '' : `
-                        <td class="px-6 py-4 text-sm font-mono text-accent-yellow bg-dark-900/30 align-top border-l border-dark-700/50">
-                            ${criteriaText}
+                        <td class="px-6 py-4 text-sm font-mono text-accent-yellow bg-dark-900/30 align-top border-l border-dark-700/50 leading-relaxed">
+                            ${criteriaContent}
                         </td>
                     `;
 
