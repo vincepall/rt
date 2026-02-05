@@ -85,6 +85,7 @@
                 <div class="relative group">
                     <select id="process-select" class="block w-full pl-4 pr-10 py-3 text-base bg-dark-900 border border-dark-600 text-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 rounded-md transition-all appearance-none cursor-pointer hover:border-gray-500 hover:bg-black/20">
                         <option value="" disabled selected>-- Selecteer Lasmethode --</option>
+                        <option value="all" class="font-bold text-accent-yellow">Toon alle fouten (Overzicht)</option>
                         <option value="111">111 - BMBE (SMAW)</option>
                         <option value="121">121 - OP (SAW)</option>
                         <option value="131">131 - MIG (GMAW - Inert)</option>
@@ -237,6 +238,7 @@
         // --- Data Definitions ---
 
         const processes = {
+            "all": { abbr: "Overzicht", full: "Alle Lasfouten", desc: "Complete Overview" },
             "111": { abbr: "BMBE", full: "Booglassen met beklede elektrode", desc: "Manual Metal Arc Welding (SMAW)" },
             "121": { abbr: "OP", full: "Onder Poederdek", desc: "Submerged Arc Welding (SAW)" },
             "131": { abbr: "MIG", full: "Metaal Inert Gas", desc: "Metal Inert Gas (GMAW) - Solid Wire" },
@@ -373,14 +375,21 @@
 
             // Update UI Labels
             const processInfo = processes[currentProcess];
-            document.getElementById('result-title-code').textContent = currentProcess;
+            if (currentProcess === 'all') {
+                 document.getElementById('result-title-code').textContent = "Overzicht";
+            } else {
+                 document.getElementById('result-title-code').textContent = currentProcess;
+            }
             document.getElementById('result-title-abbr').textContent = processInfo.abbr;
             document.getElementById('result-title-full').textContent = `${processInfo.full} (${processInfo.desc})`;
 
             // Filter Defects
-            const validDefects = defects
-                .filter(d => d.valid.includes(currentProcess))
-                .sort((a, b) => parseInt(a.code) - parseInt(b.code));
+            let validDefects = defects;
+            if (currentProcess !== 'all') {
+                validDefects = defects.filter(d => d.valid.includes(currentProcess));
+            }
+            
+            validDefects = validDefects.sort((a, b) => parseInt(a.code) - parseInt(b.code));
 
             // Handle Norm Column Visibility & Legend
             if (currentNorm === 'none') {
