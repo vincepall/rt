@@ -66,6 +66,7 @@ const FILES_TO_CACHE = [
   "/rt/tekens.html",
   "/rt/opnames.html",
   "/rt/print_overzicht.html",
+  "/rt/lasfout.html",
   "/rt/filmvoorraad.html",
 ];
 
