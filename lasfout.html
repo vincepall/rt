@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="nl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RT Lasfouten (Dark Mode)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Katex for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0f172a', // Main bg
+                            800: '#1e293b', // Cards
+                            700: '#334155', // Borders/Hover
+                            600: '#475569', // Muted text
+                            300: '#cbd5e1', // Primary text
+                            100: '#f1f5f9', // Headings
+                        },
+                        accent: {
+                            blue: '#3b82f6',
+                            glow: 'rgba(59, 130, 246, 0.5)',
+                            yellow: '#F5DF4D'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f172a;
+        }
+        .defect-row {
+            transition: all 0.2s ease;
+        }
+        .defect-row:hover {
+            background-color: #334155;
+        }
+        select option {
+            background-color: #1e293b;
+            color: white;
+        }
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="text-dark-300 min-h-screen flex flex-col">
+
+    <!-- Top Navigation -->
+    <nav class="bg-dark-800 border-b border-dark-700 shadow-lg p-4 flex items-center fixed w-full top-0 z-50">
+        <a href="https://vincepall.github.io/rt/index.html" class="flex items-center gap-2 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors font-semibold px-3 py-2 rounded">
+            <i class="fa-solid fa-house text-accent-yellow"></i>
+            <span>Home</span>
+        </a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 pt-24 pb-12 max-w-6xl">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-accent-yellow mb-2 tracking-tight">RT Lasfouten</h1>
+            <p class="text-accent-yellow">Selecteer lasproces en beoordelingsnorm</p>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="bg-dark-800 rounded-lg shadow-md p-6 mb-8 border border-dark-600 grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Process Selector -->
+            <div>
+                <label for="process-select" class="block text-xs font-bold text-dark-300 mb-2 uppercase tracking-wider">Lasproces</label>
+                <div class="relative group">
+                    <select id="process-select" class="block w-full pl-4 pr-10 py-3 text-base bg-dark-900 border border-dark-600 text-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 rounded-md transition-all appearance-none cursor-pointer hover:border-gray-500 hover:bg-black/20">
+                        <option value="" disabled selected>-- Selecteer Lasmethode --</option>
+                        <option value="111">111 - BMBE (SMAW)</option>
+                        <option value="121">121 - OP (SAW)</option>
+                        <option value="131">131 - MIG (GMAW - Inert)</option>
+                        <option value="135">135 - MAG (GMAW - Active)</option>
+                        <option value="136">136 - MAG (FCAW - Flux Cored)</option>
+                        <option value="141">141 - TIG (GTAW)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-dark-400 group-hover:text-gray-200 transition-colors">
+                        <i class="fa-solid fa-chevron-down text-sm"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Norm Selector -->
+            <div>
+                <label for="norm-select" class="block text-xs font-bold text-dark-300 mb-2 uppercase tracking-wider">Beoordelingsnorm (Acceptatie)</label>
+                <div class="relative group">
+                    <select id="norm-select" class="block w-full pl-4 pr-10 py-3 text-base bg-dark-900 border border-dark-600 text-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 rounded-md transition-all appearance-none cursor-pointer hover:border-gray-500 hover:bg-black/20">
+                        <option value="none" selected>- (Geen criteria tonen)</option>
+                        <option value="asme">ASME V. UW 51</option>
+                        <option value="en1">EN Level 1 (Hoogste eis)</option>
+                        <option value="en2">EN Level 2 (Normale eis)</option>
+                        <option value="en3">EN Level 3 (Laagste eis)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-dark-400 group-hover:text-gray-200 transition-colors">
+                        <i class="fa-solid fa-chevron-down text-sm"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-container" class="hidden opacity-0 transition-opacity duration-500">
+            <!-- Header for Selected Process -->
+            <div class="bg-gradient-to-r from-dark-800 to-dark-900 rounded-t-xl border border-dark-700 border-b-0 p-6 flex flex-col md:flex-row md:items-center justify-between">
+                <div>
+                    <div class="flex items-baseline gap-3">
+                        <h2 id="result-title-code" class="text-4xl font-black text-white tracking-tighter drop-shadow-lg"></h2>
+                        <span id="result-title-abbr" class="text-xl text-gray-400 font-mono font-bold"></span>
+                    </div>
+                </div>
+                <div id="result-title-full" class="mt-2 md:mt-0 text-sm md:text-right text-gray-500 italic max-w-xs border-l-2 border-gray-600 pl-3 md:border-l-0 md:border-r-2 md:pl-0 md:pr-3"></div>
+            </div>
+
+            <!-- Defects Table -->
+            <div class="bg-dark-800 rounded-b-xl shadow-2xl overflow-hidden border border-dark-700">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-dark-700">
+                        <thead class="bg-dark-900/50">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-dark-400 uppercase tracking-wider w-20">Code</th>
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-dark-400 uppercase tracking-wider w-1/4">Benaming / Designation</th>
+                                <!-- Extra header for criteria moved here -->
+                                <th id="header-criteria" scope="col" class="px-6 py-4 text-left text-xs font-bold text-dark-400 uppercase tracking-wider hidden w-1/3">Acceptatiecriteria</th>
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-dark-400 uppercase tracking-wider">X-Ray Indicatie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="defects-body" class="divide-y divide-dark-700">
+                            <!-- Rows inserted via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="empty-state" class="p-12 text-center text-dark-600 hidden flex flex-col items-center">
+                    <i class="fa-regular fa-folder-open text-4xl mb-3 opacity-50"></i>
+                    <span>Geen specifieke RT fouten gevonden voor deze selectie.</span>
+                </div>
+            </div>
+            
+            <!-- Legend for Criteria -->
+            <div id="criteria-legend" class="hidden mt-6 bg-dark-900/50 p-6 rounded-lg border border-dark-700 shadow-inner">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <!-- Text Legend -->
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-200 mb-4 uppercase tracking-wider border-b border-dark-600 pb-2 inline-block">Legenda Afkortingen</h4>
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-xs text-gray-400">
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">t</span> <span class="text-gray-500">➜</span> Wanddikte (Materiaal)</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">s</span> <span class="text-gray-500">➜</span> Lasdikte (Nominaal)</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">l</span> <span class="text-gray-500">➜</span> Lengte indicatie</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">h</span> <span class="text-gray-500">➜</span> Breedte/Hoogte indicatie</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">d</span> <span class="text-gray-500">➜</span> Diameter porie</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">Wp</span> <span class="text-gray-500">➜</span> Lasbreedte</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">A</span> <span class="text-gray-500">➜</span> Oppervlakte %</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">Σl</span> <span class="text-gray-500">➜</span> Totaallengte (Som)</div>
+                            <div class="flex items-center gap-2"><span class="font-mono text-accent-yellow font-bold bg-dark-800 px-1 rounded">L</span> <span class="text-gray-500">➜</span> Beoordeelde lengte</div>
+                        </div>
+                    </div>
+
+                    <!-- Schematic Diagram -->
+                    <div class="flex-1 flex justify-center items-center bg-dark-800/50 p-4 rounded border border-dark-700/50">
+                        <svg width="320" height="150" viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Definitions -->
+                            <defs>
+                                <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+                                    <path d="M0,0 L0,6 L6,3 z" fill="#F5DF4D" />
+                                </marker>
+                            </defs>
+                            
+                            <!-- TOP VIEW ONLY -->
+                            <text x="10" y="20" fill="#64748b" font-size="10" font-weight="bold">BOVENAANZICHT (TOP VIEW)</text>
+
+                            <!-- Plate Outline -->
+                            <rect x="20" y="35" width="280" height="80" fill="#1e293b" stroke="#334155"/>
+                            
+                            <!-- Weld Bead -->
+                            <rect x="20" y="55" width="280" height="40" fill="#334155" stroke="none" opacity="0.5"/>
+                            <!-- Weld Ripples -->
+                            <path d="M20 55 Q30 75 20 95 M50 55 Q60 75 50 95 M80 55 Q90 75 80 95 M110 55 Q120 75 110 95 M140 55 Q150 75 140 95 M170 55 Q180 75 170 95 M200 55 Q210 75 200 95 M230 55 Q240 75 230 95 M260 55 Q270 75 260 95 M290 55 Q300 75 290 95" stroke="#475569" fill="none"/>
+
+                            <!-- Defect (Longitudinal - e.g. Slag/Cavity) -->
+                            <rect x="80" y="72" width="40" height="8" rx="2" fill="#000" stroke="#F5DF4D"/>
+                            
+                            <!-- Defect (Pore) -->
+                            <circle cx="180" cy="75" r="5" fill="#000" stroke="#F5DF4D"/>
+
+                            <!-- Dimensions -->
+                            
+                            <!-- l (length) -->
+                            <line x1="80" y1="90" x2="120" y2="90" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                            <text x="98" y="105" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">l</text>
+
+                            <!-- h (width/height in top view) -->
+                            <line x1="70" y1="72" x2="70" y2="80" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                            <line x1="70" y1="76" x2="80" y2="76" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                            <text x="55" y="80" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">h</text>
+
+                            <!-- d (diameter) -->
+                            <line x1="180" y1="75" x2="195" y2="60" stroke="#F5DF4D" stroke-width="1"/>
+                            <text x="198" y="60" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">d</text>
+
+                            <!-- Wp (Weld Width) -->
+                            <line x1="280" y1="55" x2="280" y2="95" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                            <text x="285" y="80" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">Wp</text>
+
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-start gap-2 text-xs text-dark-600 bg-dark-800/50 p-3 rounded border border-dark-700/50">
+                <i class="fa-solid fa-circle-info mt-0.5 text-gray-500"></i>
+                <p>Deze lijst bevat alleen fouten die radiografisch (RT) van belang zijn. <span id="spec-note" class="text-accent-yellow/80"></span></p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- Data Definitions ---
+
+        const processes = {
+            "111": { abbr: "BMBE", full: "Booglassen met beklede elektrode", desc: "Manual Metal Arc Welding (SMAW)" },
+            "121": { abbr: "OP", full: "Onder Poederdek", desc: "Submerged Arc Welding (SAW)" },
+            "131": { abbr: "MIG", full: "Metaal Inert Gas", desc: "Metal Inert Gas (GMAW) - Solid Wire" },
+            "135": { abbr: "MAG", full: "Metaal Actief Gas", desc: "Metal Active Gas (GMAW) - Solid Wire" },
+            "136": { abbr: "MAG (Gevuld)", full: "Booglassen met gevulde draad", desc: "Flux Cored Arc Welding (FCAW)" },
+            "141": { abbr: "TIG", full: "Tungsten Inert Gas", desc: "Gas Tungsten Arc Welding (GTAW)" }
+        };
+
+        // Criteria Database based on ASME V UW 51 and EN ISO 5817/10675
+        const criteria = {
+            "100": { // Crack
+                "asme": "Niet toegestaan (Not permitted)",
+                "en1": "Niet toegestaan",
+                "en2": "Niet toegestaan",
+                "en3": "Niet toegestaan"
+            },
+            "104": { // Crater Crack
+                "asme": "Niet toegestaan",
+                "en1": "Niet toegestaan",
+                "en2": "Niet toegestaan",
+                "en3": "Niet toegestaan" // Corrected: Cracks are not permitted in any level.
+            },
+            "2011": { // Gas Pore
+                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "en1": "A ≤ 1%, d ≤ 0.2s (max 3mm)",
+                "en2": "A ≤ 1.5%, d ≤ 0.3s (max 4mm)",
+                "en3": "A ≤ 2.5%, d ≤ 0.4s (max 5mm)"
+            },
+            "2013": { // Clustered Porosity
+                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "en1": "dA ≤ Wp/2 (max 15mm)",
+                "en2": "dA ≤ Wp (max 20mm)",
+                "en3": "dA ≤ Wp (max 25mm)"
+            },
+            "2015": { // Elongated cavity
+                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "en1": "h < 0.2s (max 2mm), Σl ≤ s, max 25mm",
+                "en2": "h < 0.3s (max 3mm), Σl ≤ s, max 50mm",
+                "en3": "h < 0.4s (max 4mm), Σl ≤ s, max 75mm"
+            },
+            "2016": { // Wormhole
+                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "en1": "h < 0.2s (max 2mm), Σl ≤ s, max 25mm",
+                "en2": "h < 0.3s (max 3mm), Σl ≤ s, max 50mm",
+                "en3": "h < 0.4s (max 4mm), Σl ≤ s, max 75mm"
+            },
+            "301": { // Slag
+                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "en1": "h < 0.2s (max 2mm), Σl ≤ s, max 25mm",
+                "en2": "h < 0.3s (max 3mm), Σl ≤ s, max 50mm",
+                "en3": "h < 0.4s (max 4mm), Σl ≤ s, max 75mm"
+            },
+            "303": { // Oxide
+                "asme": "t≤19: 6mm | 19&lt;t≤57: 1/3t | t&gt;57: 19mm",
+                "en1": "h < 0.2s (max 2mm), Σl ≤ s, max 25mm",
+                "en2": "h < 0.3s (max 3mm), Σl ≤ s, max 50mm",
+                "en3": "h < 0.4s (max 4mm), Σl ≤ s, max 75mm"
+            },
+            "304": { // Tungsten
+                "asme": "Zie Par. 7.1.2 (Rounded Indications)",
+                "en1": "l ≤ 0.2s (max 2mm)",
+                "en2": "l ≤ 0.3s (max 3mm)",
+                "en3": "l ≤ 0.4s (max 4mm)"
+            },
+            "401": { // LoF
+                "asme": "Niet toegestaan (Not permitted)",
+                "en1": "Niet toegestaan",
+                "en2": "Niet toegestaan",
+                "en3": "Toegestaan (mits niet aan opp.), l ≤ 0.4s (max 4mm), Σl ≤ 25mm"
+            },
+            "402": { // LoP
+                "asme": "Niet toegestaan (Not permitted)",
+                "en1": "Niet toegestaan",
+                "en2": "Niet toegestaan",
+                "en3": "Σl ≤ 25mm"
+            },
+            "5011": { // Undercut
+                "asme": "Visueel onderzoeken",
+                "en1": "Visueel onderzoeken",
+                "en2": "Visueel onderzoeken",
+                "en3": "Visueel onderzoeken"
+            },
+            "510": { // Burn through
+                "asme": "Visueel onderzoeken",
+                "en1": "Visueel onderzoeken",
+                "en2": "Visueel onderzoeken",
+                "en3": "Visueel onderzoeken"
+            }
+        };
+
+        const defects = [
+            { code: "100", nl: "Scheur", en: "Crack", rt_desc: "Donkere, grillige lijn; soms zeer fijn en vaag", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "104", nl: "Eindkrater scheur", en: "Crater crack", rt_desc: "Stervormig donker lijnenpatroon aan einde las", valid: ["111", "131", "135", "136", "141"] },
+            { code: "2011", nl: "Gasinsluitsel (Porie)", en: "Gas pore", rt_desc: "Ronde of onregelmatige donkere vlek (lagere dichtheid)", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "2013", nl: "Nestvormige porositeit", en: "Clustered porosity", rt_desc: "Groep van ronde/onregelmatige vlekjes dicht bijeen", valid: ["111", "131", "135", "136"] },
+            { code: "2015", nl: "Gaskanaal", en: "Elongated cavity", rt_desc: "Langwerpige donkere vlek (buisvormig)", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "2016", nl: "Wormgat", en: "Wormhole", rt_desc: "Langwerpige holte, soms met een 'staart' (visgraat)", valid: ["111", "121", "136"] },
+            { code: "301", nl: "Slakinsluitsel", en: "Slag inclusion", rt_desc: "Donkere, grillige en asymmetrische vormen", valid: ["111", "121", "136"] },
+            { code: "304", nl: "Wolfraaminsluitsel", en: "Tungsten inclusion", rt_desc: "Zeer heldere/witte vlek met duidelijke contour", valid: ["141"] },
+            { code: "303", nl: "Oxide-insluitsel", en: "Oxide inclusion", rt_desc: "Onregelmatige donkere vlek (minder dicht dan materiaal)", valid: ["131", "135", "136", "141"] },
+            { code: "401", nl: "Bindingsfout", en: "Lack of fusion", rt_desc: "Donkere lijn(en) georiënteerd in lengterichting lasnaad", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "402", nl: "Onvolkomen doorlassing", en: "Lack of penetration", rt_desc: "Donkere lijn met strakke rechte randen (in midden)", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "5011", nl: "Randinkarteling", en: "Undercut", rt_desc: "Donkere onregelmatige lijn aan de lasrand (niet strak)", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "510", nl: "Doorbranden", en: "Burn through", rt_desc: "Donkere vlek omgeven door lichtere ring (kegels)", valid: ["111", "131", "135", "136", "141"] }
+        ];
+
+        // --- Logic ---
+
+        const selectProcess = document.getElementById('process-select');
+        const selectNorm = document.getElementById('norm-select');
+        const resultsContainer = document.getElementById('results-container');
+        const defectsBody = document.getElementById('defects-body');
+        const headerCriteria = document.getElementById('header-criteria');
+        const specNote = document.getElementById('spec-note');
+        const criteriaLegend = document.getElementById('criteria-legend');
+
+        // State variables
+        let currentProcess = "";
+        let currentNorm = "none";
+
+        // Event Listeners
+        selectProcess.addEventListener('change', (e) => {
+            currentProcess = e.target.value;
+            updateDisplay();
+        });
+
+        selectNorm.addEventListener('change', (e) => {
+            currentNorm = e.target.value;
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            if (!currentProcess) return;
+
+            // Update UI Labels
+            const processInfo = processes[currentProcess];
+            document.getElementById('result-title-code').textContent = currentProcess;
+            document.getElementById('result-title-abbr').textContent = processInfo.abbr;
+            document.getElementById('result-title-full').textContent = `${processInfo.full} (${processInfo.desc})`;
+
+            // Filter Defects
+            const validDefects = defects
+                .filter(d => d.valid.includes(currentProcess))
+                .sort((a, b) => parseInt(a.code) - parseInt(b.code));
+
+            // Handle Norm Column Visibility & Legend
+            if (currentNorm === 'none') {
+                headerCriteria.classList.add('hidden');
+                criteriaLegend.classList.add('hidden');
+                specNote.textContent = "";
+            } else {
+                headerCriteria.classList.remove('hidden');
+                criteriaLegend.classList.remove('hidden');
+                specNote.textContent = `Criteria getoond voor: ${selectNorm.options[selectNorm.selectedIndex].text}`;
+            }
+
+            // Render Table
+            defectsBody.innerHTML = '';
+            
+            if (validDefects.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+            } else {
+                document.getElementById('empty-state').classList.add('hidden');
+                
+                validDefects.forEach(defect => {
+                    const row = document.createElement('tr');
+                    row.className = 'defect-row group animate-fade-in';
+                    
+                    // Retrieve Criteria text if active
+                    let criteriaText = "";
+                    if (currentNorm !== 'none' && criteria[defect.code]) {
+                        criteriaText = criteria[defect.code][currentNorm] || "-";
+                    }
+
+                    // Build Criteria Cell HTML
+                    const criteriaCell = currentNorm === 'none' ? '' : `
+                        <td class="px-6 py-4 text-sm font-mono text-accent-yellow bg-dark-900/30 align-top border-l border-dark-700/50">
+                            ${criteriaText}
+                        </td>
+                    `;
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap align-top">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded text-xs font-bold bg-dark-700 text-gray-300 border border-dark-600 group-hover:border-gray-500 group-hover:text-white transition-colors shadow-sm min-w-[3rem]">
+                                ${defect.code}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-200 group-hover:text-white align-top">
+                            <div>${defect.nl}</div>
+                            <div class="text-xs text-dark-500 italic font-normal group-hover:text-dark-400 mt-1">${defect.en}</div>
+                        </td>
+                        ${criteriaCell}
+                         <td class="px-6 py-4 text-sm text-gray-400 group-hover:text-gray-300 align-top">
+                            <div class="flex items-start gap-2">
+                                <i class="fa-regular fa-eye text-gray-600 group-hover:text-gray-400 mt-1"></i>
+                                <span>${defect.rt_desc}</span>
+                            </div>
+                        </td>
+                    `;
+                    defectsBody.appendChild(row);
+                });
+            }
+
+            resultsContainer.classList.remove('hidden');
+            resultsContainer.style.opacity = '1';
+        }
+    </script>
+</body>
+</html>
