@@ -194,7 +194,6 @@
 
         .status-active { background-color: #2e7d32; color: white; }
         .status-error { background-color: #c62828; color: white; }
-        .status-warn { background-color: #F5DF4D; color: #333; }
 
         .header-action {
             display: flex;
@@ -242,8 +241,10 @@
 
     <!-- Uitlezen Card -->
     <div class="calculator-card">
-        <div id="sensor-status" class="status-badge status-error" style="display: block; text-align: center; margin-top: 0; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> Sensor niet actief
+        <div style="text-align: center;">
+            <div id="sensor-status" class="status-badge status-error" style="display: block; margin-top: 0; margin-bottom: 15px;">
+                <i class="fas fa-video"></i> Selfie camera toestemming nodig...
+            </div>
         </div>
 
         <div class="result-box">
@@ -251,10 +252,14 @@
             <span class="time-big" id="calibrated-val">0.0 <span style="font-size: 1.5rem;">lx</span></span>
             
             <div class="debug-info" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
-                Ruwe Sensor: <span id="raw-val" style="color: #fff;">--</span> lx
+                Ruwe Sensor (Helderheid): <span id="raw-val" style="color: #fff;">--</span>
             </div>
             <div id="calibration-badge" class="status-badge">Niet Gekalibreerd</div>
         </div>
+        
+        <!-- Verborgen video element voor de camera -->
+        <video id="video-stream" style="display: none;" playsinline autoplay></video>
+        <canvas id="hidden-canvas" style="display: none;"></canvas>
     </div>
 
     <!-- Kalibratie Card -->
@@ -265,7 +270,7 @@
         </div>
 
         <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 20px;">
-            Voer de waarde van een echte luxmeter in en klik op de plus. (Min. 5 punten)
+            Houd de <strong>selfie camera</strong> onder de lichtbron, lees het scherm af. Voer de waarde in van je luxmeter en klik op de plus. (Min. 5 punten)
         </p>
 
         <div class="input-group">
@@ -279,7 +284,7 @@
         <table class="points-table">
             <thead>
                 <tr>
-                    <th>Telefoon</th>
+                    <th>Selfie Cam</th>
                     <th>Echte Meter</th>
                     <th></th>
                 </tr>
@@ -315,43 +320,56 @@
         const badgeEl = document.getElementById('calibration-badge');
         const refInput = document.getElementById('ref-input');
 
-        // --- Sensor Setup ---
-        function initSensor() {
-            if ('AmbientLightSensor' in window) {
-                try {
-                    const sensor = new AmbientLightSensor();
-                    
-                    sensor.addEventListener('reading', () => {
-                        sensorReading = sensor.illuminance;
-                        updateDisplay();
-                    });
+        // --- Camera Sensor Setup (Selfie Camera) ---
+        async function initCameraSensor() {
+            try {
+                // Vraag toestemming voor de voorste camera (selfie) via facingMode: 'user'
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' } 
+                });
+                
+                const video = document.getElementById('video-stream');
+                video.srcObject = stream;
+                
+                const canvas = document.getElementById('hidden-canvas');
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-                    sensor.addEventListener('error', (event) => {
-                        showError(event.error.name, event.error.message);
-                    });
-
-                    sensor.start();
+                video.addEventListener('playing', () => {
+                    canvas.width = video.videoWidth / 4; // Verklein voor prestaties
+                    canvas.height = video.videoHeight / 4;
                     
                     sensorActive = true;
-                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Sensor Actief';
+                    statusEl.innerHTML = '<i class="fas fa-camera"></i> Selfie Camera Actief';
                     statusEl.className = 'status-badge status-active';
-                    statusEl.style.display = 'block';
-                    statusEl.style.textAlign = 'center';
-                    
-                } catch (err) {
-                    showError("Init Error", err.message);
-                }
-            } else {
-                showError("Niet Ondersteund", "Browser mist sensor ondersteuning.");
-            }
-        }
 
-        function showError(name, msg) {
-            statusEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Fout: ${name}`;
-            statusEl.className = 'status-badge status-error';
-            statusEl.style.display = 'block';
-            statusEl.style.textAlign = 'center';
-            console.error(msg);
+                    // Update de helderheid elke halve seconde
+                    setInterval(() => {
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = frame.data;
+                        let sum = 0;
+                        
+                        // Bereken de luminantie (perceived brightness)
+                        for(let i = 0; i < data.length; i += 16) {
+                            const r = data[i];
+                            const g = data[i+1];
+                            const b = data[i+2];
+                            sum += (r * 0.299 + g * 0.587 + b * 0.114);
+                        }
+                        
+                        const avgLuminance = sum / (data.length / 16);
+                        
+                        // Vermenigvuldig met 10 om een groter getal te krijgen voor makkelijkere kalibratie
+                        sensorReading = avgLuminance * 10; 
+                        updateDisplay();
+                    }, 500);
+                });
+
+            } catch (err) {
+                statusEl.innerHTML = `<i class="fas fa-video-slash"></i> Camera geblokkeerd`;
+                statusEl.className = 'status-badge status-error';
+                alert("Geef toestemming voor de camera om deze als lichtsensor te gebruiken.");
+            }
         }
 
         // --- Core Logic ---
@@ -377,7 +395,7 @@
             }
             
             if (!sensorActive && sensorReading === 0) {
-               if(!confirm("De sensor leest 0. Wil je dit punt toch opslaan?")) return;
+               if(!confirm("De sensor leest 0. Geef camera toestemming. Toch opslaan?")) return;
             }
 
             points.push({ x: sensorReading, y: refVal });
@@ -433,7 +451,7 @@
             const denominator = (n * sumXX) - (sumX * sumX);
             
             if (denominator === 0) {
-                alert("Fout in berekening: De sensorwaarden zijn te identiek. Varieer de lichtsterkte meer.");
+                alert("Fout: Varieer het licht meer tijdens het meten.");
                 return;
             }
 
@@ -456,7 +474,7 @@
         }
 
         function resetCalibration() {
-            if(!confirm("Weet je zeker dat je alle punten en kalibratie wilt wissen?")) return;
+            if(!confirm("Weet je zeker dat je alle punten wilt wissen?")) return;
             
             points = [];
             calibration = { slope: 1, intercept: 0, active: false };
@@ -469,8 +487,8 @@
             updateDisplay();
         }
 
-        // Start App
-        initSensor();
+        // Start Camera Check
+        initCameraSensor();
 
     </script>
 </body>
