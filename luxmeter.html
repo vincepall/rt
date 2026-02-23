@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lux Kalibrator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background-color: #4a4a4a;
+            color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #F5DF4D;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-top: 20px;
+        }
+
+        .home-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 24px;
+            text-decoration: none;
+            z-index: 10;
+        }
+        
+        .home-icon:hover {
+            color: #F5DF4D;
+        }
+
+        .calculator-card {
+            background: #333;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #555;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #f4f4f4;
+            font-size: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #F5DF4D;
+            box-shadow: 0 0 5px rgba(245, 223, 77, 0.5);
+        }
+
+        .result-box {
+            margin-top: 10px;
+            background-color: #222;
+            border: 2px solid #F5DF4D;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .time-big {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #F5DF4D;
+            display: block;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .debug-info {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        /* App specifieke stijlen */
+        .flex-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            background-color: #F5DF4D;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Roboto Condensed', sans-serif;
+            width: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #e6ce3b;
+        }
+
+        .btn:disabled {
+            background-color: #555;
+            color: #888;
+            cursor: not-allowed;
+            border: 1px solid #444;
+        }
+
+        .btn-icon {
+            width: auto;
+            padding: 12px 20px;
+            background-color: #555;
+            color: #fff;
+        }
+
+        .btn-icon:hover {
+            background-color: #666;
+        }
+
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 1rem;
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .points-table th, .points-table td {
+            border-bottom: 1px solid #333;
+            padding: 10px 8px;
+            text-align: left;
+        }
+
+        .points-table th {
+            color: #aaa;
+            font-weight: normal;
+            font-size: 0.9rem;
+            background-color: #1a1a1a;
+        }
+
+        .delete-btn {
+            color: #ff4d4d;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            padding: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            background-color: #555;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .status-active { background-color: #2e7d32; color: white; }
+        .status-error { background-color: #c62828; color: white; }
+        .status-warn { background-color: #F5DF4D; color: #333; }
+
+        .header-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 10px;
+        }
+
+        .header-action h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #f4f4f4;
+        }
+
+        .reset-link {
+            color: #aaa;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+
+        .reset-link:hover { color: #fff; }
+
+        @media (max-width: 600px) {
+            .calculator-card {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="https://vincepall.github.io/rt/index.html" class="home-icon"><i class="fas fa-home"></i></a>
+
+    <h1>Lux Kalibrator</h1>
+
+    <!-- Uitlezen Card -->
+    <div class="calculator-card">
+        <div id="sensor-status" class="status-badge status-error" style="display: block; text-align: center; margin-top: 0; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> Sensor niet actief
+        </div>
+
+        <div class="result-box">
+            <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 5px; text-transform: uppercase;">Gekalibreerde Waarde</div>
+            <span class="time-big" id="calibrated-val">0.0 <span style="font-size: 1.5rem;">lx</span></span>
+            
+            <div class="debug-info" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+                Ruwe Sensor: <span id="raw-val" style="color: #fff;">--</span> lx
+            </div>
+            <div id="calibration-badge" class="status-badge">Niet Gekalibreerd</div>
+        </div>
+    </div>
+
+    <!-- Kalibratie Card -->
+    <div class="calculator-card">
+        <div class="header-action">
+            <h2><i class="fas fa-balance-scale"></i> Kalibratie</h2>
+            <button onclick="resetCalibration()" class="reset-link">Reset</button>
+        </div>
+
+        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 20px;">
+            Voer de waarde van een echte luxmeter in en klik op de plus. (Min. 5 punten)
+        </p>
+
+        <div class="input-group">
+            <label for="ref-input">Echte meter waarde (lx)</label>
+            <div class="flex-row">
+                <input type="number" id="ref-input" placeholder="Bijv. 450">
+                <button class="btn btn-icon" onclick="addPoint()"><i class="fas fa-plus"></i></button>
+            </div>
+        </div>
+
+        <table class="points-table">
+            <thead>
+                <tr>
+                    <th>Telefoon</th>
+                    <th>Echte Meter</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="points-list">
+                <tr><td colspan="3" style="text-align:center; color:#888; padding: 15px;">Nog geen meetpunten</td></tr>
+            </tbody>
+        </table>
+
+        <button id="calibrate-btn" class="btn" onclick="applyCalibration()" disabled style="margin-top: 20px;">
+            Bereken Curve (<span id="count-display">0</span>/5)
+        </button>
+
+        <div id="formula-display" class="debug-info" style="display: none; text-align: center; margin-top: 15px; color: #F5DF4D;">
+            y = <span id="slope-val">1.00</span>x + <span id="intercept-val">0.00</span>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let sensorReading = 0;
+        let points = [];
+        let calibration = { slope: 1, intercept: 0, active: false };
+        let sensorActive = false;
+
+        // UI Elements
+        const rawValEl = document.getElementById('raw-val');
+        const calValEl = document.getElementById('calibrated-val');
+        const statusEl = document.getElementById('sensor-status');
+        const pointsListEl = document.getElementById('points-list');
+        const countDisplayEl = document.getElementById('count-display');
+        const calibrateBtn = document.getElementById('calibrate-btn');
+        const badgeEl = document.getElementById('calibration-badge');
+        const refInput = document.getElementById('ref-input');
+
+        // --- Sensor Setup ---
+        function initSensor() {
+            if ('AmbientLightSensor' in window) {
+                try {
+                    const sensor = new AmbientLightSensor();
+                    
+                    sensor.addEventListener('reading', () => {
+                        sensorReading = sensor.illuminance;
+                        updateDisplay();
+                    });
+
+                    sensor.addEventListener('error', (event) => {
+                        showError(event.error.name, event.error.message);
+                    });
+
+                    sensor.start();
+                    
+                    sensorActive = true;
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Sensor Actief';
+                    statusEl.className = 'status-badge status-active';
+                    statusEl.style.display = 'block';
+                    statusEl.style.textAlign = 'center';
+                    
+                } catch (err) {
+                    showError("Init Error", err.message);
+                }
+            } else {
+                showError("Niet Ondersteund", "Browser mist sensor ondersteuning.");
+            }
+        }
+
+        function showError(name, msg) {
+            statusEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Fout: ${name}`;
+            statusEl.className = 'status-badge status-error';
+            statusEl.style.display = 'block';
+            statusEl.style.textAlign = 'center';
+            console.error(msg);
+        }
+
+        // --- Core Logic ---
+        function updateDisplay() {
+            rawValEl.textContent = sensorReading.toFixed(1);
+
+            let finalValue = sensorReading;
+            
+            if (calibration.active) {
+                finalValue = (calibration.slope * sensorReading) + calibration.intercept;
+                if (finalValue < 0) finalValue = 0; // Geen negatief licht
+            }
+
+            calValEl.innerHTML = `${finalValue.toFixed(1)} <span style="font-size: 1.5rem;">lx</span>`;
+        }
+
+        function addPoint() {
+            const refVal = parseFloat(refInput.value);
+            
+            if (isNaN(refVal)) {
+                alert("Voer een geldige waarde in");
+                return;
+            }
+            
+            if (!sensorActive && sensorReading === 0) {
+               if(!confirm("De sensor leest 0. Wil je dit punt toch opslaan?")) return;
+            }
+
+            points.push({ x: sensorReading, y: refVal });
+            refInput.value = "";
+            refInput.focus();
+            renderPoints();
+        }
+
+        function deletePoint(index) {
+            points.splice(index, 1);
+            renderPoints();
+        }
+
+        function renderPoints() {
+            pointsListEl.innerHTML = "";
+            
+            if (points.length === 0) {
+                pointsListEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888; padding: 15px;">Nog geen meetpunten</td></tr>`;
+            } else {
+                points.forEach((p, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="color: #fff;">${p.x.toFixed(1)}</td>
+                        <td style="color: #F5DF4D; font-weight: bold;">${p.y.toFixed(1)}</td>
+                        <td style="text-align: right;">
+                            <button onclick="deletePoint(${index})" class="delete-btn">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+                    pointsListEl.appendChild(row);
+                });
+            }
+
+            const count = points.length;
+            countDisplayEl.textContent = count;
+            calibrateBtn.disabled = count < 5;
+        }
+
+        function applyCalibration() {
+            if (points.length < 5) return;
+
+            let n = points.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+
+            for (let p of points) {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += (p.x * p.y);
+                sumXX += (p.x * p.x);
+            }
+
+            const denominator = (n * sumXX) - (sumX * sumX);
+            
+            if (denominator === 0) {
+                alert("Fout in berekening: De sensorwaarden zijn te identiek. Varieer de lichtsterkte meer.");
+                return;
+            }
+
+            const slope = ((n * sumXY) - (sumX * sumY)) / denominator;
+            const intercept = (sumY - (slope * sumX)) / n;
+
+            calibration.slope = slope;
+            calibration.intercept = intercept;
+            calibration.active = true;
+
+            badgeEl.innerHTML = '<i class="fas fa-check"></i> Actief Gekalibreerd';
+            badgeEl.className = "status-badge status-active";
+            
+            document.getElementById('formula-display').style.display = 'block';
+            document.getElementById('slope-val').textContent = slope.toFixed(3);
+            document.getElementById('intercept-val').textContent = intercept.toFixed(3);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateDisplay();
+        }
+
+        function resetCalibration() {
+            if(!confirm("Weet je zeker dat je alle punten en kalibratie wilt wissen?")) return;
+            
+            points = [];
+            calibration = { slope: 1, intercept: 0, active: false };
+            
+            badgeEl.textContent = "Niet Gekalibreerd";
+            badgeEl.className = "status-badge";
+            document.getElementById('formula-display').style.display = 'none';
+            
+            renderPoints();
+            updateDisplay();
+        }
+
+        // Start App
+        initSensor();
+
+    </script>
+</body>
+</html>
