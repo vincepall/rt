@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNR Gemiddelde</title>
+    <!-- Tailwind CSS voor een strak en modern design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Extra styling voor invoervelden om ze er netjes uit te laten zien zonder pijltjes (spinners) waar mogelijk */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen text-gray-200 font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Home knop -->
+        <a href="https://vincepall.github.io/rt/index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 mb-6 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Home
+        </a>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            
+            <!-- Linkerkolom: Afbeelding en Legenda -->
+            <div class="md:col-span-7 space-y-6">
+                
+                <!-- Afbeelding (SVG) van de detector en pijp -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700 flex flex-col items-center">
+                    <svg viewBox="0 0 300 300" class="w-full max-w-sm drop-shadow-md">
+                        <!-- Detector (Vierkant) -->
+                        <rect x="10" y="10" width="280" height="280" rx="8" fill="#1e293b" stroke="#475569" stroke-width="4"/>
+                        <text x="20" y="35" fill="#94a3b8" font-size="12" font-weight="bold">Detector</text>
+                        
+                        <!-- Pijp (90 graden bocht) - Buitenste rand -->
+                        <path d="M 120 10 L 120 130 Q 120 200 190 200 L 290 200" stroke="#334155" stroke-width="60" fill="none" stroke-linecap="butt" />
+                        <!-- Pijp - Binnenste lichte rand voor diepte -->
+                        <path d="M 120 10 L 120 130 Q 120 200 190 200 L 290 200" stroke="#475569" stroke-width="40" fill="none" stroke-linecap="butt" />
+                        
+                        <!-- Punt A: Midden in de bocht van de pijp -->
+                        <circle cx="138" cy="183" r="7" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                        <text x="152" y="188" fill="#ef4444" font-size="16" font-weight="bold">A</text>
+                        
+                        <!-- Punt B: Naast de pijp -->
+                        <circle cx="50" cy="240" r="7" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+                        <text x="65" y="245" fill="#3b82f6" font-size="16" font-weight="bold">B</text>
+                        
+                        <!-- Punt V: Verzadiging, naast de pijp -->
+                        <circle cx="230" cy="80" r="7" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+                        <text x="245" y="85" fill="#f59e0b" font-size="16" font-weight="bold">V</text>
+                    </svg>
+                </div>
+
+                <!-- Legenda / Instructies -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-200">Legenda & Normen</h2>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="inline-block w-8 h-8 rounded-full bg-orange-900/50 text-orange-400 border border-orange-800 font-bold flex items-center justify-center shrink-0 mt-0.5">V</span>
+                            <div class="ml-3">
+                                <p class="font-semibold text-gray-200">Verzadiging (Saturation)</p>
+                                <p class="text-sm text-gray-400">Punt V is de referentie voor verzadiging. Deze moet <strong class="text-gray-200">onder de 90%</strong> blijven.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="inline-block w-8 h-8 rounded-full bg-red-900/50 text-red-400 border border-red-800 font-bold flex items-center justify-center shrink-0 mt-0.5">A</span>
+                            <div class="ml-3">
+                                <p class="font-semibold text-gray-200">Meetpunt SNR in de centerlijn van de pijp</p>
+                                <p class="text-sm text-gray-400">Voor <strong class="text-emerald-400">TA</strong> minimaal <span class="text-emerald-400 font-semibold">50</span>.<br>Voor <strong class="text-fuchsia-400">TB</strong> minimaal <span class="text-fuchsia-400 font-semibold">80</span>.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="inline-block w-8 h-8 rounded-full bg-blue-900/50 text-blue-400 border border-blue-800 font-bold flex items-center justify-center shrink-0 mt-0.5">B</span>
+                            <div class="ml-3">
+                                <p class="font-semibold text-gray-200">Meetpunt SNR naast de pijp</p>
+                                <p class="text-sm text-gray-400">Voor <strong class="text-emerald-400">TA</strong> minimaal <span class="text-emerald-400 font-semibold">70</span>.<br>Voor <strong class="text-fuchsia-400">TB</strong> minimaal <span class="text-fuchsia-400 font-semibold">100</span>.</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="mt-5 p-4 bg-blue-900/30 text-blue-300 rounded-lg text-sm border border-blue-800">
+                        <strong class="text-blue-200">Let op:</strong> De SNR moet op 4 punten (binnen de vastgestelde kaders) worden gemeten. Het gemiddelde moet gerapporteerd worden.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Rechterkolom: Calculator -->
+            <div class="md:col-span-5">
+                <div class="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700 sticky top-8">
+                    <h2 class="text-xl font-semibold mb-6 text-gray-200 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        Gemiddelde Berekenen
+                    </h2>
+                    
+                    <form id="snrForm" class="space-y-4" onsubmit="event.preventDefault(); calculateAverage();">
+                        
+                        <div>
+                            <label for="val1" class="block text-sm font-medium text-gray-300 mb-1">Meting 1</label>
+                            <input type="number" step="any" id="val1" required
+                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-500"
+                                placeholder="Voer waarde in...">
+                        </div>
+                        
+                        <div>
+                            <label for="val2" class="block text-sm font-medium text-gray-300 mb-1">Meting 2</label>
+                            <input type="number" step="any" id="val2" required
+                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-500"
+                                placeholder="Voer waarde in...">
+                        </div>
+                        
+                        <div>
+                            <label for="val3" class="block text-sm font-medium text-gray-300 mb-1">Meting 3</label>
+                            <input type="number" step="any" id="val3" required
+                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-500"
+                                placeholder="Voer waarde in...">
+                        </div>
+                        
+                        <div>
+                            <label for="val4" class="block text-sm font-medium text-gray-300 mb-1">Meting 4</label>
+                            <input type="number" step="any" id="val4" required
+                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-500"
+                                placeholder="Voer waarde in...">
+                        </div>
+
+                        <button type="submit" 
+                            class="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-sm">
+                            Bereken Gemiddelde
+                        </button>
+                    </form>
+
+                    <!-- Resultaat weergave -->
+                    <div id="resultContainer" class="mt-6 hidden">
+                        <div class="p-4 bg-green-900/30 border border-green-800 rounded-lg text-center">
+                            <p class="text-sm text-green-400 font-medium mb-1">Gemiddelde SNR</p>
+                            <p id="resultValue" class="text-3xl font-bold text-green-300">0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- Foutmelding weergave -->
+                    <div id="errorContainer" class="mt-6 hidden">
+                        <div class="p-4 bg-red-900/30 border border-red-800 rounded-lg text-center">
+                            <p class="text-sm text-red-400">Vul a.u.b. alle 4 de metingen in met geldige getallen.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function calculateAverage() {
+            // Haal de waardes op
+            const v1 = parseFloat(document.getElementById('val1').value);
+            const v2 = parseFloat(document.getElementById('val2').value);
+            const v3 = parseFloat(document.getElementById('val3').value);
+            const v4 = parseFloat(document.getElementById('val4').value);
+
+            const resultContainer = document.getElementById('resultContainer');
+            const errorContainer = document.getElementById('errorContainer');
+            const resultValue = document.getElementById('resultValue');
+
+            // Reset weergave
+            resultContainer.classList.add('hidden');
+            errorContainer.classList.add('hidden');
+
+            // Validatie: check of het geldige nummers zijn
+            if (isNaN(v1) || isNaN(v2) || isNaN(v3) || isNaN(v4)) {
+                errorContainer.classList.remove('hidden');
+                return;
+            }
+
+            // Bereken het gemiddelde
+            const sum = v1 + v2 + v3 + v4;
+            const average = sum / 4;
+
+            // Toon het resultaat (afgerond op 2 decimalen voor netheid)
+            resultValue.innerText = average.toFixed(2);
+            resultContainer.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
