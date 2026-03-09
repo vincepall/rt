@@ -673,6 +673,32 @@
                 </div>
             </div>
 
+            <!-- Materiaalfactor Toggle -->
+            <div class="toggle-container" onclick="toggleMaterial()">
+                <label class="toggle-label">Factor</label>
+                <label class="switch">
+                    <input type="checkbox" id="material_veranderd">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Materiaalfactor Section (Verborgen) -->
+            <div id="material_keuze" class="keuze-sectie" style="display: none;">
+                <div class="form-group">
+                    <label for="material_select">Materiaalfactor</label>
+                    <div style="margin-bottom: 10px;">
+                        <select id="material_select" class="modal-select" onchange="onMaterialSelect()">
+                            <option value="manual">Handmatig invoeren...</option>
+                            <option disabled>--- Uit Database ---</option>
+                        </select>
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="material_factor">Gekozen Factor</label>
+                        <input type="number" id="material_factor" value="1" step="0.01" inputmode="decimal">
+                    </div>
+                </div>
+            </div>
+
             <div class="button-group">
                 <button type="submit" class="calculate-btn">
                     <i class="fas fa-calculator"></i> Bereken
@@ -801,13 +827,64 @@
 
         // --- GLOBAL STATE FOR SAVING ---
         let csvSources = [];
+        let materialFactors = [];
         const STORAGE_KEY = 'rt_focus_saved_items_v1';
 
         // Load on startup
         document.addEventListener('DOMContentLoaded', async () => {
             renderSavedList();
             await loadCsvSources();
+            await loadMaterialFactors();
         });
+
+        async function loadMaterialFactors() {
+            try {
+                const response = await fetch('materiaalfactor.csv');
+                const text = await response.text();
+                const lines = text.trim().split('\n').slice(1); // skip header
+                
+                materialFactors = lines.map(line => {
+                    const cols = line.split(',');
+                    if (cols.length < 2) return null;
+                    return {
+                        name: cols[0].trim(),
+                        factor: parseFloat(cols[1].trim().replace(',', '.'))
+                    };
+                }).filter(x => x);
+
+                populateMaterialDropdown();
+            } catch (e) {
+                console.warn("Materiaalfactor CSV load failed", e);
+            }
+        }
+
+        function populateMaterialDropdown() {
+            const select = document.getElementById('material_select');
+            materialFactors.forEach((mat, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx; 
+                opt.text = `${mat.name} (Factor ${mat.factor})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function onMaterialSelect() {
+            const select = document.getElementById('material_select');
+            const factorInput = document.getElementById('material_factor');
+            const val = select.value;
+
+            if (val === "manual") {
+                factorInput.readOnly = false;
+                factorInput.style.backgroundColor = '#3d3d3d';
+                factorInput.style.color = 'white';
+            } else {
+                const mat = materialFactors[parseInt(val)];
+                factorInput.value = mat.factor;
+                factorInput.readOnly = true;
+                factorInput.style.backgroundColor = '#555';
+                factorInput.style.color = '#ccc';
+            }
+        }
 
         async function loadCsvSources() {
             try {
@@ -1196,12 +1273,23 @@
             }, 10);
         }
 
+        function toggleMaterial() {
+            const checkbox = document.getElementById("material_veranderd");
+            setTimeout(() => {
+                const keuzeDiv = document.getElementById('material_keuze');
+                keuzeDiv.style.display = checkbox.checked ? 'block' : 'none';
+            }, 10);
+        }
+
         // Event listeners direct op inputs voor edge cases
         document.getElementById("filmtype_veranderd").addEventListener('change', function() {
             document.getElementById('filmtype_keuze').style.display = this.checked ? 'block' : 'none';
         });
         document.getElementById("focus_veranderd").addEventListener('change', function() {
             document.getElementById('focus_keuze_wrapper').style.display = this.checked ? 'block' : 'none';
+        });
+        document.getElementById("material_veranderd").addEventListener('change', function() {
+            document.getElementById('material_keuze').style.display = this.checked ? 'block' : 'none';
         });
 
         // --- Berekeningen ---
@@ -1305,33 +1393,52 @@
                 berekendeTijd = berekenFocusverandering(begintijdInSeconden, nieuweFocus, oudeFocus);
             }
 
+            // Stap 1.5: Materiaalfactor
+            const materialVeranderd = document.getElementById("material_veranderd").checked;
+            const materialFactor = materialVeranderd ? (parseFloat(document.getElementById("material_factor").value) || 1.0) : 1.0;
+            berekendeTijd = berekendeTijd * materialFactor;
+
             let outputHTML = maminMsg; // Start met mA info indien van toepassing
 
             // Stap 2: Resultaat opbouwen
-            if (focusVeranderd && !filmtypeVeranderd) {
-                // Scenario A: Alleen Focus verandert
-                outputHTML += `Op <strong>${nieuweFocus} FFD</strong> is de stralingstijd:<br>`;
+            if ((focusVeranderd || (materialVeranderd && materialFactor !== 1.0)) && !filmtypeVeranderd) {
+                // Scenario A: Focus of Materiaal verandert
+                if (focusVeranderd && materialVeranderd && materialFactor !== 1.0) {
+                    outputHTML += `Op <strong>${nieuweFocus} FFD</strong> met factor <strong>${materialFactor}</strong> is de tijd:<br>`;
+                } else if (focusVeranderd) {
+                    outputHTML += `Op <strong>${nieuweFocus} FFD</strong> is de stralingstijd:<br>`;
+                } else {
+                    outputHTML += `Met materiaalfactor <strong>${materialFactor}</strong> is de stralingstijd:<br>`;
+                }
                 outputHTML += `<div style="font-size: 2rem; margin-top: 10px;">${secondenNaarTijd(berekendeTijd)}</div>`;
             } 
-            else if (!focusVeranderd && !filmtypeVeranderd) {
+            else if (!focusVeranderd && !filmtypeVeranderd && (!materialVeranderd || materialFactor === 1.0)) {
                 // Scenario B: Niets verandert
                 // Als mA*min tab is gebruikt, is de info al getoond in maminMsg.
                 // We voegen nog een bevestiging toe of als het Time tab was:
                 if (currentTab === 'time') {
                     outputHTML += "Je hebt geen veranderingen geselecteerd.<br>De tijd blijft: " + secondenNaarTijd(begintijdInSeconden);
                 } else {
-                     // Voor mA*min is de bovenstaande msg genoeg, maar misschien duidelijkheid:
-                     outputHTML += "Geen verdere aanpassingen (Focus/Film).";
+                     outputHTML += "Geen verdere aanpassingen (Focus/Film/Materiaal).";
                 }
             }
             else {
-                // Scenario C: Filmtype verandert (en mogelijk ook focus)
+                // Scenario C: Filmtype verandert (en mogelijk ook focus/materiaal)
                 const filmtype = document.querySelector('input[name="filmtype"]:checked').value;
                 
-                if (focusVeranderd) {
-                     outputHTML += `Op <strong>${nieuweFocus} FFD</strong> is de tijd bij wissel van <strong>${filmtype}</strong> naar:<br>`;
+                let contextStr = "";
+                if (focusVeranderd && materialVeranderd && materialFactor !== 1.0) {
+                    contextStr = `Op <strong>${nieuweFocus} FFD</strong> met factor <strong>${materialFactor}</strong>`;
+                } else if (focusVeranderd) {
+                    contextStr = `Op <strong>${nieuweFocus} FFD</strong>`;
+                } else if (materialVeranderd && materialFactor !== 1.0) {
+                    contextStr = `Met factor <strong>${materialFactor}</strong>`;
+                }
+
+                if (contextStr) {
+                    outputHTML += `${contextStr} is de tijd bij wissel van <strong>${filmtype}</strong> naar:<br>`;
                 } else {
-                     outputHTML += `Bij wissel van <strong>${filmtype}</strong> naar:<br>`;
+                    outputHTML += `Bij wissel van <strong>${filmtype}</strong> naar:<br>`;
                 }
                
                 outputHTML += `<div style="margin-top:20px;">`; // Container voor blokken

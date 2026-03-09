@@ -712,12 +712,14 @@
                             <option value="Yxlon (3 mm)"></option>
                             <option value="Yxlon Smart (1 mm)"></option>
                             <option value="Balteau (2.5 mm)"></option>
+                            <option value="Balteau Rondstraler (5 mm)"></option>
                         `;
         } else if (source === "X-ray") {
           bronKeuzesDatalist.innerHTML = `
                             <option value="Yxlon (3 mm)"></option>
                             <option value="Yxlon Smart (1 mm)"></option>
                             <option value="Balteau (2.5 mm)"></option>
+                            <option value="Balteau Rondstraler (5 mm)"></option>
                         `;
         } else {
           const filteredBronnen = bronnenData.filter((b) => b.type === source);
@@ -802,6 +804,10 @@
               (procedure === "EN-A" || procedure === "EN-B")
             ) {
               ofaInput.value = wanddikte.toFixed(2);
+            }
+            if (source === "X-ray") {
+              document.getElementById("brongrootte").value =
+                "Balteau Rondstraler (5 mm)";
             }
           }
         } else if (optie === "2") {
@@ -1022,6 +1028,8 @@
           brongrootte = 1;
         else if (brongrootteValue.includes("Balteau (2.5 mm)"))
           brongrootte = 2.5;
+        else if (brongrootteValue.includes("Balteau Rondstraler (5 mm)"))
+          brongrootte = 5;
         else {
           const bron = bronnenData.find((b) => b.label === brongrootteValue);
           brongrootte = bron ? bron.size : getFloatValue("brongrootte");
