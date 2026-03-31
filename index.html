@@ -72,9 +72,9 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background-size: contain; /* Zorgt ervoor dat de afbeelding niet wordt gecropt */
+        background-size: contain;
         background-position: center;
-        background-repeat: no-repeat; /* Voorkom dat de afbeelding herhaald wordt */
+        background-repeat: no-repeat;
         width: 200px;
         height: 50px;
         background-color: transparent;
@@ -86,22 +86,10 @@
         background-color: transparent;
       }
 
-      /* Specifieke achtergrondafbeeldingen voor elke link */
-      .link1 {
-        background-image: url("tape1.PNG");
-      }
-
-      .link2 {
-        background-image: url("tape2.PNG");
-      }
-
-      .link3 {
-        background-image: url("tape3.PNG");
-      }
-
-      .link4 {
-        background-image: url("tape4.PNG");
-      }
+      .link1 { background-image: url("tape1.PNG"); }
+      .link2 { background-image: url("tape2.PNG"); }
+      .link3 { background-image: url("tape3.PNG"); }
+      .link4 { background-image: url("tape4.PNG"); }
 
       .install-button {
         display: inline-block;
@@ -123,6 +111,34 @@
         transform: scale(1.02);
       }
 
+      /* Specifieke styling voor de 1 April knoppen */
+      .btn-april-yes {
+        background-color: #28a745; 
+        color: white; 
+        padding: 15px 30px; 
+        text-decoration: none; 
+        border-radius: 8px; 
+        font-size: 1.2rem; 
+        font-weight: bold; 
+        cursor: pointer;
+        border: none;
+        display: inline-block;
+        font-family: "Handlee", sans-serif;
+      }
+      .btn-april-yes:hover { background-color: #218838; transform: scale(1.05); }
+
+      .btn-april-no {
+        background-color: #dc3545; 
+        color: white; 
+        padding: 8px 15px; 
+        border: none; 
+        border-radius: 5px; 
+        font-size: 0.9rem; 
+        cursor: pointer;
+        font-family: "Handlee", sans-serif;
+      }
+      .btn-april-no:hover { background-color: #c82333; transform: scale(1.05); }
+
       @media (max-width: 768px) {
         .link-list {
           flex-direction: column;
@@ -133,11 +149,8 @@
       let deferredPrompt;
 
       window.addEventListener("beforeinstallprompt", (e) => {
-        // Voorkom dat de standaard prompt wordt weergegeven
         e.preventDefault();
-        // Sla het event op zodat het later kan worden gebruikt
         deferredPrompt = e;
-        // Maak de install-knop zichtbaar
         const installButton = document.querySelector(".install-button");
         installButton.style.display = "inline-block";
       });
@@ -161,10 +174,7 @@
           navigator.serviceWorker
             .register("/rt/service-worker.js")
             .then((registration) => {
-              console.log(
-                "Service Worker geregistreerd met scope:",
-                registration.scope,
-              );
+              console.log("Service Worker geregistreerd met scope:", registration.scope);
             })
             .catch((error) => {
               console.log("Service Worker registratie mislukt:", error);
@@ -174,10 +184,8 @@
     </script>
   </head>
   <body>
-    <!-- De knop om het pop-up venster te openen -->
     <button class="info-btn" onclick="openModal('myModal')">i</button>
 
-    <!-- Het pop-up venster -->
     <div id="myModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
@@ -192,174 +200,48 @@
       </div>
     </div>
 
+    <div id="aprilFoolsModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+      <div class="modal-content" style="background-color: var(--bg-color); margin: 15% auto; padding: 30px; border: 2px solid #333; width: 90%; max-width: 500px; text-align: center; border-radius: 15px; color: var(--text-color);">
+        <h2 style="margin-top: 0;">Koekie notice</h2>
+        <p>Om deze tool te laten werken worden koekies gebruikt ten behoeve van best practice in adipem ventris augere.</p>
+        <p>Klik op ja om te accepteren:</p>
+        <div style="margin-top: 30px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+          <a href="https://youtu.be/dQw4w9WgXcQ?is=7rv7zW5MMFnD2RxJ" class="btn-april-yes">Ja ik accepteer</a>
+          <button onclick="document.getElementById('aprilFoolsModal').style.display='none'" class="btn-april-no">Nee sorry</button>
+        </div>
+      </div>
+    </div>
+
     <script src="script.js"></script>
-    <!-- Link naar externe JavaScript -->
 
     <div style="margin-bottom: 20px">
       <input type="text" id="searchBar" placeholder="Zoeken..." />
     </div>
 
     <ul class="link-list">
-      <li>
-        <a href="focusverandering.html" class="link1"
-          ><i class="fa-solid fa-up-down"></i>FFD & Filmtype<i
-            class="fa-solid fa-up-down"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="verval2.html" class="link3"
-          ><i class="fa-solid fa-radiation"></i>Bronsterkte<i
-            class="fa-solid fa-radiation"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="pruts.html" class="link4"
-          ><i class="fa-solid fa-robot"></i>P.R.U.T.S<i
-            class="fa-solid fa-robot"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="stralingstijd.html" class="link2"
-          ><i class="fa-solid fa-hourglass"></i>Gamma stralingstijd<i
-            class="fa-solid fa-hourglass"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="schuifje.html" class="link1"
-          ><i class="fa-solid fa-ruler-horizontal"></i>Schuifje<i
-            class="fa-solid fa-ruler-horizontal"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="opnamesklasseb.html" class="link4"
-          ><i class="fa-solid fa-star-of-life"></i>Aantal opnames<i
-            class="fa-solid fa-star-of-life"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="cw2.html" class="link2"
-          ><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i
-            class="fa-solid fa-circle-radiation"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="LW_Verdeler.html" class="link1"
-          ><i class="fa-solid fa-tape"></i>Langsnaad tool<i
-            class="fa-solid fa-tape"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="MinFFD.html" class="link4"
-          ><i class="fa-solid fa-ruler"></i>Minimale FFD<i
-            class="fa-solid fa-ruler"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="Draadjesv2.html" class="link3"
-          ><i class="fa-solid fa-grip-lines-vertical"></i>Draadvereiste EN &
-          ASME<i class="fa-solid fa-grip-lines-vertical"></i
-        ></a>
-      </li>
-      <li>
-        <a href="filmkwaliteit.html" class="link1"
-          ><i class="fa-solid fa-film"></i>Filmtype<i
-            class="fa-solid fa-film"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="bundelbreedte.html" class="link2"
-          ><i class="fa-solid fa-less-than"></i>Bundelgrootte<i
-            class="fa-solid fa-less-than"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="afzettinggamma.html" class="link1"
-          ><i class="fa-solid fa-road-barrier"></i>Afzetting Gamma<i
-            class="fa-solid fa-road-barrier"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="handigelinks.html" class="link4"
-          ><i class="fa-solid fa-link"></i>Handige links<i
-            class="fa-solid fa-link"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="buistabel.html" class="link2"
-          ><i class="fa-solid fa-chart-line"></i>Buis-tabellen<i
-            class="fa-solid fa-chart-line"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="onstream.html" class="link3"
-          ><i class="fa-solid fa-x-ray"></i>Onstream Tools<i
-            class="fa-solid fa-x-ray"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="filmvoorraad.html" class="link1"
-          ><i class="fa-solid fa-clipboard-check"></i>Filmvoorraad bus<i
-            class="fa-solid fa-clipboard-check"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="lasfout.html" class="link3"
-          ><i class="fa-solid fa-burst"></i>Lasfout Acceptatie<i
-            class="fa-solid fa-burst"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="rapportagelijst.html" class="link4"
-          ><i class="fa-solid fa-keyboard"></i>Rapportage Tools<i
-            class="fa-solid fa-keyboard"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="verzet.html" class="link1"
-          ><i class="fa-solid fa-ring"></i>Verzet van ovaaltje<i
-            class="fa-solid fa-ring"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="kvregel.html" class="link4"
-          ><i class="fa-solid fa-bolt"></i>KV Regel<i
-            class="fa-solid fa-bolt"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="timer.html" class="link3"
-          ><i class="fa-solid fa-stopwatch"></i>Gamma Timers<i
-            class="fa-solid fa-stopwatch"
-          ></i
-        ></a>
-      </li>
-      <li>
-        <a href="mtptlijst.html" class="link2"
-          ><i class="fa-solid fa-magnet"></i>MT & PT Tools<i
-            class="fa-solid fa-magnet"
-          ></i
-        ></a>
-      </li>
+      <li><a href="focusverandering.html" class="link1"><i class="fa-solid fa-up-down"></i>FFD & Filmtype<i class="fa-solid fa-up-down"></i></a></li>
+      <li><a href="verval2.html" class="link3"><i class="fa-solid fa-radiation"></i>Bronsterkte<i class="fa-solid fa-radiation"></i></a></li>
+      <li><a href="pruts.html" class="link4"><i class="fa-solid fa-robot"></i>P.R.U.T.S<i class="fa-solid fa-robot"></i></a></li>
+      <li><a href="stralingstijd.html" class="link2"><i class="fa-solid fa-hourglass"></i>Gamma stralingstijd<i class="fa-solid fa-hourglass"></i></a></li>
+      <li><a href="schuifje.html" class="link1"><i class="fa-solid fa-ruler-horizontal"></i>Schuifje<i class="fa-solid fa-ruler-horizontal"></i></a></li>
+      <li><a href="opnamesklasseb.html" class="link4"><i class="fa-solid fa-star-of-life"></i>Aantal opnames<i class="fa-solid fa-star-of-life"></i></a></li>
+      <li><a href="cw2.html" class="link2"><i class="fa-solid fa-circle-radiation"></i>Rondnaad tool<i class="fa-solid fa-circle-radiation"></i></a></li>
+      <li><a href="LW_Verdeler.html" class="link1"><i class="fa-solid fa-tape"></i>Langsnaad tool<i class="fa-solid fa-tape"></i></a></li>
+      <li><a href="MinFFD.html" class="link4"><i class="fa-solid fa-ruler"></i>Minimale FFD<i class="fa-solid fa-ruler"></i></a></li>
+      <li><a href="Draadjesv2.html" class="link3"><i class="fa-solid fa-grip-lines-vertical"></i>Draadvereiste EN & ASME<i class="fa-solid fa-grip-lines-vertical"></i></a></li>
+      <li><a href="filmkwaliteit.html" class="link1"><i class="fa-solid fa-film"></i>Filmtype<i class="fa-solid fa-film"></i></a></li>
+      <li><a href="bundelbreedte.html" class="link2"><i class="fa-solid fa-less-than"></i>Bundelgrootte<i class="fa-solid fa-less-than"></i></a></li>
+      <li><a href="afzettinggamma.html" class="link1"><i class="fa-solid fa-road-barrier"></i>Afzetting Gamma<i class="fa-solid fa-road-barrier"></i></a></li>
+      <li><a href="handigelinks.html" class="link4"><i class="fa-solid fa-link"></i>Handige links<i class="fa-solid fa-link"></i></a></li>
+      <li><a href="buistabel.html" class="link2"><i class="fa-solid fa-chart-line"></i>Buis-tabellen<i class="fa-solid fa-chart-line"></i></a></li>
+      <li><a href="onstream.html" class="link3"><i class="fa-solid fa-x-ray"></i>Onstream Tools<i class="fa-solid fa-x-ray"></i></a></li>
+      <li><a href="filmvoorraad.html" class="link1"><i class="fa-solid fa-clipboard-check"></i>Filmvoorraad bus<i class="fa-solid fa-clipboard-check"></i></a></li>
+      <li><a href="lasfout.html" class="link3"><i class="fa-solid fa-burst"></i>Lasfout Acceptatie<i class="fa-solid fa-burst"></i></a></li>
+      <li><a href="rapportagelijst.html" class="link4"><i class="fa-solid fa-keyboard"></i>Rapportage Tools<i class="fa-solid fa-keyboard"></i></a></li>
+      <li><a href="verzet.html" class="link1"><i class="fa-solid fa-ring"></i>Verzet van ovaaltje<i class="fa-solid fa-ring"></i></a></li>
+      <li><a href="kvregel.html" class="link4"><i class="fa-solid fa-bolt"></i>KV Regel<i class="fa-solid fa-bolt"></i></a></li>
+      <li><a href="timer.html" class="link3"><i class="fa-solid fa-stopwatch"></i>Gamma Timers<i class="fa-solid fa-stopwatch"></i></a></li>
+      <li><a href="mtptlijst.html" class="link2"><i class="fa-solid fa-magnet"></i>MT & PT Tools<i class="fa-solid fa-magnet"></i></a></li>
     </ul>
 
     <button class="install-button" onclick="installPWA()" style="display: none">
@@ -368,6 +250,15 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
+        
+        // --- 1 APRIL CHECK ---
+        const today = new Date();
+        // getMonth() begint bij 0, dus 3 is april. getDate() is de dag van de maand.
+        if (today.getMonth() === 3 && today.getDate() === 1) {
+          document.getElementById('aprilFoolsModal').style.display = 'block';
+        }
+        // ---------------------
+
         // Pre-update bronnen.csv in the background so it's fresh for other tools
         fetch("/rt/bronnen.csv", { cache: "no-cache" })
           .then(() => console.log("Background update for bronnen.csv triggered"))
@@ -441,7 +332,6 @@
                   seenHrefs.add(href);
                   list.appendChild(item.element);
                 } else if (!href) {
-                  // Fallback for items without links (though there shouldn't be any in .link-list)
                   list.appendChild(item.element);
                 }
               });
