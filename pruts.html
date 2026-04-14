@@ -266,15 +266,15 @@
           <option value="2">Excentrisch</option>
         </select>
       </div>
+      <div class="form-item">
+        <label for="source">Stralingsbron:</label>
+        <select id="source" name="source">
+          <option value="X-ray">X-ray</option>
+          <option value="Se75">Se-75</option>
+          <option value="Ir192">Ir-192</option>
+        </select>
+      </div>
       <div id="enOptions" style="display: none">
-        <div class="form-item">
-          <label for="source">Stralingsbron:</label>
-          <select id="source" name="source">
-            <option value="X-ray">X-ray</option>
-            <option value="Se75">Se-75</option>
-            <option value="Ir192">Ir-192</option>
-          </select>
-        </div>
         <div class="form-item" id="ovenMateriaalDiv" style="display: none">
           <label for="ovenMateriaal">Ovenmateriaal:</label>
           <select id="ovenMateriaal" name="ovenMateriaal">
@@ -700,21 +700,7 @@
         const bronKeuzesDatalist = document.getElementById("bronKeuzes");
         bronKeuzesDatalist.innerHTML = "";
 
-        if (procedure === "ASME") {
-          // For ASME, show all bronnenData options AND hardcoded X-ray options
-          bronnenData.forEach((bron) => {
-            const option = document.createElement("option");
-            option.value = bron.label;
-            bronKeuzesDatalist.appendChild(option);
-          });
-          // Add hardcoded X-ray options
-          bronKeuzesDatalist.innerHTML += `
-                            <option value="Yxlon (3 mm)"></option>
-                            <option value="Yxlon Smart (1 mm)"></option>
-                            <option value="Balteau (2.5 mm)"></option>
-                            <option value="Balteau Rondstraler (5 mm)"></option>
-                        `;
-        } else if (source === "X-ray") {
+        if (source === "X-ray") {
           bronKeuzesDatalist.innerHTML = `
                             <option value="Yxlon (3 mm)"></option>
                             <option value="Yxlon Smart (1 mm)"></option>
@@ -2013,12 +1999,12 @@
                 const ffd_m = sfd / 1000.0;
                 let base_exposure =
                   (consts.ff * (ffd_m * ffd_m)) / (currentActivity * consts.k);
-                // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus 4mm
+                // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus 5mm
                 let exposureThickness =
                   technique === "SWSI" ? wanddikte : 2 * wanddikte;
                 let attenuation = Math.pow(
                   2,
-                  (exposureThickness + 4) / consts.hvl,
+                  (exposureThickness + 5) / consts.hvl,
                 );
                 let time_minutes_d7 = base_exposure * attenuation;
 
