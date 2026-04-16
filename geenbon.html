@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tijdelijke Bon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* A4 styling for screen */
+        body {
+            background-color: #f3f4f6;
+            font-family: Arial, sans-serif;
+            color: #1f2937;
+        }
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 2rem auto;
+            background: white;
+            padding: 20mm;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Clean inputs for the form feel */
+        input[type="text"], input[type="date"], input[type="number"], select, textarea {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 4px 8px;
+            background-color: #f9fafb;
+            transition: all 0.2s;
+        }
+        input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: white;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Print-specific styling to make it look like a standard document */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        @media print {
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            body {
+                background: white;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Hide specific inputs on print entirely if they are empty */
+            .hide-empty-print:placeholder-shown {
+                display: none !important;
+            }
+            .a4-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 15mm 20mm;
+                width: 210mm;
+                height: 297mm;
+                max-height: 297mm;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+            input[type="text"], input[type="date"], input[type="number"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                appearance: none;
+                -webkit-appearance: none;
+                resize: none;
+                font-family: inherit;
+                font-size: inherit;
+            }
+            select {
+                background-image: none !important;
+            }
+            /* Removing placeholder texts on print if empty */
+            input::placeholder, textarea::placeholder {
+                color: transparent;
+            }
+            .order-block {
+                border: none !important;
+                padding: 0 !important;
+                margin-bottom: 1.5rem !important;
+            }
+            .border-l-2 {
+                border-left-color: transparent !important;
+                padding-left: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Controls Toolbar (Hidden on Print) -->
+    <div class="fixed top-4 left-4 no-print flex gap-3 z-50">
+        <a href="https://vincepall.github.io/rt/index.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded shadow transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Home
+        </a>
+        <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white font-semibold px-4 py-2 rounded shadow transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print
+        </button>
+    </div>
+
+    <!-- Main A4 Document -->
+    <div class="a4-container flex flex-col">
+        
+        <!-- Document Header -->
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex flex-col gap-3 w-3/5">
+                <input type="text" placeholder="Klantnaam" class="font-bold text-xl w-full placeholder-gray-400">
+                
+                <div id="operators-container" class="flex flex-col gap-2 mt-2 w-3/4">
+                    <input type="text" placeholder="Operator 1" class="w-full">
+                    <input type="text" placeholder="Operator 2" class="w-full">
+                </div>
+                
+                <div class="flex flex-col gap-2 mt-2 no-print">
+                    <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium text-left w-fit transition-colors" onclick="addOperator()">
+                        + Extra Operator Toevoegen (max 5)
+                    </button>
+                    <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium text-left w-fit transition-colors" onclick="addHeaderTextField()">
+                        + Tekstveld Toevoegen
+                    </button>
+                </div>
+            </div>
+            
+            <div class="w-1/3 flex justify-end">
+                <input type="date" id="doc-date" class="font-medium text-right cursor-pointer">
+            </div>
+        </div>
+
+        <div id="header-text-container" class="flex flex-col gap-2 w-full mb-6 mt-1"></div>
+
+        <!-- Orders & Jobs Section -->
+        <div class="flex-grow overflow-hidden">
+            <div id="orders-container" class="flex flex-col gap-6">
+                <!-- Orders will be dynamically injected here -->
+            </div>
+            
+            <button class="mt-6 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium py-2 px-4 rounded border border-indigo-200 border-dashed w-full no-print transition-colors" onclick="addOrder()">
+                + Nog een Order / Onderzoek Toevoegen
+            </button>
+        </div>
+
+        <!-- Document Footer -->
+        <div class="mt-12 pt-6 border-t-2 border-gray-800 flex flex-col gap-4">
+            <div>
+                <h3 class="font-bold mb-2">Totaal aantal gebruikte films per formaat:</h3>
+                <div id="film-totals" class="min-h-[40px] text-sm whitespace-pre-line text-gray-700 font-medium">
+                    Nog geen films geregistreerd.
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <textarea class="w-full font-medium" rows="2" placeholder="Voer notities of tijden in...">8 uur incl. reistijd, ontwikkelen en rapporteren</textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Initialization ---
+        // Set today's date automatically
+        document.getElementById('doc-date').valueAsDate = new Date();
+        
+        // Define Film Sizes exactly as requested
+        const filmSizes = ['10x12', '10x16', '10x24', '10x40', '10x48', '6x12', '6x16', '6x24', '6x48', '18x24', '30x40', '18x43'];
+        
+        // Counters for dynamic IDs
+        let opCount = 2;
+        let orderCounter = 0;
+        let rtRowCounter = 0;
+
+        // Initialize with one Order by default
+        addOrder();
+
+        // --- Logic: Header Text Fields ---
+        function addHeaderTextField() {
+            const container = document.getElementById('header-text-container');
+            const wrapper = document.createElement('div');
+            wrapper.className = "flex items-start gap-2 w-full";
+            
+            // Use textarea instead of input so it can expand to multiple lines if needed
+            const input = document.createElement('textarea');
+            input.rows = 1;
+            input.placeholder = 'Extra informatie / opmerking...';
+            input.className = 'w-full hide-empty-print resize-none overflow-hidden'; 
+            input.oninput = function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            };
+            
+            const btn = document.createElement('button');
+            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            btn.className = "text-red-400 hover:text-red-600 no-print flex-shrink-0 mt-1.5";
+            btn.title = "Tekstveld verwijderen";
+            btn.onclick = () => wrapper.remove();
+            
+            wrapper.appendChild(input);
+            wrapper.appendChild(btn);
+            container.appendChild(wrapper);
+        }
+
+        // --- Logic: Operators ---
+        function addOperator() {
+            if(opCount >= 5) {
+                alert("Maximaal 5 operators toegestaan volgens het sjabloon.");
+                return;
+            }
+            opCount++;
+            const container = document.getElementById('operators-container');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = `(Operator ${opCount})`;
+            input.className = 'w-full';
+            container.appendChild(input);
+        }
+
+        // --- Logic: Orders & Jobs ---
+        function addOrder() {
+            orderCounter++;
+            const id = orderCounter;
+            
+            const html = `
+                <div class="order-block border border-gray-200 p-5 rounded-lg relative bg-white" id="order-${id}">
+                    <button onclick="removeOrder(${id})" class="absolute top-3 right-3 text-red-500 hover:bg-red-50 p-1 rounded no-print text-sm" title="Order verwijderen">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                    
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="font-bold min-w-[140px]">Type Onderzoek:</span>
+                        <select class="w-32 font-medium bg-gray-50 cursor-pointer" onchange="handleJobTypeChange(${id}, this.value)">
+                            <option value="RT">RT</option>
+                            <option value="MT">MT</option>
+                            <option value="PT">PT</option>
+                            <option value="UT">UT</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="min-w-[140px] font-medium">- Ordernr:</span>
+                        <input type="text" class="w-1/2 font-bold" placeholder="Voer ordernummer in">
+                    </div>
+                    
+                    <div id="order-details-${id}" class="pl-4 border-l-2 border-indigo-200 ml-1 mt-2">
+                        <!-- Dynamic sub-section based on Job Type -->
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('orders-container').insertAdjacentHTML('beforeend', html);
+            // Trigger the initial layout generation for the default "RT" type
+            handleJobTypeChange(id, 'RT');
+        }
+
+        function removeOrder(id) {
+            document.getElementById(`order-${id}`).remove();
+            calculateTotals();
+        }
+
+        function handleJobTypeChange(orderId, type) {
+            const container = document.getElementById(`order-details-${orderId}`);
+            
+            if (type === 'RT') {
+                container.innerHTML = `
+                    <div class="rt-rows-container flex flex-col gap-3" id="rt-rows-${orderId}"></div>
+                    <button onclick="addRTRow(${orderId})" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 mt-3 flex items-center gap-1 no-print">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        RT Filmregel toevoegen
+                    </button>
+                `;
+                addRTRow(orderId); // Add the first row automatically
+            } else {
+                // MT, PT, UT blank text field
+                container.innerHTML = `
+                    <textarea class="w-full min-h-[100px]" placeholder="Leeg tekstveld voor ${type} onderzoeksdetails..."></textarea>
+                `;
+            }
+            calculateTotals(); // Recalculate in case RT rows were removed by changing type
+        }
+
+        // --- Logic: RT Rows & Calculations ---
+        function addRTRow(orderId) {
+            rtRowCounter++;
+            const rowId = rtRowCounter;
+            
+            // Build dropdown options from predefined array
+            const options = filmSizes.map(size => `<option value="${size}">${size}</option>`).join('');
+
+            const html = `
+                <div class="rt-row flex items-center gap-1" id="rt-row-${rowId}">
+                    <span class="font-medium">- <span class="no-print">[</span></span>
+                    <input type="number" class="w-16 text-center rt-inp1" placeholder="aantal">
+                    <span class="font-medium"><span class="no-print">]</span> &times; <span class="no-print">[</span></span>
+                    <input type="text" class="w-24 text-center rt-inp2" placeholder="tekst/aantal">
+                    <span class="font-medium text-gray-500 mx-1 no-print">&rarr;</span>
+                    <span class="font-medium no-print">[</span>
+                    <input type="number" class="w-16 text-center font-bold rt-total bg-indigo-50" placeholder="Totaal" oninput="calculateTotals()">
+                    <span class="font-medium"><span class="no-print">]</span> &times;</span>
+                    <select class="rt-size cursor-pointer" onchange="calculateTotals()">
+                        ${options}
+                    </select>
+                    
+                    <textarea rows="1" class="flex-1 min-w-[120px] text-sm font-bold text-gray-800 placeholder-gray-400 ml-1 hide-empty-print resize-none overflow-hidden" placeholder="Diktetoeslag" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';"></textarea>
+                    
+                    <button onclick="removeRTRow(${rowId})" class="text-red-400 hover:text-red-600 no-print ml-1" title="Regel verwijderen">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById(`rt-rows-${orderId}`).insertAdjacentHTML('beforeend', html);
+        }
+
+        function removeRTRow(rowId) {
+            document.getElementById(`rt-row-${rowId}`).remove();
+            calculateTotals();
+        }
+
+        // Aggregate all RT totals grouped by film size
+        function calculateTotals() {
+            const totals = {};
+            const rows = document.querySelectorAll('.rt-row');
+            
+            rows.forEach(row => {
+                const totalValue = parseInt(row.querySelector('.rt-total').value);
+                const size = row.querySelector('.rt-size').value;
+                
+                if (!isNaN(totalValue) && totalValue > 0 && size) {
+                    totals[size] = (totals[size] || 0) + totalValue;
+                }
+            });
+
+            const displayArea = document.getElementById('film-totals');
+            
+            if (Object.keys(totals).length === 0) {
+                displayArea.textContent = 'Nog geen films geregistreerd.';
+                return;
+            }
+
+            // Format output as "xx * Size"
+            const formattedTotals = Object.entries(totals)
+                .map(([size, total]) => `${total} * ${size}`)
+                .join('\n');
+                
+            displayArea.textContent = formattedTotals;
+        }
+    </script>
+</body>
+</html>
