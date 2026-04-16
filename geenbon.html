@@ -6,18 +6,18 @@
     <title>Tijdelijke Bon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* A4 styling for screen */
+        /* Screen styling - Gebruikt nu vrijwel volledige breedte */
         body {
             background-color: #f3f4f6;
             font-family: Arial, sans-serif;
             color: #1f2937;
         }
         .a4-container {
-            width: 210mm;
-            min-height: 297mm;
+            width: 95%; /* Aangepast van 210mm naar 95% breedte */
+            max-width: 1800px; /* Optionele max-breedte voor hele grote schermen */
             margin: 2rem auto;
             background: white;
-            padding: 20mm;
+            padding: 2rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             position: relative;
         }
@@ -37,18 +37,19 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        /* Print-specific styling to make it look like a standard document */
+        /* Print-specific styling - Alles 'squishy' maken voor 1 A4 */
         @page {
             size: A4;
-            margin: 0;
+            margin: 10mm; /* Compacte marge rondom het papier */
         }
         @media print {
             html, body {
-                width: 210mm;
-                height: 297mm;
+                width: 100%;
+                height: auto;
                 margin: 0;
                 padding: 0;
-                overflow: hidden;
+                font-size: 11px !important; /* Kleiner algemeen lettertype op print */
+                line-height: 1.2 !important; /* Compacter maken van tekstregels */
             }
             body {
                 background: white;
@@ -56,23 +57,28 @@
             .no-print {
                 display: none !important;
             }
-            /* Hide specific inputs on print entirely if they are empty */
             .hide-empty-print:placeholder-shown {
                 display: none !important;
             }
             .a4-container {
                 box-shadow: none;
                 margin: 0;
-                padding: 15mm 20mm;
-                width: 210mm;
-                height: 297mm;
-                max-height: 297mm;
-                box-sizing: border-box;
+                padding: 0;
+                width: 100%;
                 display: flex;
                 flex-direction: column;
                 page-break-after: avoid;
                 page-break-inside: avoid;
             }
+
+            /* Tailwind spaties/marges overrulen om de layout te comprimeren */
+            .mb-4, .mb-6 { margin-bottom: 0.25rem !important; }
+            .mt-12 { margin-top: 0.5rem !important; }
+            .mt-6, .mt-4, .mt-2 { margin-top: 0.25rem !important; }
+            .pt-6 { padding-top: 0.5rem !important; }
+            .p-5 { padding: 0.5rem !important; }
+            .gap-6, .gap-4, .gap-3 { gap: 0.25rem !important; }
+
             input[type="text"], input[type="date"], input[type="number"], select, textarea {
                 border: none !important;
                 background: transparent !important;
@@ -83,30 +89,32 @@
                 -webkit-appearance: none;
                 resize: none;
                 font-family: inherit;
-                font-size: inherit;
+                font-size: 11px !important; /* Inputs schalen mee omlaag */
+                line-height: 1.2 !important;
             }
             select {
                 background-image: none !important;
             }
-            /* Removing placeholder texts on print if empty */
             input::placeholder, textarea::placeholder {
                 color: transparent;
             }
             .order-block {
                 border: none !important;
                 padding: 0 !important;
-                margin-bottom: 1.5rem !important;
+                margin-bottom: 0.5rem !important;
             }
             .border-l-2 {
                 border-left-color: transparent !important;
                 padding-left: 0 !important;
             }
+            
+            /* Grotere titels ietwat intomen */
+            .text-xl { font-size: 14px !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Controls Toolbar (Hidden on Print) -->
     <div class="fixed top-4 left-4 no-print flex gap-3 z-50">
         <a href="https://vincepall.github.io/rt/index.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded shadow transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -118,10 +126,8 @@
         </button>
     </div>
 
-    <!-- Main A4 Document -->
     <div class="a4-container flex flex-col">
         
-        <!-- Document Header -->
         <div class="flex justify-between items-start mb-4">
             <div class="flex flex-col gap-3 w-3/5">
                 <input type="text" placeholder="Klantnaam" class="font-bold text-xl w-full placeholder-gray-400">
@@ -148,18 +154,15 @@
 
         <div id="header-text-container" class="flex flex-col gap-2 w-full mb-6 mt-1"></div>
 
-        <!-- Orders & Jobs Section -->
         <div class="flex-grow overflow-hidden">
             <div id="orders-container" class="flex flex-col gap-6">
-                <!-- Orders will be dynamically injected here -->
-            </div>
+                </div>
             
             <button class="mt-6 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium py-2 px-4 rounded border border-indigo-200 border-dashed w-full no-print transition-colors" onclick="addOrder()">
                 + Nog een Order / Onderzoek Toevoegen
             </button>
         </div>
 
-        <!-- Document Footer -->
         <div class="mt-12 pt-6 border-t-2 border-gray-800 flex flex-col gap-4">
             <div>
                 <h3 class="font-bold mb-2">Totaal aantal gebruikte films per formaat:</h3>
@@ -176,18 +179,14 @@
 
     <script>
         // --- Initialization ---
-        // Set today's date automatically
         document.getElementById('doc-date').valueAsDate = new Date();
         
-        // Define Film Sizes exactly as requested
         const filmSizes = ['10x12', '10x16', '10x24', '10x40', '10x48', '6x12', '6x16', '6x24', '6x48', '18x24', '30x40', '18x43'];
         
-        // Counters for dynamic IDs
         let opCount = 2;
         let orderCounter = 0;
         let rtRowCounter = 0;
 
-        // Initialize with one Order by default
         addOrder();
 
         // --- Logic: Header Text Fields ---
@@ -196,7 +195,6 @@
             const wrapper = document.createElement('div');
             wrapper.className = "flex items-start gap-2 w-full";
             
-            // Use textarea instead of input so it can expand to multiple lines if needed
             const input = document.createElement('textarea');
             input.rows = 1;
             input.placeholder = 'Extra informatie / opmerking...';
@@ -259,13 +257,11 @@
                     </div>
                     
                     <div id="order-details-${id}" class="pl-4 border-l-2 border-indigo-200 ml-1 mt-2">
-                        <!-- Dynamic sub-section based on Job Type -->
                     </div>
                 </div>
             `;
             
             document.getElementById('orders-container').insertAdjacentHTML('beforeend', html);
-            // Trigger the initial layout generation for the default "RT" type
             handleJobTypeChange(id, 'RT');
         }
 
@@ -285,14 +281,13 @@
                         RT Filmregel toevoegen
                     </button>
                 `;
-                addRTRow(orderId); // Add the first row automatically
+                addRTRow(orderId); 
             } else {
-                // MT, PT, UT blank text field
                 container.innerHTML = `
                     <textarea class="w-full min-h-[100px]" placeholder="Leeg tekstveld voor ${type} onderzoeksdetails..."></textarea>
                 `;
             }
-            calculateTotals(); // Recalculate in case RT rows were removed by changing type
+            calculateTotals(); 
         }
 
         // --- Logic: RT Rows & Calculations ---
@@ -300,7 +295,6 @@
             rtRowCounter++;
             const rowId = rtRowCounter;
             
-            // Build dropdown options from predefined array
             const options = filmSizes.map(size => `<option value="${size}">${size}</option>`).join('');
 
             const html = `
@@ -333,7 +327,6 @@
             calculateTotals();
         }
 
-        // Aggregate all RT totals grouped by film size
         function calculateTotals() {
             const totals = {};
             const rows = document.querySelectorAll('.rt-row');
@@ -354,7 +347,6 @@
                 return;
             }
 
-            // Format output as "xx * Size"
             const formattedTotals = Object.entries(totals)
                 .map(([size, total]) => `${total} * ${size}`)
                 .join('\n');
