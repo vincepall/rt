@@ -37,22 +37,23 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        /* Print-specific styling - Alles 'squishy' maken voor 1 A4 */
+        /* Print-specific styling - Maximaal 'squishy' met groter lettertype */
         @page {
             size: A4;
-            margin: 10mm; /* Compacte marge rondom het papier */
+            margin: 8mm; /* Kleinere paginamarge voor meer ruimte */
         }
         @media print {
             html, body {
                 width: 100%;
-                height: auto;
+                height: 100%;
                 margin: 0;
                 padding: 0;
-                font-size: 11px !important; /* Kleiner algemeen lettertype op print */
-                line-height: 1.2 !important; /* Compacter maken van tekstregels */
+                font-size: 14px !important; /* Verhoogd van 12px naar 14px voor leesbaarheid */
+                line-height: 1.2 !important; /*lets meer ademruimte dan 1.1 */
             }
             body {
                 background: white;
+                -webkit-print-color-adjust: exact;
             }
             .no-print {
                 display: none !important;
@@ -65,19 +66,21 @@
                 margin: 0;
                 padding: 0;
                 width: 100%;
+                min-height: 100%;
                 display: flex;
                 flex-direction: column;
-                page-break-after: avoid;
-                page-break-inside: avoid;
+                justify-content: flex-start;
+                overflow: hidden;
             }
 
-            /* Tailwind spaties/marges overrulen om de layout te comprimeren */
-            .mb-4, .mb-6 { margin-bottom: 0.25rem !important; }
-            .mt-12 { margin-top: 0.5rem !important; }
-            .mt-6, .mt-4, .mt-2 { margin-top: 0.25rem !important; }
-            .pt-6 { padding-top: 0.5rem !important; }
-            .p-5 { padding: 0.5rem !important; }
-            .gap-6, .gap-4, .gap-3 { gap: 0.25rem !important; }
+            /* Witruimte minimaliseren tussen blokken */
+            .mb-4, .mb-6 { margin-bottom: 0.2rem !important; }
+            .mt-12 { margin-top: 0.75rem !important; }
+            .mt-6, .mt-4 { margin-top: 0.15rem !important; }
+            .mt-2 { margin-top: 0 !important; }
+            .pt-6 { padding-top: 0.3rem !important; }
+            .p-5 { padding: 0.2rem 0 !important; }
+            .gap-6, .gap-4, .gap-3 { gap: 0.15rem !important; }
 
             input[type="text"], input[type="date"], input[type="number"], select, textarea {
                 border: none !important;
@@ -89,7 +92,7 @@
                 -webkit-appearance: none;
                 resize: none;
                 font-family: inherit;
-                font-size: 11px !important; /* Inputs schalen mee omlaag */
+                font-size: 14px !important;
                 line-height: 1.2 !important;
             }
             select {
@@ -100,16 +103,19 @@
             }
             .order-block {
                 border: none !important;
-                padding: 0 !important;
-                margin-bottom: 0.5rem !important;
+                padding: 0.2rem 0 !important;
+                margin-bottom: 0.3rem !important;
             }
             .border-l-2 {
-                border-left-color: transparent !important;
-                padding-left: 0 !important;
+                border-left-width: 1px !important;
+                padding-left: 0.6rem !important;
             }
             
-            /* Grotere titels ietwat intomen */
-            .text-xl { font-size: 14px !important; }
+            .text-xl { font-size: 18px !important; } /* Titels duidelijker */
+
+            #orders-container {
+                flex-grow: 0;
+            }
         }
     </style>
 </head>
@@ -172,7 +178,9 @@
             </div>
             
             <div class="mt-4">
-                <textarea class="w-full font-medium" rows="2" placeholder="Voer notities of tijden in...">8 uur incl. reistijd, ontwikkelen en rapporteren</textarea>
+                <textarea class="w-full font-medium resize-none overflow-hidden hide-empty-print" rows="1" 
+                    placeholder="Voer notities of tijden in..."
+                    oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'">8 uur incl. reistijd, ontwikkelen en rapporteren</textarea>
             </div>
         </div>
     </div>
@@ -284,7 +292,9 @@
                 addRTRow(orderId); 
             } else {
                 container.innerHTML = `
-                    <textarea class="w-full min-h-[100px]" placeholder="Leeg tekstveld voor ${type} onderzoeksdetails..."></textarea>
+                    <textarea class="w-full h-auto resize-none overflow-hidden hide-empty-print" rows="1" 
+                        placeholder="Leeg tekstveld voor ${type} onderzoeksdetails..." 
+                        oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'"></textarea>
                 `;
             }
             calculateTotals(); 
