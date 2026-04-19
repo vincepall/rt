@@ -113,6 +113,12 @@
             
             .text-xl { font-size: 18px !important; } /* Titels duidelijker */
 
+            /* Hide brackets in print */
+            .no-print-brackets { display: none !important; }
+            
+            /* Bold arrow in print */
+            .print-bold-arrow { font-weight: 900 !important; }
+
             #orders-container {
                 flex-grow: 0;
             }
@@ -139,8 +145,25 @@
                 <input type="text" placeholder="Klantnaam" class="font-bold text-xl w-full placeholder-gray-400">
                 
                 <div id="operators-container" class="flex flex-col gap-2 mt-2 w-3/4">
-                    <input type="text" placeholder="Operator 1" class="w-full">
-                    <input type="text" placeholder="Operator 2" class="w-full">
+                    <div class="flex items-center gap-2 w-full">
+                        <input type="text" placeholder="Operator 1" class="w-full">
+                    </div>
+                    <div class="flex items-center gap-2 w-full">
+                        <input type="text" placeholder="Operator 2" class="w-full">
+                        <button class="text-red-400 hover:text-red-600 no-print flex-shrink-0" onclick="this.parentElement.remove(); updateOperatorPlaceholders();" title="Operator verwijderen">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border-b border-gray-300 my-4 print:my-2 print:border-gray-400"></div>
+
+                <div class="mt-2 w-3/4">
+                    <select class="w-full font-medium cursor-pointer">
+                        <option value="-">-</option>
+                        <option value="Prefab" selected>Prefab</option>
+                        <option value="Montage">Montage</option>
+                    </select>
                 </div>
                 
                 <div class="flex flex-col gap-2 mt-2 no-print">
@@ -159,6 +182,7 @@
         </div>
 
         <div id="header-text-container" class="flex flex-col gap-2 w-full mb-6 mt-1"></div>
+        <div class="border-b border-gray-300 mb-6 print:mb-2 print:border-gray-400"></div>
 
         <div class="flex-grow overflow-hidden">
             <div id="orders-container" class="flex flex-col gap-6">
@@ -170,7 +194,7 @@
         </div>
 
         <div class="mt-12 pt-6 border-t-2 border-gray-800 flex flex-col gap-4">
-            <div>
+            <div id="film-totals-section">
                 <h3 class="font-bold mb-2">Totaal aantal gebruikte films per formaat:</h3>
                 <div id="film-totals" class="min-h-[40px] text-sm whitespace-pre-line text-gray-700 font-medium">
                     Nog geen films geregistreerd.
@@ -225,17 +249,40 @@
 
         // --- Logic: Operators ---
         function addOperator() {
-            if(opCount >= 5) {
+            const container = document.getElementById('operators-container');
+            if(container.children.length >= 5) {
                 alert("Maximaal 5 operators toegestaan volgens het sjabloon.");
                 return;
             }
-            opCount++;
-            const container = document.getElementById('operators-container');
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = "flex items-center gap-2 w-full";
+            
             const input = document.createElement('input');
             input.type = 'text';
-            input.placeholder = `(Operator ${opCount})`;
             input.className = 'w-full';
-            container.appendChild(input);
+            
+            const btn = document.createElement('button');
+            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            btn.className = "text-red-400 hover:text-red-600 no-print flex-shrink-0";
+            btn.title = "Operator verwijderen";
+            btn.onclick = () => {
+                wrapper.remove();
+                updateOperatorPlaceholders();
+            };
+            
+            wrapper.appendChild(input);
+            wrapper.appendChild(btn);
+            container.appendChild(wrapper);
+            updateOperatorPlaceholders();
+        }
+
+        function updateOperatorPlaceholders() {
+            const container = document.getElementById('operators-container');
+            Array.from(container.children).forEach((wrapper, index) => {
+                const input = wrapper.querySelector('input');
+                input.placeholder = `Operator ${index + 1}`;
+            });
         }
 
         // --- Logic: Orders & Jobs ---
@@ -249,22 +296,18 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
                     
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="font-bold min-w-[140px]">Type Onderzoek:</span>
-                        <select class="w-32 font-medium bg-gray-50 cursor-pointer" onchange="handleJobTypeChange(${id}, this.value)">
+                    <div class="flex items-center gap-1 mb-2">
+                        <select class="w-12 font-medium bg-gray-50 cursor-pointer" onchange="handleJobTypeChange(${id}, this.value)">
                             <option value="RT">RT</option>
                             <option value="MT">MT</option>
                             <option value="PT">PT</option>
                             <option value="UT">UT</option>
                         </select>
+                        <span class="font-medium">-</span>
+                        <input type="text" class="flex-1 font-bold" placeholder="Voer ordernummer in">
                     </div>
                     
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="min-w-[140px] font-medium">- Ordernr:</span>
-                        <input type="text" class="w-1/2 font-bold" placeholder="Voer ordernummer in">
-                    </div>
-                    
-                    <div id="order-details-${id}" class="pl-4 border-l-2 border-indigo-200 ml-1 mt-2">
+                    <div id="order-details-${id}" class="pl-4 border-l-2 border-indigo-200 ml-1">
                     </div>
                 </div>
             `;
@@ -308,28 +351,62 @@
             const options = filmSizes.map(size => `<option value="${size}">${size}</option>`).join('');
 
             const html = `
-                <div class="rt-row flex items-center gap-1" id="rt-row-${rowId}">
-                    <span class="font-medium">- <span class="no-print">[</span></span>
-                    <input type="number" class="w-16 text-center rt-inp1" placeholder="aantal">
-                    <span class="font-medium"><span class="no-print">]</span> &times; <span class="no-print">[</span></span>
-                    <input type="text" class="w-24 text-center rt-inp2" placeholder="tekst/aantal">
-                    <span class="font-medium text-gray-500 mx-1">&rarr;</span>
-                    <span class="font-medium no-print">[</span>
-                    <input type="number" class="w-16 text-center font-bold rt-total bg-indigo-50" placeholder="Totaal" oninput="calculateTotals()">
-                    <span class="font-medium"><span class="no-print">]</span> &times;</span>
-                    <select class="rt-size cursor-pointer" onchange="calculateTotals()">
-                        ${options}
-                    </select>
+                <div class="rt-row flex items-start gap-1 mb-2" id="rt-row-${rowId}">
+                    <div class="flex items-center gap-1 pt-0.5">
+                        <span class="font-medium">- </span>
+                        <input type="number" class="w-16 text-center rt-inp1" placeholder="aantal">
+                        <span class="font-medium">&times;</span>
+                        <input type="text" class="w-24 text-center rt-inp2" placeholder="tekst/aantal">
+                        <span class="font-medium text-gray-500 mx-1 print-bold-arrow">&rarr;</span>
+                    </div>
+
+                    <div class="flex flex-col gap-1" id="rt-film-container-${rowId}">
+                        <div class="film-line flex items-center gap-1">
+                            <input type="number" class="w-16 text-center font-bold rt-total bg-indigo-50" placeholder="Totaal" oninput="calculateTotals()">
+                            <span class="font-medium">&times;</span>
+                            <select class="rt-size cursor-pointer" onchange="calculateTotals()">
+                                ${options}
+                            </select>
+                            <button onclick="addFilmLine(${rowId})" class="text-indigo-600 hover:text-indigo-800 no-print ml-1" title="Extra filmmaat toevoegen">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            </button>
+                        </div>
+                    </div>
                     
-                    <textarea rows="1" class="flex-1 min-w-[120px] text-sm font-bold text-gray-800 placeholder-gray-400 ml-1 hide-empty-print resize-none overflow-hidden" placeholder="Diktetoeslag" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';"></textarea>
+                    <input type="text" list="diktetoeslag-options" class="flex-1 min-w-[120px] text-sm font-bold text-gray-800 placeholder-gray-400 ml-1 hide-empty-print" placeholder="Diktetoeslag">
+                    <datalist id="diktetoeslag-options">
+                        <option value="Diktetoeslag (doorstraalde dikte >31mm)">
+                        <option value="Aansluitend uitslag">
+                        <option value="Se75">
+                        <option value="Ir192">
+                    </datalist>
                     
-                    <button onclick="removeRTRow(${rowId})" class="text-red-400 hover:text-red-600 no-print ml-1" title="Regel verwijderen">
+                    <button onclick="removeRTRow(${rowId})" class="text-red-400 hover:text-red-600 no-print ml-1 mt-1" title="Regel verwijderen">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </button>
                 </div>
             `;
             
             document.getElementById(`rt-rows-${orderId}`).insertAdjacentHTML('beforeend', html);
+        }
+
+        function addFilmLine(rowId) {
+            const container = document.getElementById(`rt-film-container-${rowId}`);
+            const options = filmSizes.map(size => `<option value="${size}">${size}</option>`).join('');
+            
+            const html = `
+                <div class="film-line flex items-center gap-1">
+                    <input type="number" class="w-16 text-center font-bold rt-total bg-indigo-50" placeholder="Totaal" oninput="calculateTotals()">
+                    <span class="font-medium">&times;</span>
+                    <select class="rt-size cursor-pointer" onchange="calculateTotals()">
+                        ${options}
+                    </select>
+                    <button onclick="this.parentElement.remove(); calculateTotals();" class="text-red-400 hover:text-red-600 no-print ml-1" title="Verwijder filmmaat">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
         }
 
         function removeRTRow(rowId) {
@@ -339,11 +416,20 @@
 
         function calculateTotals() {
             const totals = {};
-            const rows = document.querySelectorAll('.rt-row');
+            const rtRows = document.querySelectorAll('.rt-row');
+            const filmLines = document.querySelectorAll('.film-line');
+            const totalsSection = document.getElementById('film-totals-section');
             
-            rows.forEach(row => {
-                const totalValue = parseInt(row.querySelector('.rt-total').value);
-                const size = row.querySelector('.rt-size').value;
+            if (rtRows.length === 0) {
+                totalsSection.style.display = 'none';
+                return;
+            } else {
+                totalsSection.style.display = 'block';
+            }
+            
+            filmLines.forEach(line => {
+                const totalValue = parseInt(line.querySelector('.rt-total').value);
+                const size = line.querySelector('.rt-size').value;
                 
                 if (!isNaN(totalValue) && totalValue > 0 && size) {
                     totals[size] = (totals[size] || 0) + totalValue;
