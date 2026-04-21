@@ -62,20 +62,57 @@
              animation: fadeIn 0.3s ease-out 0.1s forwards;
              opacity: 0;
         }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            @page { size: landscape; margin: 10mm; }
+            body { 
+                background-color: white !important; 
+                color: black !important; 
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            /* Force all text in the print view to black for contrast */
+            #print-view * {
+                color: black !important;
+                text-shadow: none !important;
+            }
+            #print-view .bg-accent-yellow\/20 {
+                background-color: #cbd5e1 !important;
+                height: 1px;
+            }
+            #print-view table th {
+                background-color: #f1f5f9 !important;
+            }
+            #print-view table {
+                page-break-inside: auto;
+            }
+            #print-view tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            #print-view td {
+                vertical-align: top;
+            }
+        }
     </style>
 </head>
 <body class="text-dark-300 min-h-screen flex flex-col">
 
     <!-- Top Navigation -->
-    <nav class="bg-dark-800 border-b border-dark-700 shadow-lg p-4 flex items-center fixed w-full top-0 z-50">
+    <nav class="bg-dark-800 border-b border-dark-700 shadow-lg p-4 flex items-center justify-between fixed w-full top-0 z-50 print:hidden">
         <a href="index.html" class="flex items-center gap-2 text-dark-300 hover:text-white hover:bg-dark-700 transition-colors font-semibold px-3 py-2 rounded">
             <i class="fa-solid fa-house text-accent-yellow"></i>
             <span>Home</span>
         </a>
+        <button onclick="prepareAndPrint()" class="flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-600 text-white px-4 py-2 rounded transition-colors text-sm font-semibold shadow-sm">
+            <i class="fa-solid fa-print text-accent-yellow"></i>
+            <span>Print Overzicht</span>
+        </button>
     </nav>
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 pt-24 pb-12 max-w-7xl">
+    <!-- Main Content (Hidden during print) -->
+    <main class="flex-grow container mx-auto px-4 pt-24 pb-12 max-w-7xl print:hidden">
         
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-accent-yellow mb-2 tracking-tight">RT Lasfouten</h1>
@@ -246,118 +283,92 @@
                             <!-- Defect (Pore) -->
                             <circle cx="180" cy="75" r="5" fill="#000" stroke="#F5DF4D"/>
                             <!-- Dimensions -->
-                            <!-- l (length) -->
                             <line x1="80" y1="90" x2="120" y2="90" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
-                            <text x="98" y="105" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">l</text>
-                            <!-- h (width) -->
+                            <text x="100" y="105" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">l</text>
                             <line x1="70" y1="72" x2="70" y2="80" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
                             <line x1="70" y1="76" x2="80" y2="76" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
-                            <text x="55" y="80" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">h</text>
-                            <!-- d (diameter) -->
+                            <text x="65" y="80" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold" text-anchor="end">h</text>
                             <line x1="180" y1="75" x2="195" y2="60" stroke="#F5DF4D" stroke-width="1"/>
-                            <text x="198" y="60" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">d</text>
-                            <!-- Wp (Weld Width) -->
+                            <text x="198" y="60" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold" text-anchor="start">d</text>
                             <line x1="280" y1="55" x2="280" y2="95" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
-                            <text x="285" y="80" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">Wp</text>
+                            <text x="285" y="80" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold" text-anchor="start">Wp</text>
                         </svg>
                     </div>
                 </div>
 
-                <!-- NEW EN Specifics: Clustered, Linear and Elongated -->
+                <!-- EN Specifics: Clustered, Linear and Elongated -->
                 <div id="en-specific-rules" class="hidden mt-4 pt-6 border-t border-dark-700/50 animate-fade-in-delayed">
                     <h4 class="font-bold text-gray-200 mb-6 uppercase tracking-wider">Specifieke Beoordeling & Samensmelting (EN ISO 5817)</h4>
-                    
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        
-                        <!-- 1. Gas Nest Specifics -->
+                        <!-- 1. Gas Nest -->
                         <div class="bg-dark-800/30 p-4 rounded-lg border border-dark-700/50 flex flex-col items-center text-center">
                             <h5 class="text-accent-yellow font-bold mb-4 text-sm uppercase tracking-wide w-full text-left">1. Nestvormige Porositeit (2013)</h5>
                             <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <marker id="arrow2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
-                                        <path d="M0,0 L0,6 L6,3 z" fill="#F5DF4D" />
-                                    </marker>
-                                </defs>
+                                <defs><marker id="arrow2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L6,3 z" fill="#F5DF4D" /></marker></defs>
                                 <rect x="0" y="30" width="220" height="50" fill="#334155" opacity="0.3"/>
-                                <!-- Pores -->
                                 <circle cx="60" cy="55" r="15" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
                                 <circle cx="115" cy="55" r="10" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
-                                <!-- Distance -->
                                 <line x1="75" y1="55" x2="105" y2="55" stroke="#F5DF4D" stroke-width="1"/>
-                                <text x="86" y="50" fill="#F5DF4D" font-size="10" font-family="monospace">D</text>
-                                <!-- Combined -->
+                                <text x="90" y="50" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">D</text>
                                 <circle cx="87.5" cy="55" r="42.5" fill="none" stroke="#F5DF4D" stroke-width="1.5" stroke-dasharray="4,2"/>
-                                <!-- Labels -->
                                 <line x1="60" y1="70" x2="60" y2="90" stroke="#64748b" stroke-width="0.5"/>
-                                <text x="50" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">dA1</text>
+                                <text x="60" y="100" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">dA1</text>
                                 <line x1="115" y1="65" x2="115" y2="90" stroke="#64748b" stroke-width="0.5"/>
-                                <text x="105" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">dA2</text>
-                                <!-- dAc -->
+                                <text x="115" y="100" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">dA2</text>
                                 <line x1="45" y1="15" x2="130" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
                                 <line x1="45" y1="15" x2="45" y2="40" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
                                 <line x1="130" y1="15" x2="130" y2="40" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
-                                <text x="78" y="10" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">dAc</text>
+                                <text x="87.5" y="10" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">dAc</text>
                             </svg>
                             <p class="text-xs text-gray-300 mt-4 text-left w-full border-t border-dark-700 pt-3">
                                 Als <span class="font-mono text-accent-yellow">D &lt; dA(kleinste)</span>, combineer tot één nest:
                                 <code class="block font-mono text-accent-yellow bg-black/30 px-2 py-1 rounded mt-1">dAc = dA1 + dA2 + D</code>
                             </p>
                         </div>
-
-                        <!-- 2. Linear Porosity Specifics -->
+                        <!-- 2. Linear Porosity -->
                         <div class="bg-dark-800/30 p-4 rounded-lg border border-dark-700/50 flex flex-col items-center text-center">
                             <h5 class="text-accent-yellow font-bold mb-4 text-sm uppercase tracking-wide w-full text-left">2. Lineaire Porositeit (2014)</h5>
                             <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="0" y="30" width="220" height="50" fill="#334155" opacity="0.3"/>
-                                <!-- Pores -->
                                 <circle cx="50" cy="55" r="8" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
                                 <circle cx="90" cy="55" r="5" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
                                 <circle cx="120" cy="55" r="6" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
                                 <circle cx="160" cy="55" r="8" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
-                                <!-- Distance -->
                                 <line x1="58" y1="55" x2="85" y2="55" stroke="#F5DF4D" stroke-width="1"/>
-                                <text x="68" y="50" fill="#F5DF4D" font-size="10" font-family="monospace">D</text>
-                                <!-- Labels -->
+                                <text x="71.5" y="50" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">D</text>
                                 <line x1="50" y1="63" x2="50" y2="90" stroke="#64748b" stroke-width="0.5"/>
-                                <text x="43" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">d1</text>
+                                <text x="50" y="100" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">d1</text>
                                 <line x1="90" y1="60" x2="90" y2="90" stroke="#64748b" stroke-width="0.5"/>
-                                <text x="83" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">d2</text>
-                                <!-- Length l -->
+                                <text x="90" y="100" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">d2</text>
                                 <line x1="42" y1="15" x2="168" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
                                 <line x1="42" y1="15" x2="42" y2="47" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
                                 <line x1="168" y1="15" x2="168" y2="47" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
-                                <text x="100" y="10" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">l</text>
+                                <text x="105" y="10" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">l</text>
                             </svg>
                             <p class="text-xs text-gray-300 mt-4 text-left w-full border-t border-dark-700 pt-3">
                                 Als <span class="font-mono text-accent-yellow">D &lt; d(kleinste)</span>, dan worden de poriën gezien als één volledig samengesmolten oppervlak in de berekening.
                             </p>
                         </div>
-
-                        <!-- 3. Elongated Cavities Specifics -->
+                        <!-- 3. Elongated Cavities -->
                         <div class="bg-dark-800/30 p-4 rounded-lg border border-dark-700/50 flex flex-col items-center text-center">
                             <h5 class="text-accent-yellow font-bold mb-4 text-sm uppercase tracking-wide w-full text-left">3. Gaskanalen (2015/2016)</h5>
                             <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="0" y="30" width="220" height="50" fill="#334155" opacity="0.3"/>
-                                <!-- Cavities -->
                                 <ellipse cx="40" cy="45" rx="15" ry="3" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
                                 <ellipse cx="100" cy="60" rx="10" ry="2" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
                                 <ellipse cx="160" cy="50" rx="20" ry="4" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
-                                <!-- Distance -->
                                 <line x1="110" y1="55" x2="140" y2="55" stroke="#F5DF4D" stroke-width="1"/>
-                                <text x="122" y="50" fill="#F5DF4D" font-size="10" font-family="monospace">D</text>
-                                <!-- Labels -->
+                                <text x="125" y="50" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">D</text>
                                 <line x1="25" y1="15" x2="55" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
-                                <text x="35" y="10" fill="#F5DF4D" font-size="10" font-family="monospace">l1</text>
+                                <text x="40" y="10" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">l1</text>
                                 <line x1="25" y1="15" x2="25" y2="45" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
                                 <line x1="55" y1="15" x2="55" y2="45" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
-                                
                                 <line x1="90" y1="80" x2="110" y2="80" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
-                                <text x="95" y="92" fill="#F5DF4D" font-size="10" font-family="monospace">l2</text>
+                                <text x="100" y="92" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">l2</text>
                                 <line x1="90" y1="60" x2="90" y2="80" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
                                 <line x1="110" y1="60" x2="110" y2="80" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
-                                
                                 <line x1="140" y1="15" x2="180" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
-                                <text x="155" y="10" fill="#F5DF4D" font-size="10" font-family="monospace">l3</text>
+                                <text x="160" y="10" fill="#F5DF4D" font-size="10" font-family="monospace" text-anchor="middle">l3</text>
                                 <line x1="140" y1="15" x2="140" y2="50" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
                                 <line x1="180" y1="15" x2="180" y2="50" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
                             </svg>
@@ -365,10 +376,8 @@
                                 Als <span class="font-mono text-accent-yellow">D &lt; l(kortste)</span>, dan worden beide defecten als één doorlopende lengte opgeteld bij <span class="font-mono text-accent-yellow">Σl</span>.
                             </p>
                         </div>
-                        
                     </div>
                 </div>
-
             </div>
 
             <div class="mt-4 flex items-start gap-2 text-xs text-dark-600 bg-dark-800/50 p-3 rounded border border-dark-700/50">
@@ -379,76 +388,207 @@
 
     </main>
 
+    <!-- Print Overview Container (Only visible during @media print) -->
+    <div id="print-view" class="hidden print:block w-full text-black p-2 font-sans">
+        <h1 class="text-2xl font-bold border-b-2 border-black pb-2 mb-4">RT Lasfouten - Algemene Beoordelingscriteria & Formules</h1>
+        
+        <div class="mb-4 text-sm font-semibold bg-gray-100 p-3 border border-gray-400">
+            <div class="italic text-gray-700">
+                Dit overzicht toont de algemene formules voor beoordeling. 
+                <span class="font-mono bg-white px-1 border border-gray-300">t</span> = wanddikte, 
+                <span class="font-mono bg-white px-1 border border-gray-300">s</span> = lasdikte (nominaal), 
+                <span class="font-mono bg-white px-1 border border-gray-300">Wp</span> = lasbreedte. 
+                Criteria zijn berekend op basis van een referentielengte (L) van 100mm, tenzij anders is aangegeven.
+            </div>
+        </div>
+
+        <table class="w-full text-left text-[11px] border-collapse border border-gray-500 mb-8">
+            <thead>
+                <tr>
+                    <th class="border border-gray-500 p-2 w-[5%] text-center">Code</th>
+                    <th class="border border-gray-500 p-2 w-[15%]">Lasfout / Omschrijving</th>
+                    <th class="border border-gray-500 p-2 w-[20%]">ASME V. UW 51</th>
+                    <th class="border border-gray-500 p-2 w-[20%]">EN ISO 5817 Level 1 / B</th>
+                    <th class="border border-gray-500 p-2 w-[20%]">EN ISO 5817 Level 2 / C</th>
+                    <th class="border border-gray-500 p-2 w-[20%]">EN ISO 5817 Level 3 / D</th>
+                </tr>
+            </thead>
+            <tbody id="print-tbody" class="divide-y divide-gray-400">
+                <!-- Dynamically filled on print button click -->
+            </tbody>
+        </table>
+
+        <!-- Print Diagrams (Black & White versions) -->
+        <div class="mt-8 page-break-inside-avoid" style="page-break-inside: avoid;">
+            <h2 class="text-lg font-bold border-b border-black mb-4">Verduidelijkingstekeningen (EN ISO 5817 Samensmeltingsregels)</h2>
+            
+            <!-- Force exactly 4 columns for print layout -->
+            <div class="grid grid-cols-4 gap-6 items-start">
+                
+                <!-- Print: General -->
+                <div class="p-2 border border-gray-400">
+                    <h5 class="font-bold text-xs uppercase mb-2">Algemene Definities</h5>
+                    <svg width="100%" height="auto" viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg">
+                        <defs><marker id="print-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L6,3 z" fill="#000" /></marker></defs>
+                        <rect x="20" y="35" width="280" height="80" fill="#fff" stroke="#000"/>
+                        <rect x="20" y="55" width="280" height="40" fill="#e5e7eb" stroke="none"/>
+                        <path d="M20 55 Q30 75 20 95 M50 55 Q60 75 50 95 M80 55 Q90 75 80 95 M110 55 Q120 75 110 95 M140 55 Q150 75 140 95 M170 55 Q180 75 170 95 M200 55 Q210 75 200 95 M230 55 Q240 75 230 95 M260 55 Q270 75 260 95 M290 55 Q300 75 290 95" stroke="#9ca3af" fill="none"/>
+                        <rect x="80" y="72" width="40" height="8" rx="2" fill="#000" stroke="#000"/>
+                        <circle cx="180" cy="75" r="5" fill="#000" stroke="#000"/>
+                        <line x1="80" y1="90" x2="120" y2="90" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <text x="100" y="105" fill="#000" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">l</text>
+                        <line x1="70" y1="72" x2="70" y2="80" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <line x1="70" y1="76" x2="80" y2="76" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <text x="65" y="80" fill="#000" font-size="12" font-family="monospace" font-weight="bold" text-anchor="end">h</text>
+                        <line x1="180" y1="75" x2="195" y2="60" stroke="#000" stroke-width="1"/>
+                        <text x="198" y="60" fill="#000" font-size="12" font-family="monospace" font-weight="bold" text-anchor="start">d</text>
+                        <line x1="280" y1="55" x2="280" y2="95" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <text x="285" y="80" fill="#000" font-size="12" font-family="monospace" font-weight="bold" text-anchor="start">Wp</text>
+                    </svg>
+                </div>
+
+                <!-- Print: Nest -->
+                <div class="p-2 border border-gray-400">
+                    <h5 class="font-bold text-xs uppercase mb-2">1. Nest (2013)</h5>
+                    <svg width="100%" height="auto" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="30" width="220" height="50" fill="#e5e7eb" stroke="none"/>
+                        <circle cx="60" cy="55" r="15" fill="#000" stroke="#000" stroke-width="1"/>
+                        <circle cx="115" cy="55" r="10" fill="#000" stroke="#000" stroke-width="1"/>
+                        <line x1="75" y1="55" x2="105" y2="55" stroke="#000" stroke-width="1"/>
+                        <text x="90" y="50" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">D</text>
+                        <circle cx="87.5" cy="55" r="42.5" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4,2"/>
+                        <line x1="60" y1="70" x2="60" y2="90" stroke="#000" stroke-width="0.5"/>
+                        <text x="60" y="100" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">dA1</text>
+                        <line x1="115" y1="65" x2="115" y2="90" stroke="#000" stroke-width="0.5"/>
+                        <text x="115" y="100" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">dA2</text>
+                        <line x1="45" y1="15" x2="130" y2="15" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <line x1="45" y1="15" x2="45" y2="40" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <line x1="130" y1="15" x2="130" y2="40" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <text x="87.5" y="10" fill="#000" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">dAc</text>
+                    </svg>
+                    <div class="text-[10px] mt-2 leading-relaxed italic border-t border-gray-400 pt-1">Als D &lt; dA(kleinste), één nest.<br> dAc = dA1 + dA2 + D</div>
+                </div>
+
+                <!-- Print: Linear -->
+                <div class="p-2 border border-gray-400">
+                    <h5 class="font-bold text-xs uppercase mb-2">2. Lineair (2014)</h5>
+                    <svg width="100%" height="auto" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="30" width="220" height="50" fill="#e5e7eb" stroke="none"/>
+                        <circle cx="50" cy="55" r="8" fill="#000" stroke="#000" stroke-width="1"/>
+                        <circle cx="90" cy="55" r="5" fill="#000" stroke="#000" stroke-width="1"/>
+                        <circle cx="120" cy="55" r="6" fill="#000" stroke="#000" stroke-width="1"/>
+                        <circle cx="160" cy="55" r="8" fill="#000" stroke="#000" stroke-width="1"/>
+                        <line x1="58" y1="55" x2="85" y2="55" stroke="#000" stroke-width="1"/>
+                        <text x="71.5" y="50" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">D</text>
+                        <line x1="50" y1="63" x2="50" y2="90" stroke="#000" stroke-width="0.5"/>
+                        <text x="50" y="100" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">d1</text>
+                        <line x1="90" y1="60" x2="90" y2="90" stroke="#000" stroke-width="0.5"/>
+                        <text x="90" y="100" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">d2</text>
+                        <line x1="42" y1="15" x2="168" y2="15" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <line x1="42" y1="15" x2="42" y2="47" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <line x1="168" y1="15" x2="168" y2="47" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <text x="105" y="10" fill="#000" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">l</text>
+                    </svg>
+                    <div class="text-[10px] mt-2 leading-relaxed italic border-t border-gray-400 pt-1">Als D &lt; d(kleinste), zie als volledig samengesmolten oppervlak.</div>
+                </div>
+
+                <!-- Print: Elongated -->
+                <div class="p-2 border border-gray-400">
+                    <h5 class="font-bold text-xs uppercase mb-2">3. Gaskanaal (2015)</h5>
+                    <svg width="100%" height="auto" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="30" width="220" height="50" fill="#e5e7eb" stroke="none"/>
+                        <ellipse cx="40" cy="45" rx="15" ry="3" fill="#000" stroke="#000" stroke-width="1"/>
+                        <ellipse cx="100" cy="60" rx="10" ry="2" fill="#000" stroke="#000" stroke-width="1"/>
+                        <ellipse cx="160" cy="50" rx="20" ry="4" fill="#000" stroke="#000" stroke-width="1"/>
+                        <line x1="110" y1="55" x2="140" y2="55" stroke="#000" stroke-width="1"/>
+                        <text x="125" y="50" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">D</text>
+                        <line x1="25" y1="15" x2="55" y2="15" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <text x="40" y="10" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">l1</text>
+                        <line x1="25" y1="15" x2="25" y2="45" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <line x1="55" y1="15" x2="55" y2="45" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <line x1="90" y1="80" x2="110" y2="80" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <text x="100" y="92" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">l2</text>
+                        <line x1="90" y1="60" x2="90" y2="80" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <line x1="110" y1="60" x2="110" y2="80" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <line x1="140" y1="15" x2="180" y2="15" stroke="#000" stroke-width="1" marker-start="url(#print-arrow)" marker-end="url(#print-arrow)"/>
+                        <text x="160" y="10" fill="#000" font-size="10" font-family="monospace" text-anchor="middle">l3</text>
+                        <line x1="140" y1="15" x2="140" y2="50" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                        <line x1="180" y1="15" x2="180" y2="50" stroke="#000" stroke-width="0.5" stroke-dasharray="2"/>
+                    </svg>
+                    <div class="text-[10px] mt-2 leading-relaxed italic border-t border-gray-400 pt-1">Als D &lt; l(kortste), dan is het één doorlopende lengte.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <script>
         // --- Helpers ---
-        // Generates HTML for calculated EN values: "h < 3mm (0.2s)"
+        // Deze helper functies genereren nu standaard de algemene regel (als t/wp 0 is)
         const fmtEN = (t, factor, max, prefix = "") => {
             if (!t || t <= 0) return `${prefix} &le; ${factor}s (max ${max}mm)`;
-            
             const limit = Math.min(t * factor, max).toFixed(1);
-            return `${prefix} &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(${factor}s, max ${max})</span>`;
+            return `${prefix} &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-[10px]">(${factor}s, max ${max})</span>`;
         };
 
         const fmtEN_Pore = (t, factor, max, area) => {
              if (!t || t <= 0) return `A &le; ${area}%, d &le; ${factor}s (max ${max}mm)`;
              const limit = Math.min(t * factor, max).toFixed(1);
-             return `A &le; ${area}%, d &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(${factor}s, max ${max})</span>`;
+             return `A &le; ${area}%, d &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-[10px]">(${factor}s, max ${max})</span>`;
         };
 
         const fmtEN_Cluster = (wp, factor, max) => {
              if (!wp || wp <= 0) return `dA &le; Wp${factor === 0.5 ? '/2' : ''} (max ${max}mm)`;
              const limit = Math.min(wp * factor, max).toFixed(1);
-             return `dA &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(Wp${factor === 0.5 ? '/2' : ''}, max ${max})</span>`;
+             return `dA &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-[10px]">(Wp${factor === 0.5 ? '/2' : ''}, max ${max})</span>`;
         };
 
-        // NEW: Helper for Linear Porosity (l <= s max X, d <= Ys max Z)
         const fmtEN_LinearPore = (t, maxL, factorD, maxD) => {
              if (!t || t <= 0) return `l &le; s (max ${maxL}mm)<br>d &le; ${factorD}s (max ${maxD}mm)`;
              const limitL = Math.min(t, maxL).toFixed(1);
              const limitD = Math.min(t * factorD, maxD).toFixed(1);
-             return `l &le; <strong>${limitL}mm</strong> <span class="italic opacity-70 text-xs">(&le;s, max ${maxL})</span><br>` +
-                    `d &le; <strong>${limitD}mm</strong> <span class="italic opacity-70 text-xs">(${factorD}s, max ${maxD})</span>`;
+             return `l &le; <strong>${limitL}mm</strong> <span class="italic opacity-70 text-[10px]">(&le;s, max ${maxL})</span><br>` +
+                    `d &le; <strong>${limitD}mm</strong> <span class="italic opacity-70 text-[10px]">(${factorD}s, max ${maxD})</span>`;
         };
 
-        // Helper for Sum of Lengths (Σl <= s, max X)
         const fmtSumL = (t, max) => {
             if (!t || t <= 0) return `, &Sigma;l &le; s (max ${max}mm)`;
             const limit = Math.min(t, max).toFixed(1);
-            return `<br>&Sigma;l &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(&le;s, max ${max})</span>`;
+            return `<br>&Sigma;l &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-[10px]">(&le;s, max ${max})</span>`;
         };
 
         const fmtASME_Gen = (t) => {
              if (!t || t <= 0) return "t&le;19: 6mm | 19&lt;t&le;57: 1/3t | t&gt;57: 19mm";
-             if (t <= 19) return `<strong>6.0mm</strong> <span class="italic opacity-70 text-xs">(t&le;19)</span>`;
-             if (t <= 57) return `<strong>${(t/3).toFixed(1)}mm</strong> <span class="italic opacity-70 text-xs">(1/3t)</span>`;
-             return `<strong>19.0mm</strong> <span class="italic opacity-70 text-xs">(max)</span>`;
+             if (t <= 19) return `<strong>6.0mm</strong> <span class="italic opacity-70 text-[10px]">(t&le;19)</span>`;
+             if (t <= 57) return `<strong>${(t/3).toFixed(1)}mm</strong> <span class="italic opacity-70 text-[10px]">(1/3t)</span>`;
+             return `<strong>19.0mm</strong> <span class="italic opacity-70 text-[10px]">(max)</span>`;
         };
 
         const fmtASME_Pore = (t) => {
-            if (!t || t <= 0) return "t&le;50: 1/4t (max 4mm) | Geïsoleerd (>25mm): 1/3t (max 6mm) | t&gt;50: 10mm <br><span class='text-xs opacity-70 mt-1 block'>t&lt;3.0: max 12 per 150mm las</span>";
+            if (!t || t <= 0) return "t&le;50: 1/4t (max 4) | Iso. (>25mm): 1/3t (max 6) | t&gt;50: 10mm";
             
-            if (t > 50) return `<strong>10.0mm</strong> <span class="italic opacity-70 text-xs">(t>50)</span>`;
+            if (t > 50) return `<strong>10.0mm</strong> <span class="italic opacity-70 text-[10px]">(t>50)</span>`;
 
             const std = Math.min(t/4, 4).toFixed(1);
             const iso = Math.min(t/3, 6).toFixed(1);
             
-            let html = `<div>Standaard: <strong>${std}mm</strong> <span class="italic opacity-70 text-xs">(1/4t, max 4)</span></div>` +
-                   `<div class="h-px w-full bg-accent-yellow/20 my-2"></div>` + 
-                   `<div>Geïsoleerd (>25mm): <strong>${iso}mm</strong> <span class="italic opacity-70 text-xs">(1/3t, max 6)</span></div>`;
+            let html = `<div>Standaard: <strong>${std}mm</strong> <span class="italic opacity-70 text-[10px]">(1/4t, max 4)</span></div>` +
+                   `<div class="h-px w-full bg-accent-yellow/20 my-1"></div>` + 
+                   `<div>Geïsoleerd (>25mm): <strong>${iso}mm</strong> <span class="italic opacity-70 text-[10px]">(1/3t, max 6)</span></div>`;
                    
             if (t < 3.0) {
-                html += `<div class="h-px w-full bg-accent-yellow/20 my-2"></div><div><span class="text-xs italic text-accent-yellow">Let op (t<3.0): Max 12 indicaties per 150mm</span></div>`;
+                html += `<div class="h-px w-full bg-accent-yellow/20 my-1"></div><div><span class="text-[10px] italic text-accent-yellow">Let op (t<3.0): Max 12 indicaties / 150mm</span></div>`;
             }
             return html;
         };
 
         const fmtASME_Cluster = (t) => {
-             if (!t || t <= 0) return "Clusterlengte &le; 2t (max 25mm) | &Sigma;L clusters &le; 25mm per 150mm las";
+             if (!t || t <= 0) return "Lengte &le; 2t (max 25) | &Sigma;L clusters &le; 25mm per 150mm las";
              
              const clusterLen = Math.min(t * 2, 25).toFixed(1);
-             return `<div>Lengte &le; <strong>${clusterLen}mm</strong> <span class="italic opacity-70 text-xs">(2t, max 25)</span></div>` +
-                    `<div class="h-px w-full bg-accent-yellow/20 my-2"></div>` + 
-                    `<div>&Sigma;L clusters &le; <strong>25.0mm</strong> <span class="italic opacity-70 text-xs">(in elke 150mm laslengte)</span></div>`;
+             return `<div>Lengte &le; <strong>${clusterLen}mm</strong> <span class="italic opacity-70 text-[10px]">(2t, max 25)</span></div>` +
+                    `<div class="h-px w-full bg-accent-yellow/20 my-1"></div>` + 
+                    `<div>&Sigma;L clusters &le; <strong>25.0mm</strong> <span class="italic opacity-70 text-[10px]">(per 150mm las)</span></div>`;
         };
 
 
@@ -465,89 +605,73 @@
         };
 
         const criteria = {
-            "100": { // Crack
-                "asme": () => "Niet toegestaan",
-                "en1": () => "Niet toegestaan",
-                "en2": () => "Niet toegestaan",
-                "en3": () => "Niet toegestaan"
-            },
-            "104": { // Crater Crack
-                "asme": () => "Niet toegestaan",
-                "en1": () => "Niet toegestaan",
-                "en2": () => "Niet toegestaan",
-                "en3": () => "Niet toegestaan"
-            },
-            "2011": { // Gas Pore
+            "100": { "asme": () => "Niet toegestaan", "en1": () => "Niet toegestaan", "en2": () => "Niet toegestaan", "en3": () => "Niet toegestaan" },
+            "104": { "asme": () => "Niet toegestaan", "en1": () => "Niet toegestaan", "en2": () => "Niet toegestaan", "en3": () => "Niet toegestaan" },
+            "2011": { 
                 "asme": (t, w) => fmtASME_Pore(t),
                 "en1": (t, w) => fmtEN_Pore(t, 0.2, 3, 1),
                 "en2": (t, w) => fmtEN_Pore(t, 0.3, 4, 1.5),
                 "en3": (t, w) => fmtEN_Pore(t, 0.4, 5, 2.5)
             },
-            "2013": { // Clustered Porosity
+            "2013": { 
                 "asme": (t, w) => fmtASME_Cluster(t),
                 "en1": (t, w) => fmtEN_Cluster(w, 0.5, 15),
                 "en2": (t, w) => fmtEN_Cluster(w, 1.0, 20),
                 "en3": (t, w) => fmtEN_Cluster(w, 1.0, 25)
             },
-            "2014": { // NEW: Linear Porosity
-                "asme": (t, w) => fmtASME_Pore(t) + '<br><span class="text-xs text-dark-400 mt-1 block">Regels porositeit toepassen</span>',
+            "2014": { 
+                "asme": (t, w) => fmtASME_Pore(t) + '<br><span class="text-[10px] text-dark-400 mt-1 block">Regels porositeit toepassen</span>',
                 "en1": (t, w) => fmtEN_LinearPore(t, 25, 0.2, 2),
                 "en2": (t, w) => fmtEN_LinearPore(t, 50, 0.3, 3),
                 "en3": (t, w) => fmtEN_LinearPore(t, 75, 0.4, 4)
             },
-            "2015": { // Elongated cavity
+            "2015": { 
                 "asme": (t, w) => fmtASME_Gen(t),
                 "en1": (t, w) => fmtEN(t, 0.2, 2, "h") + fmtSumL(t, 25),
                 "en2": (t, w) => fmtEN(t, 0.3, 3, "h") + fmtSumL(t, 50),
                 "en3": (t, w) => fmtEN(t, 0.4, 4, "h") + fmtSumL(t, 75)
             },
-            "2016": { // Wormhole
+            "2016": { 
                 "asme": (t, w) => fmtASME_Gen(t),
                 "en1": (t, w) => fmtEN(t, 0.2, 2, "h") + fmtSumL(t, 25),
                 "en2": (t, w) => fmtEN(t, 0.3, 3, "h") + fmtSumL(t, 50),
                 "en3": (t, w) => fmtEN(t, 0.4, 4, "h") + fmtSumL(t, 75)
             },
-            "301": { // Slag
+            "301": { 
                 "asme": (t, w) => fmtASME_Gen(t),
                 "en1": (t, w) => fmtEN(t, 0.2, 2, "h") + fmtSumL(t, 25),
                 "en2": (t, w) => fmtEN(t, 0.3, 3, "h") + fmtSumL(t, 50),
                 "en3": (t, w) => fmtEN(t, 0.4, 4, "h") + fmtSumL(t, 75)
             },
-            "303": { // Oxide
+            "303": { 
                 "asme": (t, w) => fmtASME_Gen(t),
                 "en1": (t, w) => fmtEN(t, 0.2, 2, "h") + fmtSumL(t, 25),
                 "en2": (t, w) => fmtEN(t, 0.3, 3, "h") + fmtSumL(t, 50),
                 "en3": (t, w) => fmtEN(t, 0.4, 4, "h") + fmtSumL(t, 75)
             },
-            "304": { // Tungsten
+            "304": { 
                 "asme": (t, w) => fmtASME_Pore(t),
                 "en1": (t, w) => fmtEN(t, 0.2, 2, "l"),
                 "en2": (t, w) => fmtEN(t, 0.3, 3, "l"),
                 "en3": (t, w) => fmtEN(t, 0.4, 4, "l")
             },
-            "401": { // LoF
+            "401": { 
                 "asme": () => "Niet toegestaan",
                 "en1": () => "Niet toegestaan",
                 "en2": () => "Niet toegestaan",
                 "en3": (t, w) => "Toegestaan (mits niet aan opp.),<br>" + fmtEN(t, 0.4, 4, "h") + fmtSumL(t, 25)
             },
-            "402": { // LoP
+            "402": { 
                 "asme": () => "Niet toegestaan",
                 "en1": () => "Niet toegestaan",
                 "en2": () => "Niet toegestaan",
                 "en3": (t, w) => "&Sigma;l &le; 25mm"
             },
-            "5011": { // Undercut
-                "asme": () => "Visueel onderzoeken",
-                "en1": () => "Visueel onderzoeken",
-                "en2": () => "Visueel onderzoeken",
-                "en3": () => "Visueel onderzoeken"
+            "5011": { 
+                "asme": () => "Visueel onderzoeken", "en1": () => "Visueel onderzoeken", "en2": () => "Visueel onderzoeken", "en3": () => "Visueel onderzoeken"
             },
-            "510": { // Burn through
-                "asme": () => "Visueel onderzoeken",
-                "en1": () => "Visueel onderzoeken",
-                "en2": () => "Visueel onderzoeken",
-                "en3": () => "Visueel onderzoeken"
+            "510": { 
+                "asme": () => "Visueel onderzoeken", "en1": () => "Visueel onderzoeken", "en2": () => "Visueel onderzoeken", "en3": () => "Visueel onderzoeken"
             }
         };
 
@@ -556,7 +680,7 @@
             { code: "104", nl: "Eindkrater scheur", en: "Crater crack", rt_desc: "Stervormig donker lijnenpatroon aan einde las", valid: ["111", "131", "135", "136", "141"] },
             { code: "2011", nl: "Gasinsluitsel (Porie)", en: "Gas pore", rt_desc: "Ronde of onregelmatige donkere vlek (lagere dichtheid)", valid: ["111", "121", "131", "135", "136", "141"] },
             { code: "2013", nl: "Nestvormige porositeit", en: "Clustered porosity", rt_desc: "Groep van ronde/onregelmatige vlekjes dicht bijeen", valid: ["111", "131", "135", "136", "141"] },
-            { code: "2014", nl: "Lineaire porositeit", en: "Linear porosity", rt_desc: "Reeks van gasinsluitsels parallel aan de lengteas van de las", valid: ["111", "121", "131", "135", "136", "141"] }, // NEW ITEM
+            { code: "2014", nl: "Lineaire porositeit", en: "Linear porosity", rt_desc: "Reeks van gasinsluitsels parallel aan de lengteas van de las", valid: ["111", "121", "131", "135", "136", "141"] },
             { code: "2015", nl: "Gaskanaal", en: "Elongated cavity", rt_desc: "Langwerpige donkere vlek (buisvormig, vaak in lengterichting)", valid: ["111", "121", "131", "135", "136", "141"] },
             { code: "2016", nl: "Wormgat", en: "Wormhole", rt_desc: "Langwerpige holte, soms met een 'staart' (visgraat patroon)", valid: ["111", "121", "136"] },
             { code: "301", nl: "Slakinsluitsel", en: "Slag inclusion", rt_desc: "Donkere, grillige en asymmetrische vormen", valid: ["111", "121", "136"] },
@@ -648,7 +772,6 @@
                 dimensionsPanel.classList.remove('hidden');
                 specNote.textContent = `Criteria getoond voor: ${selectNorm.options[selectNorm.selectedIndex].text}`;
                 
-                // Show specific diagrams for EN rules only
                 if (currentNorm.startsWith('en')) {
                     enSpecificRules.classList.remove('hidden');
                 } else {
@@ -719,6 +842,52 @@
             resultsContainer.style.opacity = '1';
         }
 
+        // --- PRINT FUNCTIONALITY ---
+        function buildPrintTable() {
+            // For print we intentionally pass 0 to force rendering of general rules/formulas.
+            const valT = 0; 
+            const valWp = 0;
+            const printBody = document.getElementById('print-tbody');
+            printBody.innerHTML = '';
+
+            // Generate Table Rows for all defects
+            defects.sort((a, b) => parseInt(a.code) - parseInt(b.code)).forEach(defect => {
+                const row = document.createElement('tr');
+
+                const getCrit = (norm) => {
+                    if (!criteria[defect.code] || !criteria[defect.code][norm]) return "-";
+                    let rawText = criteria[defect.code][norm](valT, valWp);
+                    if (rawText.includes('|') && !rawText.includes('<')) {
+                        const parts = rawText.split('|').map(p => p.trim());
+                        return parts.join('<br><div class="h-px w-full bg-gray-300 my-1"></div>');
+                    }
+                    return rawText;
+                };
+
+                row.innerHTML = `
+                    <td class="p-2 border border-gray-400 text-center font-bold text-gray-800">${defect.code}</td>
+                    <td class="p-2 border border-gray-400 leading-tight">
+                        <div class="font-bold text-black">${defect.nl}</div>
+                        <div class="italic text-gray-600 text-[10px] mt-0.5">${defect.en}</div>
+                    </td>
+                    <td class="p-2 border border-gray-400 font-mono leading-relaxed bg-white">${getCrit('asme')}</td>
+                    <td class="p-2 border border-gray-400 font-mono leading-relaxed bg-white">${getCrit('en1')}</td>
+                    <td class="p-2 border border-gray-400 font-mono leading-relaxed bg-white">${getCrit('en2')}</td>
+                    <td class="p-2 border border-gray-400 font-mono leading-relaxed bg-white">${getCrit('en3')}</td>
+                `;
+                printBody.appendChild(row);
+            });
+        }
+
+        function prepareAndPrint() {
+            buildPrintTable();
+            // Short timeout to ensure DOM renders the hidden table completely before triggering print dialog
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+
+        // Initialize view
         updateDisplay();
     </script>
 </body>
