@@ -75,7 +75,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 pt-24 pb-12 max-w-6xl">
+    <main class="flex-grow container mx-auto px-4 pt-24 pb-12 max-w-7xl">
         
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-accent-yellow mb-2 tracking-tight">RT Lasfouten</h1>
@@ -126,9 +126,9 @@
                         <select id="norm-select" class="block w-full pl-4 pr-10 py-3 text-base bg-dark-900 border border-dark-600 text-gray-200 focus:outline-none focus:ring-1 focus:ring-accent-yellow focus:border-accent-yellow rounded-md transition-all appearance-none cursor-pointer hover:border-gray-500 hover:bg-black/20">
                             <option value="none" selected>- (Geen criteria tonen)</option>
                             <option value="asme">ASME V. UW 51 / App. 4</option>
-                            <option value="en1">EN Level 1 (Hoogste eis)</option>
-                            <option value="en2">EN Level 2 (Normale eis)</option>
-                            <option value="en3">EN Level 3 (Laagste eis)</option>
+                            <option value="en1">EN ISO 5817 Level 1 / B (Hoogste eis)</option>
+                            <option value="en2">EN ISO 5817 Level 2 / C (Normale eis)</option>
+                            <option value="en3">EN ISO 5817 Level 3 / D (Laagste eis)</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-dark-400 group-hover:text-gray-200 transition-colors">
                             <i class="fa-solid fa-chevron-down text-sm"></i>
@@ -163,7 +163,7 @@
                     </div>
                     
                     <div class="col-span-2 text-xs text-dark-500 pb-2">
-                        * Vul in voor automatische berekening van limieten.
+                        * Vul in voor automatische berekening van limieten. (L = 100mm)
                     </div>
                 </div>
             </div>
@@ -205,11 +205,11 @@
                 </div>
             </div>
             
-            <!-- Legend containing standard schematic AND new Gas Nest clarification -->
+            <!-- Legend containing standard schematic AND Specific EN Clarifications -->
             <div id="criteria-legend" class="hidden mt-6 bg-dark-900/50 p-6 rounded-lg border border-dark-700 shadow-inner animate-fade-in">
                 
                 <!-- General Legend & Schematic Row -->
-                <div class="flex flex-col lg:flex-row gap-8 pb-6 border-b border-dark-700/50">
+                <div class="flex flex-col lg:flex-row gap-8 pb-6">
                     <!-- Text Legend -->
                     <div class="flex-1">
                         <h4 class="font-bold text-gray-200 mb-4 uppercase tracking-wider inline-block">Legenda Afkortingen</h4>
@@ -263,63 +263,109 @@
                     </div>
                 </div>
 
-                <!-- NEW SECTION: Gas Nest Specifics (Only visible for EN norms) -->
-                <div id="gasnest-explanation" class="hidden mt-6 pt-4 animate-fade-in-delayed">
-                    <h4 class="font-bold text-gray-200 mb-4 uppercase tracking-wider">Specifieke Beoordeling: Gasnesten (EN Normen)</h4>
+                <!-- NEW EN Specifics: Clustered, Linear and Elongated -->
+                <div id="en-specific-rules" class="hidden mt-4 pt-6 border-t border-dark-700/50 animate-fade-in-delayed">
+                    <h4 class="font-bold text-gray-200 mb-6 uppercase tracking-wider">Specifieke Beoordeling & Samensmelting (EN ISO 5817)</h4>
                     
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                         <!-- Gas Nest Schematic Diagram (Based on provided image) -->
-                        <div class="bg-dark-800/50 p-4 rounded border border-dark-700/50 flex-shrink-0">
-                            <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- 1. Gas Nest Specifics -->
+                        <div class="bg-dark-800/30 p-4 rounded-lg border border-dark-700/50 flex flex-col items-center text-center">
+                            <h5 class="text-accent-yellow font-bold mb-4 text-sm uppercase tracking-wide w-full text-left">1. Nestvormige Porositeit (2013)</h5>
+                            <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
                                 <defs>
-                                    <!-- Reusing arrow marker -->
                                     <marker id="arrow2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
                                         <path d="M0,0 L0,6 L6,3 z" fill="#F5DF4D" />
                                     </marker>
                                 </defs>
-                                <text x="10" y="20" fill="#64748b" font-size="10" font-weight="bold">GASNEST SAMENSMELTING (EN ISO 5817)</text>
-
-                                <!-- Weld Bead Background -->
-                                <rect x="10" y="40" width="280" height="80" fill="#334155" stroke="none" opacity="0.3"/>
-
-                                <!-- Pore 1 (dA1) -->
-                                <circle cx="100" cy="80" r="15" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
-                                <!-- Pore 2 (dA2) -->
-                                <circle cx="145" cy="80" r="10" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
-
-                                <!-- Distance D (small distance) -->
-                                <line x1="115" y1="80" x2="135" y2="80" stroke="#F5DF4D" stroke-width="1"/>
-                                <text x="120" y="75" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">D</text>
-
-                                <!-- Combined Area Circle (dAc) - Dashed -->
-                                <circle cx="122.5" cy="80" r="37.5" fill="none" stroke="#F5DF4D" stroke-width="1.5" stroke-dasharray="4,2"/>
-
-                                <!-- Dimensions Labels -->
-                                <!-- dA1 label -->
-                                <line x1="100" y1="95" x2="100" y2="125" stroke="#64748b" stroke-width="0.5"/>
-                                <text x="90" y="135" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">dA1</text>
-                                <!-- dA2 label -->
-                                <line x1="145" y1="90" x2="145" y2="125" stroke="#64748b" stroke-width="0.5"/>
-                                <text x="135" y="135" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">dA2</text>
-
-                                <!-- dAc label (Combined diameter) -->
-                                <line x1="85" y1="42.5" x2="160" y2="42.5" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
-                                <!-- Projection lines for dAc -->
-                                <line x1="85" y1="40" x2="85" y2="80" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
-                                <line x1="160" y1="40" x2="160" y2="80" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
-                                <text x="112" y="35" fill="#F5DF4D" font-size="14" font-family="monospace" font-weight="bold">dAc</text>
+                                <rect x="0" y="30" width="220" height="50" fill="#334155" opacity="0.3"/>
+                                <!-- Pores -->
+                                <circle cx="60" cy="55" r="15" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <circle cx="115" cy="55" r="10" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <!-- Distance -->
+                                <line x1="75" y1="55" x2="105" y2="55" stroke="#F5DF4D" stroke-width="1"/>
+                                <text x="86" y="50" fill="#F5DF4D" font-size="10" font-family="monospace">D</text>
+                                <!-- Combined -->
+                                <circle cx="87.5" cy="55" r="42.5" fill="none" stroke="#F5DF4D" stroke-width="1.5" stroke-dasharray="4,2"/>
+                                <!-- Labels -->
+                                <line x1="60" y1="70" x2="60" y2="90" stroke="#64748b" stroke-width="0.5"/>
+                                <text x="50" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">dA1</text>
+                                <line x1="115" y1="65" x2="115" y2="90" stroke="#64748b" stroke-width="0.5"/>
+                                <text x="105" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">dA2</text>
+                                <!-- dAc -->
+                                <line x1="45" y1="15" x2="130" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
+                                <line x1="45" y1="15" x2="45" y2="40" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                <line x1="130" y1="15" x2="130" y2="40" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                <text x="78" y="10" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">dAc</text>
                             </svg>
+                            <p class="text-xs text-gray-300 mt-4 text-left w-full border-t border-dark-700 pt-3">
+                                Als <span class="font-mono text-accent-yellow">D &lt; dA(kleinste)</span>, combineer tot één nest:
+                                <code class="block font-mono text-accent-yellow bg-black/30 px-2 py-1 rounded mt-1">dAc = dA1 + dA2 + D</code>
+                            </p>
+                        </div>
+
+                        <!-- 2. Linear Porosity Specifics -->
+                        <div class="bg-dark-800/30 p-4 rounded-lg border border-dark-700/50 flex flex-col items-center text-center">
+                            <h5 class="text-accent-yellow font-bold mb-4 text-sm uppercase tracking-wide w-full text-left">2. Lineaire Porositeit (2014)</h5>
+                            <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="0" y="30" width="220" height="50" fill="#334155" opacity="0.3"/>
+                                <!-- Pores -->
+                                <circle cx="50" cy="55" r="8" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <circle cx="90" cy="55" r="5" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <circle cx="120" cy="55" r="6" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <circle cx="160" cy="55" r="8" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <!-- Distance -->
+                                <line x1="58" y1="55" x2="85" y2="55" stroke="#F5DF4D" stroke-width="1"/>
+                                <text x="68" y="50" fill="#F5DF4D" font-size="10" font-family="monospace">D</text>
+                                <!-- Labels -->
+                                <line x1="50" y1="63" x2="50" y2="90" stroke="#64748b" stroke-width="0.5"/>
+                                <text x="43" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">d1</text>
+                                <line x1="90" y1="60" x2="90" y2="90" stroke="#64748b" stroke-width="0.5"/>
+                                <text x="83" y="100" fill="#F5DF4D" font-size="10" font-family="monospace">d2</text>
+                                <!-- Length l -->
+                                <line x1="42" y1="15" x2="168" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
+                                <line x1="42" y1="15" x2="42" y2="47" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                <line x1="168" y1="15" x2="168" y2="47" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                <text x="100" y="10" fill="#F5DF4D" font-size="12" font-family="monospace" font-weight="bold">l</text>
+                            </svg>
+                            <p class="text-xs text-gray-300 mt-4 text-left w-full border-t border-dark-700 pt-3">
+                                Als <span class="font-mono text-accent-yellow">D &lt; d(kleinste)</span>, dan worden de poriën gezien als één volledig samengesmolten oppervlak in de berekening.
+                            </p>
+                        </div>
+
+                        <!-- 3. Elongated Cavities Specifics -->
+                        <div class="bg-dark-800/30 p-4 rounded-lg border border-dark-700/50 flex flex-col items-center text-center">
+                            <h5 class="text-accent-yellow font-bold mb-4 text-sm uppercase tracking-wide w-full text-left">3. Gaskanalen (2015/2016)</h5>
+                            <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="0" y="30" width="220" height="50" fill="#334155" opacity="0.3"/>
+                                <!-- Cavities -->
+                                <ellipse cx="40" cy="45" rx="15" ry="3" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <ellipse cx="100" cy="60" rx="10" ry="2" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <ellipse cx="160" cy="50" rx="20" ry="4" fill="#000" stroke="#F5DF4D" stroke-width="1"/>
+                                <!-- Distance -->
+                                <line x1="110" y1="55" x2="140" y2="55" stroke="#F5DF4D" stroke-width="1"/>
+                                <text x="122" y="50" fill="#F5DF4D" font-size="10" font-family="monospace">D</text>
+                                <!-- Labels -->
+                                <line x1="25" y1="15" x2="55" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
+                                <text x="35" y="10" fill="#F5DF4D" font-size="10" font-family="monospace">l1</text>
+                                <line x1="25" y1="15" x2="25" y2="45" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                <line x1="55" y1="15" x2="55" y2="45" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                
+                                <line x1="90" y1="80" x2="110" y2="80" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
+                                <text x="95" y="92" fill="#F5DF4D" font-size="10" font-family="monospace">l2</text>
+                                <line x1="90" y1="60" x2="90" y2="80" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                <line x1="110" y1="60" x2="110" y2="80" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                
+                                <line x1="140" y1="15" x2="180" y2="15" stroke="#F5DF4D" stroke-width="1" marker-start="url(#arrow2)" marker-end="url(#arrow2)"/>
+                                <text x="155" y="10" fill="#F5DF4D" font-size="10" font-family="monospace">l3</text>
+                                <line x1="140" y1="15" x2="140" y2="50" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                                <line x1="180" y1="15" x2="180" y2="50" stroke="#F5DF4D" stroke-width="0.5" stroke-dasharray="2"/>
+                            </svg>
+                            <p class="text-xs text-gray-300 mt-4 text-left w-full border-t border-dark-700 pt-3">
+                                Als <span class="font-mono text-accent-yellow">D &lt; l(kortste)</span>, dan worden beide defecten als één doorlopende lengte opgeteld bij <span class="font-mono text-accent-yellow">Σl</span>.
+                            </p>
                         </div>
                         
-                        <!-- Explanatory Text derived from the user's image -->
-                        <div class="text-sm text-gray-300 space-y-3 flex-1">
-                            <p><strong class="text-accent-yellow">Regel voor samensmelting:</strong> Volgens EN ISO 5817 moeten dicht bij elkaar gelegen poriën in een nest als één geheel worden beschouwd als de onderlinge afstand (<span class="font-mono text-accent-yellow">D</span>) kleiner is dan de diameter van de kleinste porie in de groep.</p>
-                            
-                            <div class="bg-dark-900/50 p-3 rounded border-l-4 border-accent-yellow">
-                                <p class="mb-1">De totale te beoordelen diameter (<span class="font-mono text-accent-yellow">dAc</span>) wordt dan berekend als:</p>
-                                <code class="block text-center font-mono text-lg text-accent-yellow my-2 bg-black/30 py-1 rounded">dAc = dA1 + dA2 + D</code>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -337,10 +383,10 @@
         // --- Helpers ---
         // Generates HTML for calculated EN values: "h < 3mm (0.2s)"
         const fmtEN = (t, factor, max, prefix = "") => {
-            if (!t || t <= 0) return `${prefix} &lt; ${factor}s (max ${max}mm)`;
+            if (!t || t <= 0) return `${prefix} &le; ${factor}s (max ${max}mm)`;
             
             const limit = Math.min(t * factor, max).toFixed(1);
-            return `${prefix} &lt; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(${factor}s, max ${max})</span>`;
+            return `${prefix} &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(${factor}s, max ${max})</span>`;
         };
 
         const fmtEN_Pore = (t, factor, max, area) => {
@@ -355,11 +401,20 @@
              return `dA &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(Wp${factor === 0.5 ? '/2' : ''}, max ${max})</span>`;
         };
 
+        // NEW: Helper for Linear Porosity (l <= s max X, d <= Ys max Z)
+        const fmtEN_LinearPore = (t, maxL, factorD, maxD) => {
+             if (!t || t <= 0) return `l &le; s (max ${maxL}mm)<br>d &le; ${factorD}s (max ${maxD}mm)`;
+             const limitL = Math.min(t, maxL).toFixed(1);
+             const limitD = Math.min(t * factorD, maxD).toFixed(1);
+             return `l &le; <strong>${limitL}mm</strong> <span class="italic opacity-70 text-xs">(&le;s, max ${maxL})</span><br>` +
+                    `d &le; <strong>${limitD}mm</strong> <span class="italic opacity-70 text-xs">(${factorD}s, max ${maxD})</span>`;
+        };
+
         // Helper for Sum of Lengths (Σl <= s, max X)
         const fmtSumL = (t, max) => {
             if (!t || t <= 0) return `, &Sigma;l &le; s (max ${max}mm)`;
             const limit = Math.min(t, max).toFixed(1);
-            return `, &Sigma;l &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(&le;s, max ${max})</span>`;
+            return `<br>&Sigma;l &le; <strong>${limit}mm</strong> <span class="italic opacity-70 text-xs">(&le;s, max ${max})</span>`;
         };
 
         const fmtASME_Gen = (t) => {
@@ -369,7 +424,6 @@
              return `<strong>19.0mm</strong> <span class="italic opacity-70 text-xs">(max)</span>`;
         };
 
-        // Updated ASME Porosity logic according to 10.1.2 and 10.1.5
         const fmtASME_Pore = (t) => {
             if (!t || t <= 0) return "t&le;50: 1/4t (max 4mm) | Geïsoleerd (>25mm): 1/3t (max 6mm) | t&gt;50: 10mm <br><span class='text-xs opacity-70 mt-1 block'>t&lt;3.0: max 12 per 150mm las</span>";
             
@@ -382,14 +436,12 @@
                    `<div class="h-px w-full bg-accent-yellow/20 my-2"></div>` + 
                    `<div>Geïsoleerd (>25mm): <strong>${iso}mm</strong> <span class="italic opacity-70 text-xs">(1/3t, max 6)</span></div>`;
                    
-            // Add rule 10.1.5 for thin materials
             if (t < 3.0) {
                 html += `<div class="h-px w-full bg-accent-yellow/20 my-2"></div><div><span class="text-xs italic text-accent-yellow">Let op (t<3.0): Max 12 indicaties per 150mm</span></div>`;
             }
             return html;
         };
 
-        // NEW: Specific ASME rule for Clustered porosity (10.1.6)
         const fmtASME_Cluster = (t) => {
              if (!t || t <= 0) return "Clusterlengte &le; 2t (max 25mm) | &Sigma;L clusters &le; 25mm per 150mm las";
              
@@ -412,7 +464,6 @@
             "141": { abbr: "TIG", full: "Tungsten Inert Gas", desc: "Gas Tungsten Arc Welding (GTAW)" }
         };
 
-        // Criteria Database updated to use Functions (t = thickness, w = weld width)
         const criteria = {
             "100": { // Crack
                 "asme": () => "Niet toegestaan",
@@ -433,10 +484,16 @@
                 "en3": (t, w) => fmtEN_Pore(t, 0.4, 5, 2.5)
             },
             "2013": { // Clustered Porosity
-                "asme": (t, w) => fmtASME_Cluster(t), // Updated to correct rule 10.1.6
+                "asme": (t, w) => fmtASME_Cluster(t),
                 "en1": (t, w) => fmtEN_Cluster(w, 0.5, 15),
                 "en2": (t, w) => fmtEN_Cluster(w, 1.0, 20),
                 "en3": (t, w) => fmtEN_Cluster(w, 1.0, 25)
+            },
+            "2014": { // NEW: Linear Porosity
+                "asme": (t, w) => fmtASME_Pore(t) + '<br><span class="text-xs text-dark-400 mt-1 block">Regels porositeit toepassen</span>',
+                "en1": (t, w) => fmtEN_LinearPore(t, 25, 0.2, 2),
+                "en2": (t, w) => fmtEN_LinearPore(t, 50, 0.3, 3),
+                "en3": (t, w) => fmtEN_LinearPore(t, 75, 0.4, 4)
             },
             "2015": { // Elongated cavity
                 "asme": (t, w) => fmtASME_Gen(t),
@@ -472,13 +529,13 @@
                 "asme": () => "Niet toegestaan",
                 "en1": () => "Niet toegestaan",
                 "en2": () => "Niet toegestaan",
-                "en3": (t, w) => "Toegestaan (mits niet aan opp.), " + fmtEN(t, 0.4, 4, "l") + ", Σl &le; 25mm"
+                "en3": (t, w) => "Toegestaan (mits niet aan opp.),<br>" + fmtEN(t, 0.4, 4, "h") + fmtSumL(t, 25)
             },
             "402": { // LoP
                 "asme": () => "Niet toegestaan",
                 "en1": () => "Niet toegestaan",
                 "en2": () => "Niet toegestaan",
-                "en3": () => "Σl &le; 25mm"
+                "en3": (t, w) => "&Sigma;l &le; 25mm"
             },
             "5011": { // Undercut
                 "asme": () => "Visueel onderzoeken",
@@ -499,13 +556,14 @@
             { code: "104", nl: "Eindkrater scheur", en: "Crater crack", rt_desc: "Stervormig donker lijnenpatroon aan einde las", valid: ["111", "131", "135", "136", "141"] },
             { code: "2011", nl: "Gasinsluitsel (Porie)", en: "Gas pore", rt_desc: "Ronde of onregelmatige donkere vlek (lagere dichtheid)", valid: ["111", "121", "131", "135", "136", "141"] },
             { code: "2013", nl: "Nestvormige porositeit", en: "Clustered porosity", rt_desc: "Groep van ronde/onregelmatige vlekjes dicht bijeen", valid: ["111", "131", "135", "136", "141"] },
-            { code: "2015", nl: "Gaskanaal", en: "Elongated cavity", rt_desc: "Langwerpige donkere vlek (buisvormig)", valid: ["111", "121", "131", "135", "136", "141"] },
-            { code: "2016", nl: "Wormgat", en: "Wormhole", rt_desc: "Langwerpige holte, soms met een 'staart' (visgraat)", valid: ["111", "121", "136"] },
+            { code: "2014", nl: "Lineaire porositeit", en: "Linear porosity", rt_desc: "Reeks van gasinsluitsels parallel aan de lengteas van de las", valid: ["111", "121", "131", "135", "136", "141"] }, // NEW ITEM
+            { code: "2015", nl: "Gaskanaal", en: "Elongated cavity", rt_desc: "Langwerpige donkere vlek (buisvormig, vaak in lengterichting)", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "2016", nl: "Wormgat", en: "Wormhole", rt_desc: "Langwerpige holte, soms met een 'staart' (visgraat patroon)", valid: ["111", "121", "136"] },
             { code: "301", nl: "Slakinsluitsel", en: "Slag inclusion", rt_desc: "Donkere, grillige en asymmetrische vormen", valid: ["111", "121", "136"] },
             { code: "304", nl: "Wolfraaminsluitsel", en: "Tungsten inclusion", rt_desc: "Zeer heldere/witte vlek met duidelijke contour", valid: ["141"] },
             { code: "303", nl: "Oxide-insluitsel", en: "Oxide inclusion", rt_desc: "Onregelmatige donkere vlek (minder dicht dan materiaal)", valid: ["131", "135", "136", "141"] },
             { code: "401", nl: "Bindingsfout", en: "Lack of fusion", rt_desc: "Donkere lijn(en) georiënteerd in lengterichting lasnaad", valid: ["111", "121", "131", "135", "136", "141"] },
-            { code: "402", nl: "Onvolkomen doorlassing", en: "Lack of penetration", rt_desc: "Donkere lijn met strakke rechte randen (in midden)", valid: ["111", "121", "131", "135", "136", "141"] },
+            { code: "402", nl: "Onvolkomen doorlassing", en: "Lack of penetration", rt_desc: "Donkere lijn met strakke rechte randen (in hart las)", valid: ["111", "121", "131", "135", "136", "141"] },
             { code: "5011", nl: "Randinkarteling", en: "Undercut", rt_desc: "Donkere onregelmatige lijn aan de lasrand (niet strak)", valid: ["111", "121", "131", "135", "136", "141"] },
             { code: "510", nl: "Doorbranden", en: "Burn through", rt_desc: "Donkere vlek omgeven door lichtere ring (kegels)", valid: ["111", "131", "135", "136", "141"] }
         ];
@@ -523,18 +581,15 @@
         const headerCriteria = document.getElementById('header-criteria');
         const specNote = document.getElementById('spec-note');
         const criteriaLegend = document.getElementById('criteria-legend');
-        const gasNestExplanation = document.getElementById('gasnest-explanation');
+        const enSpecificRules = document.getElementById('en-specific-rules');
 
-        // New Elements for toggle
         const processToggle = document.getElementById('process-toggle');
         const processSelectContainer = document.getElementById('process-select-container');
         const processAllLabel = document.getElementById('process-all-label');
 
-        // State variables
         let currentProcess = "all";
         let currentNorm = "none";
 
-        // Event Listeners
         processToggle.addEventListener('change', (e) => {
             if (e.target.checked) {
                 processSelectContainer.classList.remove('hidden');
@@ -566,7 +621,6 @@
         function updateDisplay() {
             if (!currentProcess) return;
 
-            // Update UI Labels
             const processInfo = processes[currentProcess];
             if (currentProcess === 'all') {
                  document.getElementById('result-title-code').textContent = "Overzicht";
@@ -576,39 +630,35 @@
             document.getElementById('result-title-abbr').textContent = processInfo.abbr;
             document.getElementById('result-title-full').textContent = `${processInfo.full} (${processInfo.desc})`;
 
-            // Filter Defects
             let validDefects = defects;
             if (currentProcess !== 'all') {
                 validDefects = defects.filter(d => d.valid.includes(currentProcess));
             }
             validDefects = validDefects.sort((a, b) => parseInt(a.code) - parseInt(b.code));
 
-            // Handle Norm Column Visibility, Inputs & Legend
             if (currentNorm === 'none') {
                 headerCriteria.classList.add('hidden');
                 criteriaLegend.classList.add('hidden');
                 dimensionsPanel.classList.add('hidden');
                 specNote.textContent = "";
-                gasNestExplanation.classList.add('hidden'); // Hide Gas Nest explainer
+                enSpecificRules.classList.add('hidden');
             } else {
                 headerCriteria.classList.remove('hidden');
                 criteriaLegend.classList.remove('hidden');
                 dimensionsPanel.classList.remove('hidden');
                 specNote.textContent = `Criteria getoond voor: ${selectNorm.options[selectNorm.selectedIndex].text}`;
                 
-                // Show Gas Nest explainer ONLY if an EN norm is selected
+                // Show specific diagrams for EN rules only
                 if (currentNorm.startsWith('en')) {
-                    gasNestExplanation.classList.remove('hidden');
+                    enSpecificRules.classList.remove('hidden');
                 } else {
-                    gasNestExplanation.classList.add('hidden');
+                    enSpecificRules.classList.add('hidden');
                 }
             }
 
-            // Get numeric inputs
             const valT = parseFloat(inputT.value);
             const valWp = parseFloat(inputWp.value);
 
-            // Render Table
             defectsBody.innerHTML = '';
             
             if (validDefects.length === 0) {
@@ -620,15 +670,10 @@
                     const row = document.createElement('tr');
                     row.className = 'defect-row group animate-fade-in';
                     
-                    // Retrieve and Format Criteria
                     let criteriaContent = "-";
                     if (currentNorm !== 'none' && criteria[defect.code] && criteria[defect.code][currentNorm]) {
-                        // Execute the criteria function with current inputs
                         const rawText = criteria[defect.code][currentNorm](valT, valWp);
                         
-                        // Handle formatting (split pipes if any, though functions now return HTML mostly)
-                        // Note: Some functions return <br> or specific HTML, so we just use it directly
-                        // If it contains | (legacy fallback), split it.
                         if (rawText.includes('|') && !rawText.includes('<')) {
                              const parts = rawText.split('|').map(p => p.trim());
                              criteriaContent = parts.map((part, index) => {
@@ -642,7 +687,6 @@
                         }
                     }
 
-                    // Build Criteria Cell HTML
                     const criteriaCell = currentNorm === 'none' ? '' : `
                         <td class="px-6 py-4 text-sm font-mono text-accent-yellow bg-dark-900/30 align-top border-l border-dark-700/50 leading-relaxed">
                             ${criteriaContent}
@@ -675,7 +719,6 @@
             resultsContainer.style.opacity = '1';
         }
 
-        // Initialize view
         updateDisplay();
     </script>
 </body>
