@@ -171,21 +171,28 @@
                     const today = new Date();
                     const currentMonday = getMonday(today);
                     
-                    const weekDates = [];
+                    const weekData = [];
                     for (let i = 0; i < 6; i++) {
-                        const d = new Date(currentMonday);
-                        d.setDate(d.getDate() + (i * 7));
-                        weekDates.push(d);
+                        const m = new Date(currentMonday);
+                        m.setDate(m.getDate() + (i * 7));
+                        
+                        const w = new Date(m);
+                        w.setDate(w.getDate() + 2); // Wednesday
+                        
+                        const s = new Date(m);
+                        s.setDate(s.getDate() + 6); // Sunday
+                        
+                        weekData.push({ monday: m, wednesday: w, sunday: s });
                     }
 
                     // Update title with week range
-                    const firstWeekNum = getWeekNumber(weekDates[0]);
-                    const lastWeekNum = getWeekNumber(weekDates[weekDates.length - 1]);
+                    const firstWeekNum = getWeekNumber(weekData[0].monday);
+                    const lastWeekNum = getWeekNumber(weekData[weekData.length - 1].monday);
                     document.getElementById('overviewTitle').innerText = `Bronnen Activiteit Overzicht - Week ${firstWeekNum} t/m Week ${lastWeekNum}`;
 
                     let headerHTML = '<tr><th>Bron</th><th>Type</th>';
-                    weekDates.forEach(d => {
-                        headerHTML += `<th>Week ${getWeekNumber(d)}<br><small>${formatDateShort(d)}</small></th>`;
+                    weekData.forEach(wd => {
+                        headerHTML += `<th>Week ${getWeekNumber(wd.monday)}<br><small>${formatDateShort(wd.monday)} t/m ${formatDateShort(wd.sunday)}</small></th>`;
                     });
                     headerHTML += '</tr>';
                     tableHead.innerHTML = headerHTML;
@@ -204,8 +211,8 @@
                                 if (bron && type && !isNaN(activiteit) && datum && bron.toLowerCase() !== "bron") {
                                     let rowHTML = `<tr><td class="source-col">${bron}</td><td class="source-col">${type}</td>`;
                                     
-                                    weekDates.forEach(wkDate => {
-                                        const act = calculateActivity(activiteit, type, datum, wkDate);
+                                    weekData.forEach(wd => {
+                                        const act = calculateActivity(activiteit, type, datum, wd.wednesday);
                                         rowHTML += `<td>${act.toFixed(2)}</td>`;
                                     });
                                     
