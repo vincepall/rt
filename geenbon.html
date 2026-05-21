@@ -159,7 +159,7 @@
                 <div class="border-b border-gray-300 my-4 print:my-2 print:border-gray-400"></div>
 
                 <div class="mt-2 w-3/4">
-                    <select class="w-full font-medium cursor-pointer">
+                    <select class="w-full font-medium cursor-pointer" onchange="updateBottomSentence()">
                         <option value="-">-</option>
                         <option value="Prefab" selected>Prefab</option>
                         <option value="Montage">Montage</option>
@@ -206,7 +206,7 @@
             </div>
             
             <div class="mt-4">
-                <textarea class="w-full font-medium resize-none overflow-hidden hide-empty-print" rows="1" 
+                <textarea id="notes-textarea" class="w-full font-medium resize-none overflow-hidden hide-empty-print" rows="1" 
                     placeholder="Voer notities of tijden in..."
                     oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'">8 uur incl. reistijd, ontwikkelen en rapporteren</textarea>
             </div>
@@ -301,7 +301,7 @@
                     </button>
                     
                     <div class="flex items-center gap-1 mb-2">
-                        <select class="w-12 font-medium bg-gray-50 cursor-pointer" onchange="handleJobTypeChange(${id}, this.value)">
+                        <select class="job-type-select w-12 font-medium bg-gray-50 cursor-pointer" onchange="handleJobTypeChange(${id}, this.value)">
                             <option value="RT">RT</option>
                             <option value="MT">MT</option>
                             <option value="PT">PT</option>
@@ -320,9 +320,53 @@
             handleJobTypeChange(id, 'RT');
         }
 
+        function updateBottomSentence() {
+            const presetSelect = document.querySelector('.a4-container select'); 
+            const textarea = document.getElementById('notes-textarea');
+            if (!presetSelect || !textarea) return;
+
+            const presetValue = presetSelect.value.toLowerCase();
+            const hasBunker = presetValue.includes('bunker');
+            
+            const jobSelects = document.querySelectorAll('.job-type-select');
+            let hasRT = false;
+            jobSelects.forEach(sel => {
+                if (sel.value === 'RT') hasRT = true;
+            });
+
+            let currentText = textarea.value.trim();
+            let match = currentText.match(/^(\d+\s*uur)(.*)$/i);
+            
+            if (match) {
+                let prefix = match[1];
+                let suffix = match[2].trim();
+                
+                let isStandardSuffix = suffix === "" || 
+                                       suffix === "incl. reistijd, ontwikkelen en rapporteren" ||
+                                       suffix === "incl. reistijd" ||
+                                       suffix === "incl. ontwikkelen en rapporteren";
+                                       
+                if (isStandardSuffix) {
+                    let parts = [];
+                    if (!hasBunker) parts.push("reistijd");
+                    if (hasRT) parts.push("ontwikkelen en rapporteren");
+                    
+                    if (parts.length > 0) {
+                        textarea.value = prefix + " incl. " + parts.join(", ");
+                    } else {
+                        textarea.value = prefix;
+                    }
+                    
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                }
+            }
+        }
+
         function removeOrder(id) {
             document.getElementById(`order-${id}`).remove();
             calculateTotals();
+            updateBottomSentence();
         }
 
         function handleJobTypeChange(orderId, type) {
@@ -345,6 +389,7 @@
                 `;
             }
             calculateTotals(); 
+            updateBottomSentence();
         }
 
         // --- Logic: RT Rows & Calculations ---
