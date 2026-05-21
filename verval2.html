@@ -106,18 +106,16 @@
         const ci1 = parseFloat(document.getElementById("ci1").value);
         const type = document.getElementById("isotope").value;
         const firstDate = document.getElementById("firstDate").value;
-        const secondDate =
-          document.getElementById("secondDate").value || formatDate(new Date());
+        const secondDate = document.getElementById("secondDate").value;
 
         if (isNaN(ci1) || !firstDate) {
           alert("Vul a.u.b. alle velden correct in.");
           return;
         }
 
-        const firstDateObj = new Date(firstDate.split("-").reverse().join("-"));
-        const secondDateObj = new Date(
-          secondDate.split("-").reverse().join("-"),
-        );
+        const firstDateObj = new Date(firstDate);
+        // Als er geen tweede datum is ingevuld, gebruik dan de huidige tijd
+        const secondDateObj = secondDate ? new Date(secondDate) : new Date();
         const timeDifference = secondDateObj - firstDateObj;
         const days = timeDifference / (1000 * 3600 * 24);
         let ci2 = 0;
@@ -280,16 +278,15 @@
     <label for="ci1">Activiteit (Ci) op eerste datum:</label>
     <input type="number" id="ci1" required /><br /><br />
 
-    <label for="firstDate">Eerste datum (DD-MM-YYYY):</label>
+    <label for="firstDate">Eerste datum:</label>
     <input
-      type="text"
+      type="date"
       id="firstDate"
-      placeholder="DD-MM-YYYY"
       required
     /><br /><br />
 
-    <label for="secondDate">Tweede datum (DD-MM-YYYY):</label>
-    <input type="text" id="secondDate" placeholder="DD-MM-YYYY" /><br /><br />
+    <label for="secondDate">Tweede datum (laat leeg voor vandaag):</label>
+    <input type="date" id="secondDate" /><br /><br />
 
     <button onclick="calculateActivity()">Bereken activiteit</button>
 
