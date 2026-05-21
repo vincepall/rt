@@ -226,6 +226,7 @@
                 <option value="flat">1. Vlakke Plaat</option>
                 <option value="curve_out">2. Bron Buiten / Film Binnen</option>
                 <option value="curve_in">3. Bron Binnen / Film Buiten</option>
+                <option value="dwsi">4. DWSI (Bron Buiten / Film Buiten)</option>
             </select>
         </div>
 
@@ -448,7 +449,7 @@
             if (Math.abs(angleRad) >= Math.PI/2) return null;
             const t_exit = ffd / Math.cos(angleRad);
             const t_enter = (ffd - wallT) / Math.cos(angleRad);
-            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter };
+            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter, segs: [{enter: t_enter, exit: t_exit}] };
         }
         else if (scenario === 'curve_out') {
             const center = { x: 0, y: ffd + rIn };
@@ -460,7 +461,7 @@
             let t_exit = (hitsIn.length >= 2) ? hitsIn[0] : hitsOut[1];
             
             if (t_exit <= t_enter) return null;
-            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter };
+            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter, segs: [{enter: t_enter, exit: t_exit}] };
         }
         else if (scenario === 'curve_in') {
             const center = { x: 0, y: ffd - rOut };
@@ -471,7 +472,33 @@
             const t_exit = hitsOut.find(t => t > 0.001);
 
             if (t_enter !== undefined && t_exit !== undefined && t_exit > t_enter) {
-                return { enter: t_enter, exit: t_exit, len: t_exit - t_enter };
+                return { enter: t_enter, exit: t_exit, len: t_exit - t_enter, segs: [{enter: t_enter, exit: t_exit}] };
+            }
+            return null;
+        }
+        else if (scenario === 'dwsi') {
+            const center = { x: 0, y: ffd - rOut };
+            const hitsOut = intersectLineCircle(source, dir, center, rOut).filter(t => t > 0.001);
+            const hitsIn = intersectLineCircle(source, dir, center, rIn).filter(t => t > 0.001);
+            
+            if (hitsOut.length < 2) return null;
+            let t1 = hitsOut[0], t4 = hitsOut[1];
+
+            if (hitsIn.length >= 2) {
+                let t2 = hitsIn[0], t3 = hitsIn[1];
+                if (t2 > t1 && t4 > t3) {
+                    return {
+                        enter: t1, exit: t4,
+                        len: (t2 - t1) + (t4 - t3),
+                        segs: [{enter: t1, exit: t2}, {enter: t3, exit: t4}]
+                    };
+                }
+            } else if (hitsIn.length === 0) {
+                return {
+                    enter: t1, exit: t4,
+                    len: t4 - t1,
+                    segs: [{enter: t1, exit: t4}]
+                };
             }
             return null;
         }
@@ -616,10 +643,12 @@
             const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rIn);
             if(hits.length > 0) distEdge = hits[0];
         }
-        else if (appState.scenario === 'curve_in') {
+        else if (appState.scenario === 'curve_in' || appState.scenario === 'dwsi') {
              const center = {x:0, y: ffd-rOut};
              const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rOut);
-             if(hits.length > 0) distEdge = hits.find(d => d>0) || 0;
+             if(hits.length > 0) {
+                 distEdge = (appState.scenario === 'dwsi' && hits.length > 1) ? Math.max(...hits) : hits.find(d => d>0) || 0;
+             }
         }
 
         document.getElementById('resBeamWidth').innerText = typeof maxBeamWidth === 'number' ? Math.round(maxBeamWidth) + " mm" : maxBeamWidth;
@@ -640,7 +669,8 @@
             resUserEl.style.color = "#ffffff"; // White for dark mode
         }
 
-        const k = thicknessAtUserLen / wt;
+        const nominalWt = (appState.scenario === 'dwsi') ? 2 * wt : wt;
+        const k = thicknessAtUserLen / nominalWt;
         document.getElementById('resKFactor').innerText = `K = ${k.toFixed(2)}`;
 
         drawSimulation(ffd, wt, rOut, targetLen, maxAngleRad, userAngle);
@@ -659,7 +689,7 @@
             const Py = (ffd + rIn) - rIn * Math.cos(betaHalf);
             return Math.atan2(Px, Py);
         }
-        else if (scenario === 'curve_in') {
+        else if (scenario === 'curve_in' || scenario === 'dwsi') {
             const betaHalf = (L/2) / rOut;
             const Px = rOut * Math.sin(betaHalf);
             const Py = (ffd - rOut) + rOut * Math.cos(betaHalf);
@@ -686,11 +716,11 @@
             const betaRad = Math.atan2(dx, -dy); 
             return 2 * Math.abs(betaRad) * rIn; 
         }
-        else if (scenario === 'curve_in') {
+        else if (scenario === 'curve_in' || scenario === 'dwsi') {
             const center = {x:0, y: ffd - rOut};
             const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(angle), y:Math.cos(angle)}, center, rOut);
             if (hits.length === 0) return 0;
-            const t = hits.find(h => h > 0);
+            const t = (scenario === 'dwsi' && hits.length > 1) ? Math.max(...hits) : hits.find(h => h > 0);
             if (!t) return 0;
             const Px = t * Math.sin(angle);
             const Py = t * Math.cos(angle);
@@ -740,18 +770,20 @@
             
             bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: Math.max(filmEdgeY, ffd) };
         }
-        else if (appState.scenario === 'curve_in') {
+        else if (appState.scenario === 'curve_in' || appState.scenario === 'dwsi') {
              const center = {x:0, y: ffd-rOut};
              const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rOut);
              if(hits.length > 0) {
-                 const dist = hits.find(d => d>0);
+                 const dist = (appState.scenario === 'dwsi' && hits.length > 1) ? Math.max(...hits) : hits.find(d => d>0);
                  if(dist) {
                     filmEdgeX = dist * Math.sin(userAngle);
                     filmEdgeY = dist * Math.cos(userAngle);
                  }
              }
              const hitsC = intersectLineCircle({x:0,y:0}, {x:0, y:1}, center, rOut);
-             if(hitsC.length > 0) filmCenterY = hitsC.find(d => d>0);
+             if(hitsC.length > 0) {
+                 filmCenterY = (appState.scenario === 'dwsi' && hitsC.length > 1) ? Math.max(...hitsC) : hitsC.find(d => d>0);
+             }
              
              bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: Math.max(filmEdgeY, ffd) };
         }
@@ -835,7 +867,7 @@
             ctx.setLineDash([]);
 
         } 
-        else if (appState.scenario === 'curve_out' || appState.scenario === 'curve_in') {
+        else if (appState.scenario === 'curve_out' || appState.scenario === 'curve_in' || appState.scenario === 'dwsi') {
             const mY = (appState.scenario === 'curve_out') ? toPix(ffd + rIn) : toPix(ffd - rOut);
             drawPipe(ctx, 0, mY, toPix(rOut), toPix(rIn));
 
@@ -882,44 +914,48 @@
         
         // T (Center)
         const segCenter = getRaySegments(appState.scenario, 0, ffd, wt, rOut);
-        if(segCenter) {
-            const y1 = toPix(segCenter.enter);
-            const y2 = toPix(segCenter.exit);
-            // Rode lijn
+        if(segCenter && segCenter.segs) {
             ctx.strokeStyle = '#e74c3c';
             ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(0, y1);
-            ctx.lineTo(0, y2);
-            ctx.stroke();
-            // Label t - Zwart
             ctx.fillStyle = '#000';
             ctx.font = 'bold 16px sans-serif';
-            ctx.fillText("t", 10, (y1+y2)/2);
+            let labelY = 0;
+            segCenter.segs.forEach(seg => {
+                const y1 = toPix(seg.enter);
+                const y2 = toPix(seg.exit);
+                ctx.beginPath();
+                ctx.moveTo(0, y1);
+                ctx.lineTo(0, y2);
+                ctx.stroke();
+                labelY = (y1+y2)/2;
+            });
+            ctx.fillText("t", 10, labelY);
         }
         
         // T' (Edge - UserAngle)
         const segEdge = getRaySegments(appState.scenario, userAngle, ffd, wt, rOut);
-        if(segEdge) {
-            const r1 = toPix(segEdge.enter);
-            const r2 = toPix(segEdge.exit);
-            const x1 = r1 * Math.sin(userAngle);
-            const y1 = r1 * Math.cos(userAngle);
-            const x2 = r2 * Math.sin(userAngle);
-            const y2 = r2 * Math.cos(userAngle);
-            
-            // Rode lijn
+        if(segEdge && segEdge.segs) {
             ctx.strokeStyle = '#e74c3c';
             ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-            
-             // Label t' - Zwart
             ctx.fillStyle = '#000';
             ctx.font = 'bold 16px sans-serif';
-            drawTextRotated(ctx, "t'", (x1+x2)/2 - 20, (y1+y2)/2, -userAngle);
+            let labelX = 0, labelY = 0;
+            segEdge.segs.forEach(seg => {
+                const r1 = toPix(seg.enter);
+                const r2 = toPix(seg.exit);
+                const x1 = r1 * Math.sin(userAngle);
+                const y1 = r1 * Math.cos(userAngle);
+                const x2 = r2 * Math.sin(userAngle);
+                const y2 = r2 * Math.cos(userAngle);
+                
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                labelX = (x1+x2)/2;
+                labelY = (y1+y2)/2;
+            });
+            drawTextRotated(ctx, "t'", labelX - 20, labelY, -userAngle);
         }
 
 
