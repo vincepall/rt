@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -199,16 +199,20 @@
 
         <div class="mt-12 pt-6 border-t-2 border-gray-800 flex flex-col gap-4">
             <div id="film-totals-section">
-                <h3 class="font-bold mb-2">Totaal aantal gebruikte films per formaat:</h3>
+                <h3 id="film-totals-header" class="font-bold mb-2">Totaal aantal gebruikte films (0) , per formaat:</h3>
                 <div id="film-totals" class="min-h-[40px] text-sm whitespace-pre-line text-gray-700 font-medium">
                     Nog geen films geregistreerd.
                 </div>
             </div>
             
-            <div class="mt-4">
+            <div class="mt-4 flex flex-col gap-2">
+                <div class="flex items-center gap-2 font-bold text-gray-800">
+                    <span>Totaal aantal uren:</span>
+                    <input type="number" id="total-hours-input" class="w-16 text-center font-bold border border-gray-300 rounded" value="8" oninput="this.dataset.userEdited = 'true'; updateBottomSentence()">
+                </div>
                 <textarea id="notes-textarea" class="w-full font-medium resize-none overflow-hidden hide-empty-print" rows="1" 
                     placeholder="Voer notities of tijden in..."
-                    oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'">8 uur incl. reistijd, ontwikkelen en rapporteren</textarea>
+                    oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'">(8 uur RT) incl. reistijd, ontwikkelen en rapporteren</textarea>
             </div>
         </div>
     </div>
@@ -287,6 +291,57 @@
                 const input = wrapper.querySelector('input');
                 input.placeholder = `Operator ${index + 1}`;
             });
+            updatePersonSelects();
+        }
+
+        function updatePersonSelects() {
+            const opCount = document.getElementById('operators-container').children.length || 1;
+            const selects = document.querySelectorAll('.person-select');
+            
+            selects.forEach(select => {
+                const currentValue = parseInt(select.value) || 1;
+                let options = '';
+                for (let i = 1; i <= opCount; i++) {
+                    options += `<option value="${i}">${i}</option>`;
+                }
+                select.innerHTML = options;
+                
+                if (currentValue <= opCount) {
+                    select.value = currentValue;
+                } else {
+                    select.value = opCount;
+                }
+                updatePlurals(select);
+            });
+        }
+
+        function updatePlurals(element) {
+            if (!element) return;
+            const row = element.closest('.hour-person-row');
+            if (!row) return;
+            
+            const hourInput = row.querySelector('.hour-input');
+            const hourLabel = row.querySelector('.hour-label');
+            const personSelect = row.querySelector('.person-select');
+            const personLabel = row.querySelector('.person-label');
+
+            if (hourInput && hourLabel) {
+                const hours = parseFloat(hourInput.value);
+                if (!isNaN(hours) && hours > 1) {
+                    hourLabel.textContent = 'uren door';
+                } else {
+                    hourLabel.textContent = 'uur door';
+                }
+            }
+            
+            if (personSelect && personLabel) {
+                const persons = parseInt(personSelect.value);
+                if (!isNaN(persons) && persons > 1) {
+                    personLabel.textContent = 'personen';
+                } else {
+                    personLabel.textContent = 'persoon';
+                }
+            }
         }
 
         // --- Logic: Orders & Jobs ---
@@ -301,14 +356,15 @@
                     </button>
                     
                     <div class="flex items-center gap-1 mb-2">
-                        <select class="job-type-select w-12 font-medium bg-gray-50 cursor-pointer" onchange="handleJobTypeChange(${id}, this.value)">
+                        <select class="job-type-select font-medium bg-gray-50 cursor-pointer" onchange="handleJobTypeChange(${id}, this.value)">
                             <option value="RT">RT</option>
                             <option value="MT">MT</option>
                             <option value="PT">PT</option>
                             <option value="UT">UT</option>
+                            <option value="Reistijd">Reistijd</option>
                         </select>
-                        <span class="font-medium">-</span>
-                        <input type="text" class="flex-1 font-bold" placeholder="Voer ordernummer in">
+                        <span class="font-medium ordernr-dash">-</span>
+                        <input type="text" class="flex-1 font-bold ordernr-input" placeholder="Voer ordernummer in">
                     </div>
                     
                     <div id="order-details-${id}" class="pl-4 border-l-2 border-indigo-200 ml-1">
@@ -328,39 +384,93 @@
             const presetValue = presetSelect.value.toLowerCase();
             const hasBunker = presetValue.includes('bunker');
             
-            const jobSelects = document.querySelectorAll('.job-type-select');
+            let typeHours = {};
             let hasRT = false;
-            jobSelects.forEach(sel => {
-                if (sel.value === 'RT') hasRT = true;
+            let hasReistijd = false;
+            
+            document.querySelectorAll('.order-block').forEach(block => {
+                const jobTypeSelect = block.querySelector('.job-type-select');
+                if (!jobTypeSelect) return;
+                const type = jobTypeSelect.value;
+                
+                if (type === 'RT') {
+                    hasRT = true;
+                } else {
+                    if (type === 'Reistijd') hasReistijd = true;
+                    
+                    const hourInput = block.querySelector('.hour-input');
+                    if (hourInput) {
+                        const val = parseFloat(hourInput.value.replace(',', '.'));
+                        if (!isNaN(val) && val > 0) {
+                            typeHours[type] = (typeHours[type] || 0) + val;
+                        }
+                    }
+                }
             });
 
-            let currentText = textarea.value.trim();
-            let match = currentText.match(/^(\d+\s*uur)(.*)$/i);
+            let otherHoursSum = 0;
+            let partsList = [];
             
-            if (match) {
-                let prefix = match[1];
-                let suffix = match[2].trim();
-                
-                let isStandardSuffix = suffix === "" || 
-                                       suffix === "incl. reistijd, ontwikkelen en rapporteren" ||
-                                       suffix === "incl. reistijd" ||
-                                       suffix === "incl. ontwikkelen en rapporteren";
-                                       
-                if (isStandardSuffix) {
-                    let parts = [];
-                    if (!hasBunker) parts.push("reistijd");
-                    if (hasRT) parts.push("ontwikkelen en rapporteren");
-                    
-                    if (parts.length > 0) {
-                        textarea.value = prefix + " incl. " + parts.join(", ");
-                    } else {
-                        textarea.value = prefix;
-                    }
-                    
-                    textarea.style.height = 'auto';
-                    textarea.style.height = textarea.scrollHeight + 'px';
+            for (let type in typeHours) {
+                otherHoursSum += typeHours[type];
+                partsList.push(`${typeHours[type]} uur ${type}`);
+            }
+
+            let totalInput = document.getElementById('total-hours-input');
+            if (totalInput) {
+                if (totalInput.dataset.userEdited !== 'true') {
+                    totalInput.value = hasRT ? Math.max(8, otherHoursSum) : otherHoursSum;
+                } else if (parseFloat(totalInput.value) < otherHoursSum) {
+                    totalInput.value = otherHoursSum;
                 }
             }
+            
+            let calculatedTotal = totalInput ? (parseFloat(totalInput.value) || 0) : (hasRT ? Math.max(8, otherHoursSum) : otherHoursSum);
+
+            if (hasRT) {
+                let rtHours = Math.max(0, calculatedTotal - otherHoursSum);
+                partsList.push(`${rtHours} uur RT`);
+            }
+            
+            let newPrefix = "";
+            if (partsList.length > 0) {
+                newPrefix = `(${partsList.join(", ")}) `;
+            }
+
+            let currentText = textarea.value.trim();
+            const regex = /^(\([^)]*\)\s*|[\d.,]+\s*uur\s*\([^)]*\)\s*|(?:\d+(?:[.,]\d+)?\s*uur(?:\s+(?:RT|MT|PT|UT))?(?:,\s*)?)+[.]?\s*|[\d.,]+\s*uur\s*)/i;
+            let match = currentText.match(regex);
+            
+            let restOfSentence = match ? currentText.substring(match[0].length) : currentText;
+            
+            let isStandardSuffix = false;
+            let cleanRest = restOfSentence.trim().toLowerCase();
+            
+            if (cleanRest === "" || 
+                cleanRest === "incl. reistijd, ontwikkelen en rapporteren" ||
+                cleanRest === "incl. reistijd" ||
+                cleanRest === "incl. ontwikkelen en rapporteren" ||
+                cleanRest === "incl reistijd, ontwikkelen en rapporteren" ||
+                cleanRest === "incl. reistijd, rapporteren" ||
+                cleanRest === "incl. rapporteren" ||
+                cleanRest === "incl reistijd, rapporteren") {
+                isStandardSuffix = true;
+            }
+            
+            if (isStandardSuffix || !match) {
+                let suffixParts = [];
+                if (!hasBunker && !hasReistijd) suffixParts.push("reistijd");
+                if (hasRT) {
+                    suffixParts.push("ontwikkelen en rapporteren");
+                } else {
+                    suffixParts.push("rapporteren");
+                }
+                restOfSentence = suffixParts.length > 0 ? "incl. " + suffixParts.join(", ") : "";
+            }
+            
+            textarea.value = newPrefix + restOfSentence;
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
         }
 
         function removeOrder(id) {
@@ -369,8 +479,31 @@
             updateBottomSentence();
         }
 
+        function generateTimeOptions() {
+            let options = '<option value="" disabled selected>-</option>';
+            for (let h = 0; h < 24; h++) {
+                for (let m = 0; m < 60; m += 15) {
+                    const hh = h.toString().padStart(2, '0');
+                    const mm = m.toString().padStart(2, '0');
+                    options += `<option value="${hh}:${mm}">${hh}:${mm}</option>`;
+                }
+            }
+            return options;
+        }
+
         function handleJobTypeChange(orderId, type) {
             const container = document.getElementById(`order-details-${orderId}`);
+            
+            const dash = container.parentElement.querySelector('.ordernr-dash');
+            const input = container.parentElement.querySelector('.ordernr-input');
+            
+            if (type === 'Reistijd') {
+                if (dash) dash.classList.add('hidden');
+                if (input) input.classList.add('hidden');
+            } else {
+                if (dash) dash.classList.remove('hidden');
+                if (input) input.classList.remove('hidden');
+            }
             
             if (type === 'RT') {
                 container.innerHTML = `
@@ -381,8 +514,46 @@
                     </button>
                 `;
                 addRTRow(orderId); 
-            } else {
+            } else if (type === 'Reistijd') {
                 container.innerHTML = `
+                    <div class="flex flex-col gap-2 mb-2 reistijd-block">
+                        <div class="flex items-center gap-2">
+                            <select class="font-bold border border-gray-200 rounded p-1 text-sm reistijd-start bg-white cursor-pointer" onchange="calculateReistijd(this)">
+                                ${generateTimeOptions()}
+                            </select>
+                            <span>tot</span>
+                            <select class="font-bold border border-gray-200 rounded p-1 text-sm reistijd-end bg-white cursor-pointer" onchange="calculateReistijd(this)">
+                                ${generateTimeOptions()}
+                            </select>
+                            <span class="ml-2 font-bold text-gray-700">=</span>
+                            <input type="number" class="w-16 text-center font-bold hour-input bg-gray-100" placeholder="0" readonly>
+                            <span class="font-medium text-gray-700">uur</span>
+                        </div>
+                        <div class="flex items-center gap-2 w-full mt-1">
+                            <input type="text" class="flex-1 border border-gray-200 rounded p-1" placeholder="Vertrekplaats">
+                            <span>naar</span>
+                            <input type="text" class="flex-1 border border-gray-200 rounded p-1" placeholder="Bestemming">
+                        </div>
+                    </div>
+                `;
+            } else {
+                const opCount = document.getElementById('operators-container').children.length || 1;
+                let options = '';
+                for (let i = 1; i <= opCount; i++) {
+                    options += `<option value="${i}" ${i === opCount ? 'selected' : ''}>${i}</option>`;
+                }
+                
+                const initialPersonLabel = opCount > 1 ? 'personen' : 'persoon';
+                
+                container.innerHTML = `
+                    <div class="flex items-center gap-2 mb-2 hour-person-row">
+                        <input type="number" class="w-16 text-center font-bold hour-input" placeholder="x" oninput="updatePlurals(this); updateBottomSentence();">
+                        <span class="font-medium text-gray-700 hour-label">uur door</span>
+                        <select class="w-16 cursor-pointer font-bold person-select text-center" onchange="updatePlurals(this)">
+                            ${options}
+                        </select>
+                        <span class="font-medium text-gray-700 person-label">${initialPersonLabel}</span>
+                    </div>
                     <textarea class="w-full h-auto resize-none overflow-hidden hide-empty-print" rows="1" 
                         placeholder="Leeg tekstveld voor ${type} onderzoeksdetails..." 
                         oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'"></textarea>
@@ -390,6 +561,29 @@
             }
             calculateTotals(); 
             updateBottomSentence();
+        }
+
+        function calculateReistijd(element) {
+            const block = element.closest('.reistijd-block');
+            if (!block) return;
+            const startInp = block.querySelector('.reistijd-start');
+            const endInp = block.querySelector('.reistijd-end');
+            const hourInp = block.querySelector('.hour-input');
+
+            if (startInp.value && endInp.value) {
+                const [startH, startM] = startInp.value.split(':').map(Number);
+                const [endH, endM] = endInp.value.split(':').map(Number);
+                
+                let diffM = (endH * 60 + endM) - (startH * 60 + startM);
+                if (diffM < 0) diffM += 24 * 60; // handle overnight
+                
+                const hours = (diffM / 60).toFixed(2);
+                hourInp.value = parseFloat(hours);
+                updateBottomSentence();
+            } else {
+                hourInp.value = '';
+                updateBottomSentence();
+            }
         }
 
         // --- Logic: RT Rows & Calculations ---
@@ -465,6 +659,7 @@
 
         function calculateTotals() {
             const totals = {};
+            let grandTotal = 0;
             const rtRows = document.querySelectorAll('.rt-row');
             const filmLines = document.querySelectorAll('.film-line');
             const totalsSection = document.getElementById('film-totals-section');
@@ -482,8 +677,14 @@
                 
                 if (!isNaN(totalValue) && totalValue > 0 && size) {
                     totals[size] = (totals[size] || 0) + totalValue;
+                    grandTotal += totalValue;
                 }
             });
+
+            const header = document.getElementById('film-totals-header');
+            if (header) {
+                header.textContent = `Totaal aantal gebruikte films (${grandTotal}) , per formaat:`;
+            }
 
             const displayArea = document.getElementById('film-totals');
             
