@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skate & Dodge - Exposure Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0b071e;
+            --neon-pink: #ff007f;
+            --neon-cyan: #00f0ff;
+            --neon-yellow: #ffea00;
+            --neon-green: #39ff14;
+            --panel-bg: rgba(20, 15, 45, 0.7);
+            --border-glow: 0 0 15px rgba(255, 0, 127, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Roboto Condensed', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .home-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            z-index: 100;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+            transition: transform 0.2s;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1000px;
+            max-height: 600px;
+            aspect-ratio: 5 / 3;
+            border: 4px solid var(--neon-pink);
+            box-shadow: var(--border-glow);
+            border-radius: 12px;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1b0c36 0%, #06020d 100%);
+        }
+
+        @media (max-width: 1000px), (max-height: 600px) {
+            #gameContainer {
+                width: 100vw;
+                height: 100vh;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Overlay Screens */
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(11, 7, 30, 0.85);
+            z-index: 10;
+            transition: opacity 0.3s ease-in-out;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+            opacity: 0;
+        }
+
+        h1.game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            margin: 0 0 10px 0;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 30px var(--neon-pink);
+            animation: titlePulse 2s infinite alternate;
+        }
+
+        @keyframes titlePulse {
+            0% { text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink); }
+            100% { text-shadow: 0 0 15px var(--neon-cyan), 0 0 35px var(--neon-cyan); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            margin-bottom: 30px;
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel label {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .panel input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.2rem;
+            border: 2px solid var(--neon-pink);
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 20px;
+            box-shadow: 0 0 5px rgba(255, 0, 127, 0.2);
+        }
+
+        .panel input[type="text"]:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(45deg, var(--neon-pink), #ff00ab);
+            color: #fff;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px var(--neon-pink);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--neon-pink);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-cyan {
+            background: linear-gradient(45deg, var(--neon-cyan), #00bfff);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .btn-cyan:hover {
+            box-shadow: 0 0 25px var(--neon-cyan);
+        }
+
+        .btn-yellow {
+            background: linear-gradient(45deg, var(--neon-yellow), #ffd200);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-yellow);
+        }
+
+        .btn-yellow:hover {
+            box-shadow: 0 0 25px var(--neon-yellow);
+        }
+
+        .highscore-display {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 5px rgba(255, 234, 0, 0.5);
+        }
+
+        /* Instructions HUD */
+        .controls-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 5;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+            padding: 0 20px;
+        }
+
+        .controls-hint span {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+
+        /* Game Over Layout */
+        .gameover-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        #screenshotContainer {
+            margin-top: 15px;
+            border: 2px solid var(--neon-yellow);
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+            max-width: 80%;
+            box-shadow: 0 0 15px rgba(255, 234, 0, 0.3);
+        }
+
+        #screenshotContainer img {
+            width: 100%;
+            display: block;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+            z-index: 8;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+
+    <div id="gameContainer">
+        <div class="scanlines"></div>
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- MENU OVERLAY -->
+        <div id="menuScreen" class="overlay-screen">
+            <h1 class="game-title">Skate & Dodge</h1>
+            <div class="subtitle">Vaporwave Skate Challenge</div>
+
+            <div class="panel">
+                <label for="playerName">VOER JE NAAM IN:</label>
+                <input type="text" id="playerName" maxlength="15" placeholder="SKATER">
+                <button class="btn" id="startBtn">START GAME</button>
+                <div class="highscore-display" id="menuHighscore">High Score: 0 door -</div>
+            </div>
+        </div>
+
+        <!-- GAMEOVER OVERLAY -->
+        <div id="gameoverScreen" class="overlay-screen hidden">
+            <h1 class="game-title" style="color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink);">CRASH!</h1>
+            <div class="subtitle" id="gameoverMsg" style="color: var(--neon-yellow);">Nieuwe High Score!</div>
+
+            <div class="panel" style="max-width: 500px;">
+                <h3 id="finalScoreText" style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; margin: 5px 0;">Score: 0</h3>
+                <h4 id="finalDistanceText" style="color: var(--neon-cyan); margin: 5px 0;">Afstand: 0m</h4>
+
+                <div id="screenshotContainer">
+                    <img id="screenshotImg" alt="Score Kaart">
+                </div>
+
+                <div class="gameover-buttons">
+                    <button class="btn btn-yellow" id="retryBtn">SPEEL OPNIEUW</button>
+                    <button class="btn btn-cyan" id="downloadBtn">DOWNLOAD SCREENSHOT</button>
+                    <button class="btn" id="shareBtn" style="background: linear-gradient(45deg, #00ff66, #00cc55); box-shadow: 0 0 15px #00ff66;">DEEL SCORE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- IN-GAME HINTS -->
+        <div id="hudHints" class="controls-hint">
+            Links: <span>SHOVIT</span> | Midden: <span>SPRONG</span> | Rechts: <span>KICKFLIP</span><br>
+            Hou vast op de grond om te <span>MANUALEN</span> en beweeg vinger op/neer!
+        </div>
+    </div>
+
+    <script>
+        // Web Audio Synthesizer
+        let audioCtx = null;
+        function playSound(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'jump') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.12);
+                } else if (type === 'grind') {
+                    const duration = 0.08;
+                    const bufferSize = audioCtx.sampleRate * duration;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = (Math.random() * 2 - 1) * 0.15;
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 1400;
+                    
+                    const noiseGain = audioCtx.createGain();
+                    noiseGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                    
+                    noise.connect(filter);
+                    filter.connect(noiseGain);
+                    noiseGain.connect(audioCtx.destination);
+                    noise.start();
+                } else if (type === 'crash') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.45);
+                    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.45);
+                } else if (type === 'highscore') {
+                    const now = audioCtx.currentTime;
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const noteOsc = audioCtx.createOscillator();
+                        const noteGain = audioCtx.createGain();
+                        noteOsc.type = 'triangle';
+                        noteOsc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        noteGain.gain.setValueAtTime(0.06, now + idx * 0.08);
+                        noteGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.15);
+                        noteOsc.connect(noteGain);
+                        noteGain.connect(audioCtx.destination);
+                        noteOsc.start(now + idx * 0.08);
+                        noteOsc.stop(now + idx * 0.08 + 0.15);
+                    });
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+
+        // Game Setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Logic dimensions
+        const WIDTH = 1000;
+        const HEIGHT = 600;
+        canvas.width = WIDTH;
+        canvas.height = HEIGHT;
+
+        let gameState = 'MENU'; // MENU, PLAYING, GAMEOVER
+        let skaterName = 'Skater';
+        let highscore = 0;
+        let highscoreHolder = 'Niemand';
+        let currentScreenshotData = null;
+
+        // Load local high score
+        function loadHighscore() {
+            const savedScore = localStorage.getItem('skate_highscore');
+            const savedName = localStorage.getItem('skate_highscore_name');
+            if (savedScore) {
+                highscore = parseInt(savedScore, 10);
+                highscoreHolder = savedName || 'Anoniem';
+            }
+            document.getElementById('menuHighscore').textContent = `High Score: ${highscore} door ${highscoreHolder}`;
+        }
+        loadHighscore();
+
+        // Game Variables
+        let skater;
+        let groundSegments = [];
+        let obstacles = [];
+        let rails = [];
+        let particles = [];
+        let stars = [];
+        let citySilhouettes = [];
+        let cameraShake = 0;
+        let gameSpeed = 5;
+        let distance = 0;
+        let rawScore = 0;
+        let activeMultiplier = 1;
+        let frameCount = 0;
+
+        // Touch input states
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        let lastInputY = 0;
+        let inputActive = false;
+
+        // Initialize stars & city silhouettes once
+        for (let i = 0; i < 60; i++) {
+            stars.push({
+                x: Math.random() * WIDTH,
+                y: Math.random() * (HEIGHT - 250),
+                size: Math.random() * 2 + 0.5,
+                brightness: Math.random()
+            });
+        }
+        for (let i = 0; i < 20; i++) {
+            citySilhouettes.push({
+                x: i * (WIDTH / 15) + Math.random() * 20,
+                width: WIDTH / 12 + Math.random() * 30,
+                height: 100 + Math.random() * 180,
+                lights: Array.from({length: 8}, () => Math.random() > 0.5)
+            });
+        }
+
+        // Ground Height calculation
+        function getGroundHeight(px) {
+            for (let i = 0; i < groundSegments.length; i++) {
+                const seg = groundSegments[i];
+                if (px >= seg.x && px <= seg.x + seg.width) {
+                    if (seg.type === 'gap') {
+                        return null; // Gap
+                    }
+                    const pct = (px - seg.x) / seg.width;
+                    return seg.startY + (seg.endY - seg.startY) * pct;
+                }
+            }
+            return HEIGHT - 100;
+        }
+
+        class Skater {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = 150;
+                this.y = HEIGHT - 100;
+                this.vy = 0;
+                this.width = 40;
+                this.height = 50;
+                this.gravity = 0.55;
+                this.jumpForce = -11.5;
+                this.isGrounded = true;
+                this.isGrinding = false;
+                this.isManualing = false;
+                
+                // Tricks
+                this.trickType = 'none'; // 'none', 'kickflip', 'shovit'
+                this.trickProgress = 0;  // 0 to 1
+                
+                // Manual details
+                this.manualBalance = 0; // -1 to 1
+                this.manualDriftSpeed = 0;
+                this.manualStreakFrames = 0;
+                this.manualType = 'tail'; // 'tail', 'nose'
+
+                this.pendingJump = false;
+                this.pendingJumpX = 0;
+                this.jumpTimer = null;
+            }
+
+            jump(xPos) {
+                if (this.isGrounded || this.isGrinding || this.isManualing) {
+                    this.isManualing = false;
+                    this.isGrounded = false;
+                    this.isGrinding = false;
+                    
+                    // Determine trick type based on screen zone tapped
+                    if (xPos < WIDTH / 3) {
+                        this.trickType = 'shovit';
+                        this.trickProgress = 0;
+                        this.vy = this.jumpForce * 1.05; // extra height
+                    } else if (xPos > (2 * WIDTH) / 3) {
+                        this.trickType = 'kickflip';
+                        this.trickProgress = 0;
+                        this.vy = this.jumpForce * 1.05; // extra height
+                    } else {
+                        this.trickType = 'none';
+                        this.vy = this.jumpForce;
+                    }
+
+                    playSound('jump');
+                    spawnDust(this.x, this.y, 8);
+                }
+            }
+
+            update() {
+                // Determine slope angle of the ground containing skater
+                let slopeAngle = 0;
+                const segment = groundSegments.find(seg => this.x >= seg.x && this.x <= seg.x + seg.width);
+                if (segment && segment.type !== 'gap') {
+                    slopeAngle = Math.atan2(segment.endY - segment.startY, segment.width);
+                }
+                this.slopeAngle = slopeAngle;
+
+                if (!this.isGrinding && !this.isManualing) {
+                    this.vy += this.gravity;
+                    this.y += this.vy;
+                }
+
+                // Check landing boundaries
+                const currentGroundY = getGroundHeight(this.x + 20);
+                if (currentGroundY === null) {
+                    // Over a gap!
+                    this.isGrounded = false;
+                    this.isGrinding = false;
+                    this.isManualing = false;
+                } else {
+                    if (this.y >= currentGroundY) {
+                        this.y = currentGroundY;
+                        this.vy = 0;
+                        
+                        if (!this.isGrounded && !this.isGrinding && !this.isManualing) {
+                            this.land();
+                        }
+                    }
+                }
+
+                // Animate tricks
+                if (this.trickType !== 'none') {
+                    this.trickProgress += 0.045; // completes in ~22 frames
+                    if (this.trickProgress >= 1) {
+                        let bonus = 0;
+                        if (this.trickType === 'kickflip') {
+                            bonus = Math.floor(150 * activeMultiplier);
+                            createFlyingText(`+${bonus} KICKFLIP!`, this.x + 20, this.y - 50, '#ffea00');
+                        } else if (this.trickType === 'shovit') {
+                            bonus = Math.floor(120 * activeMultiplier);
+                            createFlyingText(`+${bonus} POP SHOVIT!`, this.x + 20, this.y - 50, '#00f0ff');
+                        }
+                        rawScore += bonus;
+                        activeMultiplier += 1;
+                        this.trickType = 'none';
+                        this.trickProgress = 0;
+                    }
+                }
+
+                // Grinding updates
+                if (this.isGrinding) {
+                    rawScore += 0.5 * activeMultiplier;
+                    if (frameCount % 4 === 0) {
+                        spawnSpark(this.x + 10, this.y + 10);
+                        playSound('grind');
+                    }
+                }
+
+                // Manual balancing updates
+                if (this.isManualing) {
+                    this.manualStreakFrames++;
+                    // dynamic random drift
+                    this.manualDriftSpeed += (Math.random() - 0.5) * 0.0075;
+                    this.manualDriftSpeed = Math.max(-0.04, Math.min(0.04, this.manualDriftSpeed));
+                    this.manualBalance += this.manualDriftSpeed;
+
+                    rawScore += 0.45 * activeMultiplier;
+
+                    // sparks/trail from manual wheels
+                    if (frameCount % 5 === 0) {
+                        particles.push(new Particle(
+                            this.x + (this.manualType === 'nose' ? 30 : 10),
+                            this.y + 10,
+                            -gameSpeed * 0.5,
+                            -Math.random() * 1.5,
+                            varColor('--neon-green'),
+                            Math.random() * 2 + 1,
+                            15
+                        ));
+                        playSound('grind');
+                    }
+
+                    // Check balance bounds
+                    if (this.manualBalance < -1.1 || this.manualBalance > 1.1) {
+                        triggerCrash();
+                    }
+                }
+            }
+
+            land() {
+                // If landed mid-trick, crash!
+                if (this.trickType !== 'none') {
+                    triggerCrash();
+                    return;
+                }
+
+                // Check if user is holding touch to land into a manual
+                if (inputActive) {
+                    startManual(touchStartY);
+                } else {
+                    this.isGrounded = true;
+                    spawnDust(this.x, this.y, 8);
+                }
+            }
+
+            draw() {
+                // Render balance meter if manualing
+                if (this.isManualing) {
+                    const barX = this.x - 30;
+                    const barY = this.y - 85;
+                    const barW = 8;
+                    const barH = 70;
+
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.strokeStyle = varColor('--neon-cyan');
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(barX, barY, barW, barH);
+                    ctx.fillRect(barX, barY, barW, barH);
+
+                    // Sweet spot
+                    ctx.strokeStyle = varColor('--neon-green');
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(barX, barY + barH/2 - 12);
+                    ctx.lineTo(barX + barW, barY + barH/2 - 12);
+                    ctx.moveTo(barX, barY + barH/2 + 12);
+                    ctx.lineTo(barX + barW, barY + barH/2 + 12);
+                    ctx.stroke();
+
+                    // Balance dot
+                    const pointerY = barY + barH/2 + (this.manualBalance * (barH/2));
+                    ctx.fillStyle = varColor('--neon-pink');
+                    ctx.shadowColor = varColor('--neon-pink');
+                    ctx.shadowBlur = 6;
+                    ctx.beginPath();
+                    ctx.arc(barX + barW/2, pointerY, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                ctx.save();
+                ctx.translate(this.x + 20, this.y);
+                
+                // Board tilting & scaling based on tricks and manual state
+                let boardAngle = this.slopeAngle;
+                let boardScaleX = 1;
+
+                if (this.isManualing) {
+                    boardAngle += (this.manualType === 'nose' ? -0.18 : 0.18);
+                } else if (this.trickType === 'kickflip') {
+                    boardAngle += this.trickProgress * Math.PI * 2;
+                } else if (this.trickType === 'shovit') {
+                    boardScaleX = Math.cos(this.trickProgress * Math.PI * 2);
+                }
+
+                ctx.rotate(boardAngle);
+                ctx.scale(boardScaleX, 1);
+
+                // Draw skateboard deck
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = varColor('--neon-cyan');
+                ctx.shadowColor = varColor('--neon-cyan');
+                ctx.shadowBlur = 8;
+                
+                ctx.beginPath();
+                ctx.moveTo(-25, 8);
+                ctx.lineTo(25, 8);
+                ctx.stroke();
+
+                // Wheels
+                ctx.fillStyle = '#fff';
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.arc(-16, 12, 4, 0, Math.PI * 2);
+                ctx.arc(16, 12, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Skater Body
+                ctx.strokeStyle = varColor('--neon-pink');
+                ctx.shadowColor = varColor('--neon-pink');
+                ctx.shadowBlur = 10;
+                ctx.lineWidth = 5;
+
+                // Legs
+                ctx.beginPath();
+                ctx.moveTo(-10, 8);
+                ctx.lineTo(-5, -10);
+                ctx.moveTo(10, 8);
+                ctx.lineTo(5, -10);
+                ctx.stroke();
+
+                // Torso
+                ctx.beginPath();
+                ctx.moveTo(0, -10);
+                ctx.lineTo(0, -32);
+                ctx.stroke();
+
+                // Arms pose
+                ctx.beginPath();
+                if (this.isGrinding || this.isManualing) {
+                    ctx.moveTo(0, -28);
+                    ctx.lineTo(-20, -22);
+                    ctx.moveTo(0, -28);
+                    ctx.lineTo(15, -24);
+                } else if (!this.isGrounded) {
+                    ctx.moveTo(0, -28);
+                    ctx.lineTo(-18, -40);
+                    ctx.moveTo(0, -28);
+                    ctx.lineTo(18, -40);
+                } else {
+                    ctx.moveTo(0, -28);
+                    ctx.lineTo(-12, -18);
+                    ctx.moveTo(0, -28);
+                    ctx.lineTo(12, -18);
+                }
+                ctx.stroke();
+
+                // Head
+                ctx.fillStyle = '#fff';
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.arc(0, -38, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        function varColor(cssName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(cssName).trim();
+        }
+
+        // Particle Engines
+        class Particle {
+            constructor(x, y, vx, vy, color, size, life) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.size = size;
+                this.maxLife = life;
+                this.life = life;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life / this.maxLife;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function spawnSpark(x, y) {
+            particles.push(new Particle(
+                x, y,
+                -gameSpeed * 0.4 + (Math.random() * 2 - 1),
+                -Math.random() * 3,
+                varColor('--neon-yellow'),
+                Math.random() * 3 + 1,
+                30
+            ));
+        }
+
+        function spawnDust(x, y, count) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(
+                    x, y + 10,
+                    -gameSpeed + (Math.random() * 2 - 1),
+                    -Math.random() * 1.5,
+                    'rgba(255, 255, 255, 0.4)',
+                    Math.random() * 4 + 2,
+                    20
+                ));
+            }
+        }
+
+        function spawnCrashExplosion(x, y) {
+            for (let i = 0; i < 40; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 8 + 2;
+                particles.push(new Particle(
+                    x, y,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed - 2,
+                    Math.random() > 0.5 ? varColor('--neon-pink') : varColor('--neon-cyan'),
+                    Math.random() * 5 + 2,
+                    50
+                ));
+            }
+        }
+
+        // Flying texts for combos
+        let flyingTexts = [];
+        function createFlyingText(text, x, y, color) {
+            flyingTexts.push({ text, x, y, color, life: 55 });
+        }
+
+        // Obstacles & Level Generation
+        class Obstacle {
+            constructor() {
+                this.x = WIDTH + 50;
+                const baseGroundY = getGroundHeight(this.x) || (HEIGHT - 100);
+                this.y = baseGroundY;
+                this.width = 30 + Math.random() * 15;
+                this.height = 35 + Math.random() * 15;
+                this.passed = false;
+            }
+
+            update() {
+                this.x -= gameSpeed;
+                const currentGroundY = getGroundHeight(this.x);
+                if (currentGroundY !== null) {
+                    this.y = currentGroundY;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.shadowColor = varColor('--neon-yellow');
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = varColor('--neon-yellow');
+
+                ctx.beginPath();
+                ctx.rect(this.x - this.width/2, this.y - this.height, this.width, this.height);
+                ctx.fill();
+
+                // hazard stripes
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(this.x - this.width/2, this.y - this.height * 0.7);
+                ctx.lineTo(this.x + this.width/2, this.y - this.height * 0.4);
+                ctx.moveTo(this.x - this.width/2, this.y - this.height * 0.4);
+                ctx.lineTo(this.x + this.width/2, this.y - this.height * 0.1);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        class Rail {
+            constructor() {
+                this.x = WIDTH + 50;
+                this.length = 200 + Math.random() * 250;
+                const baseGroundY = getGroundHeight(this.x) || (HEIGHT - 100);
+                this.y = baseGroundY - 60 - Math.random() * 30; // Elevated rail
+                this.passed = false;
+            }
+
+            update() {
+                this.x -= gameSpeed;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.strokeStyle = varColor('--neon-cyan');
+                ctx.shadowColor = varColor('--neon-cyan');
+                ctx.shadowBlur = 10;
+                ctx.lineWidth = 6;
+
+                // Main bar
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.length, this.y);
+                ctx.stroke();
+
+                // Supports
+                ctx.lineWidth = 4;
+                const supportG1 = getGroundHeight(this.x + 20) || (HEIGHT - 100);
+                const supportG2 = getGroundHeight(this.x + this.length - 20) || (HEIGHT - 100);
+                
+                ctx.beginPath();
+                ctx.moveTo(this.x + 20, this.y);
+                ctx.lineTo(this.x + 20, supportG1);
+                ctx.moveTo(this.x + this.length - 20, this.y);
+                ctx.lineTo(this.x + this.length - 20, supportG2);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        // Generating ground dynamically
+        function handleGround() {
+            if (groundSegments.length === 0) {
+                let curX = 0;
+                let lastY = HEIGHT - 100;
+                for (let i = 0; i < 5; i++) {
+                    groundSegments.push({
+                        x: curX,
+                        width: 300,
+                        startY: lastY,
+                        endY: lastY,
+                        type: 'flat'
+                    });
+                    curX += 300;
+                }
+            }
+
+            // Keep generating ahead
+            let rightmost = groundSegments[groundSegments.length - 1];
+            while (rightmost.x + rightmost.width < WIDTH + 400) {
+                let type = 'flat';
+                let nextWidth = 300;
+                let startY = rightmost.endY;
+                let endY = startY;
+
+                const rand = Math.random();
+                if (rand < 0.4) {
+                    type = 'flat';
+                    nextWidth = 200 + Math.random() * 200;
+                } else if (rand < 0.75) {
+                    type = 'slope';
+                    nextWidth = 180 + Math.random() * 120;
+                    let dir = Math.random() > 0.5 ? 1 : -1;
+                    if (startY > HEIGHT - 90) dir = -1; // force up
+                    if (startY < HEIGHT - 160) dir = 1;  // force down
+                    endY = startY + dir * (40 + Math.random() * 40);
+                } else {
+                    type = 'gap';
+                    nextWidth = 110 + Math.random() * 50;
+                    endY = startY;
+                }
+
+                const newSeg = {
+                    x: rightmost.x + rightmost.width,
+                    width: nextWidth,
+                    startY: startY,
+                    endY: endY,
+                    type: type
+                };
+                groundSegments.push(newSeg);
+                rightmost = newSeg;
+            }
+
+            // Remove offscreen ground
+            groundSegments = groundSegments.filter(seg => seg.x + seg.width > -400);
+            groundSegments.forEach(seg => {
+                seg.x -= gameSpeed;
+            });
+        }
+
+        // Main game cycle
+        function spawnManager() {
+            if (frameCount % 120 === 0) {
+                if (Math.random() > 0.55) {
+                    obstacles.push(new Obstacle());
+                } else if (Math.random() > 0.6) {
+                    rails.push(new Rail());
+                }
+            }
+        }
+
+        function checkCollisions() {
+            // Check rails for grinding
+            let onARail = false;
+            rails.forEach(rail => {
+                const skaterLeft = skater.x;
+                const skaterRight = skater.x + skater.width;
+                const skaterBottom = skater.y + 12;
+
+                if (skaterRight >= rail.x && skaterLeft <= rail.x + rail.length) {
+                    if (skater.vy >= 0 && Math.abs(skaterBottom - rail.y) < 15) {
+                        // Crash if landing on a rail mid-trick
+                        if (skater.trickType !== 'none') {
+                            triggerCrash();
+                            return;
+                        }
+
+                        if (inputActive || skater.isGrinding) {
+                            skater.y = rail.y - 12;
+                            skater.vy = 0;
+                            skater.isGrinding = true;
+                            skater.isGrounded = false;
+                            skater.isManualing = false;
+                            onARail = true;
+                        }
+                    }
+                }
+            });
+
+            if (!onARail && skater.isGrinding) {
+                skater.isGrinding = false;
+                createFlyingText(`x${activeMultiplier} GRIND COMBO!`, skater.x, skater.y - 30, '#00f0ff');
+                activeMultiplier += 1;
+                playSound('jump');
+            }
+
+            // Check obstacle crashes
+            obstacles.forEach(obs => {
+                const skaterLeft = skater.x + 5;
+                const skaterRight = skater.x + skater.width - 5;
+                const skaterTop = skater.y - skater.height + 15;
+                const skaterBottom = skater.y + 8;
+
+                const obsLeft = obs.x - obs.width/2;
+                const obsRight = obs.x + obs.width/2;
+                const obsTop = obs.y - obs.height;
+                const obsBottom = obs.y;
+
+                if (skaterRight >= obsLeft && skaterLeft <= obsRight &&
+                    skaterBottom >= obsTop && skaterTop <= obsBottom) {
+                    triggerCrash();
+                }
+
+                if (!obs.passed && obs.x < skater.x) {
+                    obs.passed = true;
+                    const passScore = Math.floor(100 * activeMultiplier);
+                    rawScore += passScore;
+                    createFlyingText(`+${passScore}`, obs.x, obs.y - 50, '#ffea00');
+                }
+            });
+
+            // Falling below screen (in a gap)
+            if (skater.y > HEIGHT + 60) {
+                triggerCrash();
+            }
+        }
+
+        function triggerCrash() {
+            playSound('crash');
+            cameraShake = 20;
+            spawnCrashExplosion(skater.x + 20, skater.y - 15);
+            gameState = 'GAMEOVER';
+            handleGameOver();
+        }
+
+        function handleGameOver() {
+            // Cash in pending manual score if crashed
+            if (skater.isManualing) {
+                skater.isManualing = false;
+            }
+
+            const finalScore = Math.floor(rawScore);
+            const finalDistance = Math.floor(distance);
+
+            document.getElementById('finalScoreText').textContent = `Score: ${finalScore}`;
+            document.getElementById('finalDistanceText').textContent = `Afstand: ${finalDistance}m`;
+
+            const isNewHigh = finalScore > highscore;
+            if (isNewHigh) {
+                highscore = finalScore;
+                highscoreHolder = skaterName;
+                localStorage.setItem('skate_highscore', highscore);
+                localStorage.setItem('skate_highscore_name', highscoreHolder);
+                document.getElementById('gameoverMsg').innerHTML = `🔥 NIEUWE HIGH SCORE! 🔥`;
+                playSound('highscore');
+            } else {
+                document.getElementById('gameoverMsg').textContent = `High Score staat op ${highscore} (${highscoreHolder})`;
+            }
+
+            generateScorecardScreenshot(finalScore, finalDistance, isNewHigh);
+
+            setTimeout(() => {
+                document.getElementById('gameoverScreen').classList.remove('hidden');
+            }, 600);
+        }
+
+        function generateScorecardScreenshot(score, dist, isNewHigh) {
+            const cardCanvas = document.createElement('canvas');
+            cardCanvas.width = 600;
+            cardCanvas.height = 400;
+            const c = cardCanvas.getContext('2d');
+
+            const bgGrad = c.createRadialGradient(300, 200, 50, 300, 200, 300);
+            bgGrad.addColorStop(0, '#1c0f3c');
+            bgGrad.addColorStop(1, '#070414');
+            c.fillStyle = bgGrad;
+            c.fillRect(0, 0, 600, 400);
+
+            c.strokeStyle = 'rgba(255, 0, 127, 0.15)';
+            c.lineWidth = 1;
+            for (let i = 0; i < 600; i += 30) {
+                c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 400); c.stroke();
+            }
+            for (let i = 0; i < 400; i += 30) {
+                c.beginPath(); c.moveTo(0, i); c.lineTo(600, i); c.stroke();
+            }
+
+            c.strokeStyle = '#ff007f';
+            c.lineWidth = 8;
+            c.shadowColor = '#ff007f';
+            c.shadowBlur = 15;
+            c.strokeRect(10, 10, 580, 380);
+
+            c.shadowColor = '#00f0ff';
+            c.shadowBlur = 10;
+            c.fillStyle = '#fff';
+            c.font = 'bold 32px "Orbitron"';
+            c.textAlign = 'center';
+            c.fillText('SKATE & DODGE', 300, 65);
+
+            c.fillStyle = '#00f0ff';
+            c.font = '16px "Orbitron"';
+            c.fillText('EXPOSURE GAME CHALLENGE', 300, 95);
+
+            c.strokeStyle = '#00f0ff';
+            c.lineWidth = 2;
+            c.beginPath();
+            c.moveTo(100, 115);
+            c.lineTo(500, 115);
+            c.stroke();
+
+            c.shadowBlur = 0;
+            c.fillStyle = '#fff';
+            c.font = '22px "Roboto Condensed"';
+            c.fillText(`SPELER: ${skaterName.toUpperCase()}`, 300, 155);
+
+            c.fillStyle = 'rgba(255, 0, 127, 0.2)';
+            c.fillRect(100, 180, 400, 80);
+            c.strokeStyle = '#ff007f';
+            c.lineWidth = 2;
+            c.strokeRect(100, 180, 400, 80);
+
+            c.fillStyle = '#ffea00';
+            c.font = 'bold 36px "Orbitron"';
+            c.shadowColor = '#ffea00';
+            c.shadowBlur = 10;
+            c.fillText(`${score.toLocaleString()}`, 300, 235);
+            c.shadowBlur = 0;
+
+            c.fillStyle = '#fff';
+            c.font = '18px "Roboto Condensed"';
+            c.fillText(`Afstand afgelegd: ${dist} meter`, 300, 290);
+            
+            const today = new Date().toLocaleDateString('nl-NL', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+            c.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            c.font = '14px "Roboto Condensed"';
+            c.fillText(today, 300, 325);
+
+            if (isNewHigh) {
+                c.save();
+                c.translate(480, 270);
+                c.rotate(-0.25);
+                c.fillStyle = 'rgba(57, 255, 20, 0.15)';
+                c.fillRect(-80, -25, 160, 50);
+                c.strokeStyle = '#39ff14';
+                c.lineWidth = 3;
+                c.shadowColor = '#39ff14';
+                c.shadowBlur = 8;
+                c.strokeRect(-80, -25, 160, 50);
+                c.fillStyle = '#39ff14';
+                c.font = 'bold 16px "Orbitron"';
+                c.fillText('HIGH SCORE', 0, 7);
+                c.restore();
+            }
+
+            currentScreenshotData = cardCanvas.toDataURL('image/png');
+            const imgEl = document.getElementById('screenshotImg');
+            imgEl.src = currentScreenshotData;
+            document.getElementById('screenshotContainer').style.display = 'block';
+        }
+
+        // Draw Environment & Slopes
+        function drawBackground() {
+            stars.forEach(star => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + 0.6 * Math.sin(frameCount * 0.05 + star.brightness * 10)})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Retro Moon
+            ctx.save();
+            ctx.shadowColor = varColor('--neon-pink');
+            ctx.shadowBlur = 30;
+            ctx.fillStyle = 'rgba(255, 0, 127, 0.2)';
+            ctx.beginPath();
+            ctx.arc(850, 150, 75, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(850, 150, 65, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Parallax silhouette city
+            ctx.fillStyle = '#0f0826';
+            citySilhouettes.forEach((building, i) => {
+                const screenX = (building.x - frameCount * 0.7) % (WIDTH + building.width) - building.width;
+                ctx.fillRect(screenX, HEIGHT - 100 - building.height, building.width, building.height);
+
+                ctx.fillStyle = (frameCount % 40 < 20) ? varColor('--neon-cyan') : 'rgba(0, 240, 255, 0.3)';
+                building.lights.forEach((light, lIdx) => {
+                    if (light) {
+                        const wx = screenX + 8 + (lIdx % 2) * 16;
+                        const wy = HEIGHT - 100 - building.height + 15 + Math.floor(lIdx / 2) * 25;
+                        if (wx < screenX + building.width - 8 && wy < HEIGHT - 105) {
+                            ctx.fillRect(wx, wy, 6, 8);
+                        }
+                    }
+                });
+                ctx.fillStyle = '#0f0826';
+            });
+
+            // Draw Ground Segments and scrolling perspective lines
+            groundSegments.forEach(seg => {
+                if (seg.type !== 'gap') {
+                    // Draw neon slope line
+                    ctx.save();
+                    ctx.strokeStyle = varColor('--neon-pink');
+                    ctx.lineWidth = 6;
+                    ctx.shadowColor = varColor('--neon-pink');
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.moveTo(seg.x, seg.startY);
+                    ctx.lineTo(seg.x + seg.width, seg.endY);
+                    ctx.stroke();
+
+                    // Fill solid background below slope line
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = 'rgba(15, 8, 38, 0.7)';
+                    ctx.beginPath();
+                    ctx.moveTo(seg.x, seg.startY);
+                    ctx.lineTo(seg.x + seg.width, seg.endY);
+                    ctx.lineTo(seg.x + seg.width, HEIGHT);
+                    ctx.lineTo(seg.x, HEIGHT);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+
+                    // Grid perspective lines
+                    ctx.strokeStyle = 'rgba(255, 0, 127, 0.1)';
+                    ctx.lineWidth = 2;
+                    const gridSpacing = 40;
+                    const startOffset = seg.x % gridSpacing;
+                    for (let gx = -startOffset; gx < seg.width; gx += gridSpacing) {
+                        if (gx >= 0) {
+                            const px = seg.x + gx;
+                            const pct = gx / seg.width;
+                            const py = seg.startY + (seg.endY - seg.startY) * pct;
+                            ctx.beginPath();
+                            ctx.moveTo(px, py);
+                            ctx.lineTo(px - 12, HEIGHT);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            });
+        }
+
+        function drawHUD() {
+            ctx.save();
+            
+            // Score
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 24px "Orbitron"';
+            ctx.textAlign = 'left';
+            ctx.shadowColor = varColor('--neon-cyan');
+            ctx.shadowBlur = 5;
+            ctx.fillText(`SCORE: ${Math.floor(rawScore).toLocaleString()}`, 20, 40);
+
+            // Multiplier
+            if (activeMultiplier > 1) {
+                ctx.fillStyle = varColor('--neon-yellow');
+                ctx.shadowColor = varColor('--neon-yellow');
+                ctx.fillText(`x${activeMultiplier}`, 20, 75);
+            }
+
+            // Distance
+            ctx.fillStyle = '#fff';
+            ctx.shadowBlur = 0;
+            ctx.font = '18px "Orbitron"';
+            ctx.textAlign = 'right';
+            ctx.fillText(`AFSTAND: ${Math.floor(distance)}m`, WIDTH - 20, 40);
+
+            // Speed
+            ctx.fillStyle = varColor('--neon-cyan');
+            ctx.font = '14px "Orbitron"';
+            ctx.fillText(`SPEED: ${(gameSpeed * 5).toFixed(0)} km/h`, WIDTH - 20, 68);
+
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            if (gameState === 'PLAYING') {
+                frameCount++;
+                distance += gameSpeed * 0.05;
+
+                if (frameCount % 600 === 0 && gameSpeed < 13) {
+                    gameSpeed += 0.5;
+                }
+
+                if (cameraShake > 0) {
+                    cameraShake *= 0.9;
+                    if (cameraShake < 0.2) cameraShake = 0;
+                }
+
+                ctx.save();
+                if (cameraShake > 0) {
+                    const dx = (Math.random() - 0.5) * cameraShake;
+                    const dy = (Math.random() - 0.5) * cameraShake;
+                    ctx.translate(dx, dy);
+                }
+
+                ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+                // Update & draw ground segments scroll
+                handleGround();
+
+                // draw backgrounds
+                drawBackground();
+
+                spawnManager();
+
+                // Update & Draw Rails
+                rails = rails.filter(rail => rail.x + rail.length > -50);
+                rails.forEach(rail => {
+                    rail.update();
+                    rail.draw();
+                });
+
+                // Update & Draw Obstacles
+                obstacles = obstacles.filter(obs => obs.x > -50);
+                obstacles.forEach(obs => {
+                    obs.update();
+                    obs.draw();
+                });
+
+                // Update & Draw Particles
+                particles = particles.filter(p => p.life > 0);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+
+                // Update & Draw Skater
+                skater.update();
+                skater.draw();
+
+                // Multiplier reset decay
+                if (skater.isGrounded && !skater.isManualing && frameCount % 180 === 0 && activeMultiplier > 1) {
+                    activeMultiplier = 1;
+                    createFlyingText('combo reset', skater.x, skater.y - 30, '#ff007f');
+                }
+
+                checkCollisions();
+
+                // Draw flying score text overlays
+                flyingTexts = flyingTexts.filter(t => t.life > 0);
+                flyingTexts.forEach(t => {
+                    t.y -= 1.2;
+                    t.life--;
+                    ctx.save();
+                    ctx.globalAlpha = t.life / 55;
+                    ctx.fillStyle = t.color;
+                    ctx.font = 'bold 20px "Orbitron"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(t.text, t.x, t.y);
+                    ctx.restore();
+                });
+
+                drawHUD();
+
+                ctx.restore();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize Skater
+        skater = new Skater();
+
+        // Canvas Scale Coordinates helper
+        function getEventCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            const x = (clientX - rect.left) / rect.width * WIDTH;
+            const y = (clientY - rect.top) / rect.height * HEIGHT;
+            return { x, y, clientY };
+        }
+
+        function startManual(yPos) {
+            if (skater.isManualing) return;
+            
+            skater.isManualing = true;
+            skater.isGrounded = false; // suspend regular ground alignment
+            skater.manualBalance = 0;
+            skater.manualDriftSpeed = (Math.random() > 0.5 ? 0.015 : -0.015);
+            skater.manualStreakFrames = 0;
+            
+            // Choose Manual type based on touch location
+            if (touchStartY < WIDTH / 2) {
+                skater.manualType = 'nose';
+                createFlyingText('NOSE MANUAL', skater.x + 20, skater.y - 30, '#39ff14');
+            } else {
+                skater.manualType = 'tail';
+                createFlyingText('MANUAL', skater.x + 20, skater.y - 30, '#39ff14');
+            }
+        }
+
+        function endManual() {
+            if (!skater.isManualing) return;
+            skater.isManualing = false;
+            skater.isGrounded = true;
+
+            const comboPoints = Math.floor(skater.manualStreakFrames * 4.5 * activeMultiplier);
+            rawScore += comboPoints;
+            activeMultiplier += Math.floor(skater.manualStreakFrames / 70); // bump multiplier
+            createFlyingText(`+${comboPoints} COMBO!`, skater.x + 20, skater.y - 30, '#39ff14');
+            skater.manualStreakFrames = 0;
+        }
+
+        // Control handlers
+        function handleInputStart(e) {
+            if (e.cancelable) e.preventDefault();
+            inputActive = true;
+
+            if (gameState === 'PLAYING') {
+                const coords = getEventCoordinates(e);
+                touchStartY = coords.x; // track horizontal click
+                lastInputY = coords.clientY; // track Y for manual
+
+                if (skater.isGrounded) {
+                    skater.pendingJump = true;
+                    skater.pendingJumpX = coords.x;
+                    // Start timer: if held longer than 180ms -> start manual!
+                    skater.jumpTimer = setTimeout(() => {
+                        if (skater.pendingJump && skater.isGrounded) {
+                            skater.pendingJump = false;
+                            startManual(coords.x);
+                        }
+                    }, 180);
+                } else if (skater.isGrinding) {
+                    // Jump off rail
+                    skater.jump(coords.x);
+                }
+            }
+        }
+
+        function handleInputEnd(e) {
+            if (e.cancelable) e.preventDefault();
+            inputActive = false;
+
+            if (gameState === 'PLAYING') {
+                if (skater.pendingJump) {
+                    clearTimeout(skater.jumpTimer);
+                    skater.pendingJump = false;
+                    skater.jump(skater.pendingJumpX);
+                }
+                if (skater.isManualing) {
+                    endManual();
+                }
+            }
+        }
+
+        function handleInputMove(e) {
+            if (gameState === 'PLAYING' && skater.isManualing) {
+                const coords = getEventCoordinates(e);
+                const dy = coords.clientY - lastInputY;
+                skater.manualBalance += dy * 0.0075; // weight balancing sensitivity
+                skater.manualBalance = Math.max(-1.2, Math.min(1.2, skater.manualBalance));
+                lastInputY = coords.clientY;
+            }
+        }
+
+        canvas.addEventListener('touchstart', handleInputStart, { passive: false });
+        canvas.addEventListener('touchend', handleInputEnd, { passive: false });
+        canvas.addEventListener('touchmove', handleInputMove, { passive: false });
+
+        canvas.addEventListener('mousedown', handleInputStart);
+        canvas.addEventListener('mouseup', handleInputEnd);
+        canvas.addEventListener('mousemove', handleInputMove);
+
+        // Keyboard support
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                inputActive = true;
+                if (gameState === 'PLAYING') {
+                    if (skater.isGrounded) {
+                        skater.pendingJump = true;
+                        skater.pendingJumpX = WIDTH / 2; // middle normal jump
+                        skater.jumpTimer = setTimeout(() => {
+                            if (skater.pendingJump && skater.isGrounded) {
+                                skater.pendingJump = false;
+                                startManual(WIDTH / 2);
+                            }
+                        }, 180);
+                    } else if (skater.isGrinding) {
+                        skater.jump(WIDTH / 2);
+                    }
+                }
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                if (gameState === 'PLAYING' && skater.isManualing) {
+                    skater.manualBalance -= 0.15;
+                } else if (gameState === 'PLAYING' && skater.isGrounded) {
+                    skater.jump(0); // Shovit trick jump
+                }
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                if (gameState === 'PLAYING' && skater.isManualing) {
+                    skater.manualBalance += 0.15;
+                } else if (gameState === 'PLAYING' && skater.isGrounded) {
+                    skater.jump(WIDTH); // Kickflip trick jump
+                }
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'Space') {
+                inputActive = false;
+                if (skater.pendingJump) {
+                    clearTimeout(skater.jumpTimer);
+                    skater.pendingJump = false;
+                    skater.jump(WIDTH / 2);
+                }
+                if (skater.isManualing) {
+                    endManual();
+                }
+            }
+        });
+
+        // Menu buttons
+        document.getElementById('startBtn').addEventListener('click', () => {
+            const nameInput = document.getElementById('playerName').value.trim();
+            skaterName = nameInput || 'Skater';
+            document.getElementById('menuScreen').classList.add('hidden');
+            
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            startGame();
+        });
+
+        document.getElementById('retryBtn').addEventListener('click', () => {
+            document.getElementById('gameoverScreen').classList.add('hidden');
+            startGame();
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (currentScreenshotData) {
+                const link = document.createElement('a');
+                link.download = `skate_dodge_highscore_${skaterName}.png`;
+                link.href = currentScreenshotData;
+                link.click();
+            }
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            if (currentScreenshotData && navigator.share) {
+                fetch(currentScreenshotData)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        const file = new File([blob], `skate_dodge_highscore_${skaterName}.png`, { type: 'image/png' });
+                        navigator.share({
+                            files: [file],
+                            title: 'Skate & Dodge High Score',
+                            text: `Ik haalde ${Math.floor(rawScore)} punten in Skate & Dodge tijdens exposure wachttijd!`
+                        }).catch(err => console.log('Share error', err));
+                    });
+            } else {
+                alert("Sociaal delen is niet direct ondersteund op deze browser. Gebruik de Download knop!");
+            }
+        });
+
+        function startGame() {
+            gameState = 'PLAYING';
+            skater.reset();
+            groundSegments = [];
+            obstacles = [];
+            rails = [];
+            particles = [];
+            flyingTexts = [];
+            gameSpeed = 6.5;
+            distance = 0;
+            rawScore = 0;
+            activeMultiplier = 1;
+            frameCount = 0;
+        }
+
+        if (!navigator.share) {
+            document.getElementById('shareBtn').style.opacity = '0.5';
+        }
+
+        // Run animation loop
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
