@@ -64,6 +64,83 @@
             // Scroll to the result after calculation
             document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
         }
+
+        let bronnenData = [];
+
+        function berekenHuidigeActiviteit(ci1, type, datum) {
+            const firstDateObj = new Date(datum.split("-").reverse().join("-"));
+            const secondDate = new Date();
+            const timeDifference = secondDate - firstDateObj;
+            const days = timeDifference / (1000 * 3600 * 24);
+            let ci2 = 0;
+
+            if (type === "Se75") {
+                ci2 = ci1 / Math.pow(2, days / 120);
+            } else if (type === "Ir192") {
+                ci2 = ci1 / Math.pow(2, days / 74);
+            }
+            return ci2;
+        }
+
+        function laadBronnen() {
+            fetch('bronnen.csv')
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.split('\n');
+                    const select = document.getElementById('bronSelect');
+                    
+                    rows.forEach(row => {
+                        if (row.trim() !== '') {
+                            const cols = row.split(',');
+                            if (cols.length >= 5) {
+                                const bron = cols[0];
+                                const type = cols[1];
+                                const activiteit = parseFloat(cols[2]);
+                                const datum = cols[3];
+                                const brongrootte = cols[4];
+                                
+                                if (bron && type && !isNaN(activiteit) && datum && brongrootte) {
+                                    const currentActivity = berekenHuidigeActiviteit(activiteit, type, datum);
+                                    
+                                    bronnenData.push({
+                                        bron: bron,
+                                        type: type,
+                                        activiteit: currentActivity
+                                    });
+                                    
+                                    const option = document.createElement('option');
+                                    option.value = bron;
+                                    option.textContent = `${bron} (${type} - ${currentActivity.toFixed(2)} Ci)`;
+                                    select.appendChild(option);
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Fout bij het laden van bronnen:', error));
+        }
+
+        function selecteerBron(bronNaam) {
+            if (!bronNaam) {
+                document.getElementById('Ci').value = '';
+                return;
+            }
+            const gekozenBron = bronnenData.find(b => b.bron === bronNaam);
+            if (gekozenBron) {
+                if (gekozenBron.type === 'Se75') {
+                    document.getElementById('Se75').checked = true;
+                } else if (gekozenBron.type === 'Ir192') {
+                    document.getElementById('Ir192').checked = true;
+                }
+                document.getElementById('Ci').value = gekozenBron.activiteit.toFixed(2);
+            }
+        }
+
+        function clearSelectedBron() {
+            document.getElementById('bronSelect').value = '';
+        }
+
+        window.addEventListener('DOMContentLoaded', laadBronnen);
     </script>
 </head>
 <body>
@@ -86,23 +163,28 @@
     <script src="script.js"></script> <!-- Link naar externe JavaScript -->
 
     <form>
+        <label for="bronSelect">Kies een specifieke bron uit de lijst (optioneel):</label><br>
+        <select id="bronSelect" onchange="selecteerBron(this.value)">
+            <option value="">-- Handmatige invoer --</option>
+        </select><br><br>
+
         <label>Kies een gamma bron:</label><br>
-        <input type="radio" id="Ir192" name="bron" value="Ir192" checked>
+        <input type="radio" id="Ir192" name="bron" value="Ir192" checked onchange="clearSelectedBron()">
         <label for="Ir192">Iridium-192 (Ir192)</label><br>
-        <input type="radio" id="Se75" name="bron" value="Se75">
+        <input type="radio" id="Se75" name="bron" value="Se75" onchange="clearSelectedBron()">
         <label for="Se75">Selenium-75 (Se75)</label><br><br>
 
         <label for="Ci">Voer de hoeveelheid Ci in:</label><br>
-        <input type="number" id="Ci" step="any"><br><br>
+        <input type="number" id="Ci" step="any" oninput="clearSelectedBron()"><br><br>
 
         <label for="wanddikte_pb">Voer de doorstraalde dikte lood (Pb) in, in (mm):</label><br>
-        <input type="number" id="wanddikte_pb" step="any"><br><br>
+        <input type="number" id="wanddikte_pb" step="any" value="0"><br><br>
 
         <label for="wanddikte_fe">Voer de doorstraalde dikte staal in, in (mm):</label><br>
-        <input type="number" id="wanddikte_fe" step="any"><br><br>
+        <input type="number" id="wanddikte_fe" step="any" value="0"><br><br>
 
         <label for="gewenste_dosis">Voer de gewenste dosis in (μSv/h):</label><br>
-        <input type="number" id="gewenste_dosis" step="any"><br><br>
+        <input type="number" id="gewenste_dosis" step="any" value="10"><br><br>
 
         <button type="button" onclick="bereken()">Bereken</button>
     </form>
