@@ -193,7 +193,7 @@
                 </div>
             
             <button class="mt-6 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium py-2 px-4 rounded border border-indigo-200 border-dashed w-full no-print transition-colors" onclick="addOrder()">
-                + Nog een Order / Onderzoek Toevoegen
+                + Nog een onderzoek, reistijd of pauze
             </button>
         </div>
 
@@ -362,6 +362,7 @@
                             <option value="PT">PT</option>
                             <option value="UT">UT</option>
                             <option value="Reistijd">Reistijd</option>
+                            <option value="Pauze">Pauze</option>
                         </select>
                         <span class="font-medium ordernr-dash">-</span>
                         <input type="text" class="flex-1 font-bold ordernr-input" placeholder="Voer ordernummer in">
@@ -387,6 +388,7 @@
             let typeHours = {};
             let hasRT = false;
             let hasReistijd = false;
+            let pauzeHoursSum = 0;
             
             document.querySelectorAll('.order-block').forEach(block => {
                 const jobTypeSelect = block.querySelector('.job-type-select');
@@ -402,7 +404,11 @@
                     if (hourInput) {
                         const val = parseFloat(hourInput.value.replace(',', '.'));
                         if (!isNaN(val) && val > 0) {
-                            typeHours[type] = (typeHours[type] || 0) + val;
+                            if (type === 'Pauze') {
+                                pauzeHoursSum += val;
+                            } else {
+                                typeHours[type] = (typeHours[type] || 0) + val;
+                            }
                         }
                     }
                 }
@@ -446,14 +452,17 @@
             let isStandardSuffix = false;
             let cleanRest = restOfSentence.trim().toLowerCase();
             
-            if (cleanRest === "" || 
-                cleanRest === "incl. reistijd, ontwikkelen en rapporteren" ||
-                cleanRest === "incl. reistijd" ||
-                cleanRest === "incl. ontwikkelen en rapporteren" ||
-                cleanRest === "incl reistijd, ontwikkelen en rapporteren" ||
-                cleanRest === "incl. reistijd, rapporteren" ||
-                cleanRest === "incl. rapporteren" ||
-                cleanRest === "incl reistijd, rapporteren") {
+            // Strip any existing "excl. ... uur pauze" or "excl ... uur pauze" from cleanRest to check if the base is standard
+            let baseCleanRest = cleanRest.replace(/,?\s*excl\.?\s*[\d.,]+\s*uur\s*pauze\s*$/i, '').trim();
+            
+            if (baseCleanRest === "" || 
+                baseCleanRest === "incl. reistijd, ontwikkelen en rapporteren" ||
+                baseCleanRest === "incl. reistijd" ||
+                baseCleanRest === "incl. ontwikkelen en rapporteren" ||
+                baseCleanRest === "incl reistijd, ontwikkelen en rapporteren" ||
+                baseCleanRest === "incl. reistijd, rapporteren" ||
+                baseCleanRest === "incl. rapporteren" ||
+                baseCleanRest === "incl reistijd, rapporteren") {
                 isStandardSuffix = true;
             }
             
@@ -466,6 +475,14 @@
                     suffixParts.push("rapporteren");
                 }
                 restOfSentence = suffixParts.length > 0 ? "incl. " + suffixParts.join(", ") : "";
+                
+                if (pauzeHoursSum > 0) {
+                    if (restOfSentence) {
+                        restOfSentence += `, excl. ${pauzeHoursSum} uur pauze`;
+                    } else {
+                        restOfSentence = `excl. ${pauzeHoursSum} uur pauze`;
+                    }
+                }
             }
             
             textarea.value = newPrefix + restOfSentence;
@@ -497,7 +514,7 @@
             const dash = container.parentElement.querySelector('.ordernr-dash');
             const input = container.parentElement.querySelector('.ordernr-input');
             
-            if (type === 'Reistijd') {
+            if (type === 'Reistijd' || type === 'Pauze') {
                 if (dash) dash.classList.add('hidden');
                 if (input) input.classList.add('hidden');
             } else {
@@ -536,6 +553,29 @@
                         </div>
                     </div>
                 `;
+            } else if (type === 'Pauze') {
+                container.innerHTML = `
+                    <div class="flex flex-col gap-2 mb-2 pauze-block">
+                        <div class="flex items-center gap-2">
+                            <select class="font-bold border border-gray-200 rounded p-1 text-sm pauze-start bg-white cursor-pointer" onchange="calculatePauze(this)">
+                                ${generateTimeOptions()}
+                            </select>
+                            <span>tot</span>
+                            <select class="font-bold border border-gray-200 rounded p-1 text-sm pauze-end bg-white cursor-pointer" onchange="calculatePauze(this)">
+                                ${generateTimeOptions()}
+                            </select>
+                            <span class="ml-2 font-bold text-gray-700">=</span>
+                            <input type="number" class="w-16 text-center font-bold hour-input bg-gray-100" placeholder="0" readonly>
+                            <span class="font-medium text-gray-700">uur</span>
+                        </div>
+                    </div>
+                `;
+                // Set default values: 12:00 to 12:30 (0.5 hour)
+                const startSelect = container.querySelector('.pauze-start');
+                const endSelect = container.querySelector('.pauze-end');
+                startSelect.value = '12:00';
+                endSelect.value = '12:30';
+                calculatePauze(startSelect);
             } else {
                 const opCount = document.getElementById('operators-container').children.length || 1;
                 let options = '';
@@ -568,6 +608,29 @@
             if (!block) return;
             const startInp = block.querySelector('.reistijd-start');
             const endInp = block.querySelector('.reistijd-end');
+            const hourInp = block.querySelector('.hour-input');
+
+            if (startInp.value && endInp.value) {
+                const [startH, startM] = startInp.value.split(':').map(Number);
+                const [endH, endM] = endInp.value.split(':').map(Number);
+                
+                let diffM = (endH * 60 + endM) - (startH * 60 + startM);
+                if (diffM < 0) diffM += 24 * 60; // handle overnight
+                
+                const hours = (diffM / 60).toFixed(2);
+                hourInp.value = parseFloat(hours);
+                updateBottomSentence();
+            } else {
+                hourInp.value = '';
+                updateBottomSentence();
+            }
+        }
+
+        function calculatePauze(element) {
+            const block = element.closest('.pauze-block');
+            if (!block) return;
+            const startInp = block.querySelector('.pauze-start');
+            const endInp = block.querySelector('.pauze-end');
             const hourInp = block.querySelector('.hour-input');
 
             if (startInp.value && endInp.value) {
