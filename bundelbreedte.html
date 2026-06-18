@@ -212,7 +212,12 @@
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group hidden" id="customAngleGroup">
+            <label for="customAngle">Eigen openingshoek (°):</label>
+            <input type="number" id="customAngle" value="50" min="1" max="360" step="1" oninput="calculate()">
+        </div>
+
+        <div class="form-group" id="beamTypeGroup">
             <label id="lblBeamType">Bundel (Openingshoek):</label>
             <div class="radio-group" id="axisContainer">
                 <!-- Radio buttons via JS -->
@@ -361,6 +366,11 @@
             sel.appendChild(opt);
         }
         
+        const customOpt = document.createElement('option');
+        customOpt.value = 'custom';
+        customOpt.innerText = 'Eigen openingshoek...';
+        sel.appendChild(customOpt);
+        
         updateTubeOptions();
         updateScenarioUI();
         calculate();
@@ -381,8 +391,20 @@
 
     function updateTubeOptions() {
         appState.currentTube = document.getElementById('tubeSelect').value;
-        const data = tubeDB[appState.currentTube];
         const container = document.getElementById('axisContainer');
+        const customGroup = document.getElementById('customAngleGroup');
+        const beamTypeGroup = document.getElementById('beamTypeGroup');
+        
+        if (appState.currentTube === 'custom') {
+            customGroup.className = 'form-group';
+            beamTypeGroup.className = 'form-group hidden';
+            return;
+        } else {
+            customGroup.className = 'form-group hidden';
+            beamTypeGroup.className = 'form-group';
+        }
+        
+        const data = tubeDB[appState.currentTube];
         container.innerHTML = '';
         
         // Bepaal de naam van de "bundel" (bundel of collimator)
@@ -531,7 +553,12 @@
 
         const rOut = diam / 2;
         const rIn = rOut - wt;
-        const tubeAngleDeg = tubeDB[appState.currentTube].axes[appState.currentAxis];
+        let tubeAngleDeg;
+        if (appState.currentTube === 'custom') {
+            tubeAngleDeg = parseFloat(document.getElementById('customAngle').value) || 0;
+        } else {
+            tubeAngleDeg = tubeDB[appState.currentTube].axes[appState.currentAxis];
+        }
         const maxAngleRad = (tubeAngleDeg / 2) * (Math.PI / 180);
 
         if (appState.scenario !== 'flat' && wt >= rOut) {
