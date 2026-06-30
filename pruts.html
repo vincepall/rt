@@ -407,12 +407,12 @@
       >
         <h2 style="color: #f5df4d; margin-bottom: 10px;">Bundel & Dikte Simulatie</h2>
         <div style="margin-bottom: 15px; background-color: rgba(0,0,0,0.5); padding: 12px 20px; border-radius: 12px; display: inline-flex; align-items: center; gap: 15px; border: 1px solid rgba(245, 223, 77, 0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-          <span style="color: #F5DF4D; font-weight: bold; font-size: 1.1rem; text-shadow: 1px 1px 2px #000;">Openingshoek:</span>
+          <span id="beam-angle-title" style="color: #F5DF4D; font-weight: bold; font-size: 1.1rem; text-shadow: 1px 1px 2px #000;">Openingshoek:</span>
           <label style="color: #fff; cursor: pointer; font-weight: bold; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px #000;">
-            <input type="radio" name="beamAngle" value="large" checked onchange="updateVisualizer()" style="cursor: pointer; margin: 0; vertical-align: middle;"> Brede (60°)
+            <input type="radio" name="beamAngle" value="large" checked onchange="updateVisualizer()" style="cursor: pointer; margin: 0; vertical-align: middle;"> <span id="lbl-beam-large-text">Brede (60°)</span>
           </label>
           <label style="color: #fff; cursor: pointer; font-weight: bold; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px #000;">
-            <input type="radio" name="beamAngle" value="small" onchange="updateVisualizer()" style="cursor: pointer; margin: 0; vertical-align: middle;"> Smalle (40°)
+            <input type="radio" name="beamAngle" value="small" onchange="updateVisualizer()" style="cursor: pointer; margin: 0; vertical-align: middle;"> <span id="lbl-beam-small-text">Smalle (40°)</span>
           </label>
         </div>
         <div
@@ -597,8 +597,14 @@
         .getElementById("diameter")
         .addEventListener("input", resetManualEditFlags);
       document
+        .getElementById("diameter")
+        .addEventListener("change", resetManualEditFlags);
+      document
         .getElementById("wanddikte")
         .addEventListener("input", resetManualEditFlags);
+      document
+        .getElementById("wanddikte")
+        .addEventListener("change", resetManualEditFlags);
       document
         .getElementById("technique")
         .addEventListener("change", resetManualEditFlags);
@@ -945,7 +951,7 @@
 
         updateVisibility();
 
-        updateFFD();
+        updateFFD(shouldAutoFill);
 
         calculateResults();
       } // --- START AANGEPASTE 'SLIMME' UPDATEOFA ---
@@ -1001,8 +1007,14 @@
       }
       // --- EINDE AANGEPASTE 'SLIMME' UPDATEOFA ---
 
-      function updateFFD() {
+      function updateFFD(shouldAutoFill = false) {
         calculateMinFFD();
+        if (shouldAutoFill && !sfdManuallyEdited && minFFD > 0) {
+          const optie = document.getElementById("optie").value;
+          if (optie === "") {
+            document.getElementById("sfd").value = minFFD.toFixed(2);
+          }
+        }
         checkFFDWarning();
       }
 
@@ -1332,20 +1344,19 @@
         const isContactSWSI = technique === "SWSI" && optie === "";
 
         if (isContactSWSI) {
-          // SWSI Contact: Ray travels from Source -> Outer Wall -> Inner Wall (Film)
-          // Source S is Outside. Film P is on Inner Surface (r).
-          // We image the wall closest to the Source (The "Top" or "Near" wall).
-
-          // Source relative to center (Assuming film is at -r, Source is at +Y = -r + SFD)
-          // Note: SFD is Source-to-Film.
-          const sourceY = -r + sfd;
+          // SWSI Contact: Film is on the inner wall (r) in contact with the weld.
+          // Source is outside (r + sfd).
+          const sourceY = r + sfd;
 
           for (let n = 3; n <= 30; n++) {
-            const alpha = Math.PI / n; // Half-angle of coverage on Inner Surface
+            // Film length is based on outer circumference:
+            const targetLen = (diameter * Math.PI) / n;
+            // Film is on the inner wall (r):
+            const alpha = (targetLen / 2) / r;
 
             // Target Point P on Inner Surface (Film)
             const Px = r * Math.sin(alpha);
-            const Py = -r * Math.cos(alpha);
+            const Py = r * Math.cos(alpha);
 
             // Vector from Source S(0, sourceY) to P(Px, Py)
             const Vx = Px;
@@ -1353,24 +1364,18 @@
 
             // Coefficients for Line S + u*V
             const A = Vx * Vx + Vy * Vy;
-            const B = 2 * (0 * Vx + sourceY * Vy);
+            const B = 2 * sourceY * Vy;
 
-            // 1. Find Intersection with Outer Circle (R) - Near Side
+            // 1. Find Intersection with Outer Circle (R)
             const C_outer = sourceY * sourceY - R * R;
             const delta_outer = B * B - 4 * A * C_outer;
             if (delta_outer < 0) continue;
-            // Smallest positive root u (Near side entrance)
             const u_out = (-B - Math.sqrt(delta_outer)) / (2 * A);
 
-            // 2. Find Intersection with Inner Circle (r) - Near Side
-            const C_inner = sourceY * sourceY - r * r;
-            const delta_inner = B * B - 4 * A * C_inner;
-            if (delta_inner < 0) continue;
-            // Smallest positive root u (Near side exit)
-            const u_in = (-B - Math.sqrt(delta_inner)) / (2 * A);
+            // P is on the inner circle (r), so u_in is exactly 1.0
+            const u_in = 1.0;
 
-            // 3. Calculate Path Length through Near Wall
-            // Ray enters at u_out, exits near wall at u_in.
+            // Calculate Path Length through Near Wall
             const pathLength = (u_in - u_out) * Math.sqrt(A);
 
             // Check Ratio against single wall thickness
@@ -1383,7 +1388,7 @@
           // Film is at -R. Source is at -R + SFD.
           const sourceY = -R + sfd;
 
-          const isDoubleWall = technique === "DWSI";
+          const isDoubleWall = technique === "DWSI" || technique === "DWDI";
 
           for (let n = 3; n <= 30; n++) {
             const alpha = Math.PI / n;
@@ -2139,19 +2144,14 @@
             document.getElementById("opname-locaties").style.display = "none";
           } else {
             // CALCULATE MINIMUM EXPOSURES
-            let minExposures = "";
-
-            // Skip calculation for SWSI Contact (SWSI + Optie "Nee")
-            if (!(technique === "SWSI" && optie === "")) {
-              minExposures = calculateMinimumExposures(
-                diameter,
-                wanddikte,
-                sfd,
-                technique,
-                procedure,
-                optie,
-              );
-            }
+            let minExposures = calculateMinimumExposures(
+              diameter,
+              wanddikte,
+              sfd,
+              technique,
+              procedure,
+              optie,
+            );
 
             omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${formatMmToCm(omtrek)}</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${minExposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
 
@@ -2551,7 +2551,46 @@
           sfdInput.value = "0"; // Initialize FFD field with 0 if no minFFD is calculated
         }
       });
+
+      function getBeamAngles() {
+        const source = document.getElementById("source").value;
+        const brongrootteVal = document.getElementById("brongrootte").value;
+
+        if (source === "Se75") {
+          return { small: 60, large: 90, term: "collimator" };
+        } else if (source === "Ir192") {
+          return { small: 60, large: 90, term: "collimator" };
+        } else if (source === "X-ray") {
+          if (brongrootteVal.includes("Yxlon (3 mm)")) {
+            return { small: 40, large: 55, term: "bundel" };
+          } else if (brongrootteVal.includes("Yxlon Smart (1 mm)")) {
+            return { small: 30, large: 60, term: "bundel" };
+          } else if (brongrootteVal.includes("Balteau (2.5 mm)")) {
+            return { small: 40, large: 50, term: "bundel" };
+          } else if (brongrootteVal.includes("Balteau Rondstraler (5 mm)")) {
+            return { small: 40, large: 360, term: "bundel" };
+          }
+        }
+        return { small: 40, large: 60, term: "bundel" };
+      }
+
       function updateVisualizer() {
+        // Update DOM labels for beam angles based on chosen radiation source first
+        const angles = getBeamAngles();
+        const term = angles.term || 'bundel';
+        const titleEl = document.getElementById("beam-angle-title");
+        const largeTextEl = document.getElementById("lbl-beam-large-text");
+        const smallTextEl = document.getElementById("lbl-beam-small-text");
+        if (titleEl) {
+          titleEl.textContent = (term.charAt(0).toUpperCase() + term.slice(1)) + " openingshoek:";
+        }
+        if (largeTextEl) {
+          largeTextEl.textContent = `Brede ${term} (${angles.large}°)`;
+        }
+        if (smallTextEl) {
+          smallTextEl.textContent = `Smalle ${term} (${angles.small}°)`;
+        }
+
         const technique = document.getElementById("technique").value;
         const section = document.getElementById("visualizer-section");
 
@@ -2561,8 +2600,14 @@
         const procedure = document.getElementById("procedure").value;
         const optie = document.getElementById("optie").value;
 
-        // Basic validation
-        if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0) {
+        // Basic validation & Centraal check
+        if (
+          isNaN(diameter) ||
+          isNaN(wanddikte) ||
+          isNaN(sfd) ||
+          sfd <= 0 ||
+          optie === "1"
+        ) {
           section.style.display = "none";
           return;
         }
@@ -2585,7 +2630,7 @@
         // Get selected beam angle choice (wide vs narrow)
         const beamAngleEl = document.querySelector('input[name="beamAngle"]:checked');
         const beamAngleVal = beamAngleEl ? beamAngleEl.value : 'large';
-        const maxAngleDeg = beamAngleVal === 'large' ? 60 : 40;
+        const maxAngleDeg = beamAngleVal === 'large' ? angles.large : angles.small;
         const maxAngleRad = (maxAngleDeg / 2) * Math.PI / 180;
 
         // Determine exposures
@@ -2624,20 +2669,37 @@
         const thicknessAtEdge = getPathLength(scenario, userAngle, sfd, wanddikte, R);
         const availableLength = calculateLengthForAngle(scenario, maxAngleRad, sfd, R);
 
+        let ffdPrimeVal = sfd;
+        if (scenario === 'flat') {
+            ffdPrimeVal = Math.sqrt((targetLen/2)*(targetLen/2) + sfd*sfd);
+        } else if (scenario === 'curve_out') {
+            const center = {x:0, y: sfd + r};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, r);
+            if (hits.length > 0) ffdPrimeVal = hits[0];
+        } else if (scenario === 'curve_in' || scenario === 'dwsi') {
+            const center = {x:0, y: sfd - R};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, R);
+            if (hits.length > 0) {
+                const dist = (scenario === 'dwsi' && hits.length > 1) ? Math.max(...hits) : hits.find(d => d > 0);
+                if (dist) ffdPrimeVal = dist;
+            }
+        }
+
         // Update Stats HTML
         statsDiv.innerHTML = `
             <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; font-size: 1.1em;">
                 <div><strong>Diameter:</strong> <span style="color: #f5df4d">${diameter} mm</span></div>
                 <div><strong>Wanddikte:</strong> <span style="color: #f5df4d">${wanddikte} mm</span></div>
-                <div><strong>FFD:</strong> <span style="color: #f5df4d">${sfd} mm</span></div>
+                <div><strong>FFD:</strong> <span style="color: #f5df4d">${(sfd / 10).toFixed(1)} cm</span></div>
             </div>
             <hr style="border-color: #444; margin: 10px 0;">
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; font-size: 1.1em;">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; font-size: 1.2em;">
                 <div><strong>Aantal opnames:</strong> <span style="color: #f5df4d; font-size: 1.2em;">${exposures}</span></div>
                 <div><strong>Effectieve filmlengte:</strong> <span style="color: cyan; font-size: 1.2em;">${formatMmToCm(targetLen)}</span></div>
             </div>
             <hr style="border-color: #444; margin: 10px 0;">
             <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 1.1em; color: #ccc;">
+                <div style="flex-basis: 100%; margin-bottom: 5px;"><strong>FFD' (schuine FFD):</strong> <span style="color: cyan;">${(ffdPrimeVal / 10).toFixed(1)} cm</span></div>
                 <div><strong>Dikte center (t):</strong> <span style="color: #fff;">${(scenario === 'dwsi' ? 2 * wanddikte : wanddikte).toFixed(2)} mm</span></div>
                 <div><strong>Dikte rand (t'):</strong> <span style="color: ${userAngle <= maxAngleRad ? '#fff' : '#ff4d4d'};">${thicknessAtEdge.toFixed(2)} mm</span></div>
             </div>
@@ -2868,8 +2930,8 @@
         ctx.save();
         ctx.translate(tx, ty);
 
-        // 1. Draw Beam 
-        const beamLen = contentH / scale * 1.5;
+        // 1. Draw Beam (extend to bottom of canvas)
+        const beamLen = h * 2;
         ctx.beginPath();
         ctx.moveTo(0,0);
         ctx.lineTo(Math.sin(maxAngle)*beamLen, Math.cos(maxAngle)*beamLen);
@@ -2913,10 +2975,11 @@
             ctx.lineTo(halfL, filmY);
             ctx.stroke();
 
-            // Label FFD' (alleen label)
+            // Label FFD'
+            const ffdPrimeVal = Math.sqrt((targetLen/2)*(targetLen/2) + ffd*ffd);
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 12px sans-serif';
-            drawTextRotated(ctx, "FFD'", halfL/2 + 10, filmY/2, Math.atan2(filmY, halfL) - Math.PI/2);
+            drawTextRotated(ctx, `FFD' (${(ffdPrimeVal / 10).toFixed(1)} cm)`, halfL/2 + 15, filmY/2, Math.atan2(filmY, halfL) - Math.PI/2);
             
             // Stippellijn Bron -> Center (FFD)
             ctx.beginPath();
@@ -2924,7 +2987,7 @@
             ctx.lineTo(0, filmY);
             ctx.stroke();
             // Label FFD
-            drawTextRotated(ctx, "FFD", -15, filmY/2, -Math.PI/2);
+            drawTextRotated(ctx, `FFD (${(ffd / 10).toFixed(1)} cm)`, -15, filmY/2, -Math.PI/2);
             
             ctx.setLineDash([]);
 
@@ -2956,9 +3019,10 @@
             ctx.stroke();
             
             // Label FFD'
+            const ffdPrimeVal = Math.sqrt(filmEdgeX * filmEdgeX + filmEdgeY * filmEdgeY);
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 12px sans-serif';
-            drawTextRotated(ctx, "FFD'", ex/2 + 10, ey/2, Math.atan2(ey, ex) - Math.PI/2);
+            drawTextRotated(ctx, `FFD' (${(ffdPrimeVal / 10).toFixed(1)} cm)`, ex/2 + 15, ey/2, Math.atan2(ey, ex) - Math.PI/2);
             
             // Stippellijn Bron -> Center
             ctx.beginPath();
@@ -2967,7 +3031,7 @@
             ctx.stroke();
             
             // Label FFD
-            drawTextRotated(ctx, "FFD", -15, toPix(filmCenterY)/2, -Math.PI/2);
+            drawTextRotated(ctx, `FFD (${(ffd / 10).toFixed(1)} cm)`, -15, toPix(filmCenterY)/2, -Math.PI/2);
             
             ctx.setLineDash([]);
         }
