@@ -397,6 +397,53 @@
         </strong>
       </div>
       <div
+        id="visualizer-section"
+        style="
+          display: none;
+          margin: 20px auto;
+          max-width: 600px;
+          text-align: center;
+        "
+      >
+        <h2 style="color: #f5df4d; margin-bottom: 10px;">Bundel & Dikte Simulatie</h2>
+        <div style="margin-bottom: 15px; background-color: rgba(0,0,0,0.5); padding: 12px 20px; border-radius: 12px; display: inline-flex; align-items: center; gap: 15px; border: 1px solid rgba(245, 223, 77, 0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+          <span style="color: #F5DF4D; font-weight: bold; font-size: 1.1rem; text-shadow: 1px 1px 2px #000;">Openingshoek:</span>
+          <label style="color: #fff; cursor: pointer; font-weight: bold; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px #000;">
+            <input type="radio" name="beamAngle" value="large" checked onchange="updateVisualizer()" style="cursor: pointer; margin: 0; vertical-align: middle;"> Brede (60°)
+          </label>
+          <label style="color: #fff; cursor: pointer; font-weight: bold; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px #000;">
+            <input type="radio" name="beamAngle" value="small" onchange="updateVisualizer()" style="cursor: pointer; margin: 0; vertical-align: middle;"> Smalle (40°)
+          </label>
+        </div>
+        <div
+          style="
+            background-color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #444;
+          "
+        >
+          <canvas
+            id="dwsi-canvas"
+            width="580"
+            height="500"
+            style="background-color: #121212; max-width: 100%"
+          ></canvas>
+          <div
+            id="visualizer-stats"
+            style="
+              color: #e0e0e0;
+              margin-top: 15px;
+              font-family: monospace;
+              text-align: left;
+              padding: 10px;
+            "
+          >
+            <!-- Stats worden hier ingevuld door JS -->
+          </div>
+        </div>
+      </div>
+      <div
         class="image-container"
         id="container1B"
         style="
@@ -443,44 +490,6 @@
         "
       >
         <h2>Opstelling 2 (Klasse A)</h2>
-      </div>
-      <div
-        id="visualizer-section"
-        style="
-          display: none;
-          margin: 20px auto;
-          max-width: 600px;
-          text-align: center;
-        "
-      >
-        <h2 style="color: #f5df4d">DWSI Simulatie</h2>
-        <div
-          style="
-            background-color: #000;
-            padding: 10px;
-            border-radius: 10px;
-            border: 2px solid #444;
-          "
-        >
-          <canvas
-            id="dwsi-canvas"
-            width="580"
-            height="500"
-            style="background-color: #121212; max-width: 100%"
-          ></canvas>
-          <div
-            id="visualizer-stats"
-            style="
-              color: #e0e0e0;
-              margin-top: 15px;
-              font-family: monospace;
-              text-align: left;
-              padding: 10px;
-            "
-          >
-            <!-- Stats worden hier ingevuld door JS -->
-          </div>
-        </div>
       </div>
     </div>
 
@@ -1290,6 +1299,8 @@
 
         locatiesDiv.innerHTML = locatiesLijst;
         locatiesDiv.style.display = "block";
+
+        updateVisualizer();
       }
 
       // --- NEW FUNCTION: Calculate Minimum Exposures based on Geometry (ISO 17636 principles) ---
@@ -2083,12 +2094,23 @@
           diameterAntwoord.innerHTML = `<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: ${exposures}, opstelling DWSI</strong>`;
           diameterAntwoord.style.display = "block";
 
+          // Show the omtrek calculator with the input for DWSI
+          if (!isNaN(diameter)) {
+            const omtrek = diameter * Math.PI;
+            const omtrekCalculatorElement = document.getElementById("omtrek-calculator");
+            omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${formatMmToCm(omtrek)}</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${exposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
+            omtrekCalculatorElement.style.display = "block";
+            berekenOpnameLocaties();
+          }
+
           // Hide standard plotting elements
           document.getElementById("container1A").style.display = "none";
           document.getElementById("container2A").style.display = "none";
           document.getElementById("container1B").style.display = "none";
           document.getElementById("container2B").style.display = "none";
           document.getElementById("verzet-result").style.display = "none";
+
+          updateVisualizer();
           return; // Exit before standard plotting
         }
 
@@ -2162,12 +2184,13 @@
           // Only show images if Centraal is NOT selected
 
           if (technique === "DWDI") {
+            let exposures = 3;
             if (ovaaltje === "Ja") {
               document.getElementById("diameterAntwoord").innerHTML =
                 '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 2 Opnames onder 90 graden</strong>';
+              exposures = 2;
 
               // Calculate verzet
-
               if (
                 !isNaN(diameter) &&
                 !isNaN(wanddikte) &&
@@ -2175,7 +2198,6 @@
                 !isNaN(sfd)
               ) {
                 // Conditions for Opstelling 11 / F
-
                 const verzetResultElement =
                   document.getElementById("verzet-result");
 
@@ -2186,28 +2208,34 @@
                 ) {
                   verzetResultElement.innerHTML =
                     '<strong class="red-text">Opstelling 11 / F is niet toegestaan omdat niet aan de eisen wordt voldaan.</strong>';
-
                   verzetResultElement.style.display = "block";
                 } else {
                   const A = sfd - diameter;
-
                   const verzet = 1.5 * lasbreedte * (A / diameter);
-
                   verzetResultElement.innerHTML = `Het benodigde verzet is: <strong>${verzet.toFixed(2)} mm</strong>`;
                   verzetResultElement.classList.remove("red-text");
-
                   verzetResultElement.style.display = "block";
                 }
               }
             } else {
               // Ovaaltje is Nee
-
               document.getElementById("diameterAntwoord").innerHTML =
                 '<strong style="font-size: 1.3em; color: yellow; padding: 15px;">Aantal opnames: 3 Opnames onder 60 / 120 graden</strong>';
+              exposures = 3;
             }
 
             document.getElementById("diameterAntwoord").style.display = "block";
 
+            // Show the omtrek calculator with the input for DWDI
+            if (!isNaN(diameter)) {
+              const omtrek = diameter * Math.PI;
+              const omtrekCalculatorElement = document.getElementById("omtrek-calculator");
+              omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${formatMmToCm(omtrek)}</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${exposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
+              omtrekCalculatorElement.style.display = "block";
+              berekenOpnameLocaties();
+            }
+
+            updateVisualizer();
             return;
           }
 
@@ -2527,16 +2555,11 @@
         const technique = document.getElementById("technique").value;
         const section = document.getElementById("visualizer-section");
 
-        // Show only for DWSI
-        if (technique !== "DWSI") {
-          section.style.display = "none";
-          return;
-        }
-
         const diameter = getFloatValue("diameter");
         const wanddikte = getFloatValue("wanddikte");
-        const sfd = getFloatValue("sfd");
+        const sfd = getFloatValue("sfd"); // SFD / FFD in pruts.html
         const procedure = document.getElementById("procedure").value;
+        const optie = document.getElementById("optie").value;
 
         // Basic validation
         if (isNaN(diameter) || isNaN(wanddikte) || isNaN(sfd) || sfd <= 0) {
@@ -2545,302 +2568,488 @@
         }
 
         section.style.display = "block";
-        const canvas = document.getElementById("dwsi-canvas");
         const statsDiv = document.getElementById("visualizer-stats");
 
-        // Determine ratio limit based on procedure
-        let ratioLimit = 1.2; // Default Class A / ASME
-        if (procedure === "EN-B") {
-          ratioLimit = 1.1;
-        }
-
-        // --- Calculation Logic (Same as standalone tool) ---
-        const R = diameter / 2.0;
-        const r = R - wanddikte;
-
-        let optimalN = 30;
-        let optimalStats = {};
-        let found = false;
-
-        for (let n = 3; n <= 30; n++) {
-          const alpha = Math.PI / n;
-          const sourceY = R - sfd; // Top of canvas logic relative to center
-
-          // Target Point P on Outer Surface (Film side)
-          const Px = R * Math.sin(alpha);
-          const Py = R * Math.cos(alpha); // Bottom (positive Y in math usually, but let's stick to geometric calc)
-
-          // Vector
-          const Vx = Px;
-          const Vy = Py - sourceY;
-
-          const A = Vx * Vx + Vy * Vy;
-          const B = 2 * sourceY * Vy;
-
-          // Intersections
-          const getIntersections = (radius) => {
-            const C = sourceY * sourceY - radius * radius;
-            const delta = B * B - 4 * A * C;
-            if (delta < 0) return [];
-            const sqrtD = Math.sqrt(delta);
-            return [
-              (-B - Math.sqrt(delta)) / (2 * A),
-              (-B + Math.sqrt(delta)) / (2 * A),
-            ].sort((a, b) => a - b);
-          };
-
-          const hitsOuter = getIntersections(R);
-          const hitsInner = getIntersections(r);
-
-          let pathLength = 0;
-          if (hitsOuter.length === 2) {
-            const entryOuter = hitsOuter[0];
-            const exitOuter = hitsOuter[1];
-            let lengthInsideHollow = 0;
-            if (hitsInner.length === 2) {
-              lengthInsideHollow = (hitsInner[1] - hitsInner[0]) * Math.sqrt(A);
+        // Determine scenario mapping
+        let scenario = 'dwsi';
+        if (technique === 'SWSI') {
+            if (optie === '1' || optie === '2') {
+                scenario = 'curve_in';
+            } else {
+                scenario = 'curve_out';
             }
-            const totalChord = (exitOuter - entryOuter) * Math.sqrt(A);
-            pathLength = totalChord - lengthInsideHollow;
-          }
-
-          const nominal = 2 * wanddikte;
-          const ratio = pathLength / nominal;
-
-          if (ratio <= ratioLimit) {
-            optimalN = n;
-            optimalStats = {
-              ratio,
-              pathLength,
-              centerPAth: 2 * wanddikte,
-              hitsOuter,
-              hitsInner,
-              sourceY,
-              alpha,
-            };
-            found = true;
-            break;
-          }
+        } else if (technique === 'DWSI' || technique === 'DWDI') {
+            scenario = 'dwsi';
         }
 
-        // Fallback for drawing if not found (draw n=30 state)
-        if (!found) {
-          const alpha = Math.PI / 30;
-          const sourceY = R - sfd;
-          optimalStats = {
-            ratio: "> Limit",
-            pathLength: 0,
-            centerPath: 2 * wanddikte,
-            hitsOuter: [],
-            hitsInner: [],
-            sourceY: sourceY,
-            alpha: alpha,
-          };
+        // Get selected beam angle choice (wide vs narrow)
+        const beamAngleEl = document.querySelector('input[name="beamAngle"]:checked');
+        const beamAngleVal = beamAngleEl ? beamAngleEl.value : 'large';
+        const maxAngleDeg = beamAngleVal === 'large' ? 60 : 40;
+        const maxAngleRad = (maxAngleDeg / 2) * Math.PI / 180;
+
+        // Determine exposures
+        let exposures = 3; // Fallback
+        const opnamesInput = document.getElementById("aantal-opnames-input");
+        if (optie === "1") {
+            exposures = 1; // Panoramic is always 1 exposure
+        } else if (opnamesInput && !isNaN(parseInt(opnamesInput.value)) && parseInt(opnamesInput.value) > 0) {
+            exposures = parseInt(opnamesInput.value);
+        } else {
+            // Fallback calculation matching technique
+            if (technique === "DWSI") {
+                exposures = wanddikte < 7.62 ? 4 : 5;
+            } else if (technique === "DWDI") {
+                const ovaaltje = document.getElementById("ovaaltje").value;
+                exposures = ovaaltje === "Ja" ? 2 : 3;
+            } else {
+                // SWSI
+                const minExp = calculateMinimumExposures(diameter, wanddikte, sfd, technique, procedure, optie);
+                if (typeof minExp === 'number') {
+                    exposures = minExp;
+                } else if (!isNaN(parseInt(minExp))) {
+                    exposures = parseInt(minExp);
+                } else {
+                    exposures = 3;
+                }
+            }
         }
 
-        // --- Update Stats Text ---
-        const arcLength = (diameter * Math.PI) / optimalN;
+        // Calculations
+        const R = diameter / 2;
+        const r = R - wanddikte;
+        const targetLen = (diameter * Math.PI) / exposures;
+        const userAngle = calculateAngleForLength(scenario, targetLen, sfd, R);
+        
+        const thicknessAtEdge = getPathLength(scenario, userAngle, sfd, wanddikte, R);
+        const availableLength = calculateLengthForAngle(scenario, maxAngleRad, sfd, R);
 
+        // Update Stats HTML
         statsDiv.innerHTML = `
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between;">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; font-size: 1.1em;">
                 <div><strong>Diameter:</strong> <span style="color: #f5df4d">${diameter} mm</span></div>
                 <div><strong>Wanddikte:</strong> <span style="color: #f5df4d">${wanddikte} mm</span></div>
                 <div><strong>FFD:</strong> <span style="color: #f5df4d">${sfd} mm</span></div>
             </div>
-            <hr style="border-color: #444;">
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between;">
-                <div><strong>Aantal opnames:</strong> <span style="color: #f5df4d; font-size: 1.2em;">${found ? optimalN : ">30"}</span></div>
-                <div><strong>Film lengte (Boog):</strong> <span style="color: cyan; font-size: 1.2em;">${arcLength.toFixed(1)} mm</span></div>
+            <hr style="border-color: #444; margin: 10px 0;">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; font-size: 1.1em;">
+                <div><strong>Aantal opnames:</strong> <span style="color: #f5df4d; font-size: 1.2em;">${exposures}</span></div>
+                <div><strong>Effectieve filmlengte:</strong> <span style="color: cyan; font-size: 1.2em;">${formatMmToCm(targetLen)}</span></div>
             </div>
-            <div style="margin-top: 5px; font-size: 0.9em; color: #888;">
-                Ratio: ${found ? optimalStats.ratio.toFixed(3) : "Te Hoog"} (Max: ${ratioLimit})
+            <hr style="border-color: #444; margin: 10px 0;">
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 1.1em; color: #ccc;">
+                <div><strong>Dikte center (t):</strong> <span style="color: #fff;">${(scenario === 'dwsi' ? 2 * wanddikte : wanddikte).toFixed(2)} mm</span></div>
+                <div><strong>Dikte rand (t'):</strong> <span style="color: ${userAngle <= maxAngleRad ? '#fff' : '#ff4d4d'};">${thicknessAtEdge.toFixed(2)} mm</span></div>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.95em;">
+                ${userAngle <= maxAngleRad 
+                    ? `<span style="color: #2ec4b6; font-weight: bold;">✔ Binnen bundel (Benodigde filmlengte: ${formatMmToCm(targetLen)} vs. Max. beschikbare lengte: ${formatMmToCm(availableLength)})</span>`
+                    : `<span style="color: #e71d36; font-weight: bold;">⚠ Buiten bundel! Benodigde filmlengte: ${formatMmToCm(targetLen)} is groter dan max. beschikbare lengte: ${formatMmToCm(availableLength)}</span>`
+                }
             </div>
         `;
 
-        // --- Draw Canvas ---
-        drawCanvas(canvas, R, r, sfd, optimalN, optimalStats);
+        // Render simulation canvas
+        drawSimulation(sfd, wanddikte, R, targetLen, maxAngleRad, userAngle, scenario);
       }
-      function drawCanvas(canvas, R, r, sfd, n, stats) {
-        const ctx = canvas.getContext("2d");
-        const w = canvas.width;
-        const h = canvas.height;
 
-        // Clear background
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, w, h);
+      function calculateLengthForAngle(scenario, angle, ffd, rOut) {
+        if (scenario === 'flat') {
+            return 2 * ffd * Math.tan(angle);
+        }
+        else if (scenario === 'curve_out') {
+            const wt = parseFloat(document.getElementById('wanddikte').value) || 0;
+            const rIn = rOut - wt;
+            const center = {x:0, y: ffd+rIn};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(angle), y:Math.cos(angle)}, center, rIn);
+            if (hits.length === 0) return 0; 
+            const t = hits[0];
+            const Px = t * Math.sin(angle);
+            const Py = t * Math.cos(angle);
+            const Mx = 0; const My = ffd + rIn;
+            const dx = Px - Mx; const dy = Py - My;
+            const betaRad = Math.atan2(dx, -dy); 
+            return 2 * Math.abs(betaRad) * rIn; 
+        }
+        else if (scenario === 'curve_in' || scenario === 'dwsi') {
+            const center = {x:0, y: ffd - rOut};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(angle), y:Math.cos(angle)}, center, rOut);
+            if (hits.length === 0) return 0;
+            const t = (scenario === 'dwsi' && hits.length > 1) ? Math.max(...hits) : hits.find(h => h > 0);
+            if (!t) return 0;
+            const Px = t * Math.sin(angle);
+            const Py = t * Math.cos(angle);
+            const Mx = 0; const My = ffd - rOut;
+            const dx = Px - Mx; const dy = Py - My;
+            const beta = Math.atan2(dx, dy); 
+            return 2 * Math.abs(beta) * rOut;
+        }
+        return 0;
+      }
 
-        const cx = w / 2;
-        const cy = h / 2;
-        // Scale logic: Fit (SFD + R) into height with margin
-        const scale = Math.min(w, h) / (sfd * 1.15);
+      function intersectLineCircle(P, D, C, R) {
+        const cx = C.x; const cy = C.y;
+        const px = P.x; const py = P.y;
+        const dx = D.x; const dy = D.y;
 
-        const sourceY_coord = stats.sourceY;
-        const midY = (sourceY_coord + R) / 2;
+        const Lx = px - cx;
+        const Ly = py - cy;
 
-        const toCanvas = (x, y) => ({
-          x: cx + x * scale,
-          y: cy + (y - midY) * scale,
-        });
+        const a = dx*dx + dy*dy; 
+        const b = 2 * (Lx*dx + Ly*dy);
+        const c = (Lx*Lx + Ly*Ly) - (R*R);
 
-        // 1. Draw Source
-        const sPos = toCanvas(0, sourceY_coord);
+        const det = b*b - 4*a*c;
+        if (det < 0) return []; 
+        
+        const t1 = (-b - Math.sqrt(det)) / (2*a);
+        const t2 = (-b + Math.sqrt(det)) / (2*a);
+        return [t1, t2].sort((x,y) => x-y); 
+      }
+
+      function getRaySegments(scenario, angleRad, ffd, wallT, rOut) {
+        const rIn = rOut - wallT;
+        const dir = { x: Math.sin(angleRad), y: Math.cos(angleRad) }; 
+        const source = { x: 0, y: 0 };
+        
+        if (scenario === 'flat') {
+            if (Math.abs(angleRad) >= Math.PI/2) return null;
+            const t_exit = ffd / Math.cos(angleRad);
+            const t_enter = (ffd - wallT) / Math.cos(angleRad);
+            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter, segs: [{enter: t_enter, exit: t_exit}] };
+        }
+        else if (scenario === 'curve_out') {
+            const center = { x: 0, y: ffd + rIn };
+            const hitsOut = intersectLineCircle(source, dir, center, rOut);
+            const hitsIn = intersectLineCircle(source, dir, center, rIn);
+            
+            if (hitsOut.length < 2) return null;
+            let t_enter = hitsOut[0];
+            let t_exit = (hitsIn.length >= 2) ? hitsIn[0] : hitsOut[1];
+            
+            if (t_exit <= t_enter) return null;
+            return { enter: t_enter, exit: t_exit, len: t_exit - t_enter, segs: [{enter: t_enter, exit: t_exit}] };
+        }
+        else if (scenario === 'curve_in') {
+            const center = { x: 0, y: ffd - rOut };
+            const hitsOut = intersectLineCircle(source, dir, center, rOut);
+            const hitsIn = intersectLineCircle(source, dir, center, rIn);
+            
+            const t_enter = hitsIn.find(t => t > 0.001);
+            const t_exit = hitsOut.find(t => t > 0.001);
+
+            if (t_enter !== undefined && t_exit !== undefined && t_exit > t_enter) {
+                return { enter: t_enter, exit: t_exit, len: t_exit - t_enter, segs: [{enter: t_enter, exit: t_exit}] };
+            }
+            return null;
+        }
+        else if (scenario === 'dwsi') {
+            const center = { x: 0, y: ffd - rOut };
+            const hitsOut = intersectLineCircle(source, dir, center, rOut).filter(t => t > 0.001);
+            const hitsIn = intersectLineCircle(source, dir, center, rIn).filter(t => t > 0.001);
+            
+            if (hitsOut.length < 2) return null;
+            let t1 = hitsOut[0], t4 = hitsOut[1];
+
+            if (hitsIn.length >= 2) {
+                let t2 = hitsIn[0], t3 = hitsIn[1];
+                if (t2 > t1 && t4 > t3) {
+                    return {
+                        enter: t1, exit: t4,
+                        len: (t2 - t1) + (t4 - t3),
+                        segs: [{enter: t1, exit: t2}, {enter: t3, exit: t4}]
+                    };
+                }
+            } else if (hitsIn.length === 0) {
+                return {
+                    enter: t1, exit: t4,
+                    len: t4 - t1,
+                    segs: [{enter: t1, exit: t4}]
+                };
+            }
+            return null;
+        }
+        return null;
+      }
+
+      function getPathLength(scenario, angleRad, ffd, wallT, rOut) {
+        const seg = getRaySegments(scenario, angleRad, ffd, wallT, rOut);
+        return seg ? seg.len : 0;
+      }
+
+      function calculateAngleForLength(scenario, L, ffd, rOut) {
+        if (scenario === 'flat') {
+            return Math.atan((L/2) / ffd);
+        } 
+        else if (scenario === 'curve_out') {
+            const wallT = parseFloat(document.getElementById('wanddikte').value) || 0;
+            const rIn = rOut - wallT;
+            const betaHalf = (L/2) / rIn;
+            const Px = rIn * Math.sin(betaHalf);
+            const Py = (ffd + rIn) - rIn * Math.cos(betaHalf);
+            return Math.atan2(Px, Py);
+        }
+        else if (scenario === 'curve_in' || scenario === 'dwsi') {
+            const betaHalf = (L/2) / rOut;
+            const Px = rOut * Math.sin(betaHalf);
+            const Py = (ffd - rOut) + rOut * Math.cos(betaHalf);
+            return Math.atan2(Px, Py);
+        }
+        return 0;
+      }
+
+      function drawSimulation(ffd, wt, rOut, targetLen, maxAngle, userAngle, scenario) {
+        const cvs = document.getElementById('dwsi-canvas');
+        const ctx = cvs.getContext('2d');
+        const w = cvs.width = cvs.clientWidth || 580;
+        const h = cvs.height = cvs.clientHeight || 500;
+
+        ctx.clearRect(0,0,w,h);
+        
+        // --- AUTO ZOOM BEREKENING ---
+        let bounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+        const rIn = rOut - wt;
+
+        let filmEdgeX = 0, filmEdgeY = 0;
+        let filmCenterX = 0, filmCenterY = 0;
+        
+        if (scenario === 'flat') {
+            filmEdgeY = ffd;
+            filmEdgeX = (targetLen/2);
+            filmCenterY = ffd;
+            bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: ffd };
+        } 
+        else if (scenario === 'curve_out') {
+            const center = {x:0, y: ffd+rIn};
+            const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rIn);
+            if(hits.length > 0) {
+                const dist = hits[0];
+                filmEdgeX = dist * Math.sin(userAngle);
+                filmEdgeY = dist * Math.cos(userAngle);
+            }
+            const hitsC = intersectLineCircle({x:0,y:0}, {x:0, y:1}, center, rIn);
+            if(hitsC.length > 0) filmCenterY = hitsC[0];
+            
+            bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: Math.max(filmEdgeY, ffd) };
+        }
+        else if (scenario === 'curve_in' || scenario === 'dwsi') {
+             const center = {x:0, y: ffd-rOut};
+             const hits = intersectLineCircle({x:0,y:0}, {x:Math.sin(userAngle), y:Math.cos(userAngle)}, center, rOut);
+             if(hits.length > 0) {
+                 const dist = (scenario === 'dwsi' && hits.length > 1) ? Math.max(...hits) : hits.find(d => d>0);
+                 if(dist) {
+                    filmEdgeX = dist * Math.sin(userAngle);
+                    filmEdgeY = dist * Math.cos(userAngle);
+                 }
+             }
+             const hitsC = intersectLineCircle({x:0,y:0}, {x:0, y:1}, center, rOut);
+             if(hitsC.length > 0) {
+                 filmCenterY = (scenario === 'dwsi' && hitsC.length > 1) ? Math.max(...hitsC) : hitsC.find(d => d>0);
+             }
+             
+             bounds = { minX: -filmEdgeX, maxX: filmEdgeX, minY: 0, maxY: Math.max(filmEdgeY, ffd) };
+        }
+
+        const paddingX = Math.max((bounds.maxX - bounds.minX) * 0.3, 20);
+        const paddingY = Math.max((bounds.maxY - bounds.minY) * 0.1, 20);
+        
+        const contentW = (bounds.maxX - bounds.minX) + paddingX*2;
+        const contentH = (bounds.maxY - bounds.minY) + paddingY*2;
+        
+        const scaleX = w / contentW;
+        const scaleY = h / contentH;
+        const scale = Math.min(scaleX, scaleY);
+        
+        const toPix = (v) => v * scale;
+        
+        const tx = w/2; 
+        const ty = 30; // Beetje marge boven
+
+        ctx.save();
+        ctx.translate(tx, ty);
+
+        // 1. Draw Beam 
+        const beamLen = contentH / scale * 1.5;
         ctx.beginPath();
-        ctx.arc(sPos.x, sPos.y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = "#f5df4d";
+        ctx.moveTo(0,0);
+        ctx.lineTo(Math.sin(maxAngle)*beamLen, Math.cos(maxAngle)*beamLen);
+        ctx.lineTo(Math.sin(-maxAngle)*beamLen, Math.cos(-maxAngle)*beamLen);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(255, 193, 7, 0.15)'; // Geel-oranje
         ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "14px Arial";
-        ctx.fillText("Bron", sPos.x + 10, sPos.y);
-
-        // 2. Draw Pipe
-        const cPos = toCanvas(0, 0);
-
-        // Outer
-        ctx.beginPath();
-        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
-        ctx.strokeStyle = "#555";
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(245, 223, 77, 0.4)'; // Donkeroranje lijn
+        ctx.setLineDash([5,5]);
         ctx.stroke();
+        ctx.setLineDash([]);
 
-        // Inner
-        ctx.beginPath();
-        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2);
-        ctx.strokeStyle = "#555";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        // Fill pipe walls
-        ctx.beginPath();
-        ctx.arc(cPos.x, cPos.y, R * scale, 0, Math.PI * 2);
-        ctx.arc(cPos.x, cPos.y, r * scale, 0, Math.PI * 2, true);
-        ctx.fillStyle = "rgba(100, 100, 100, 0.3)";
-        ctx.fill();
-
-        // 3. Draw Rays, Film and Text Values
-        if (stats.hitsOuter && stats.hitsOuter.length > 0) {
-          const alpha = Math.PI / n;
-          const angles = [-alpha, alpha];
-
-          // --- A. Center Ray & Text ---
-          const centerFilmP = toCanvas(0, R);
-          ctx.beginPath();
-          ctx.moveTo(sPos.x, sPos.y);
-          ctx.lineTo(centerFilmP.x, centerFilmP.y);
-          ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-          ctx.setLineDash([5, 5]);
-          ctx.stroke();
-          ctx.setLineDash([]);
-
-          // Draw Center Thickness Value
-          if (stats.centerPath) {
-            const centerTextPos = toCanvas(5, 0); // Slightly right of center (x=0, y=0)
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 14px Arial";
-            ctx.fillText(
-              stats.centerPath.toFixed(2) + "mm",
-              centerTextPos.x,
-              centerTextPos.y,
-            );
-          }
-
-          // --- B. Edge Rays & Text ---
-          angles.forEach((ang, index) => {
-            const filmX = R * Math.sin(ang);
-            const filmY = R * Math.cos(ang);
-            const filmPos = toCanvas(filmX, filmY);
-
-            // Blue Ray Line (Source to Film)
-            ctx.beginPath();
-            ctx.moveTo(sPos.x, sPos.y);
-            ctx.lineTo(filmPos.x, filmPos.y);
-            ctx.strokeStyle = "cyan";
-            ctx.lineWidth = 1;
+        // 2. Draw Material & Lines
+        if (scenario === 'flat') {
+            const filmY = toPix(ffd);
+            const matTop = toPix(ffd - wt);
+            const drawW = w/scale * 2; 
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+            ctx.fillRect(-drawW/2, matTop, drawW, toPix(wt));
+            ctx.strokeStyle = '#c0392b';
+            ctx.beginPath(); 
+            ctx.moveTo(-drawW/2, matTop); ctx.lineTo(drawW/2, matTop);
+            ctx.moveTo(-drawW/2, filmY); ctx.lineTo(drawW/2, filmY);
             ctx.stroke();
 
-            // Red Path through Wall (Highlight)
-            const Vx = filmX;
-            const Vy = filmY - sourceY_coord;
-            const A = Vx * Vx + Vy * Vy;
-            const B = 2 * sourceY_coord * Vy;
-            const C_out = sourceY_coord * sourceY_coord - R * R;
-            const C_in = sourceY_coord * sourceY_coord - r * r;
+            // Target Length Marker
+            const halfL = toPix(targetLen/2);
+            ctx.strokeStyle = '#27ae60';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-halfL, filmY+2);
+            ctx.lineTo(halfL, filmY+2);
+            ctx.stroke();
+            
+            // Stippellijn Bron -> Edge (FFD')
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(halfL, filmY);
+            ctx.stroke();
 
-            const getU = (C) => {
-              const d = B * B - 4 * A * C;
-              if (d < 0) return [];
-              return [
-                (-B - Math.sqrt(d)) / (2 * A),
-                (-B + Math.sqrt(d)) / (2 * A),
-              ];
-            };
+            // Label FFD' (alleen label)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px sans-serif';
+            drawTextRotated(ctx, "FFD'", halfL/2 + 10, filmY/2, Math.atan2(filmY, halfL) - Math.PI/2);
+            
+            // Stippellijn Bron -> Center (FFD)
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(0, filmY);
+            ctx.stroke();
+            // Label FFD
+            drawTextRotated(ctx, "FFD", -15, filmY/2, -Math.PI/2);
+            
+            ctx.setLineDash([]);
 
-            const uOut = getU(C_out);
-            const uIn = getU(C_in);
+        } 
+        else if (scenario === 'curve_out' || scenario === 'curve_in' || scenario === 'dwsi') {
+            const mY = (scenario === 'curve_out') ? toPix(ffd + rIn) : toPix(ffd - rOut);
+            drawPipe(ctx, 0, mY, toPix(rOut), toPix(rIn));
 
-            if (uOut.length === 2) {
-              let uStart = uOut[0];
-              let uEnd = uIn.length === 2 ? uIn[0] : uOut[1];
-              let p1 = toCanvas(uStart * Vx, sourceY_coord + uStart * Vy);
-              let p2 = toCanvas(uEnd * Vx, sourceY_coord + uEnd * Vy);
-
-              // Draw Top Wall path
-              ctx.beginPath();
-              ctx.moveTo(p1.x, p1.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.strokeStyle = "red";
-              ctx.lineWidth = 3;
-              ctx.stroke();
-
-              if (uIn.length === 2) {
-                uStart = uIn[1];
-                uEnd = uOut[1];
-                p1 = toCanvas(uStart * Vx, sourceY_coord + uStart * Vy);
-                p2 = toCanvas(uEnd * Vx, sourceY_coord + uEnd * Vy);
-                // Draw Bottom Wall path
-                ctx.beginPath();
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
-                ctx.strokeStyle = "red";
-                ctx.lineWidth = 3;
-                ctx.stroke();
-              }
-            }
-
-            // Draw Side Thickness Value (Only on the right side ray to avoid clutter)
-            if (index === 1 && stats.pathLength > 0) {
-              // Position text slightly to the right of the ray passing through the pipe wall
-              const textX = filmX + R * 0.2;
-              const textY = 0; // Middle height
-              const sideTextPos = toCanvas(textX, textY);
-
-              ctx.fillStyle = "yellow"; // Different color for distinction
-              ctx.font = "bold 14px Arial";
-              ctx.fillText(
-                stats.pathLength.toFixed(2) + "mm",
-                sideTextPos.x,
-                sideTextPos.y,
-              );
-            }
-          });
-
-          // Film Arc
-          ctx.beginPath();
-          ctx.arc(
-            cPos.x,
-            cPos.y,
-            R * scale + 8,
-            Math.PI / 2 - alpha,
-            Math.PI / 2 + alpha,
-          );
-          ctx.strokeStyle = "cyan";
-          ctx.lineWidth = 4;
-          ctx.stroke();
-
-          const txtPos = toCanvas(0, R);
-          ctx.fillStyle = "cyan";
-          ctx.font = "14px Arial";
-          ctx.fillText("Film", txtPos.x - 12, txtPos.y + 25);
+            // Film (Green/Cyan user part)
+            const beta = (targetLen/2) / ((scenario === 'curve_out')?rIn:rOut);
+            ctx.strokeStyle = 'cyan';
+            ctx.lineWidth = 4;
+            const rad = (scenario === 'curve_out') ? toPix(rIn)-2 : toPix(rOut)+3;
+            const startA = (scenario === 'curve_out') ? -Math.PI/2 : Math.PI/2;
+            
+            ctx.beginPath();
+            ctx.arc(0, mY, rad, startA - beta, startA + beta);
+            ctx.stroke();
+            
+            // Stippellijn Bron -> Edge
+            const ex = toPix(filmEdgeX);
+            const ey = toPix(filmEdgeY);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+            
+            // Label FFD'
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px sans-serif';
+            drawTextRotated(ctx, "FFD'", ex/2 + 10, ey/2, Math.atan2(ey, ex) - Math.PI/2);
+            
+            // Stippellijn Bron -> Center
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(0, toPix(filmCenterY));
+            ctx.stroke();
+            
+            // Label FFD
+            drawTextRotated(ctx, "FFD", -15, toPix(filmCenterY)/2, -Math.PI/2);
+            
+            ctx.setLineDash([]);
         }
+        
+        // --- 3. Dikte Indicatoren (t en t') ---
+        
+        // T (Center)
+        const segCenter = getRaySegments(scenario, 0, ffd, wt, rOut);
+        if(segCenter && segCenter.segs) {
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 16px sans-serif';
+            let labelY = 0;
+            segCenter.segs.forEach(seg => {
+                const y1 = toPix(seg.enter);
+                const y2 = toPix(seg.exit);
+                ctx.beginPath();
+                ctx.moveTo(0, y1);
+                ctx.lineTo(0, y2);
+                ctx.stroke();
+                labelY = (y1+y2)/2;
+            });
+            ctx.fillText("t", 10, labelY);
+        }
+        
+        // T' (Edge - UserAngle)
+        const segEdge = getRaySegments(scenario, userAngle, ffd, wt, rOut);
+        if(segEdge && segEdge.segs) {
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 16px sans-serif';
+            let labelX = 0, labelY = 0;
+            segEdge.segs.forEach(seg => {
+                const r1 = toPix(seg.enter);
+                const r2 = toPix(seg.exit);
+                const x1 = r1 * Math.sin(userAngle);
+                const y1 = r1 * Math.cos(userAngle);
+                const x2 = r2 * Math.sin(userAngle);
+                const y2 = r2 * Math.cos(userAngle);
+                
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                labelX = (x1+x2)/2;
+                labelY = (y1+y2)/2;
+            });
+            drawTextRotated(ctx, "t'", labelX - 20, labelY, -userAngle);
+        }
+
+        // 4. Draw Source
+        ctx.fillStyle = '#f1c40f';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        ctx.restore();
+      }
+
+      function drawPipe(ctx, x, y, ro, ri) {
+        ctx.beginPath();
+        ctx.arc(x, y, ro, 0, Math.PI*2);
+        ctx.arc(x, y, ri, 0, Math.PI*2, true);
+        ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+        ctx.fill();
+        ctx.strokeStyle = '#c0392b';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      
+      function drawTextRotated(ctx, text, x, y, angle) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.textAlign = "center";
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
       }
     </script>
     <div style="height: 200px"></div>
