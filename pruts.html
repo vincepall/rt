@@ -188,9 +188,58 @@
         border-radius: 8px;
         margin: 0; /* Override default p margin */
       }
+      .beam-selector-container {
+        margin-bottom: 15px;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 12px 20px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid rgba(245, 223, 77, 0.2);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
       @media (max-width: 600px) {
+        body {
+          padding: 15px 10px !important;
+        }
+        .form-container {
+          padding: 0 10px;
+        }
         .results-grid {
           grid-template-columns: 1fr;
+        }
+        .beam-selector-container {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 12px;
+          padding: 10px 15px;
+        }
+        #pruts-image {
+          position: relative;
+          display: block;
+          margin: 10px auto;
+          width: 80px;
+          top: 0;
+          right: 0;
+        }
+        h1 {
+          font-size: 20px !important;
+          margin: 10px auto;
+          border-radius: 15px;
+        }
+        .image-container {
+          width: 100% !important;
+          max-width: 320px;
+          height: auto !important;
+          aspect-ratio: 488 / 820;
+          background-size: contain;
+          background-repeat: no-repeat;
+        }
+        .image-container h2 {
+          font-size: 1.2rem;
+          margin-top: 5px;
         }
       }
     </style>
@@ -406,8 +455,7 @@
         "
       >
         <h2 style="color: #f5df4d; margin-bottom: 10px;">Bundel & Dikte Simulatie</h2>
-        <div style="margin-bottom: 15px; background-color: rgba(0,0,0,0.5); padding: 12px 20px; border-radius: 12px; display: inline-flex; align-items: center; gap: 15px; border: 1px solid rgba(245, 223, 77, 0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-          <span id="beam-angle-title" style="color: #F5DF4D; font-weight: bold; font-size: 1.1rem; text-shadow: 1px 1px 2px #000;">Openingshoek:</span>
+        <div class="beam-selector-container">
           <label style="color: #fff; cursor: pointer; font-weight: bold; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px #000;">
             <input type="radio" name="beamAngle" value="large" checked onchange="updateVisualizer()" style="cursor: pointer; margin: 0; vertical-align: middle;"> <span id="lbl-beam-large-text">Brede (60°)</span>
           </label>
@@ -2578,12 +2626,8 @@
         // Update DOM labels for beam angles based on chosen radiation source first
         const angles = getBeamAngles();
         const term = angles.term || 'bundel';
-        const titleEl = document.getElementById("beam-angle-title");
         const largeTextEl = document.getElementById("lbl-beam-large-text");
         const smallTextEl = document.getElementById("lbl-beam-small-text");
-        if (titleEl) {
-          titleEl.textContent = (term.charAt(0).toUpperCase() + term.slice(1)) + " openingshoek:";
-        }
         if (largeTextEl) {
           largeTextEl.textContent = `Brede ${term} (${angles.large}°)`;
         }
@@ -2705,8 +2749,8 @@
             </div>
             <div style="margin-top: 10px; font-size: 0.95em;">
                 ${userAngle <= maxAngleRad 
-                    ? `<span style="color: #2ec4b6; font-weight: bold;">✔ Binnen bundel (Benodigde filmlengte: ${formatMmToCm(targetLen)} vs. Max. beschikbare lengte: ${formatMmToCm(availableLength)})</span>`
-                    : `<span style="color: #e71d36; font-weight: bold;">⚠ Buiten bundel! Benodigde filmlengte: ${formatMmToCm(targetLen)} is groter dan max. beschikbare lengte: ${formatMmToCm(availableLength)}</span>`
+                    ? `<span style="color: #2ec4b6; font-weight: bold;">✔ Binnen bundel (Nodig: ${formatMmToCm(targetLen)} / Max. film: ${formatMmToCm(availableLength)})</span>`
+                    : `<span style="color: #e71d36; font-weight: bold;">⚠ Buiten bundel! (Nodig: ${formatMmToCm(targetLen)} / Max. film: ${formatMmToCm(availableLength)})</span>`
                 }
             </div>
         `;
@@ -2864,7 +2908,7 @@
         const cvs = document.getElementById('dwsi-canvas');
         const ctx = cvs.getContext('2d');
         const w = cvs.width = cvs.clientWidth || 580;
-        const h = cvs.height = cvs.clientHeight || 500;
+        const h = cvs.height = Math.round(w * 500 / 580);
 
         ctx.clearRect(0,0,w,h);
         
@@ -3115,6 +3159,12 @@
         ctx.fillText(text, 0, 0);
         ctx.restore();
       }
+
+      window.addEventListener("resize", () => {
+        if (document.getElementById("visualizer-section").style.display !== "none") {
+          updateVisualizer();
+        }
+      });
     </script>
     <div style="height: 200px"></div>
     <div style="height: 200px"></div>
