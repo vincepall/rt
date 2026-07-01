@@ -722,7 +722,7 @@
                 const baseOverdikte = getMaxOverdikte(weldType, mid);
                 const lasoverdikte = baseOverdikte * mult;
 
-                if (lasoverdikte > 0) {
+                if (lasoverdikte >= 0) {
                     asmeThresholds.forEach(thresh => {
                         const t = thresh - lasoverdikte;
                         if (t > interval.min && t <= interval.max) {
@@ -777,16 +777,13 @@
             }
             document.querySelector(".title-area h1").innerText = `Draadvereiste [${sourceLabel}, (ASME: ${weldText})]`;
 
-
-            // Create ranges and evaluate wires
+            // Evaluate wires and collect rows
+            const rows = [];
             for (let i = 1; i < pts.length; i++) {
                 const prev = pts[i-1];
                 const curr = pts[i];
-                
-                const rangeText = `${prev.toFixed(2)} &lt; t &le; ${curr.toFixed(2)}`;
                 const evalT = curr;
                 
-                // Evaluate wires for this thickness
                 const enA_swsi = getWireEN_A(evalT, "SWSI", source);
                 const enA_dwsi = getWireEN_A(evalT, "DWSI", source);
                 const enA_dwdi = getWireEN_A(evalT, "DWDI", source);
@@ -798,23 +795,57 @@
                 const asme_source = getWireASME(evalT, "Sourceside", weldType, mult);
                 const asme_film = getWireASME(evalT, "Filmside", weldType, mult);
                 
-                // Create row
+                rows.push({
+                    prev: prev,
+                    curr: curr,
+                    enA_swsi, enA_dwsi, enA_dwdi,
+                    enB_swsi, enB_dwsi, enB_dwdi,
+                    asme_source, asme_film
+                });
+            }
+
+            // Merge adjacent rows with identical requirements
+            const mergedRows = [];
+            if (rows.length > 0) {
+                let currentMerged = rows[0];
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (r.enA_swsi === currentMerged.enA_swsi &&
+                        r.enA_dwsi === currentMerged.enA_dwsi &&
+                        r.enA_dwdi === currentMerged.enA_dwdi &&
+                        r.enB_swsi === currentMerged.enB_swsi &&
+                        r.enB_dwsi === currentMerged.enB_dwsi &&
+                        r.enB_dwdi === currentMerged.enB_dwdi &&
+                        r.asme_source === currentMerged.asme_source &&
+                        r.asme_film === currentMerged.asme_film) {
+                        // Extend current interval upper bound
+                        currentMerged.curr = r.curr;
+                    } else {
+                        mergedRows.push(currentMerged);
+                        currentMerged = r;
+                    }
+                }
+                mergedRows.push(currentMerged);
+            }
+
+            // Create table elements for merged rows
+            mergedRows.forEach(row => {
+                const rangeText = `${row.prev.toFixed(2)} &lt; t &le; ${row.curr.toFixed(2)}`;
                 const tr = document.createElement("tr");
                 
                 tr.innerHTML = `
                     <td class="thick-col thick-border-right">${rangeText}</td>
-                    <td>${formatWire(enA_swsi)}</td>
-                    <td>${formatWire(enA_dwsi)}</td>
-                    <td class="thick-border-right">${formatWire(enA_dwdi)}</td>
-                    <td class="klasse-b-col">${formatWire(enB_swsi)}</td>
-                    <td class="klasse-b-col">${formatWire(enB_dwsi)}</td>
-                    <td class="klasse-b-col thick-border-right">${formatWire(enB_dwdi)}</td>
-                    <td>${formatWire(asme_source)}</td>
-                    <td>${formatWire(asme_film)}</td>
+                    <td>${formatWire(row.enA_swsi)}</td>
+                    <td>${formatWire(row.enA_dwsi)}</td>
+                    <td class="thick-border-right">${formatWire(row.enA_dwdi)}</td>
+                    <td class="klasse-b-col">${formatWire(row.enB_swsi)}</td>
+                    <td class="klasse-b-col">${formatWire(row.enB_dwsi)}</td>
+                    <td class="klasse-b-col thick-border-right">${formatWire(row.enB_dwdi)}</td>
+                    <td>${formatWire(row.asme_source)}</td>
+                    <td>${formatWire(row.asme_film)}</td>
                 `;
-                
                 tbody.appendChild(tr);
-            }
+            });
         }
 
         // Initialize the table
