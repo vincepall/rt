@@ -256,6 +256,36 @@
             background-color: #e8eaec !important;
         }
 
+        .ir192-col {
+            background-color: #c5c8cc !important;
+        }
+        tbody tr:nth-child(even) .ir192-col {
+            background-color: #b8bbbf !important;
+        }
+        .klasse-b-col.ir192-col {
+            background-color: #bdc0c4 !important;
+        }
+        tbody tr:nth-child(even) .klasse-b-col.ir192-col {
+            background-color: #b0b3b7 !important;
+        }
+
+        .se75-col {
+            background-color: #e9ecef !important;
+        }
+        tbody tr:nth-child(even) .se75-col {
+            background-color: #dedede !important;
+        }
+        .klasse-b-col.se75-col {
+            background-color: #e2e5e8 !important;
+        }
+        tbody tr:nth-child(even) .klasse-b-col.se75-col {
+            background-color: #d7d9db !important;
+        }
+
+        .setup-border-right {
+            border-right: 2px solid #6c757d !important;
+        }
+
         .info-legend {
             margin-top: 30px;
             padding: 20px;
@@ -342,7 +372,7 @@
             }
             @page { 
                 size: landscape; 
-                margin: 10mm; 
+                margin: 0; 
             }
             tbody tr:nth-child(even) {
                 background-color: #f5f5f5 !important;
@@ -359,6 +389,33 @@
             }
             tbody tr:nth-child(even) .klasse-b-col {
                 background-color: #e8eaec !important;
+            }
+            .ir192-col {
+                background-color: #c5c8cc !important;
+            }
+            tbody tr:nth-child(even) .ir192-col {
+                background-color: #b8bbbf !important;
+            }
+            .klasse-b-col.ir192-col {
+                background-color: #bdc0c4 !important;
+            }
+            tbody tr:nth-child(even) .klasse-b-col.ir192-col {
+                background-color: #b0b3b7 !important;
+            }
+            .se75-col {
+                background-color: #e9ecef !important;
+            }
+            tbody tr:nth-child(even) .se75-col {
+                background-color: #dedede !important;
+            }
+            .klasse-b-col.se75-col {
+                background-color: #e2e5e8 !important;
+            }
+            tbody tr:nth-child(even) .klasse-b-col.se75-col {
+                background-color: #d7d9db !important;
+            }
+            .setup-border-right {
+                border-right: 2px solid black !important;
             }
             .wall-tag {
                 border: none;
@@ -377,6 +434,309 @@
                 break-before: page;
                 margin-top: 0 !important;
             }
+
+            /* Custom print view styles */
+            body.view-single {
+                padding: 10mm !important;
+            }
+            body.view-complete {
+                padding: 10mm !important;
+            }
+            body.view-booklet {
+                padding: 0 !important;
+            }
+            
+            body.view-complete .no-print,
+            body.view-booklet .no-print,
+            body.view-booklet header,
+            body.view-booklet .info-legend {
+                display: none !important;
+            }
+
+            body.view-complete .info-legend .legend-diagram {
+                display: none !important;
+            }
+
+            body.view-complete .weld-diagram-img-large {
+                max-height: 250px !important;
+                margin-top: 10px !important;
+            }
+
+            body.view-complete .complete-page {
+                page-break-after: always !important;
+                break-after: page !important;
+                margin-bottom: 0 !important;
+            }
+            body.view-complete .asme-tables-container {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 10px !important;
+            }
+            body.view-complete .en-tables-container {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 15px !important;
+            }
+
+            body.view-booklet .booklet-sheets-container {
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                display: block !important;
+            }
+            body.view-booklet .booklet-sheet-wrapper {
+                min-width: auto !important;
+                display: block !important;
+            }
+            body.view-booklet .booklet-sheet {
+                display: flex !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+                overflow: hidden !important;
+            }
+            body.view-booklet .a5-page {
+                width: 148.5mm !important;
+                height: 210mm !important;
+                padding: 12mm 10mm !important;
+                box-sizing: border-box !important;
+            }
+            body.view-booklet .booklet-sheet .a5-page:first-child {
+                border-right: 1px dashed rgba(0, 0, 0, 0.08) !important;
+            }
+        }
+
+        /* Screen Styles for Views and Booklet Preview */
+        .view-section {
+            width: 100%;
+        }
+
+        /* Complete View */
+        .complete-page {
+            margin-bottom: 40px;
+        }
+        .sub-view-title-main {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            color: #1a1a1a;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 6px;
+        }
+        .en-tables-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .en-table-block, .asme-table-block {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            margin-bottom: 5px;
+        }
+        .sub-view-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            margin: 15px 0 10px 0;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .asme-tables-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Booklet view preview */
+        .booklet-instructions {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            color: #0d47a1;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .booklet-instructions p {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .booklet-instructions ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 14px;
+        }
+        .booklet-instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .booklet-sheets-container {
+            width: 100%;
+            overflow-x: auto;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 35px;
+            background: #e9ecef;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .booklet-sheet-wrapper {
+            min-width: 297mm;
+            display: flex;
+            justify-content: center;
+        }
+        .booklet-sheet {
+            background: white;
+            width: 297mm;
+            height: 210mm;
+            display: flex;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .a5-page {
+            width: 148.5mm;
+            height: 210mm;
+            box-sizing: border-box;
+            padding: 15mm 12mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #ffffff;
+            position: relative;
+        }
+        .booklet-sheet .a5-page:first-child {
+            border-right: 1px dashed rgba(0, 0, 0, 0.15);
+        }
+        .a5-page .page-header {
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .a5-page .page-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .a5-page .page-footer {
+            font-family: 'Outfit', sans-serif;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 4px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .a5-page table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 9.5px !important;
+            line-height: 1.2 !important;
+        }
+        .a5-page th, .a5-page td {
+            padding: 4px 2px !important;
+            font-size: 9.5px !important;
+        }
+        .a5-page .thick-col {
+            width: 85px !important;
+            padding-left: 4px !important;
+            font-size: 9.5px !important;
+        }
+        
+        #completeViewContainer table {
+            font-size: 12.5px !important;
+        }
+        #completeViewContainer th, #completeViewContainer td {
+            padding: 6px 4px !important;
+        }
+        #completeViewContainer .thick-col {
+            width: 130px !important;
+            padding-left: 8px !important;
+        }
+        #completeViewContainer .view-section .table-wrapper {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        /* Hide view-sections on load by default */
+        body.view-single #completeViewContainer,
+        body.view-single #bookletViewContainer {
+            display: none;
+        }
+        body.view-complete #singleViewContainer,
+        body.view-complete #bookletViewContainer {
+            display: none;
+        }
+        body.view-booklet #singleViewContainer,
+        body.view-booklet #completeViewContainer {
+            display: none;
+        }
+        
+        /* Specific rules for page content in booklet */
+        .legend-compact {
+            font-size: 10px;
+            line-height: 1.35;
+        }
+        .legend-compact strong {
+            display: block;
+            margin-top: 6px;
+            margin-bottom: 2px;
+            color: #333;
+        }
+        .legend-compact ul {
+            margin: 0;
+            padding-left: 14px;
+        }
+        .legend-compact li {
+            margin-bottom: 2px;
+        }
+
+        /* Compact tables for print/booklet views to fit 19 columns */
+        body.view-complete table {
+            font-size: 9px !important;
+        }
+        body.view-complete th, body.view-complete td {
+            padding: 5px 3px !important;
+        }
+        body.view-booklet table {
+            font-size: 7.5px !important;
+        }
+        body.view-booklet th, body.view-booklet td {
+            padding: 3px 1.5px !important;
+        }
+        body.view-booklet .thick-col {
+            padding-left: 4px !important;
+            width: auto !important;
+        }
+        body.view-complete .thick-col {
+            padding-left: 6px !important;
+            width: auto !important;
+        }
         }
     </style>
 </head>
@@ -394,6 +754,15 @@
 
         <div class="no-print">
             <div class="control-group">
+                <label for="viewModeSelect">Weergavemodus:</label>
+                <select id="viewModeSelect" onchange="changeViewMode()">
+                    <option value="single">Enkel Overzicht (Dynamisch)</option>
+                    <option value="complete" selected>Overzicht (1.65 - 35 mm) (A4)</option>
+                    <option value="booklet">Boekje (A5 vouwbaar)</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="sourceControlGroup">
                 <label for="sourceSelect">Stralingsbron:</label>
                 <select id="sourceSelect" onchange="populateTable()">
                     <option value="X-ray">X-ray (Röntgen)</option>
@@ -402,7 +771,7 @@
                 </select>
             </div>
 
-            <div class="control-group">
+            <div class="control-group" id="weldControlGroup">
                 <label for="weldTypeSelect">Lasoverdikte Type (ASME):</label>
                 <select id="weldTypeSelect" onchange="populateTable()">
                     <option value="None">Geen lasoverdikte (0 mm)</option>
@@ -411,7 +780,7 @@
                 </select>
             </div>
 
-            <div class="control-group">
+            <div class="control-group" id="multControlGroup">
                 <label for="multSelect">ASME Lasoverdikte Factor:</label>
                 <select id="multSelect" onchange="populateTable()">
                     <option value="1" selected>1x lasoverdikte</option>
@@ -420,30 +789,221 @@
             </div>
         </div>
 
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2" class="thick-border-right" style="width: 180px; vertical-align: middle;">Nominale Dikte t (mm)</th>
-                        <th colspan="3" class="section-header thick-border-right">EN ISO 19232-1 Klasse A</th>
-                        <th colspan="3" class="section-header thick-border-right klasse-b-col">EN ISO 19232-1 Klasse B</th>
-                        <th colspan="2" class="section-header">ASME Sec. V Art. 2</th>
-                    </tr>
-                    <tr>
-                        <th>SWSI<br><span class="wall-tag tag-single">Enkelwandig (t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
-                        <th>DWSI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Filmzijde</small></th>
-                        <th class="thick-border-right">DWDI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
-                        <th class="klasse-b-col">SWSI<br><span class="wall-tag tag-single">Enkelwandig (t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
-                        <th class="klasse-b-col">DWSI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Filmzijde</small></th>
-                        <th class="klasse-b-col thick-border-right">DWDI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
-                        <th>Bronzijde<br><span class="wall-tag tag-single">Enkelwandig (t + las)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
-                        <th>Filmzijde<br><span class="wall-tag tag-single">Enkelwandig (t + las)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Filmzijde</small></th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Dynamic Rows go here -->
-                </tbody>
-            </table>
+        <!-- Mode 1: Single Dynamic View -->
+        <div id="singleViewContainer" class="view-section">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="thick-border-right" style="width: 180px; vertical-align: middle;">Nominale Dikte t (mm)</th>
+                            <th colspan="3" class="section-header thick-border-right">EN ISO 19232-1 Klasse A</th>
+                            <th colspan="3" class="section-header thick-border-right klasse-b-col">EN ISO 19232-1 Klasse B</th>
+                            <th colspan="2" class="section-header">ASME Sec. V Art. 2</th>
+                        </tr>
+                        <tr>
+                            <th>SWSI<br><span class="wall-tag tag-single">Enkelwandig (t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
+                            <th>DWSI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Filmzijde</small></th>
+                            <th class="thick-border-right">DWDI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
+                            <th class="klasse-b-col">SWSI<br><span class="wall-tag tag-single">Enkelwandig (t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
+                            <th class="klasse-b-col">DWSI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Filmzijde</small></th>
+                            <th class="klasse-b-col thick-border-right">DWDI<br><span class="wall-tag tag-double">Dubbelwandig (2t)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
+                            <th>Bronzijde<br><span class="wall-tag tag-single">Enkelwandig (t + las)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Bronzijde</small></th>
+                            <th>Filmzijde<br><span class="wall-tag tag-single">Enkelwandig (t + las)</span><br><small style="font-size: 10px; font-weight: bold; color: #495057;">BKI: Filmzijde</small></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Dynamic Rows go here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Mode 2: Complete overview -->
+        <div id="completeViewContainer" class="view-section" style="display: none;">
+            <div class="complete-page page-en">
+                <h2 class="sub-view-title-main">EN ISO 19232-1 Klasse A & B Overzicht (Wanddikte 1.65 - 35 mm)</h2>
+                <div class="en-tables-container">
+                    <div class="en-table-block">
+                        <h3 class="sub-view-title"><i class="fas fa-radiation"></i> Röntgen, Selenium & Iridium (X-ray / Se-75 / Ir-192)</h3>
+                        <div class="table-wrapper" id="enTableCombinedAll"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="complete-page page-asme">
+                <h2 class="sub-view-title-main">ASME Sec. V Art. 2 Overzicht (1x lasoverdikte)</h2>
+                <div class="asme-tables-container">
+                    <div class="asme-table-block">
+                        <h3 class="sub-view-title"><i class="fas fa-minus"></i> Geen lasoverdikte</h3>
+                        <div class="table-wrapper" id="asmeTableNone"></div>
+                    </div>
+                    <div class="asme-table-block">
+                        <h3 class="sub-view-title"><i class="fas fa-grip-lines"></i> Type A / D lasoverdikte</h3>
+                        <div class="table-wrapper" id="asmeTableAD"></div>
+                    </div>
+                    <div class="asme-table-block">
+                        <h3 class="sub-view-title"><i class="fas fa-grip-lines-vertical"></i> Type B / C lasoverdikte</h3>
+                        <div class="table-wrapper" id="asmeTableBC"></div>
+                    </div>
+                </div>
+                <div class="asme-diagram-container" style="text-align: center; margin-top: 25px; display: flex; flex-direction: column; align-items: center;">
+                    <h3 class="sub-view-title" style="margin-top: 0; justify-content: center; width: 100%;"><i class="fas fa-project-diagram"></i> ASME Lastypen (Lascategorieën)</h3>
+                    <img src="Lascategorie.png" alt="ASME Lastype" class="weld-diagram-img-large" style="max-height: 220px; max-width: 90%; object-fit: contain; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.06); background: white; padding: 10px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 3: Booklet view -->
+        <div id="bookletViewContainer" class="view-section" style="display: none;">
+            <div class="booklet-instructions no-print">
+                <p><i class="fas fa-print"></i> <strong>Afdrukinstructies voor het boekje:</strong></p>
+                <ul>
+                    <li>Stel de printer in op <strong>A4</strong> en de afdrukstand op <strong>Liggend (Landscape)</strong>.</li>
+                    <li>Schakel <strong>Dubbelzijdig afdrukken</strong> in en kies voor <strong>Omdraaien om de korte zijde (Flip on short edge)</strong>.</li>
+                    <li>Zorg dat in de afdrukinstellingen de marges op <strong>Geen (None)</strong> of <strong>Minimum</strong> staan.</li>
+                    <li>Na het printen vouwt u de pagina's in het midden en niet u ze vast voor een handig A5 boekje.</li>
+                </ul>
+            </div>
+            <div class="booklet-sheets-container">
+                <!-- Sheet 1 (Outer): Pages 8 & 1 -->
+                <div class="booklet-sheet-wrapper">
+                    <div class="booklet-sheet">
+                        <div class="a5-page page-8">
+                            <div class="page-header">IQI Sets & Materiaalgroepen</div>
+                            <div class="page-content" style="display: flex; flex-direction: column; gap: 6px; font-size: 8px; line-height: 1.25;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                                    <div style="border: 1px solid var(--border-color); border-radius: 4px; padding: 5px; background-color: #f8f9fa;">
+                                        <strong style="color: var(--primary-dark); font-size: 8.5px; display: block; margin-bottom: 2px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">EN ISO 19232-1 Materiaalgroepen</strong>
+                                        <div style="display: flex; flex-direction: column; gap: 1px;">
+                                            <div><strong>FE:</strong> Staal, nikkel, kobalt</div>
+                                            <div><strong>AL:</strong> Aluminium, magnesium</div>
+                                            <div><strong>CU:</strong> Koper en koperlegeringen</div>
+                                            <div><strong>TI:</strong> Titaan en titaanlegeringen</div>
+                                        </div>
+                                    </div>
+                                    <div style="border: 1px solid var(--border-color); border-radius: 4px; padding: 5px; background-color: #f8f9fa;">
+                                        <strong style="color: var(--primary-dark); font-size: 8.5px; display: block; margin-bottom: 2px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">ASME BPVC V Groepen</strong>
+                                        <div style="display: flex; flex-direction: column; gap: 1px; font-size: 7.2px;">
+                                            <div><strong>01 / 02:</strong> Titanium / Aluminium</div>
+                                            <div><strong>1:</strong> C-staal, RVS-300, laag-gelegeerd</div>
+                                            <div><strong>2 / 3:</strong> Al-brons / Inconel, maraging</div>
+                                            <div><strong>4 / 5:</strong> Monel, Cu-Ni, messing / Tin brons</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex-grow: 1;">
+                                    <div style="border: 1px solid var(--border-color); border-radius: 4px; padding: 5px; background-color: white;">
+                                        <strong style="color: var(--primary-dark); font-size: 8.5px; display: block; margin-bottom: 2px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">EN ISO 19232-1 Sets (7 draden)</strong>
+                                        <ul style="margin: 0; padding-left: 10px; list-style-type: square; display: flex; flex-direction: column; gap: 1px;">
+                                            <li><strong>Set W13:</strong> W13 t/m W19 <span style="color: var(--text-muted); font-size: 7.5px;">(0.20 - 0.05 mm)</span></li>
+                                            <li><strong>Set W10:</strong> W10 t/m W16 <span style="color: var(--text-muted); font-size: 7.5px;">(0.40 - 0.10 mm)</span></li>
+                                            <li><strong>Set W6:</strong> W6 t/m W12 <span style="color: var(--text-muted); font-size: 7.5px;">(1.00 - 0.25 mm)</span></li>
+                                            <li><strong>Set W1:</strong> W1 t/m W7 <span style="color: var(--text-muted); font-size: 7.5px;">(3.20 - 0.80 mm)</span></li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div style="border: 1px solid var(--border-color); border-radius: 4px; padding: 5px; background-color: white;">
+                                        <strong style="color: var(--primary-dark); font-size: 8.5px; display: block; margin-bottom: 2px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">ASME Sec. V Sets (6 draden)</strong>
+                                        <ul style="margin: 0; padding-left: 10px; list-style-type: square; display: flex; flex-direction: column; gap: 1px;">
+                                            <li><strong>Set 1A:</strong> #1 t/m #6 <span style="color: var(--text-muted); font-size: 7.5px;">(0.08 - 0.25 mm)</span></li>
+                                            <li><strong>Set 1B:</strong> #6 t/m #11 <span style="color: var(--text-muted); font-size: 7.5px;">(0.25 - 0.81 mm)</span></li>
+                                            <li><strong>Set 1C:</strong> #11 t/m #16 <span style="color: var(--text-muted); font-size: 7.5px;">(0.81 - 2.54 mm)</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="page-footer">Pagina 8</div>
+                        </div>
+                        <div class="a5-page page-1">
+                            <div class="cover-content" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+                                <h2 style="font-family: 'Outfit', sans-serif; font-size: 24px; margin: 0 0 5px 0; color: #1a1a1a;">Draadvereisten</h2>
+                                <h3 style="font-family: 'Outfit', sans-serif; font-size: 14px; margin: 0 0 20px 0; font-weight: normal; color: var(--text-muted);">Zakboekje (A5)</h3>
+                                <div style="font-size: 11px; margin-bottom: 25px; color: var(--text-muted); max-width: 90%;">
+                                    Tabellen voor EN ISO 19232-1 en ASME Sec. V Art. 2 (1.65 - 35 mm).
+                                </div>
+                                <div style="font-size: 24px; color: var(--primary-dark); margin-bottom: 10px;">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                                <div style="font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--border-color); width: 60%; padding-top: 10px;">
+                                    Röntgen, Selenium & Iridium
+                                </div>
+                            </div>
+                            <div class="page-footer">Pagina 1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sheet 1 (Inner): Pages 2 & 7 -->
+                <div class="booklet-sheet-wrapper">
+                    <div class="booklet-sheet">
+                        <div class="a5-page page-2">
+                            <div class="page-header">EN Klasse A (Wanddikte 1.65 - 35 mm)</div>
+                            <div class="page-content" id="bookletEnKlasseA"></div>
+                            <div style="font-size: 7.5px; color: var(--text-muted); text-align: center; margin-top: 4px; border-top: 1px dashed #eee; padding-top: 4px;">
+                                <strong>Kolommen per set-up:</strong> X = Röntgen | Se = Selenium-75 | Ir = Iridium-192 (grijs)
+                            </div>
+                            <div class="page-footer">Pagina 2</div>
+                        </div>
+                        <div class="a5-page page-7">
+                            <div class="page-header">ASME Lastypen (Lascategorieën)</div>
+                            <div class="page-content" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 5px;">
+                                <img src="Lascategorie.png" alt="ASME Lastype" style="max-height: 145mm; max-width: 100%; object-fit: contain; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+                            </div>
+                            <div class="page-footer">Pagina 7</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sheet 2 (Outer): Pages 6 & 3 -->
+                <div class="booklet-sheet-wrapper">
+                    <div class="booklet-sheet">
+                        <div class="a5-page page-6">
+                            <div class="page-header">ASME Sec. V - Type B / C lasoverdikte</div>
+                            <div class="page-content" id="bookletAsmeBC"></div>
+                            <div style="font-size: 8px; color: var(--text-muted); text-align: center; margin-top: 4px; border-top: 1px dashed #eee; padding-top: 4px; line-height: 1.35;">
+                                <strong>ASME lasoverdikten (Type B / C):</strong><br>
+                                t &le; 2.4 mm: +2.5 | t &le; 4.8 mm: +3.0 | t &le; 13 mm: +4.0 | t &le; 25 mm: +5.0 | t &gt; 25 mm: +6.0<br>
+                                <span style="font-size: 7.5px; color: var(--info); font-weight: bold;">(Zie pag. 7 voor ASME Lastypen diagram)</span>
+                            </div>
+                            <div class="page-footer">Pagina 6</div>
+                        </div>
+                        <div class="a5-page page-3">
+                            <div class="page-header">EN Klasse B (Wanddikte 1.65 - 35 mm)</div>
+                            <div class="page-content" id="bookletEnKlasseB"></div>
+                            <div style="font-size: 7.5px; color: var(--text-muted); text-align: center; margin-top: 4px; border-top: 1px dashed #eee; padding-top: 4px;">
+                                <strong>Kolommen per set-up:</strong> X = Röntgen | Se = Selenium-75 | Ir = Iridium-192 (grijs)
+                            </div>
+                            <div class="page-footer">Pagina 3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sheet 2 (Inner): Pages 4 & 5 -->
+                <div class="booklet-sheet-wrapper">
+                    <div class="booklet-sheet">
+                        <div class="a5-page page-4">
+                            <div class="page-header">ASME Sec. V - Geen lasoverdikte</div>
+                            <div class="page-content" id="bookletAsmeNone"></div>
+                            <div style="font-size: 8px; color: var(--text-muted); text-align: center; margin-top: 4px; border-top: 1px dashed #eee; padding-top: 4px; line-height: 1.35;">
+                                <strong>ASME lasoverdikten:</strong> Geen extra lasoverdikte (0 mm)<br>
+                                <span style="font-size: 7.5px; color: var(--info); font-weight: bold;">(Zie pag. 7 voor ASME Lastypen diagram)</span>
+                            </div>
+                            <div class="page-footer">Pagina 4</div>
+                        </div>
+                        <div class="a5-page page-5">
+                            <div class="page-header">ASME Sec. V - Type A / D lasoverdikte</div>
+                            <div class="page-content" id="bookletAsmeAD"></div>
+                            <div style="font-size: 8px; color: var(--text-muted); text-align: center; margin-top: 4px; border-top: 1px dashed #eee; padding-top: 4px; line-height: 1.35;">
+                                <strong>ASME lasoverdikten (Type A / D):</strong><br>
+                                t &le; 2.4 mm: +0.8 | t &le; 4.8 mm: +1.5 | t &le; 25 mm: +2.5 | t &gt; 25 mm: +3.0<br>
+                                <span style="font-size: 7.5px; color: var(--info); font-weight: bold;">(Zie pag. 7 voor ASME Lastypen diagram)</span>
+                            </div>
+                            <div class="page-footer">Pagina 5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="info-legend">
@@ -484,7 +1044,7 @@
                     </ul>
                 </div>
             </div>
-            <div style="text-align: center; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; flex-direction: column; align-items: center;">
+            <div class="legend-diagram" style="text-align: center; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; flex-direction: column; align-items: center;">
                 <h4 style="font-family: 'Outfit', sans-serif; margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: #495057; text-transform: uppercase; letter-spacing: 0.5px;">ASME Lastypen (Lascategorieën)</h4>
                 <img src="Lascategorie.png" alt="ASME Lastype" class="weld-diagram-img" style="max-width: 90%; max-height: 260px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.06); background: white; padding: 10px;">
             </div>
@@ -753,6 +1313,567 @@
             return wire;
         }
 
+        function getCombinedENTransitionPoints() {
+            let pts = [
+                // EN-A SWSI
+                1.2, 2.0, 3.5, 5.0, 7.0, 10.0, 15.0, 25.0, 32.0, 40.0, 55.0, 85.0,
+                // EN-A DWSI (divided by 2)
+                0.6, 1.0, 1.75, 2.5, 5.0, 7.5, 11.0, 19.0, 24.0, 30.0, 42.5,
+                // EN-A DWDI (divided by 2)
+                0.6, 1.0, 1.75, 2.5, 3.5, 6.0, 9.0, 15.0, 20.0, 25.0, 30.0, 42.5,
+                // EN-B SWSI
+                1.5, 2.5, 4.0, 6.0, 8.0, 12.0, 20.0, 30.0, 35.0, 45.0, 65.0,
+                // EN-B DWSI (divided by 2)
+                0.75, 1.25, 2.0, 3.0, 6.0, 9.0, 15.0, 22.5, 27.5, 35.0,
+                // EN-B DWDI (divided by 2)
+                0.75, 1.25, 2.0, 3.0, 4.0, 7.5, 12.5, 19.0, 22.5, 27.5, 35.0
+            ];
+
+            // Add Se75 corrections
+            pts.push(6.0, 10.0, 20.0, 2.5, 5.0);
+            // Add Ir192 corrections
+            pts.push(5.0, 10.0, 12.5, 20.0, 25.0, 40.0);
+
+            // Filter unique points strictly between 1.65 and 35.0
+            let uniquePts = Array.from(new Set(pts))
+                .filter(p => p > 1.65 && p < 35.0)
+                .sort((a, b) => a - b);
+
+            uniquePts.unshift(1.65);
+            uniquePts.push(35.0);
+
+            uniquePts = uniquePts.map(p => Math.round(p * 100) / 100);
+            return Array.from(new Set(uniquePts)).sort((a, b) => a - b);
+        }
+
+        function formatCombinedCell(w_se, w_ir) {
+            const se = formatWire(w_se);
+            const ir = formatWire(w_ir);
+            if (se === ir) return se;
+            return `${se} / ${ir}`;
+        }
+
+        function generateCombinedENTableHTML(klasse) {
+            const pts = getCombinedENTransitionPoints();
+            const rows = [];
+            for (let i = 1; i < pts.length; i++) {
+                const prev = pts[i-1];
+                const curr = pts[i];
+                const evalT = curr;
+                
+                // Get Klasse A values
+                const enA_swsi_x = getWireEN_A(evalT, "SWSI", "X-ray");
+                const enA_swsi_se = getWireEN_A(evalT, "SWSI", "Se75");
+                const enA_swsi_ir = getWireEN_A(evalT, "SWSI", "Ir192");
+                
+                const enA_dwsi_x = getWireEN_A(evalT, "DWSI", "X-ray");
+                const enA_dwsi_se = getWireEN_A(evalT, "DWSI", "Se75");
+                const enA_dwsi_ir = getWireEN_A(evalT, "DWSI", "Ir192");
+                
+                const enA_dwdi_x = getWireEN_A(evalT, "DWDI", "X-ray");
+                const enA_dwdi_se = getWireEN_A(evalT, "DWDI", "Se75");
+                const enA_dwdi_ir = getWireEN_A(evalT, "DWDI", "Ir192");
+                
+                // Get Klasse B values
+                const enB_swsi_x = getWireEN_B(evalT, "SWSI", "X-ray");
+                const enB_swsi_se = getWireEN_B(evalT, "SWSI", "Se75");
+                const enB_swsi_ir = getWireEN_B(evalT, "SWSI", "Ir192");
+                
+                const enB_dwsi_x = getWireEN_B(evalT, "DWSI", "X-ray");
+                const enB_dwsi_se = getWireEN_B(evalT, "DWSI", "Se75");
+                const enB_dwsi_ir = getWireEN_B(evalT, "DWSI", "Ir192");
+                
+                const enB_dwdi_x = getWireEN_B(evalT, "DWDI", "X-ray");
+                const enB_dwdi_se = getWireEN_B(evalT, "DWDI", "Se75");
+                const enB_dwdi_ir = getWireEN_B(evalT, "DWDI", "Ir192");
+                
+                rows.push({
+                    prev, curr,
+                    enA_swsi_x, enA_swsi_se, enA_swsi_ir,
+                    enA_dwsi_x, enA_dwsi_se, enA_dwsi_ir,
+                    enA_dwdi_x, enA_dwdi_se, enA_dwdi_ir,
+                    enB_swsi_x, enB_swsi_se, enB_swsi_ir,
+                    enB_dwsi_x, enB_dwsi_se, enB_dwsi_ir,
+                    enB_dwdi_x, enB_dwdi_se, enB_dwdi_ir
+                });
+            }
+
+            // Merge adjacent rows based on target columns
+            const mergedRows = [];
+            if (rows.length > 0) {
+                let currentMerged = rows[0];
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    let canMerge = false;
+                    if (klasse === "A") {
+                        canMerge = (
+                            r.enA_swsi_x === currentMerged.enA_swsi_x &&
+                            r.enA_swsi_se === currentMerged.enA_swsi_se &&
+                            r.enA_swsi_ir === currentMerged.enA_swsi_ir &&
+                            r.enA_dwsi_x === currentMerged.enA_dwsi_x &&
+                            r.enA_dwsi_se === currentMerged.enA_dwsi_se &&
+                            r.enA_dwsi_ir === currentMerged.enA_dwsi_ir &&
+                            r.enA_dwdi_x === currentMerged.enA_dwdi_x &&
+                            r.enA_dwdi_se === currentMerged.enA_dwdi_se &&
+                            r.enA_dwdi_ir === currentMerged.enA_dwdi_ir
+                        );
+                    } else if (klasse === "B") {
+                        canMerge = (
+                            r.enB_swsi_x === currentMerged.enB_swsi_x &&
+                            r.enB_swsi_se === currentMerged.enB_swsi_se &&
+                            r.enB_swsi_ir === currentMerged.enB_swsi_ir &&
+                            r.enB_dwsi_x === currentMerged.enB_dwsi_x &&
+                            r.enB_dwsi_se === currentMerged.enB_dwsi_se &&
+                            r.enB_dwsi_ir === currentMerged.enB_dwsi_ir &&
+                            r.enB_dwdi_x === currentMerged.enB_dwdi_x &&
+                            r.enB_dwdi_se === currentMerged.enB_dwdi_se &&
+                            r.enB_dwdi_ir === currentMerged.enB_dwdi_ir
+                        );
+                    } else {
+                        // Full table merge
+                        canMerge = (
+                            r.enA_swsi_x === currentMerged.enA_swsi_x &&
+                            r.enA_swsi_se === currentMerged.enA_swsi_se &&
+                            r.enA_swsi_ir === currentMerged.enA_swsi_ir &&
+                            r.enA_dwsi_x === currentMerged.enA_dwsi_x &&
+                            r.enA_dwsi_se === currentMerged.enA_dwsi_se &&
+                            r.enA_dwsi_ir === currentMerged.enA_dwsi_ir &&
+                            r.enA_dwdi_x === currentMerged.enA_dwdi_x &&
+                            r.enA_dwdi_se === currentMerged.enA_dwdi_se &&
+                            r.enA_dwdi_ir === currentMerged.enA_dwdi_ir &&
+                            r.enB_swsi_x === currentMerged.enB_swsi_x &&
+                            r.enB_swsi_se === currentMerged.enB_swsi_se &&
+                            r.enB_swsi_ir === currentMerged.enB_swsi_ir &&
+                            r.enB_dwsi_x === currentMerged.enB_dwsi_x &&
+                            r.enB_dwsi_se === currentMerged.enB_dwsi_se &&
+                            r.enB_dwsi_ir === currentMerged.enB_dwsi_ir &&
+                            r.enB_dwdi_x === currentMerged.enB_dwdi_x &&
+                            r.enB_dwdi_se === currentMerged.enB_dwdi_se &&
+                            r.enB_dwdi_ir === currentMerged.enB_dwdi_ir
+                        );
+                    }
+
+                    if (canMerge) {
+                        currentMerged.curr = r.curr;
+                    } else {
+                        mergedRows.push(currentMerged);
+                        currentMerged = r;
+                    }
+                }
+                mergedRows.push(currentMerged);
+            }
+
+            let html = `<table><thead>`;
+            
+            if (klasse === "A") {
+                html += `
+                    <tr>
+                        <th rowspan="3" class="thick-border-right" style="vertical-align: middle;">t (mm)</th>
+                        <th colspan="9" class="section-header">EN klasse A</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="setup-border-right">SWSI</th>
+                        <th colspan="3" class="setup-border-right">DWSI</th>
+                        <th colspan="3">DWDI</th>
+                    </tr>
+                    <tr>
+                        <th>X</th>
+                        <th class="se75-col">Se</th>
+                        <th class="ir192-col setup-border-right">Ir</th>
+                        <th>X</th>
+                        <th class="se75-col">Se</th>
+                        <th class="ir192-col setup-border-right">Ir</th>
+                        <th>X</th>
+                        <th class="se75-col">Se</th>
+                        <th class="ir192-col">Ir</th>
+                    </tr>`;
+            } else if (klasse === "B") {
+                html += `
+                    <tr>
+                        <th rowspan="3" class="thick-border-right klasse-b-col" style="vertical-align: middle;">t (mm)</th>
+                        <th colspan="9" class="section-header klasse-b-col">EN klasse B</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="klasse-b-col setup-border-right">SWSI</th>
+                        <th colspan="3" class="klasse-b-col setup-border-right">DWSI</th>
+                        <th colspan="3" class="klasse-b-col">DWDI</th>
+                    </tr>
+                    <tr>
+                        <th class="klasse-b-col">X</th>
+                        <th class="klasse-b-col se75-col">Se</th>
+                        <th class="klasse-b-col ir192-col setup-border-right">Ir</th>
+                        <th class="klasse-b-col">X</th>
+                        <th class="klasse-b-col se75-col">Se</th>
+                        <th class="klasse-b-col ir192-col setup-border-right">Ir</th>
+                        <th class="klasse-b-col">X</th>
+                        <th class="klasse-b-col se75-col">Se</th>
+                        <th class="klasse-b-col ir192-col">Ir</th>
+                    </tr>`;
+            } else {
+                // Full table
+                html += `
+                    <tr>
+                        <th rowspan="3" class="thick-border-right" style="vertical-align: middle;">t (mm)</th>
+                        <th colspan="9" class="section-header thick-border-right">EN klasse A</th>
+                        <th colspan="9" class="section-header klasse-b-col">EN klasse B</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="setup-border-right">SWSI</th>
+                        <th colspan="3" class="setup-border-right">DWSI</th>
+                        <th colspan="3" class="thick-border-right">DWDI</th>
+                        <th colspan="3" class="klasse-b-col setup-border-right">SWSI</th>
+                        <th colspan="3" class="klasse-b-col setup-border-right">DWSI</th>
+                        <th colspan="3" class="klasse-b-col thick-border-right">DWDI</th>
+                    </tr>
+                    <tr>
+                        <th>X</th>
+                        <th class="se75-col">Se</th>
+                        <th class="ir192-col setup-border-right">Ir</th>
+                        <th>X</th>
+                        <th class="se75-col">Se</th>
+                        <th class="ir192-col setup-border-right">Ir</th>
+                        <th>X</th>
+                        <th class="se75-col">Se</th>
+                        <th class="ir192-col thick-border-right">Ir</th>
+                        <th class="klasse-b-col">X</th>
+                        <th class="klasse-b-col se75-col">Se</th>
+                        <th class="klasse-b-col ir192-col setup-border-right">Ir</th>
+                        <th class="klasse-b-col">X</th>
+                        <th class="klasse-b-col se75-col">Se</th>
+                        <th class="klasse-b-col ir192-col setup-border-right">Ir</th>
+                        <th class="klasse-b-col">X</th>
+                        <th class="klasse-b-col se75-col">Se</th>
+                        <th class="klasse-b-col ir192-col thick-border-right">Ir</th>
+                    </tr>`;
+            }
+
+            html += `</thead><tbody>`;
+            
+            mergedRows.forEach(row => {
+                const rangeText = `${row.prev.toFixed(2)} &lt; t &le; ${row.curr.toFixed(2)}`;
+                if (klasse === "A") {
+                    html += `
+                        <tr>
+                            <td class="thick-col thick-border-right">${rangeText}</td>
+                            <td>${formatWire(row.enA_swsi_x)}</td>
+                            <td class="se75-col">${formatWire(row.enA_swsi_se)}</td>
+                            <td class="ir192-col setup-border-right">${formatWire(row.enA_swsi_ir)}</td>
+                            <td>${formatWire(row.enA_dwsi_x)}</td>
+                            <td class="se75-col">${formatWire(row.enA_dwsi_se)}</td>
+                            <td class="ir192-col setup-border-right">${formatWire(row.enA_dwsi_ir)}</td>
+                            <td>${formatWire(row.enA_dwdi_x)}</td>
+                            <td class="se75-col">${formatWire(row.enA_dwdi_se)}</td>
+                            <td class="ir192-col">${formatWire(row.enA_dwdi_ir)}</td>
+                        </tr>`;
+                } else if (klasse === "B") {
+                    html += `
+                        <tr>
+                            <td class="thick-col thick-border-right klasse-b-col">${rangeText}</td>
+                            <td class="klasse-b-col">${formatWire(row.enB_swsi_x)}</td>
+                            <td class="klasse-b-col se75-col">${formatWire(row.enB_swsi_se)}</td>
+                            <td class="klasse-b-col ir192-col setup-border-right">${formatWire(row.enB_swsi_ir)}</td>
+                            <td class="klasse-b-col">${formatWire(row.enB_dwsi_x)}</td>
+                            <td class="klasse-b-col se75-col">${formatWire(row.enB_dwsi_se)}</td>
+                            <td class="klasse-b-col ir192-col setup-border-right">${formatWire(row.enB_dwsi_ir)}</td>
+                            <td class="klasse-b-col">${formatWire(row.enB_dwdi_x)}</td>
+                            <td class="klasse-b-col se75-col">${formatWire(row.enB_dwdi_se)}</td>
+                            <td class="klasse-b-col ir192-col">${formatWire(row.enB_dwdi_ir)}</td>
+                        </tr>`;
+                } else {
+                    html += `
+                        <tr>
+                            <td class="thick-col thick-border-right">${rangeText}</td>
+                            <td>${formatWire(row.enA_swsi_x)}</td>
+                            <td class="se75-col">${formatWire(row.enA_swsi_se)}</td>
+                            <td class="ir192-col setup-border-right">${formatWire(row.enA_swsi_ir)}</td>
+                            <td>${formatWire(row.enA_dwsi_x)}</td>
+                            <td class="se75-col">${formatWire(row.enA_dwsi_se)}</td>
+                            <td class="ir192-col setup-border-right">${formatWire(row.enA_dwsi_ir)}</td>
+                            <td>${formatWire(row.enA_dwdi_x)}</td>
+                            <td class="se75-col">${formatWire(row.enA_dwdi_se)}</td>
+                            <td class="ir192-col thick-border-right">${formatWire(row.enA_dwdi_ir)}</td>
+                            <td class="klasse-b-col">${formatWire(row.enB_swsi_x)}</td>
+                            <td class="klasse-b-col se75-col">${formatWire(row.enB_swsi_se)}</td>
+                            <td class="klasse-b-col ir192-col setup-border-right">${formatWire(row.enB_swsi_ir)}</td>
+                            <td class="klasse-b-col">${formatWire(row.enB_dwsi_x)}</td>
+                            <td class="klasse-b-col se75-col">${formatWire(row.enB_dwsi_se)}</td>
+                            <td class="klasse-b-col ir192-col setup-border-right">${formatWire(row.enB_dwsi_ir)}</td>
+                            <td class="klasse-b-col">${formatWire(row.enB_dwdi_x)}</td>
+                            <td class="klasse-b-col se75-col">${formatWire(row.enB_dwdi_se)}</td>
+                            <td class="klasse-b-col ir192-col thick-border-right">${formatWire(row.enB_dwdi_ir)}</td>
+                        </tr>`;
+                }
+            });
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function getENTransitionPointsForSource(source) {
+            let pts = [
+                // EN-A SWSI
+                1.2, 2.0, 3.5, 5.0, 7.0, 10.0, 15.0, 25.0, 32.0, 40.0, 55.0, 85.0,
+                // EN-A DWSI (divided by 2)
+                0.6, 1.0, 1.75, 2.5, 5.0, 7.5, 11.0, 19.0, 24.0, 30.0, 42.5,
+                // EN-A DWDI (divided by 2)
+                0.6, 1.0, 1.75, 2.5, 3.5, 6.0, 9.0, 15.0, 20.0, 25.0, 30.0, 42.5,
+                // EN-B SWSI
+                1.5, 2.5, 4.0, 6.0, 8.0, 12.0, 20.0, 30.0, 35.0, 45.0, 65.0,
+                // EN-B DWSI (divided by 2)
+                0.75, 1.25, 2.0, 3.0, 6.0, 9.0, 15.0, 22.5, 27.5, 35.0,
+                // EN-B DWDI (divided by 2)
+                0.75, 1.25, 2.0, 3.0, 4.0, 7.5, 12.5, 19.0, 22.5, 27.5, 35.0
+            ];
+
+            if (source === "Se75") {
+                pts.push(6.0, 10.0, 20.0, 2.5, 5.0);
+            } else if (source === "Ir192") {
+                pts.push(5.0, 10.0, 12.5, 20.0, 25.0, 40.0);
+            }
+
+            // Filter unique points strictly between 1.65 and 35.0
+            let uniquePts = Array.from(new Set(pts))
+                .filter(p => p > 1.65 && p < 35.0)
+                .sort((a, b) => a - b);
+
+            uniquePts.unshift(1.65);
+            uniquePts.push(35.0);
+
+            uniquePts = uniquePts.map(p => Math.round(p * 100) / 100);
+            return Array.from(new Set(uniquePts)).sort((a, b) => a - b);
+        }
+
+        function generateENTableHTML(source) {
+            const pts = getENTransitionPointsForSource(source);
+            const rows = [];
+            for (let i = 1; i < pts.length; i++) {
+                const prev = pts[i-1];
+                const curr = pts[i];
+                const evalT = curr;
+                
+                const enA_swsi = getWireEN_A(evalT, "SWSI", source);
+                const enA_dwsi = getWireEN_A(evalT, "DWSI", source);
+                const enA_dwdi = getWireEN_A(evalT, "DWDI", source);
+                
+                const enB_swsi = getWireEN_B(evalT, "SWSI", source);
+                const enB_dwsi = getWireEN_B(evalT, "DWSI", source);
+                const enB_dwdi = getWireEN_B(evalT, "DWDI", source);
+                
+                rows.push({
+                    prev, curr,
+                    enA_swsi, enA_dwsi, enA_dwdi,
+                    enB_swsi, enB_dwsi, enB_dwdi
+                });
+            }
+
+            // Merge adjacent rows
+            const mergedRows = [];
+            if (rows.length > 0) {
+                let currentMerged = rows[0];
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (r.enA_swsi === currentMerged.enA_swsi &&
+                        r.enA_dwsi === currentMerged.enA_dwsi &&
+                        r.enA_dwdi === currentMerged.enA_dwdi &&
+                        r.enB_swsi === currentMerged.enB_swsi &&
+                        r.enB_dwsi === currentMerged.enB_dwsi &&
+                        r.enB_dwdi === currentMerged.enB_dwdi) {
+                        currentMerged.curr = r.curr;
+                    } else {
+                        mergedRows.push(currentMerged);
+                        currentMerged = r;
+                    }
+                }
+                mergedRows.push(currentMerged);
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="thick-border-right" style="vertical-align: middle;">t (mm)</th>
+                            <th colspan="3" class="section-header thick-border-right">EN klasse A</th>
+                            <th colspan="3" class="section-header klasse-b-col">EN klasse B</th>
+                        </tr>
+                        <tr>
+                            <th>SWSI</th>
+                            <th>DWSI</th>
+                            <th class="thick-border-right">DWDI</th>
+                            <th class="klasse-b-col">SWSI</th>
+                            <th class="klasse-b-col">DWSI</th>
+                            <th class="klasse-b-col">DWDI</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            mergedRows.forEach(row => {
+                const rangeText = `${row.prev.toFixed(2)} &lt; t &le; ${row.curr.toFixed(2)}`;
+                html += `
+                    <tr>
+                        <td class="thick-col thick-border-right">${rangeText}</td>
+                        <td>${formatWire(row.enA_swsi)}</td>
+                        <td>${formatWire(row.enA_dwsi)}</td>
+                        <td class="thick-border-right">${formatWire(row.enA_dwdi)}</td>
+                        <td class="klasse-b-col">${formatWire(row.enB_swsi)}</td>
+                        <td class="klasse-b-col">${formatWire(row.enB_dwsi)}</td>
+                        <td class="klasse-b-col">${formatWire(row.enB_dwdi)}</td>
+                    </tr>`;
+            });
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function getASMETransitionPointsForWeld(weldType, mult) {
+            let pts = [2.4, 4.8, 13.0, 25.0];
+            const asmeThresholds = [6.4, 9.5, 12.7, 19.0, 25.4, 38.1, 50.8, 63.5];
+            const weldIntervals = [
+                { min: 0, max: 2.4 },
+                { min: 2.4, max: 4.8 },
+                { min: 4.8, max: 13.0 },
+                { min: 13.0, max: 25.0 },
+                { min: 25.0, max: 100.0 }
+            ];
+
+            weldIntervals.forEach(interval => {
+                const mid = (interval.min + Math.min(interval.max, 50)) / 2;
+                const baseOverdikte = getMaxOverdikte(weldType, mid);
+                const lasoverdikte = baseOverdikte * mult;
+
+                if (lasoverdikte >= 0) {
+                    asmeThresholds.forEach(thresh => {
+                        const t = thresh - lasoverdikte;
+                        if (t > interval.min && t <= interval.max) {
+                            pts.push(t);
+                        }
+                    });
+                }
+            });
+
+            let uniquePts = Array.from(new Set(pts))
+                .filter(p => p > 1.65 && p < 35.0)
+                .sort((a, b) => a - b);
+
+            uniquePts.unshift(1.65);
+            uniquePts.push(35.0);
+
+            uniquePts = uniquePts.map(p => Math.round(p * 100) / 100);
+            return Array.from(new Set(uniquePts)).sort((a, b) => a - b);
+        }
+
+        function generateASMETableHTML(weldType, mult, title) {
+            const pts = getASMETransitionPointsForWeld(weldType, mult);
+            const rows = [];
+            for (let i = 1; i < pts.length; i++) {
+                const prev = pts[i-1];
+                const curr = pts[i];
+                const evalT = curr;
+                
+                const asme_source = getWireASME(evalT, "Sourceside", weldType, mult);
+                const asme_film = getWireASME(evalT, "Filmside", weldType, mult);
+                
+                rows.push({
+                    prev, curr,
+                    asme_source, asme_film
+                });
+            }
+
+            // Merge adjacent rows
+            const mergedRows = [];
+            if (rows.length > 0) {
+                let currentMerged = rows[0];
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (r.asme_source === currentMerged.asme_source &&
+                        r.asme_film === currentMerged.asme_film) {
+                        currentMerged.curr = r.curr;
+                    } else {
+                        mergedRows.push(currentMerged);
+                        currentMerged = r;
+                    }
+                }
+                mergedRows.push(currentMerged);
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="vertical-align: middle;">t (mm)</th>
+                            <th colspan="2" class="section-header">${title}</th>
+                        </tr>
+                        <tr>
+                            <th>Bronzijde</th>
+                            <th>Filmzijde</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            mergedRows.forEach(row => {
+                const rangeText = `${row.prev.toFixed(2)} &lt; t &le; ${row.curr.toFixed(2)}`;
+                html += `
+                    <tr>
+                        <td class="thick-col">${rangeText}</td>
+                        <td>${formatWire(row.asme_source)}</td>
+                        <td>${formatWire(row.asme_film)}</td>
+                    </tr>`;
+            });
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function populateCompleteTables() {
+            document.getElementById("enTableCombinedAll").innerHTML = generateCombinedENTableHTML();
+            
+            document.getElementById("asmeTableNone").innerHTML = generateASMETableHTML("None", 1, "Geen lasoverdikte (0 mm)");
+            document.getElementById("asmeTableAD").innerHTML = generateASMETableHTML("A", 1, "Type A / D lasoverdikte");
+            document.getElementById("asmeTableBC").innerHTML = generateASMETableHTML("B", 1, "Type B / C lasoverdikte");
+        }
+
+        function populateBookletTables() {
+            document.getElementById("bookletEnKlasseA").innerHTML = generateCombinedENTableHTML("A");
+            document.getElementById("bookletEnKlasseB").innerHTML = generateCombinedENTableHTML("B");
+            
+            document.getElementById("bookletAsmeNone").innerHTML = generateASMETableHTML("None", 1, "Geen lasoverdikte (0 mm)");
+            document.getElementById("bookletAsmeAD").innerHTML = generateASMETableHTML("A", 1, "Type A / D lasoverdikte");
+            document.getElementById("bookletAsmeBC").innerHTML = generateASMETableHTML("B", 1, "Type B / C lasoverdikte");
+        }
+
+        function changeViewMode() {
+            const mode = document.getElementById("viewModeSelect").value;
+            
+            // Toggle body classes
+            document.body.classList.remove("view-single", "view-complete", "view-booklet");
+            document.body.classList.add("view-" + mode);
+            
+            // Toggle container visibility
+            document.getElementById("singleViewContainer").style.display = (mode === "single") ? "block" : "none";
+            document.getElementById("completeViewContainer").style.display = (mode === "complete") ? "block" : "none";
+            document.getElementById("bookletViewContainer").style.display = (mode === "booklet") ? "block" : "none";
+            
+            // Toggle selector visibility (except viewModeSelect)
+            const sourceGroup = document.getElementById("sourceControlGroup");
+            const weldGroup = document.getElementById("weldControlGroup");
+            const multGroup = document.getElementById("multControlGroup");
+            
+            const titleEl = document.querySelector(".title-area h1");
+            
+            if (mode === "single") {
+                sourceGroup.style.display = "flex";
+                weldGroup.style.display = "flex";
+                multGroup.style.display = "flex";
+                populateTable(); // this will also set the title
+            } else if (mode === "complete") {
+                sourceGroup.style.display = "none";
+                weldGroup.style.display = "none";
+                multGroup.style.display = "none";
+                titleEl.innerText = "Draadvereisten - Overzicht (1.65 - 35 mm) (A4)";
+            } else if (mode === "booklet") {
+                sourceGroup.style.display = "none";
+                weldGroup.style.display = "none";
+                multGroup.style.display = "none";
+                titleEl.innerText = "Draadvereisten - A5 Zakboekje (1.65 - 35 mm)";
+            }
+        }
+
         function populateTable() {
             const source = document.getElementById("sourceSelect").value;
             const weldType = document.getElementById("weldTypeSelect").value;
@@ -849,7 +1970,12 @@
         }
 
         // Initialize the table
-        window.onload = populateTable;
+        window.onload = function() {
+            populateTable();
+            populateCompleteTables();
+            populateBookletTables();
+            changeViewMode();
+        };
     </script>
 </body>
 </html>
