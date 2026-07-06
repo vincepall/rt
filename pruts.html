@@ -305,8 +305,8 @@
       <div class="form-item">
         <label for="technique">Opstelling:</label>
         <select id="technique" name="technique">
-          <option value="SWSI">SWSI</option>
           <option value="DWSI">DWSI</option>
+          <option value="SWSI">SWSI</option>
           <option value="DWDI">DWDI</option>
         </select>
       </div>
@@ -826,7 +826,7 @@
         } else if (isLargeDiameter) {
           // Diameter >= 100, force SWSI or DWSI
           if (techniqueSelect.value === "DWDI") {
-            techniqueSelect.value = "SWSI"; // Default to SWSI if DWDI was selected
+            techniqueSelect.value = "DWSI"; // Default to DWSI if DWDI was selected
           }
         }
         // If diameter is not a number, no selection change is needed, and all options are enabled.
@@ -883,6 +883,9 @@
 
         // Control visibility of optieDiv ("Centraal of Excentrisch")
         optieDiv.style.display = technique === "SWSI" ? "flex" : "none";
+        if (technique !== "SWSI") {
+          document.getElementById("optie").value = "";
+        }
 
         // Control visibility of ovaaltjeDiv ("Ovaaltje")
         ovaaltjeDiv.style.display = technique === "DWDI" ? "flex" : "none";
@@ -1058,12 +1061,30 @@
       }
       // --- EINDE AANGEPASTE 'SLIMME' UPDATEOFA ---
 
+      function getPrefilledFFD() {
+        const technique = document.getElementById("technique").value;
+        const diameter = getFloatValue("diameter");
+        const source = document.getElementById("source").value;
+
+        if (technique === "DWSI" && !isNaN(diameter)) {
+          let candidate = minFFD;
+          if (source === "X-ray") {
+            candidate = diameter + 150;
+          } else if (source === "Se75" || source === "Ir192") {
+            candidate = diameter + 15;
+          }
+          return Math.max(minFFD, candidate);
+        }
+        return minFFD + 1;
+      }
+
       function updateFFD(shouldAutoFill = false) {
         calculateMinFFD();
         if (shouldAutoFill && !sfdManuallyEdited && minFFD > 0) {
           const optie = document.getElementById("optie").value;
-          if (optie === "") {
-            document.getElementById("sfd").value = minFFD.toFixed(2);
+          const technique = document.getElementById("technique").value;
+          if (technique === "DWSI" || optie === "") {
+            document.getElementById("sfd").value = getPrefilledFFD().toFixed(2);
           }
         }
         checkFFDWarning();
@@ -2279,15 +2300,6 @@
 
             document.getElementById("diameterAntwoord").style.display = "block";
 
-            // Show the omtrek calculator with the input for DWDI
-            if (!isNaN(diameter)) {
-              const omtrek = diameter * Math.PI;
-              const omtrekCalculatorElement = document.getElementById("omtrek-calculator");
-              omtrekCalculatorElement.innerHTML = `De omtrek is: <strong>${formatMmToCm(omtrek)}</strong> , aantal opnames: <input type="number" id="aantal-opnames-input" value="${exposures}" oninput="berekenOpnameLocaties()" style="width: 60px;">`;
-              omtrekCalculatorElement.style.display = "block";
-              berekenOpnameLocaties();
-            }
-
             updateVisualizer();
             return;
           }
@@ -2601,7 +2613,7 @@
         // Zet de FFD-waarde pas *na* de eerste autoCalculate
         const sfdInput = document.getElementById("sfd");
         if (!isNaN(minFFD) && minFFD > 0) {
-          sfdInput.value = minFFD.toFixed(2); // Initialize FFD field with calculated minFFD
+          sfdInput.value = getPrefilledFFD().toFixed(2); // Initialize FFD field with calculated prefilled FFD
         } else {
           sfdInput.value = "0"; // Initialize FFD field with 0 if no minFFD is calculated
         }
@@ -2651,13 +2663,14 @@
         const procedure = document.getElementById("procedure").value;
         const optie = document.getElementById("optie").value;
 
-        // Basic validation & Centraal check
+        // Basic validation, Centraal check, & DWDI exclusion
         if (
           isNaN(diameter) ||
           isNaN(wanddikte) ||
           isNaN(sfd) ||
           sfd <= 0 ||
-          optie === "1"
+          optie === "1" ||
+          technique === "DWDI"
         ) {
           section.style.display = "none";
           return;
