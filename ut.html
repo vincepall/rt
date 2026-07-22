@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UT Lasonderzoek – Foutlocatie Visualisatie</title>
+    <meta name="description" content="Interactieve tool voor het berekenen en visualiseren van foutlocaties bij ultrasoon lasonderzoek (UT).">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(99, 131, 177, 0.15);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #00d4ff;
+            --accent-cyan-dim: rgba(0, 212, 255, 0.15);
+            --accent-red: #ff3b3b;
+            --accent-amber: #f59e0b;
+            --accent-green: #10b981;
+            --radius: 12px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0, 212, 255, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 90%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 28px 20px 18px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(20px);
+        }
+
+        header h1 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--accent-cyan), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 0;
+            min-height: calc(100vh - 90px);
+        }
+
+        /* ── Left Panel ── */
+        .panel {
+            padding: 22px 20px;
+            border-right: 1px solid var(--border-color);
+            background: rgba(17, 24, 39, 0.5);
+            backdrop-filter: blur(12px);
+            overflow-y: auto;
+            max-height: calc(100vh - 90px);
+        }
+
+        .panel::-webkit-scrollbar { width: 5px; }
+        .panel::-webkit-scrollbar-track { background: transparent; }
+        .panel::-webkit-scrollbar-thumb { background: rgba(100,130,180,0.2); border-radius: 8px; }
+
+        .section-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .fields-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .fields-row .field {
+            margin-bottom: 0;
+        }
+
+        .field { margin-bottom: 16px; }
+
+        .field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .field label span.unit {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 9px 12px;
+            min-height: 44px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button { opacity: 0.4; }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px var(--accent-cyan-dim);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        /* Angle preset buttons */
+        .angle-presets {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .angle-btn {
+            flex: 1;
+            padding: 10px 0;
+            min-height: 44px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .angle-btn:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            color: var(--text-primary);
+        }
+
+        .angle-btn.active {
+            background: var(--accent-cyan-dim);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 20px 0;
+        }
+
+        /* Results cards */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .result-card {
+            padding: 12px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .result-card:hover {
+            border-color: rgba(0, 212, 255, 0.25);
+        }
+
+        .result-card.wide {
+            grid-column: 1 / -1;
+        }
+
+        .result-card .label {
+            font-size: 0.66rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .result-card .value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .result-card .value .unit {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 2px;
+        }
+
+        .result-card.highlight {
+            background: rgba(0, 212, 255, 0.06);
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+
+        .result-card.highlight .value {
+            color: var(--accent-cyan);
+        }
+
+        .result-card.warn {
+            background: rgba(245, 158, 11, 0.06);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .result-card.warn .value {
+            color: var(--accent-amber);
+        }
+
+        /* Leg indicator */
+        .leg-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .leg-indicator.leg-1 {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+        }
+
+        .leg-indicator.leg-2 {
+            background: rgba(0, 212, 255, 0.12);
+            color: #22d3ee;
+        }
+
+        .leg-indicator.leg-3 {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fbbf24;
+        }
+
+        .leg-indicator.leg-4plus {
+            background: rgba(255, 59, 59, 0.12);
+            color: #f87171;
+        }
+
+        /* ── Right Panel (Canvas) ── */
+        .canvas-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--bg-primary);
+            min-height: 500px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius);
+            display: block;
+        }
+
+        /* Legend overlay */
+        .legend {
+            position: absolute;
+            bottom: 28px;
+            right: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 12px 16px;
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* ── Collapsible weld details ── */
+        .weld-details {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .weld-details summary {
+            display: none; /* hidden on desktop, shown on mobile */
+        }
+
+        .weld-details .details-content {
+            display: block;
+        }
+
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 900px) {
+            .app {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+            .panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: none;
+                overflow-y: visible;
+            }
+            .canvas-wrap {
+                min-height: 400px;
+            }
+        }
+
+        /* ── Responsive: Phone ── */
+        @media (max-width: 560px) {
+            header {
+                padding: 16px 16px 12px;
+            }
+
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            header p {
+                font-size: 0.72rem;
+            }
+
+            .panel {
+                padding: 16px 14px;
+            }
+
+            .field {
+                margin-bottom: 12px;
+            }
+
+            .field label {
+                font-size: 0.82rem;
+                margin-bottom: 5px;
+            }
+
+            /* Two-column layout for compact fields */
+            .fields-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .fields-row .field {
+                margin-bottom: 0;
+            }
+
+            /* Collapsible weld section */
+            .weld-details summary {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 0;
+                font-size: 0.68rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                color: var(--text-muted);
+                cursor: pointer;
+                list-style: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .weld-details summary::-webkit-details-marker { display: none; }
+
+            .weld-details summary::before {
+                content: '▶';
+                font-size: 0.6rem;
+                transition: transform 0.2s ease;
+            }
+
+            .weld-details[open] summary::before {
+                transform: rotate(90deg);
+            }
+
+            .weld-details summary::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: var(--border-color);
+            }
+
+            .weld-details .section-title-desktop {
+                display: none;
+            }
+
+            .weld-details .details-content {
+                padding-top: 4px;
+            }
+
+            /* Canvas */
+            .canvas-wrap {
+                min-height: 300px;
+                height: 55vw;
+                max-height: 400px;
+                padding: 10px;
+            }
+
+            /* Legend compact */
+            .legend {
+                bottom: 16px;
+                right: 16px;
+                padding: 8px 12px;
+                gap: 4px;
+                font-size: 0.65rem;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .legend-item {
+                gap: 5px;
+            }
+
+            /* Results */
+            .results-grid {
+                gap: 6px;
+            }
+
+            .result-card {
+                padding: 10px;
+            }
+
+            .result-card .value {
+                font-size: 1.05rem;
+            }
+
+            .result-card .label {
+                font-size: 0.62rem;
+            }
+
+            .divider {
+                margin: 14px 0;
+            }
+
+            .section-title {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UT Lasonderzoek — Foutlocatie</h1>
+        <p>Bereken en visualiseer de positie van een fout in de las op basis van ultrasone meetgegevens</p>
+    </header>
+
+    <div class="app">
+        <!-- ── Controls Panel ── -->
+        <div class="panel">
+            <div class="section-title">Meetgegevens</div>
+
+            <div class="fields-row">
+                <div class="field">
+                    <label>Wanddikte <span class="unit">(mm)</span></label>
+                    <input type="number" id="wallThickness" value="20" min="1" max="200" step="0.1" inputmode="decimal">
+                </div>
+
+                <div class="field">
+                    <label>Index <span class="unit">(mm)</span></label>
+                    <input type="number" id="probeIndex" value="10" min="0" max="100" step="0.5" inputmode="decimal">
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Tasterhoek <span class="unit">(°)</span></label>
+                <div class="angle-presets">
+                    <button class="angle-btn active" data-angle="45">45°</button>
+                    <button class="angle-btn" data-angle="60">60°</button>
+                    <button class="angle-btn" data-angle="70">70°</button>
+                </div>
+                <input type="number" id="probeAngle" value="45" min="1" max="89" step="0.5" inputmode="decimal">
+            </div>
+
+            <div class="field">
+                <label>Voorloop <span class="unit">(mm) — voorkant taster tot fout</span></label>
+                <input type="number" id="voorloop" value="55" min="0.1" max="1000" step="0.1" inputmode="decimal">
+            </div>
+
+            <div class="divider"></div>
+
+            <details class="weld-details" open>
+                <summary>Lasgegevens ▾</summary>
+                <div class="section-title section-title-desktop">Lasgegevens</div>
+                <div class="details-content">
+
+                    <div class="field">
+                        <label>Lasvoorbewerking</label>
+                        <select id="weldType">
+                            <option value="V">V-naad</option>
+                            <option value="HV">Halve V-naad (HV)</option>
+                            <option value="X">X-naad</option>
+                            <option value="K">K-naad</option>
+                            <option value="stomp">Stompe naad</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Afstand index tot lashart <span class="unit">(mm)</span></label>
+                        <input type="number" id="weldDistance" value="40" min="0" max="500" step="0.5" inputmode="decimal">
+                    </div>
+
+                    <div class="fields-row">
+                        <div class="field">
+                            <label>Afschuiningshoek <span class="unit">(°)</span></label>
+                            <input type="number" id="bevelAngle" value="30" min="5" max="60" step="1" inputmode="decimal">
+                        </div>
+
+                        <div class="field">
+                            <label>Steg <span class="unit">(mm)</span></label>
+                            <input type="number" id="rootFace" value="2" min="0" max="20" step="0.5" inputmode="decimal">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Wortelspeling <span class="unit">(mm)</span></label>
+                        <input type="number" id="rootGap" value="2" min="0" max="10" step="0.5" inputmode="decimal">
+                    </div>
+
+                </div>
+            </details>
+
+            <div class="divider"></div>
+            <div class="section-title">Resultaten</div>
+
+            <div class="results-grid">
+                <div class="result-card highlight">
+                    <div class="label">Diepte fout</div>
+                    <div class="value" id="resDepth">—<span class="unit">mm</span></div>
+                </div>
+                <div class="result-card highlight">
+                    <div class="label">Geluidsweg</div>
+                    <div class="value" id="resSoundPath">—<span class="unit">mm</span></div>
+                </div>
+                <div class="result-card">
+                    <div class="label">Eff. voorloop (vanaf index)</div>
+                    <div class="value" id="resEffProjection">—<span class="unit">mm</span></div>
+                </div>
+                <div class="result-card">
+                    <div class="label">Gereduceerde diepte</div>
+                    <div class="value" id="resReducedDepth">—<span class="unit">mm</span></div>
+                </div>
+                <div class="result-card">
+                    <div class="label">Halve sprong</div>
+                    <div class="value" id="resHalfSkip">—<span class="unit">mm</span></div>
+                </div>
+                <div class="result-card wide">
+                    <div class="label">Been</div>
+                    <div class="value" id="resLeg">—</div>
+                </div>
+                <div class="result-card wide warn">
+                    <div class="label">Positie t.o.v. lashart</div>
+                    <div class="value" id="resWeldPos">—<span class="unit">mm</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Canvas ── -->
+        <div class="canvas-wrap">
+            <canvas id="utCanvas"></canvas>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff"></div>Geluidsbundel</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ff3b3b;box-shadow:0 0 6px #ff3b3b"></div>Foutlocatie</div>
+                <div class="legend-item"><div class="legend-color" style="background:#c89530"></div>Laszone</div>
+                <div class="legend-item"><div class="legend-color" style="background:rgba(245,158,11,0.25)"></div>WBZ (HAZ)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (() => {
+        'use strict';
+
+        // ── DOM refs ──
+        const canvas   = document.getElementById('utCanvas');
+        const ctx      = canvas.getContext('2d');
+
+        const elWT     = document.getElementById('wallThickness');
+        const elAngle  = document.getElementById('probeAngle');
+        const elVL     = document.getElementById('voorloop');
+        const elIdx    = document.getElementById('probeIndex');
+        const elWType  = document.getElementById('weldType');
+        const elWDist  = document.getElementById('weldDistance');
+        const elBevel  = document.getElementById('bevelAngle');
+        const elRoot   = document.getElementById('rootFace');
+        const elGap    = document.getElementById('rootGap');
+
+        const elResDepth     = document.getElementById('resDepth');
+        const elResSP        = document.getElementById('resSoundPath');
+        const elResEffProj   = document.getElementById('resEffProjection');
+        const elResReduced   = document.getElementById('resReducedDepth');
+        const elResHalfSkip  = document.getElementById('resHalfSkip');
+        const elResLeg       = document.getElementById('resLeg');
+        const elResWeldPos   = document.getElementById('resWeldPos');
+
+        const angleBtns = document.querySelectorAll('.angle-btn');
+
+        // ── State ──
+        let dpr = window.devicePixelRatio || 1;
+        let animTime = 0;
+        let animRAF = null;
+
+        // ── Helpers ──
+        const deg2rad = d => d * Math.PI / 180;
+        const dist = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const fmt = (v, d = 1) => Number(v).toFixed(d);
+
+        // ── Inputs ──
+        function getInputs() {
+            const voorloop   = parseFloat(elVL.value)    || 55;
+            const probeIndex = parseFloat(elIdx.value)   || 0;
+            const alphaDeg   = parseFloat(elAngle.value) || 45;
+            const effProj    = voorloop + probeIndex;
+            const sinA       = Math.sin(deg2rad(alphaDeg));
+            const S          = sinA > 0 ? effProj / sinA : 0;
+
+            return {
+                T:          parseFloat(elWT.value)    || 20,
+                alphaDeg,
+                S,
+                voorloop,
+                probeIndex,
+                effProj,
+                weldType:   elWType.value,
+                weldDist:   parseFloat(elWDist.value) || 40,
+                bevelAngle: parseFloat(elBevel.value) || 30,
+                rootFace:   parseFloat(elRoot.value)  ?? 2,
+                rootGap:    parseFloat(elGap.value)   ?? 2,
+            };
+        }
+
+        // ── Beam path calculation ──
+        function calcBeam(T, S, alphaDeg) {
+            if (T <= 0 || S <= 0 || alphaDeg <= 0 || alphaDeg >= 90) return null;
+
+            const alpha = deg2rad(alphaDeg);
+            const cosA  = Math.cos(alpha);
+            const sinA  = Math.sin(alpha);
+            const tanA  = Math.tan(alpha);
+
+            const projection   = S * sinA;
+            const reducedDepth = S * cosA;
+            const halfSkip     = T * tanA;
+
+            const nHalf    = Math.floor(reducedDepth / T);
+            const remainder = reducedDepth - nHalf * T;
+
+            // Flaw depth from scanning surface
+            const flawDepth = (nHalf % 2 === 0) ? remainder : T - remainder;
+            const legNumber = nHalf + 1;
+
+            // Build path points (in mm, x=0 at probe, y=0 at top surface, y=T at bottom)
+            const path = [{ x: 0, y: 0 }];
+            let goingDown = true;
+            let cx = 0;
+            for (let i = 0; i < nHalf; i++) {
+                cx += halfSkip;
+                path.push({ x: cx, y: goingDown ? T : 0 });
+                goingDown = !goingDown;
+            }
+            // Flaw point
+            const remH = remainder * tanA;
+            cx += remH;
+            const fy = goingDown ? remainder : (T - remainder);
+            path.push({ x: cx, y: fy });
+
+            return {
+                path, projection, reducedDepth, halfSkip,
+                flawDepth, flawX: cx, flawY: fy,
+                legNumber, nHalf, T, alphaDeg
+            };
+        }
+
+        // ── Weld polygon (coordinates relative to weld center, in mm) ──
+        function weldPolygon(type, T, bevelAng, rootFace, rootGap) {
+            const rf = Math.min(rootFace, T * 0.9);
+            const rg = rootGap / 2;
+            const tanB = Math.tan(deg2rad(bevelAng));
+            const depth = T - rf;
+
+            switch (type) {
+                case 'V': {
+                    const hw = depth * tanB + rg;
+                    return [
+                        { x: -hw, y: 0 },
+                        { x: -rg, y: depth },
+                        { x: -rg, y: T },
+                        { x:  rg, y: T },
+                        { x:  rg, y: depth },
+                        { x:  hw, y: 0 },
+                    ];
+                }
+                case 'HV': {
+                    const w = depth * tanB + rg;
+                    return [
+                        { x: -w,  y: 0 },
+                        { x: -rg, y: depth },
+                        { x: -rg, y: T },
+                        { x:  rg, y: T },
+                        { x:  rg, y: depth },
+                        { x:  rg, y: 0 },
+                    ];
+                }
+                case 'X': {
+                    const halfD = T / 2;
+                    const rfH = rf / 2;
+                    const d = halfD - rfH;
+                    const hw = d * tanB + rg;
+                    return [
+                        { x: -hw, y: 0 },
+                        { x: -rg, y: d },
+                        { x: -rg, y: halfD + rfH },
+                        { x: -hw, y: T },
+                        { x:  hw, y: T },
+                        { x:  rg, y: halfD + rfH },
+                        { x:  rg, y: d },
+                        { x:  hw, y: 0 },
+                    ];
+                }
+                case 'K': {
+                    const halfD = T / 2;
+                    const rfH = rf / 2;
+                    const d = halfD - rfH;
+                    const hw = d * tanB + rg;
+                    return [
+                        { x: -hw, y: 0 },
+                        { x: -rg, y: d },
+                        { x: -rg, y: halfD + rfH },
+                        { x: -hw, y: T },
+                        { x:  rg, y: T },
+                        { x:  rg, y: halfD + rfH },
+                        { x:  rg, y: d },
+                        { x:  rg, y: 0 },
+                    ];
+                }
+                case 'stomp':
+                default: {
+                    return [
+                        { x: -rg, y: 0 },
+                        { x: -rg, y: T },
+                        { x:  rg, y: T },
+                        { x:  rg, y: 0 },
+                    ];
+                }
+            }
+        }
+
+        // ── Canvas sizing ──
+        function resizeCanvas() {
+            const wrap = canvas.parentElement;
+            const w = wrap.clientWidth - 40;
+            const h = wrap.clientHeight - 40;
+            canvas.width  = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width  = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        // ── Main draw ──
+        function draw(time) {
+            const inp = getInputs();
+            const result = calcBeam(inp.T, inp.S, inp.alphaDeg);
+
+            const W = canvas.width / dpr;
+            const H = canvas.height / dpr;
+
+            // Clear
+            ctx.clearRect(0, 0, W, H);
+
+            if (!result) {
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '500 14px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Voer geldige waarden in', W / 2, H / 2);
+                return;
+            }
+
+            // ── Compute viewport ──
+            const margin = { top: 100, bottom: 50, left: 80, right: 60 };
+            const probeFrontX = inp.probeIndex; // front edge of probe toward weld
+            const maxX = Math.max(result.flawX, inp.weldDist, probeFrontX) + 30;
+            const minX = -20;
+            const viewW = maxX - minX;
+            const viewH = inp.T;
+
+            const drawW = W - margin.left - margin.right;
+            const drawH = H - margin.top - margin.bottom;
+            const scale = Math.min(drawW / viewW, drawH / viewH);
+
+            // Ensure plate is centered vertically if there's extra space
+            const platePixelH = viewH * scale;
+            const yOffset = margin.top + (drawH - platePixelH) / 2;
+            const xOffset = margin.left;
+
+            const tx = x => xOffset + (x - minX) * scale;
+            const ty = y => yOffset + y * scale;
+            const ts = s => s * scale; // scale a size
+
+            // ── 1. Grid ──
+            ctx.save();
+            ctx.strokeStyle = 'rgba(100, 130, 180, 0.06)';
+            ctx.lineWidth = 1;
+            // Horizontal grid every 10mm or adaptive
+            const gridStep = viewW > 200 ? 50 : viewW > 80 ? 10 : 5;
+            for (let g = 0; g <= maxX; g += gridStep) {
+                const gx = tx(g);
+                if (gx > margin.left - 5 && gx < W - margin.right + 5) {
+                    ctx.beginPath();
+                    ctx.moveTo(gx, ty(-5));
+                    ctx.lineTo(gx, ty(inp.T + 5));
+                    ctx.stroke();
+                }
+            }
+            ctx.restore();
+
+            // ── 2. Plate ──
+            const plateLeft  = tx(minX);
+            const plateRight = tx(maxX);
+            const plateTop   = ty(0);
+            const plateBot   = ty(inp.T);
+
+            // Plate fill gradient
+            const plateGrad = ctx.createLinearGradient(0, plateTop, 0, plateBot);
+            plateGrad.addColorStop(0, '#3d4a5e');
+            plateGrad.addColorStop(0.5, '#2c3646');
+            plateGrad.addColorStop(1, '#3a4558');
+            ctx.fillStyle = plateGrad;
+            ctx.fillRect(plateLeft, plateTop, plateRight - plateLeft, plateBot - plateTop);
+
+            // Plate outline
+            ctx.strokeStyle = '#5a6a82';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(plateLeft, plateTop, plateRight - plateLeft, plateBot - plateTop);
+
+            // Surface labels
+            ctx.fillStyle = '#7a8a9e';
+            ctx.font = '500 11px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Bovenzijde (scanzijde)', plateLeft + 6, plateTop - 8);
+            ctx.fillText('Onderzijde', plateLeft + 6, plateBot + 16);
+
+            // ── 3. HAZ zone ──
+            const weldCx = tx(inp.weldDist);
+            const wPoly = weldPolygon(inp.weldType, inp.T, inp.bevelAngle, inp.rootFace, inp.rootGap);
+
+            // Find max half-width of weld
+            let maxHW = 0;
+            wPoly.forEach(p => { if (Math.abs(p.x) > maxHW) maxHW = Math.abs(p.x); });
+            const hazWidth = Math.max(maxHW + 3, 5); // HAZ extends ~3mm beyond weld
+
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.07)';
+            ctx.fillRect(weldCx - ts(hazWidth), plateTop, ts(hazWidth * 2), plateBot - plateTop);
+
+            // ── 4. Weld zone ──
+            ctx.beginPath();
+            wPoly.forEach((p, i) => {
+                const px = weldCx + ts(p.x);
+                const py = ty(p.y);
+                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            });
+            ctx.closePath();
+
+            const weldGrad = ctx.createLinearGradient(0, plateTop, 0, plateBot);
+            weldGrad.addColorStop(0, '#c89530');
+            weldGrad.addColorStop(0.5, '#a07828');
+            weldGrad.addColorStop(1, '#c89530');
+            ctx.fillStyle = weldGrad;
+            ctx.fill();
+            ctx.strokeStyle = '#daa840';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Weld center line (dashed)
+            ctx.save();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = 'rgba(218, 168, 64, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(weldCx, plateTop - 15);
+            ctx.lineTo(weldCx, plateBot + 15);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            // Weld center label
+            ctx.fillStyle = '#daa840';
+            ctx.font = '600 9px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('LASHART', weldCx, plateTop - 20);
+
+            // ── 5. Beam path ──
+            ctx.save();
+            // Glow
+            ctx.shadowColor = '#00d4ff';
+            ctx.shadowBlur = 12;
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            result.path.forEach((p, i) => {
+                const px = tx(p.x);
+                const py = ty(p.y);
+                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            });
+            ctx.stroke();
+
+            // Sharper inner line
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(150, 235, 255, 0.7)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
+
+            // ── 6. Reflection points ──
+            result.path.forEach((p, i) => {
+                if (i === 0 || i === result.path.length - 1) return;
+                const px = tx(p.x);
+                const py = ty(p.y);
+                ctx.beginPath();
+                ctx.arc(px, py, 4, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 212, 255, 0.3)';
+                ctx.fill();
+                ctx.strokeStyle = '#00d4ff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // ── 7. Flaw marker ──
+            const flawPx = tx(result.flawX);
+            const flawPy = ty(result.flawY);
+            const pulse = 0.5 + 0.5 * Math.sin(time * 0.004);
+
+            // Outer glow
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(flawPx, flawPy, 10 + pulse * 6, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 59, 59, ${0.08 + pulse * 0.08})`;
+            ctx.fill();
+
+            // Middle ring
+            ctx.beginPath();
+            ctx.arc(flawPx, flawPy, 7 + pulse * 2, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 59, 59, ${0.15 + pulse * 0.1})`;
+            ctx.fill();
+
+            // Core
+            ctx.shadowColor = '#ff3b3b';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(flawPx, flawPy, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff3b3b';
+            ctx.fill();
+
+            // Cross marker
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.moveTo(flawPx - 3.5, flawPy - 3.5);
+            ctx.lineTo(flawPx + 3.5, flawPy + 3.5);
+            ctx.moveTo(flawPx + 3.5, flawPy - 3.5);
+            ctx.lineTo(flawPx - 3.5, flawPy + 3.5);
+            ctx.stroke();
+            ctx.restore();
+
+            // ── 8. Animated pulse ──
+            // Calculate total path length
+            let totalLen = 0;
+            const segLens = [];
+            for (let i = 0; i < result.path.length - 1; i++) {
+                const sl = dist(result.path[i], result.path[i + 1]);
+                segLens.push(sl);
+                totalLen += sl;
+            }
+
+            // Pulse position (bounces back and forth)
+            const cycleT = (time * 0.0008) % 2;
+            const t01 = cycleT <= 1 ? cycleT : 2 - cycleT;
+            const targetLen = t01 * totalLen;
+
+            let acc = 0;
+            for (let i = 0; i < segLens.length; i++) {
+                if (acc + segLens[i] >= targetLen) {
+                    const frac = (targetLen - acc) / segLens[i];
+                    const ppx = tx(lerp(result.path[i].x, result.path[i + 1].x, frac));
+                    const ppy = ty(lerp(result.path[i].y, result.path[i + 1].y, frac));
+
+                    ctx.save();
+                    ctx.shadowColor = '#00d4ff';
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath();
+                    ctx.arc(ppx, ppy, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#aaeeff';
+                    ctx.fill();
+                    ctx.restore();
+                    break;
+                }
+                acc += segLens[i];
+            }
+
+            // ── 9. Probe ──
+            const probeX = tx(0);
+            const probeY = ty(0);
+            const probeTip = 6;
+            const probeW = 28;
+            const probeH = 16;
+            const pAngle = deg2rad(inp.alphaDeg);
+
+            ctx.save();
+            ctx.translate(probeX, probeY);
+
+            // Probe body (wedge shape)
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-probeW * 0.3, 0);
+            ctx.lineTo(-probeW * 0.4, -probeH);
+            ctx.lineTo(probeW * 0.2, -probeH);
+            ctx.lineTo(probeW * 0.15, -probeH * 0.3);
+            ctx.closePath();
+
+            const probeGrad = ctx.createLinearGradient(0, 0, 0, -probeH);
+            probeGrad.addColorStop(0, '#64748b');
+            probeGrad.addColorStop(1, '#94a3b8');
+            ctx.fillStyle = probeGrad;
+            ctx.fill();
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Cable hint
+            ctx.beginPath();
+            ctx.moveTo(-probeW * 0.1, -probeH);
+            ctx.quadraticCurveTo(-probeW * 0.1, -probeH - 12, -probeW * 0.3, -probeH - 15);
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            ctx.restore();
+
+            // Probe label
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '600 9px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('TASTER', probeX - 4, probeY - probeH - 20);
+            ctx.font = '500 9px Inter, sans-serif';
+            ctx.fillText(inp.alphaDeg + '°', probeX - 4, probeY - probeH - 10);
+
+            // ── 9b. Probe front edge & index annotation ──
+            const probeFrontPx = tx(probeFrontX);
+            // Front edge marker (vertical tick on surface)
+            ctx.save();
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(probeFrontPx, plateTop - 5);
+            ctx.lineTo(probeFrontPx, plateTop + 6);
+            ctx.stroke();
+
+            // Index dimension (small bracket from front edge to entry point)
+            const idxDimY = plateTop + 14;
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+            ctx.fillStyle = '#fbbf24';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(probeFrontPx, plateTop + 4);
+            ctx.lineTo(probeFrontPx, idxDimY + 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(probeX, plateTop + 4);
+            ctx.lineTo(probeX, idxDimY + 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(probeFrontPx, idxDimY);
+            ctx.lineTo(probeX, idxDimY);
+            ctx.stroke();
+            ctx.font = '500 8px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('index ' + fmt(inp.probeIndex) + '', (probeFrontPx + probeX) / 2, idxDimY + 11);
+            ctx.restore();
+
+            // ── 10. Dimension annotations ──
+
+            // Depth dimension (right side of flaw)
+            const dimX = flawPx + 25;
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 59, 59, 0.5)';
+            ctx.fillStyle = '#f87171';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+
+            // Horizontal leader from flaw
+            ctx.beginPath();
+            ctx.moveTo(flawPx + 8, flawPy);
+            ctx.lineTo(dimX + 5, flawPy);
+            ctx.stroke();
+
+            // Horizontal leader from surface
+            ctx.beginPath();
+            ctx.moveTo(flawPx + 8, plateTop);
+            ctx.lineTo(dimX + 5, plateTop);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+
+            // Vertical dimension line
+            ctx.beginPath();
+            ctx.moveTo(dimX, plateTop);
+            ctx.lineTo(dimX, flawPy);
+            ctx.stroke();
+
+            // Arrowheads
+            const arrowH = 4;
+            ctx.beginPath();
+            ctx.moveTo(dimX - arrowH, plateTop + arrowH * 2);
+            ctx.lineTo(dimX, plateTop);
+            ctx.lineTo(dimX + arrowH, plateTop + arrowH * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(dimX - arrowH, flawPy - arrowH * 2);
+            ctx.lineTo(dimX, flawPy);
+            ctx.lineTo(dimX + arrowH, flawPy - arrowH * 2);
+            ctx.stroke();
+
+            // Depth text
+            ctx.font = '600 11px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(fmt(result.flawDepth) + ' mm', dimX + 8, (plateTop + flawPy) / 2 + 4);
+            ctx.restore();
+
+            // Voorloop dimension (along top surface — from probe FRONT to flaw)
+            const dimY = plateTop - 40;
+            ctx.save();
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.5)';
+            ctx.fillStyle = '#fbbf24';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+
+            ctx.beginPath();
+            ctx.moveTo(probeFrontPx, plateTop - 5);
+            ctx.lineTo(probeFrontPx, dimY - 3);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(flawPx, plateTop - 5);
+            ctx.lineTo(flawPx, dimY - 3);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+
+            // Horizontal dimension line
+            ctx.beginPath();
+            ctx.moveTo(probeFrontPx, dimY);
+            ctx.lineTo(flawPx, dimY);
+            ctx.stroke();
+
+            // Arrowheads
+            ctx.beginPath();
+            ctx.moveTo(probeFrontPx + arrowH * 2, dimY - arrowH);
+            ctx.lineTo(probeFrontPx, dimY);
+            ctx.lineTo(probeFrontPx + arrowH * 2, dimY + arrowH);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(flawPx - arrowH * 2, dimY - arrowH);
+            ctx.lineTo(flawPx, dimY);
+            ctx.lineTo(flawPx - arrowH * 2, dimY + arrowH);
+            ctx.stroke();
+
+            ctx.font = '600 11px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Voorloop: ' + fmt(inp.voorloop) + ' mm', (probeFrontPx + flawPx) / 2, dimY - 7);
+
+            // Also show effective projection (from index to flaw) as a subtle secondary line
+            const dimY2 = dimY - 20;
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.35)';
+            ctx.fillStyle = 'rgba(34, 211, 238, 0.7)';
+            ctx.setLineDash([2, 4]);
+            ctx.beginPath();
+            ctx.moveTo(probeX, dimY - 5);
+            ctx.lineTo(probeX, dimY2 - 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(flawPx, dimY - 5);
+            ctx.lineTo(flawPx, dimY2 - 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.moveTo(probeX, dimY2);
+            ctx.lineTo(flawPx, dimY2);
+            ctx.stroke();
+            ctx.font = '500 9px Inter, sans-serif';
+            ctx.fillText('eff. voorloop: ' + fmt(inp.effProj) + ' mm', (probeX + flawPx) / 2, dimY2 - 5);
+
+            ctx.restore();
+
+            // ── 11. Scale ruler ──
+            const rulerY = plateBot + 28;
+            const rulerMM = gridStep; // mm per segment
+            const rulerPx = ts(rulerMM);
+            const rulerX = plateLeft + 10;
+
+            ctx.save();
+            ctx.strokeStyle = '#5a6a82';
+            ctx.fillStyle = '#7a8a9e';
+            ctx.lineWidth = 1;
+            ctx.font = '400 9px Inter, sans-serif';
+            ctx.textAlign = 'center';
+
+            // Draw ruler
+            ctx.beginPath();
+            ctx.moveTo(rulerX, rulerY);
+            ctx.lineTo(rulerX + rulerPx, rulerY);
+            ctx.stroke();
+
+            // Ticks
+            ctx.beginPath();
+            ctx.moveTo(rulerX, rulerY - 4);
+            ctx.lineTo(rulerX, rulerY + 4);
+            ctx.moveTo(rulerX + rulerPx, rulerY - 4);
+            ctx.lineTo(rulerX + rulerPx, rulerY + 4);
+            ctx.stroke();
+
+            ctx.fillText(rulerMM + ' mm', rulerX + rulerPx / 2, rulerY + 14);
+            ctx.restore();
+
+            // ── 12. Angle arc ──
+            const arcR = Math.min(30, ts(inp.T * 0.4));
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.3)';
+            ctx.lineWidth = 1;
+            const startAngle = Math.PI / 2; // straight down
+            const endAngle = Math.PI / 2 + deg2rad(inp.alphaDeg);
+            ctx.beginPath();
+            // Draw arc from the "normal" direction to beam direction
+            // Normal is straight down from probe. Beam goes at angle alpha from normal.
+            // In canvas coords: normal is down = PI/2 from right. beam goes at alpha from normal = PI/2 - alpha
+            ctx.arc(probeX, probeY, arcR, Math.PI * 0.5 - deg2rad(inp.alphaDeg), Math.PI * 0.5);
+            ctx.stroke();
+
+            // Angle label
+            const labelAngle = Math.PI * 0.5 - deg2rad(inp.alphaDeg) / 2;
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.6)';
+            ctx.font = '500 9px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(inp.alphaDeg + '°', probeX + Math.cos(labelAngle) * (arcR + 12), probeY + Math.sin(labelAngle) * (arcR + 12));
+
+            // Draw normal line (dashed, straight down)
+            ctx.setLineDash([3, 3]);
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.15)';
+            ctx.beginPath();
+            ctx.moveTo(probeX, probeY);
+            ctx.lineTo(probeX, probeY + arcR + 5);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            // ── Update results ──
+            updateResults(result, inp);
+        }
+
+        function updateResults(result, inp) {
+            elResDepth.innerHTML    = fmt(result.flawDepth) + '<span class="unit"> mm</span>';
+            elResSP.innerHTML       = fmt(inp.S) + '<span class="unit"> mm</span>';
+            elResEffProj.innerHTML  = fmt(inp.effProj) + '<span class="unit"> mm</span>';
+            elResReduced.innerHTML  = fmt(result.reducedDepth) + '<span class="unit"> mm</span>';
+            elResHalfSkip.innerHTML = fmt(result.halfSkip) + '<span class="unit"> mm</span>';
+
+            // Leg
+            const legN = result.legNumber;
+            let legClass = 'leg-1';
+            if (legN === 2) legClass = 'leg-2';
+            else if (legN === 3) legClass = 'leg-3';
+            else if (legN >= 4) legClass = 'leg-4plus';
+
+            const beamDir = (result.nHalf % 2 === 0) ? '↘ dalend' : '↗ stijgend';
+            elResLeg.innerHTML = `<span class="leg-indicator ${legClass}">${legN}e been</span> <span style="font-size:0.72rem;color:var(--text-muted);margin-left:4px">${beamDir}</span>`;
+
+            // Position relative to weld center
+            const offsetFromWeld = result.flawX - inp.weldDist;
+            const side = offsetFromWeld < -0.5 ? ' (vóór las)' : offsetFromWeld > 0.5 ? ' (achter las)' : ' (in de las)';
+            elResWeldPos.innerHTML = (offsetFromWeld >= 0 ? '+' : '') + fmt(offsetFromWeld) + '<span class="unit"> mm' + side + '</span>';
+        }
+
+        // ── Animation loop ──
+        function animate(time) {
+            draw(time);
+            animRAF = requestAnimationFrame(animate);
+        }
+
+        // ── Events ──
+        function onInput() {
+            // Results update happens inside draw(), which is called by animate()
+        }
+
+        [elWT, elAngle, elVL, elIdx, elWType, elWDist, elBevel, elRoot, elGap].forEach(el => {
+            el.addEventListener('input', onInput);
+            el.addEventListener('change', onInput);
+        });
+
+        // Angle preset buttons
+        angleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                angleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                elAngle.value = btn.dataset.angle;
+                onInput();
+            });
+        });
+
+        // Sync angle input with buttons
+        elAngle.addEventListener('input', () => {
+            const v = parseFloat(elAngle.value);
+            angleBtns.forEach(b => {
+                b.classList.toggle('active', parseFloat(b.dataset.angle) === v);
+            });
+        });
+
+        // Resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                dpr = window.devicePixelRatio || 1;
+                resizeCanvas();
+            }, 100);
+        });
+
+        // ── Init ──
+        resizeCanvas();
+        animate(0);
+    })();
+    </script>
+</body>
+</html>
