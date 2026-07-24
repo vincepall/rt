@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urenregistratie & Overwerk Dashboard</title>
+    <meta name="description" content="Eenvoudig dashboard voor urenregistratie, verschoven uren en overwerk berekening zonder server. CSV import en export via Excel.">
+    
+    <!-- External CDNs for Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+
+    <!-- Embedded CSS Stylesheet -->
+    <style>
+/* Industrial Sharp Minimalist CSS - 24h Hours Registration */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
+
+:root {
+    --primary: #000000;
+    --primary-hover: #1f2937;
+    --bg-main: #e2e8f0; /* Solid grey background */
+    --card-bg: #ffffff;
+    --text-main: #000000;
+    --text-muted: #4b5563;
+    --border-color: #000000; /* Black box borders */
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border-radius: 0px !important; /* Force sharp square corners everywhere */
+}
+
+.hidden {
+    display: none !important;
+}
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.flex-grow { flex-grow: 1; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.w-full { width: 100%; }
+.grid { display: grid; }
+.grid-cols-6 { display: grid; grid-template-columns: repeat(6, 1fr); }
+.grid-cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+
+.btn-picker-num {
+    background: #ffffff;
+    border: 1px solid #000000;
+    padding: 6px 0;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+}
+.btn-picker-num:hover {
+    background: #e2e8f0;
+}
+.btn-picker-num.active {
+    background: #000000;
+    color: #ffffff;
+}
+
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.whitespace-nowrap { white-space: nowrap; }
+
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-4 { margin-top: 16px; }
+.mb-0 { margin-bottom: 0px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+
+.p-2 { padding: 8px; }
+.p-3 { padding: 12px; }
+.py-1 { padding-top: 4px; padding-bottom: 4px; }
+.py-2 { padding-top: 8px; padding-bottom: 8px; }
+.py-8 { padding-top: 32px; padding-bottom: 32px; }
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .font-heading {
+    font-family: 'Outfit', sans-serif;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navbar & Header */
+.navbar {
+    background: #000000;
+    color: #ffffff;
+    padding: 16px 24px;
+    border: 2px solid #000000;
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    border: 2px solid #000000;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #000000;
+    color: #ffffff;
+    border-color: #000000;
+}
+.btn-primary:hover {
+    background-color: #374151;
+    border-color: #374151;
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    border-color: #000000;
+    color: #000000;
+}
+.btn-secondary:hover {
+    background-color: #f3f4f6;
+}
+
+.btn-dark {
+    background-color: #1f2937;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+.btn-dark:hover {
+    background-color: #374151;
+}
+
+.btn-danger {
+    background-color: #ffffff;
+    border-color: #000000;
+    color: #000000;
+}
+.btn-danger:hover {
+    background-color: #fee2e2;
+}
+
+.btn-preset {
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    color: #000000;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-preset:hover {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.btn-icon {
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #000000;
+    background: white;
+}
+
+/* Cards & Layout */
+.card {
+    background: #ffffff;
+    border: 2px solid #000000;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 2px solid #000000;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card::before {
+    display: none !important;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #000000;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Form Styles */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #000000;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #000000;
+    font-size: 14px;
+    color: #000000;
+    background-color: #ffffff;
+    outline: none;
+}
+
+.form-input:focus, .form-select:focus {
+    background-color: #f8fafc;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.preview-box {
+    background-color: #f3f4f6;
+    border: 2px solid #000000;
+    padding: 12px 16px;
+    margin-top: 10px;
+    margin-bottom: 14px;
+    color: #000000;
+}
+
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    margin-bottom: 20px;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+    border: 2px solid #000000;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+    background: #ffffff;
+}
+
+.table th {
+    background-color: #f3f4f6;
+    color: #000000;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 14px;
+    border-bottom: 2px solid #000000;
+}
+
+.table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #000000;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Neutral Clean Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+    border: 1px solid #000000;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.badge-holiday {
+    background-color: #f3f4f6;
+    color: #000000;
+}
+
+.badge-weekend {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Modals */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #ffffff;
+    border: 3px solid #000000;
+    width: 100%;
+    max-width: 560px;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 16px 20px;
+    background-color: #f3f4f6;
+    border-bottom: 2px solid #000000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 14px 20px;
+    background-color: #f3f4f6;
+    border-top: 2px solid #000000;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Print Styles */
+#printableArea {
+    display: none;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    #printableArea, #printableArea * {
+        visibility: visible;
+    }
+
+    #printableArea {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+        color: #000000;
+        background: #ffffff;
+    }
+
+    .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 16px;
+        margin-bottom: 20px;
+    }
+
+    .print-summary-box {
+        border: 2px solid #000000;
+        padding: 16px;
+        margin-bottom: 24px;
+        background: #ffffff;
+    }
+
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 10pt;
+    }
+
+    .print-table th, .print-table td {
+        border: 1px solid #000000;
+        padding: 6px 8px;
+        text-align: left;
+    }
+
+    .print-table th {
+        background-color: #f3f4f6;
+        font-weight: bold;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Navigation Bar -->
+        <header class="navbar">
+            <div class="logo-group">
+                <div class="logo-icon">
+                    <i data-lucide="clock" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold leading-tight">Uren & Overwerk Dashboard</h1>
+                    <p class="text-xs">Overzicht van gewerkte uren, toeslagen en overwerk</p>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <button id="btnShowRules" class="btn btn-dark text-xs" title="Bekijk de toeslagregels">
+                    <i data-lucide="info" class="w-4 h-4"></i>
+                    Toeslagregels
+                </button>
+
+                <button id="btnClearAll" class="btn btn-dark text-xs" title="Wis alle ingevoerde uren uit het dashboard">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    Alles Wissen
+                </button>
+
+                <label for="csvFileInput" class="btn btn-secondary text-xs cursor-pointer">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    CSV Uploaden
+                </label>
+                <input type="file" id="csvFileInput" accept=".csv, .txt" class="hidden" style="display: none;">
+
+                <button id="btnExportCsv" class="btn btn-secondary text-xs">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    CSV Opslaan
+                </button>
+
+                <button id="btnPrintReport" class="btn btn-primary text-xs">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    Afdrukken
+                </button>
+            </div>
+        </header>
+
+        <!-- Period Selection Bar for Pay Slip Comparison -->
+        <div class="card p-3 mb-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                    <label class="font-bold text-sm" for="filterMonth">Periode / Loonstrook Maand:</label>
+                    <select id="filterMonth" class="form-select text-sm py-1 font-bold" style="width: auto;">
+                        <option value="ALL">Alle geregistreerde maanden</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold">Van:</span>
+                    <input type="date" id="filterStartDate" class="form-input text-xs py-1" style="width: 130px;">
+                    <span class="text-xs font-bold">t/m:</span>
+                    <input type="date" id="filterEndDate" class="form-input text-xs py-1" style="width: 130px;">
+                </div>
+
+                <div class="flex gap-1 flex-wrap">
+                    <button type="button" id="btnCurrentMonth" class="btn-preset">Deze Maand</button>
+                    <button type="button" id="btnLastMonth" class="btn-preset">Vorige Maand</button>
+                    <button type="button" id="btnResetFilters" class="btn-preset">Reset Filter</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview Cards (Per Selected Period) -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Totaal Gewerkt</span>
+                <span class="stat-value" id="statNetto">0,00 u</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Normaal (0%)</span>
+                <span class="stat-value" id="statNormaal">0,00 u</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Verschoven (30%)</span>
+                <span class="stat-value" id="statVerschoven">0,00 u</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Overwerk (40%)</span>
+                <span class="stat-value" id="statOverwerk40">0,00 u</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Overwerk (50%)</span>
+                <span class="stat-value" id="statOverwerk50">0,00 u</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Over/Feest (100%)</span>
+                <span class="stat-value" id="statOverwerk100">0,00 u</span>
+            </div>
+        </section>
+
+        <!-- Hours Entry Form -->
+        <div class="card" id="entryFormContainer">
+            <form id="entryForm">
+                <!-- Header with Title on Left, Date Picker on Right -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3" style="border-bottom: 2px solid #000000;">
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                        Uren Invoeren / Wijzigen
+                    </h2>
+
+                    <div class="flex items-center gap-2">
+                        <label class="form-label mb-0 font-bold" for="inputDatum">Datum:</label>
+                        <input type="date" id="inputDatum" tabindex="1" class="form-input text-xs font-bold py-1" style="width: 140px;" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="inputBegintijd">Begintijd (24u)</label>
+                        <div class="flex items-center gap-1">
+                            <input type="text" id="inputBegintijd" tabindex="2" class="form-input font-mono" value="08:00" placeholder="08:00" maxlength="5" required>
+                            <button type="button" tabindex="-1" onclick="open24Picker('inputBegintijd')" class="btn btn-secondary text-xs py-2 px-2" title="Kies 24-uurs tijd met muis">🕒 24u</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inputEindtijd">Eindtijd (24u)</label>
+                        <div class="flex items-center gap-1">
+                            <input type="text" id="inputEindtijd" tabindex="3" class="form-input font-mono" value="16:30" placeholder="16:30" maxlength="5" required>
+                            <button type="button" tabindex="-1" onclick="open24Picker('inputEindtijd')" class="btn btn-secondary text-xs py-2 px-2" title="Kies 24-uurs tijd met muis">🕒 24u</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inputPauzetijd">Pauze Tijdstip (24u)</label>
+                        <div class="flex items-center gap-1">
+                            <input type="text" id="inputPauzetijd" tabindex="4" class="form-input font-mono" value="12:00" placeholder="12:00" maxlength="5">
+                            <button type="button" tabindex="-1" onclick="open24Picker('inputPauzetijd')" class="btn btn-secondary text-xs py-2 px-2" title="Kies pauzetijdstip met muis">🕒 24u</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inputPauze">Pauze Duur</label>
+                        <select id="inputPauze" tabindex="5" class="form-select">
+                            <option value="0">Geen pauze (0 min)</option>
+                            <option value="15">15 minuten</option>
+                            <option value="30" selected>30 minuten</option>
+                            <option value="45">45 minuten</option>
+                            <option value="60">60 minuten</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Quick Mouse Presets -->
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold">Snelkeuze muis:</span>
+                    <div class="flex gap-1 flex-wrap">
+                        <button type="button" tabindex="-1" onclick="setPresetTime('08:00','16:30','12:00')" class="btn-preset">08.00 - 16.30 (Pauze 12:00)</button>
+                        <button type="button" tabindex="-1" onclick="setPresetTime('15:00','23:30','19:00')" class="btn-preset">15.00 - 23.30 (Pauze 19:00)</button>
+                        <button type="button" tabindex="-1" onclick="setPresetTime('18:00','02:30','22:00')" class="btn-preset">18.00 - 02.30 (Pauze 22:00)</button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-grow">
+                        <label class="form-label" for="inputOmschrijving">Omschrijving / Opmerking (Optioneel)</label>
+                        <input type="text" id="inputOmschrijving" tabindex="6" class="form-input" placeholder="">
+                    </div>
+                    <div class="form-group flex flex-col justify-end">
+                        <label class="flex items-center gap-2 text-sm font-semibold cursor-pointer py-2 border p-2 bg-white">
+                            <input type="checkbox" id="inputDirecteWerkzaamheden" tabindex="7" checked class="w-4 h-4">
+                            Directe werkzaamheden
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Live Calculation Preview -->
+                <div class="preview-box" id="formPreviewBox">
+                    <!-- Populated dynamically by JS -->
+                </div>
+
+                <div class="flex gap-2 justify-end mt-4">
+                    <button type="button" id="btnCancelEdit" tabindex="-1" class="btn btn-secondary text-xs hidden">
+                        Annuleren
+                    </button>
+                    <button type="submit" id="btnSubmitForm" tabindex="8" class="btn btn-primary text-xs">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        Invoer Opslaan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Detailed Registrations Table -->
+        <div class="card">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                    <i data-lucide="list" class="w-5 h-5"></i>
+                    Geregistreerde Werktijden
+                </h2>
+
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="searchQuery" class="form-input text-xs py-1" placeholder="Zoek op datum/omschrijving..." style="width: 200px;">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-semibold">Excel Scheidingsteken:</label>
+                        <select id="exportDelimiterSelect" class="form-select text-xs py-1" style="width: auto;">
+                            <option value=";" selected>Puntkomma ( ; ) NL Excel</option>
+                            <option value=",">Komma ( , ) Intl</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Werktijd</th>
+                            <th>Pauze Tijdstip & Duur</th>
+                            <th>Netto</th>
+                            <th>Normaal</th>
+                            <th>Verschoven (30%)</th>
+                            <th>Overwerk (40%)</th>
+                            <th>Overwerk (50%)</th>
+                            <th>Overwerk (100%)</th>
+                            <th>Omschrijving</th>
+                            <th class="text-right">Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entriesTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bar Chart (Timeline) Placed BELOW the Registrations Table -->
+        <div class="card">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                Grafisch Urenverloop per Dag
+            </h2>
+            <div style="position: relative; height: 240px;">
+                <canvas id="chartTimeline"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom 24-Hour Time Picker Modal (Zero AM/PM) -->
+    <div id="timePickerModal" class="modal-backdrop hidden">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i data-lucide="clock" class="w-5 h-5"></i>
+                    24-Uurs Tijd Kiezen
+                </h3>
+                <button onclick="close24Picker()" class="btn-icon btn-secondary">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label mb-1">Geselecteerde Tijd (24u):</label>
+                    <div id="pickerDisplay" class="text-2xl font-mono font-bold text-center border p-2 bg-slate-100">08:00</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label mb-1 text-xs uppercase">1. Kies Uur (00 t/m 23):</label>
+                    <div class="grid-cols-6 gap-1" id="pickerHoursGrid"></div>
+                </div>
+
+                <div>
+                    <label class="form-label mb-1 text-xs uppercase">2. Kies Minuten:</label>
+                    <div class="grid-cols-4 gap-1" id="pickerMinutesGrid"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="close24Picker()" class="btn btn-secondary text-xs">Annuleren</button>
+                <button onclick="confirm24Picker()" class="btn btn-primary text-xs">Tijd Toepassen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print / Report Modal -->
+    <div id="printModal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i data-lucide="printer" class="w-5 h-5"></i>
+                    Urenoverzicht Afdrukken
+                </h3>
+                <button id="btnClosePrintModal" class="btn-icon btn-secondary">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-sm mb-4">
+                    Kies de gewenste maand of periode om een overzichtelijk afdrukformaat van je gewerkte uren te maken.
+                </p>
+
+                <div class="form-group">
+                    <label class="form-label" for="printPeriodSelect">Selecteer Periode / Maand</label>
+                    <select id="printPeriodSelect" class="form-select">
+                        <option value="ALL">Alle geregistreerde uren</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="closePrintModal()" class="btn btn-secondary text-xs">Annuleren</button>
+                <button id="btnConfirmPrint" class="btn btn-primary text-xs">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    Afdrukken
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toeslagregels Modal -->
+    <div id="rulesModal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    Overwerk & Toeslagregels (regels.txt)
+                </h3>
+                <button id="btnCloseRulesModal" class="btn-icon btn-secondary">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="modal-body text-sm space-y-3">
+                <div class="border p-3 mb-3 bg-slate-100">
+                    <strong>Overwerk regels:</strong>
+                    <ul class="list-disc ml-5 mt-1 space-y-1 text-xs">
+                        <li>Boven het aantal uren dat op het dagrooster staat (standaard 8 uur).</li>
+                        <li>Arbeid verricht op Nederlandse feestdagen of op zaterdag en zondag.</li>
+                    </ul>
+                </div>
+
+                <table class="w-full text-xs border">
+                    <thead>
+                        <tr class="bg-slate-100 font-bold text-left">
+                            <th class="p-2 border-b">Moment van werken</th>
+                            <th class="p-2 border-b">Toeslag %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr><td class="p-2">Maandag t/m Vrijdag 1e en 2e overuur (>8u t/m 10u)</td><td class="p-2 font-bold">40%</td></tr>
+                        <tr><td class="p-2">Maandag t/m Vrijdag vanaf 3e overuur (>10u)</td><td class="p-2 font-bold">50%</td></tr>
+                        <tr><td class="p-2">Zaterdag (alle uren)</td><td class="p-2 font-bold">50%</td></tr>
+                        <tr><td class="p-2">Zondag (alle uren)</td><td class="p-2 font-bold">100%</td></tr>
+                        <tr><td class="p-2">Feestdag (alle uren)</td><td class="p-2 font-bold">100%</td></tr>
+                        <tr><td class="p-2">Verschoven uren (voor 08:00 of na 16:30, directe werkzaamheden)</td><td class="p-2 font-bold">30%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnCloseRulesModalBtn" onclick="document.getElementById('rulesModal').classList.add('hidden')" class="btn btn-primary text-xs">Sluiten</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container for dynamic Print view -->
+    <div id="printableArea"></div>
+
+    <!-- Embedded Application JavaScript Logic -->
+    <script>
+/**
+ * Urenregistratie & Overwerk Dashboard
+ * Calculations based on regels.txt rules:
+ * - Regular workday threshold: 8.0 hours
+ * - Shifted hours (Verschoven uren): Worked before 08:00 or after 16:30 on regular workdays (30% surcharge for direct work)
+ * - Overtime (Overwerk):
+ *   - Mon-Fri 1st & 2nd overtime hour (>8h to 10h): 40% surcharge
+ *   - Mon-Fri 3rd overtime hour onwards (>10h): 50% surcharge
+ *   - Saturday: 50% surcharge (all hours, 00:00 - 24:00)
+ *   - Sunday & Dutch Holidays (Feestdagen): 100% surcharge (all hours, 00:00 - 24:00)
+ */
+
+const STORAGE_KEY = 'uren_registratie_clean_v4';
+
+// Global State
+const state = {
+    entries: [],
+    filterMonth: 'ALL',
+    filterStartDate: '',
+    filterEndDate: '',
+    searchQuery: '',
+    weeklyChartInstance: null,
+    editingId: null,
+    exportDelimiter: ';' // Default semicolon for Dutch Excel
+};
+
+// Custom 24-Hour Mouse Time Picker State
+let pickerTargetInputId = null;
+let pickerSelectedHour = '08';
+let pickerSelectedMinute = '00';
+
+function open24Picker(targetId) {
+    pickerTargetInputId = targetId;
+    const currentVal = document.getElementById(targetId).value || '08:00';
+    const formatted = formatTime24(currentVal);
+    const parts = formatted.split(':');
+    pickerSelectedHour = parts[0];
+    pickerSelectedMinute = parts[1];
+
+    render24PickerGrids();
+    update24PickerDisplay();
+
+    const modal = document.getElementById('timePickerModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function close24Picker() {
+    const modal = document.getElementById('timePickerModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function confirm24Picker() {
+    if (pickerTargetInputId) {
+        const el = document.getElementById(pickerTargetInputId);
+        if (el) {
+            el.value = `${pickerSelectedHour}:${pickerSelectedMinute}`;
+            updateFormPreview();
+        }
+    }
+    close24Picker();
+}
+
+function render24PickerGrids() {
+    const hoursGrid = document.getElementById('pickerHoursGrid');
+    const minutesGrid = document.getElementById('pickerMinutesGrid');
+
+    if (hoursGrid) {
+        let hHtml = '';
+        for (let i = 0; i < 24; i++) {
+            const hStr = String(i).padStart(2, '0');
+            const activeClass = (hStr === pickerSelectedHour) ? 'active' : '';
+            hHtml += `<button type="button" class="btn-picker-num ${activeClass}" onclick="selectPickerHour('${hStr}')">${hStr}</button>`;
+        }
+        hoursGrid.innerHTML = hHtml;
+    }
+
+    if (minutesGrid) {
+        let mHtml = '';
+        ['00', '15', '30', '45'].forEach(mStr => {
+            const activeClass = (mStr === pickerSelectedMinute) ? 'active' : '';
+            mHtml += `<button type="button" class="btn-picker-num ${activeClass}" onclick="selectPickerMinute('${mStr}')">${mStr}</button>`;
+        });
+        minutesGrid.innerHTML = mHtml;
+    }
+}
+
+function selectPickerHour(hStr) {
+    pickerSelectedHour = hStr;
+    render24PickerGrids();
+    update24PickerDisplay();
+}
+
+function selectPickerMinute(mStr) {
+    pickerSelectedMinute = mStr;
+    render24PickerGrids();
+    update24PickerDisplay();
+}
+
+function update24PickerDisplay() {
+    const display = document.getElementById('pickerDisplay');
+    if (display) {
+        display.textContent = `${pickerSelectedHour}:${pickerSelectedMinute}`;
+    }
+}
+
+// Dutch Holidays calculation (Easter-based & Fixed dates)
+function getDutchHolidays(year) {
+    const holidays = {};
+
+    const formatDate = (y, m, d) => {
+        const mm = String(m).padStart(2, '0');
+        const dd = String(d).padStart(2, '0');
+        return `${y}-${mm}-${dd}`;
+    };
+
+    holidays[formatDate(year, 1, 1)] = 'Nieuwjaarsdag';
+    holidays[formatDate(year, 5, 5)] = 'Bevrijdingsdag';
+    holidays[formatDate(year, 12, 25)] = '1e Kerstdag';
+    holidays[formatDate(year, 12, 26)] = '2e Kerstdag';
+
+    const apr27 = new Date(year, 3, 27);
+    if (apr27.getDay() === 0) {
+        holidays[formatDate(year, 4, 26)] = 'Koningsdag (verplaatst)';
+    } else {
+        holidays[formatDate(year, 4, 27)] = 'Koningsdag';
+    }
+
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+
+    const easterSunday = new Date(year, month, day);
+
+    const addDays = (baseDate, days) => {
+        const d = new Date(baseDate);
+        d.setDate(d.getDate() + days);
+        return formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    };
+
+    holidays[addDays(easterSunday, -2)] = 'Goede Vrijdag';
+    holidays[addDays(easterSunday, 1)] = '2e Paasdag';
+    holidays[addDays(easterSunday, 39)] = 'Hemelvaartsdag';
+    holidays[addDays(easterSunday, 50)] = '2e Pinksterdag';
+
+    return holidays;
+}
+
+function isDutchHoliday(dateStr) {
+    if (!dateStr) return false;
+    const [year] = dateStr.split('-').map(Number);
+    if (!year || isNaN(year)) return false;
+    const holidays = getDutchHolidays(year);
+    return holidays[dateStr] || false;
+}
+
+function getNextDateStr(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+// Ensure 24-hour time format HH:mm (e.g. 08:00, 16:30, 23:59)
+function formatTime24(val) {
+    if (!val) return '00:00';
+    let cleaned = String(val).replace(/[^0-9:]/g, '').trim();
+    if (!cleaned) return '00:00';
+
+    let h = 0, m = 0;
+    if (cleaned.includes(':')) {
+        const parts = cleaned.split(':');
+        h = parseInt(parts[0], 10) || 0;
+        m = parseInt(parts[1], 10) || 0;
+    } else {
+        if (cleaned.length <= 2) {
+            h = parseInt(cleaned, 10) || 0;
+            m = 0;
+        } else if (cleaned.length === 3) {
+            h = parseInt(cleaned.substring(0, 1), 10) || 0;
+            m = parseInt(cleaned.substring(1, 3), 10) || 0;
+        } else {
+            h = parseInt(cleaned.substring(0, 2), 10) || 0;
+            m = parseInt(cleaned.substring(2, 4), 10) || 0;
+        }
+    }
+
+    if (h < 0) h = 0;
+    if (h > 23) h = h % 24;
+    if (m < 0) m = 0;
+    if (m > 59) m = 59;
+
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+// Quick Mouse Preset helper
+function setPresetTime(start, end, pauzeStart) {
+    const startEl = document.getElementById('inputBegintijd');
+    const endEl = document.getElementById('inputEindtijd');
+    const pauzeTijdEl = document.getElementById('inputPauzetijd');
+    if (startEl) startEl.value = start;
+    if (endEl) endEl.value = end;
+    if (pauzeTijdEl && pauzeStart) pauzeTijdEl.value = pauzeStart;
+    updateFormPreview();
+}
+
+// Convert HH:MM to decimal hours
+function timeToHours(timeStr) {
+    if (!timeStr) return 0;
+    const [h, m] = timeStr.split(':').map(Number);
+    return (h || 0) + (m || 0) / 60;
+}
+
+// Calculate hours and surcharge breakdown with calendar day splitting at 00:00 (Personeelsgids Chapter 11)
+function calculateEntryHours(entry) {
+    const { datum, begintijd, eindtijd, pauzetijd = '12:00', pauze = 0, directeWerkzaamheden = true } = entry;
+
+    let start = timeToHours(begintijd);
+    let end = timeToHours(eindtijd);
+
+    if (end <= start && end > 0) {
+        end += 24;
+    }
+
+    const brutoUren = Math.max(0, end - start);
+    const pauzeUren = (parseFloat(pauze) || 0) / 60;
+
+    let pauzeStart = timeToHours(pauzetijd || '12:00');
+    if (pauzeStart < start && end > 24) {
+        pauzeStart += 24;
+    } else if (pauzeStart < start && (pauzeStart + 24) < end) {
+        pauzeStart += 24;
+    }
+
+    let pauzeEnd = pauzeStart + pauzeUren;
+    pauzeStart = Math.max(start, Math.min(end, pauzeStart));
+    pauzeEnd = Math.max(start, Math.min(end, pauzeEnd));
+
+    const actualPauzeUren = Math.max(0, pauzeEnd - pauzeStart);
+    const nettoUren = Math.max(0, brutoUren - actualPauzeUren);
+
+    let result = {
+        bruto: brutoUren,
+        pauze: actualPauzeUren,
+        netto: nettoUren,
+        normaal: 0,
+        verschoven: 0,
+        overwerk40: 0,
+        overwerk50: 0,
+        overwerk100: 0,
+        toeslagUrenTotaal: 0,
+        isWeekend: false,
+        isFeestdag: false,
+        feestdagNaam: ''
+    };
+
+    if (nettoUren === 0 || !datum) return result;
+
+    let startMin = Math.round(start * 60);
+    let endMin = Math.round(end * 60);
+    let pauzeStartMin = Math.round(pauzeStart * 60);
+    let pauzeEndMin = Math.round(pauzeEnd * 60);
+
+    const nextDateStr = getNextDateStr(datum);
+
+    let workedMinutes = 0;
+    let normaalMinutes = 0;
+    let verschovenMinutes = 0;
+    let overwerk40Minutes = 0;
+    let overwerk50Minutes = 0;
+    let overwerk100Minutes = 0;
+
+    for (let m = startMin; m < endMin; m++) {
+        if (m >= pauzeStartMin && m < pauzeEndMin) {
+            continue; // Skip break minutes
+        }
+
+        workedMinutes++;
+
+        // Determine actual calendar date for minute m (splits at 00:00 / 1440 min)
+        const currentDatum = (m >= 1440) ? nextDateStr : datum;
+        const dateObj = new Date(currentDatum + 'T00:00:00');
+        const dayOfWeek = dateObj.getDay();
+        const holidayName = isDutchHoliday(currentDatum);
+
+        if (holidayName || dayOfWeek === 0) { // Sunday / Holiday = 100%
+            overwerk100Minutes++;
+            if (holidayName && !result.feestdagNaam) {
+                result.isFeestdag = true;
+                result.feestdagNaam = holidayName;
+            }
+        } else if (dayOfWeek === 6) { // Saturday = 50%
+            overwerk50Minutes++;
+        } else { // Monday-Friday
+            if (workedMinutes <= 480) { // First 8 hours of shift = regular
+                const minuteOfDay = m % 1440;
+                const isShiftedTime = (minuteOfDay < 480 || minuteOfDay >= 990);
+                if (directeWerkzaamheden && isShiftedTime) {
+                    verschovenMinutes++;
+                } else {
+                    normaalMinutes++;
+                }
+            } else if (workedMinutes <= 600) { // Overtime 40%
+                overwerk40Minutes++;
+            } else { // Overtime 50%
+                overwerk50Minutes++;
+            }
+        }
+    }
+
+    result.normaal = normaalMinutes / 60;
+    result.verschoven = verschovenMinutes / 60;
+    result.overwerk40 = overwerk40Minutes / 60;
+    result.overwerk50 = overwerk50Minutes / 60;
+    result.overwerk100 = overwerk100Minutes / 60;
+
+    result.toeslagUrenTotaal = 
+        (result.verschoven * 0.30) +
+        (result.overwerk40 * 0.40) +
+        (result.overwerk50 * 0.50) +
+        (result.overwerk100 * 1.00);
+
+    return result;
+}
+
+// Storage Management
+function loadEntries() {
+    try {
+        localStorage.removeItem('uren_registratie_entries');
+        localStorage.removeItem('uren_registratie_v2');
+        localStorage.removeItem('uren_registratie_v3');
+        
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+                state.entries = parsed;
+                return;
+            }
+        }
+        state.entries = [];
+    } catch (e) {
+        console.error('Fout bij laden van gegevens:', e);
+        state.entries = [];
+    }
+}
+
+function saveEntries() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries));
+    } catch (e) {
+        console.error('Fout bij opslaan van gegevens:', e);
+    }
+}
+
+function clearAllEntries() {
+    if (confirm('Weet u zeker dat u alle ingevoerde uren wilt wissen en een schone lijst wilt starten?')) {
+        state.entries = [];
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem('uren_registratie_entries');
+        saveEntries();
+        refreshDashboard();
+    }
+}
+
+// Download Blank CSV Template with headers only
+function downloadBlankTemplate() {
+    const headers = ['Datum', 'Begintijd', 'Eindtijd', 'PauzeTijd', 'Pauze (minuten)', 'DirecteWerkzaamheden', 'Omschrijving'];
+    const delimiter = state.exportDelimiter || ';';
+    const csvContent = headers.join(delimiter) + '\r\n';
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'lege_urenregistratie_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Formatters & UI Utilities
+function formatHours(val) {
+    if (!val || isNaN(val)) return '0,00';
+    return val.toFixed(2).replace('.', ',');
+}
+
+// European Date Format (DD-MM-YYYY)
+function formatDateNL(dateStr) {
+    if (!dateStr) return '';
+    let d;
+    if (dateStr.includes('-') && dateStr.split('-')[0].length === 2) {
+        const parts = dateStr.split('-');
+        d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+    } else {
+        d = new Date(dateStr + 'T00:00:00');
+    }
+
+    if (isNaN(d.getTime())) return dateStr;
+
+    const days = ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'];
+    const dayName = days[d.getDay()];
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+
+    return `${dayName} ${dd}-${mm}-${yyyy}`;
+}
+
+// Get Filtered Entries
+function getFilteredEntries() {
+    return state.entries.filter(entry => {
+        if (state.filterMonth !== 'ALL') {
+            const entryMonth = entry.datum.substring(0, 7);
+            if (entryMonth !== state.filterMonth) return false;
+        }
+
+        if (state.filterStartDate && entry.datum < state.filterStartDate) return false;
+        if (state.filterEndDate && entry.datum > state.filterEndDate) return false;
+
+        if (state.searchQuery) {
+            const q = state.searchQuery.toLowerCase();
+            const descMatch = (entry.omschrijving || '').toLowerCase().includes(q);
+            const dateMatch = entry.datum.includes(q);
+            if (!descMatch && !dateMatch) return false;
+        }
+
+        return true;
+    }).sort((a, b) => b.datum.localeCompare(a.datum) || b.begintijd.localeCompare(a.begintijd));
+}
+
+// Calculate Summary Totals
+function calculateTotals(entriesList) {
+    const totals = {
+        count: entriesList.length,
+        netto: 0,
+        normaal: 0,
+        verschoven: 0,
+        overwerk40: 0,
+        overwerk50: 0,
+        overwerk100: 0,
+        toeslagUrenTotaal: 0,
+        totaalUitbetalen: 0
+    };
+
+    entriesList.forEach(entry => {
+        const calc = calculateEntryHours(entry);
+        totals.netto += calc.netto;
+        totals.normaal += calc.normaal;
+        totals.verschoven += calc.verschoven;
+        totals.overwerk40 += calc.overwerk40;
+        totals.overwerk50 += calc.overwerk50;
+        totals.overwerk100 += calc.overwerk100;
+        totals.toeslagUrenTotaal += calc.toeslagUrenTotaal;
+    });
+
+    totals.totaalUitbetalen = totals.netto + totals.toeslagUrenTotaal;
+    return totals;
+}
+
+// Render Month Filter Options
+function populateMonthFilter() {
+    const select = document.getElementById('filterMonth');
+    if (!select) return;
+
+    const monthsSet = new Set();
+    state.entries.forEach(e => {
+        if (e.datum && e.datum.length >= 7) {
+            monthsSet.add(e.datum.substring(0, 7));
+        }
+    });
+
+    const sortedMonths = Array.from(monthsSet).sort().reverse();
+    const monthNamesNL = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
+
+    let html = '<option value="ALL">Alle maanden</option>';
+    sortedMonths.forEach(m => {
+        const [year, monthNum] = m.split('-').map(Number);
+        const name = `${monthNamesNL[monthNum - 1]} ${year}`;
+        html += `<option value="${m}" ${state.filterMonth === m ? 'selected' : ''}>${name}</option>`;
+    });
+
+    select.innerHTML = html;
+}
+
+// Render Dashboard Statistics Cards
+function renderStatsCards(totals) {
+    document.getElementById('statNetto').textContent = formatHours(totals.netto) + ' u';
+    document.getElementById('statNormaal').textContent = formatHours(totals.normaal) + ' u';
+    document.getElementById('statVerschoven').textContent = formatHours(totals.verschoven) + ' u';
+    document.getElementById('statOverwerk40').textContent = formatHours(totals.overwerk40) + ' u';
+    document.getElementById('statOverwerk50').textContent = formatHours(totals.overwerk50) + ' u';
+    document.getElementById('statOverwerk100').textContent = formatHours(totals.overwerk100) + ' u';
+}
+
+// Render Data Table
+function renderTable(entriesList) {
+    const tbody = document.getElementById('entriesTableBody');
+    if (!tbody) return;
+
+    if (entriesList.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="11" class="text-center py-8 text-muted">
+                    <p class="mb-2 font-medium">Nog geen uren geregistreerd.</p>
+                    <p class="text-xs mb-3">Upload een CSV-bestand of vul hierboven een urenregel in.</p>
+                    <button onclick="downloadBlankTemplate()" class="btn btn-secondary text-xs">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        Leeg CSV Template Downloaden
+                    </button>
+                </td>
+            </tr>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+    }
+
+    let html = '';
+    entriesList.forEach(entry => {
+        const calc = calculateEntryHours(entry);
+        const holidayBadge = calc.isFeestdag 
+            ? `<span class="badge badge-holiday" title="${calc.feestdagNaam}">Feestdag</span>` 
+            : (calc.isWeekend ? `<span class="badge badge-weekend">Weekend</span>` : '');
+
+        const pauzeTijdDisplay = entry.pauze > 0 ? `${formatTime24(entry.pauzetijd || '12:00')} (${entry.pauze}m)` : '0 min';
+
+        html += `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="font-medium whitespace-nowrap">
+                    ${formatDateNL(entry.datum)}
+                    ${holidayBadge}
+                </td>
+                <td class="font-mono text-xs">${formatTime24(entry.begintijd)} - ${formatTime24(entry.eindtijd)}</td>
+                <td class="font-mono text-xs">${pauzeTijdDisplay}</td>
+                <td class="font-semibold">${formatHours(calc.netto)} u</td>
+                <td>${formatHours(calc.normaal)} u</td>
+                <td>${formatHours(calc.verschoven)} u</td>
+                <td>${formatHours(calc.overwerk40)} u</td>
+                <td>${formatHours(calc.overwerk50)} u</td>
+                <td>${formatHours(calc.overwerk100)} u</td>
+                <td class="text-xs truncate max-w-xs" title="${entry.omschrijving || ''}">${entry.omschrijving || '-'}</td>
+                <td class="text-right whitespace-nowrap">
+                    <button onclick="editEntry('${entry.id}')" class="btn-icon btn-secondary text-xs mr-1" title="Bewerken">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="deleteEntry('${entry.id}')" class="btn-icon btn-danger text-xs" title="Verwijderen">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+    if (window.lucide) lucide.createIcons();
+}
+
+// Render Charts
+function renderCharts(totals, entriesList) {
+    const ctx2 = document.getElementById('chartTimeline');
+    if (!ctx2) return;
+
+    if (state.weeklyChartInstance) {
+        state.weeklyChartInstance.destroy();
+    }
+
+    if (entriesList.length === 0) return;
+
+    const sortedAsc = [...entriesList].sort((a,b) => a.datum.localeCompare(b.datum)).slice(-14);
+    const labels = sortedAsc.map(e => formatDateNL(e.datum));
+    const normaalData = [];
+    const verschovenData = [];
+    const overwerkData = [];
+
+    sortedAsc.forEach(e => {
+        const c = calculateEntryHours(e);
+        normaalData.push(c.normaal);
+        verschovenData.push(c.verschoven);
+        overwerkData.push(c.overwerk40 + c.overwerk50 + c.overwerk100);
+    });
+
+    state.weeklyChartInstance = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Normaal (0%)', data: normaalData, backgroundColor: '#000000' },
+                { label: 'Verschoven (30%)', data: verschovenData, backgroundColor: '#6b7280' },
+                { label: 'Overwerk (40-100%)', data: overwerkData, backgroundColor: '#9ca3af' }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { stacked: true, grid: { display: false } },
+                y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Uren' } }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12 } }
+            }
+        }
+    });
+}
+
+// Live Form Calculation Preview
+function updateFormPreview() {
+    const datum = document.getElementById('inputDatum').value;
+    const begintijd = document.getElementById('inputBegintijd').value;
+    const eindtijd = document.getElementById('inputEindtijd').value;
+    const pauzetijd = document.getElementById('inputPauzetijd').value || '12:00';
+    const pauze = parseInt(document.getElementById('inputPauze').value, 10) || 0;
+    const directeWerkzaamheden = document.getElementById('inputDirecteWerkzaamheden').checked;
+
+    const previewEl = document.getElementById('formPreviewBox');
+    if (!begintijd || !eindtijd) {
+        previewEl.innerHTML = '<span class="text-slate-500">Vul begintijd en eindtijd in voor live urenberekening.</span>';
+        return;
+    }
+
+    const tStart24 = formatTime24(begintijd);
+    const tEnd24 = formatTime24(eindtijd);
+    const tPauze24 = formatTime24(pauzetijd);
+    const calc = calculateEntryHours({ datum, begintijd: tStart24, eindtijd: tEnd24, pauzetijd: tPauze24, pauze, directeWerkzaamheden });
+
+    let details = [];
+    if (calc.normaal > 0) details.push(`<span>Normaal: <strong>${formatHours(calc.normaal)}u</strong></span>`);
+    if (calc.verschoven > 0) details.push(`<span>Verschoven (30%): <strong>${formatHours(calc.verschoven)}u</strong></span>`);
+    if (calc.overwerk40 > 0) details.push(`<span>Overwerk (40%): <strong>${formatHours(calc.overwerk40)}u</strong></span>`);
+    if (calc.overwerk50 > 0) details.push(`<span>Overwerk (50%): <strong>${formatHours(calc.overwerk50)}u</strong></span>`);
+    if (calc.overwerk100 > 0) details.push(`<span>Overwerk/Feestdag (100%): <strong>${formatHours(calc.overwerk100)}u</strong></span>`);
+
+    let holidayInfo = calc.isFeestdag ? ` <span class="badge badge-holiday">Feestdag: ${calc.feestdagNaam}</span>` : '';
+    let pauzeInfo = pauze > 0 ? ` (Pauze: ${tPauze24} - ${pauze}m)` : ' (Geen pauze)';
+
+    previewEl.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div>
+                <strong>Werktijd (${tStart24} - ${tEnd24}):</strong> <span class="text-sm font-bold">${formatHours(calc.netto)} uur netto</span>
+                ${pauzeInfo}${holidayInfo}
+            </div>
+            <div class="flex gap-3">
+                ${details.join(' | ')}
+            </div>
+        </div>
+    `;
+}
+
+// Add or Edit Entry Submit Handler
+function handleFormSubmit(e) {
+    e.preventDefault();
+
+    const datum = document.getElementById('inputDatum').value;
+    const begintijd = formatTime24(document.getElementById('inputBegintijd').value);
+    const eindtijd = formatTime24(document.getElementById('inputEindtijd').value);
+    const pauzetijd = formatTime24(document.getElementById('inputPauzetijd').value || '12:00');
+    const pauze = parseInt(document.getElementById('inputPauze').value, 10) || 0;
+    const directeWerkzaamheden = document.getElementById('inputDirecteWerkzaamheden').checked;
+    const omschrijving = document.getElementById('inputOmschrijving').value.trim();
+
+    if (!datum || !begintijd || !eindtijd) {
+        alert('Vul a.u.b. een datum, begintijd en eindtijd in.');
+        return;
+    }
+
+    if (state.editingId) {
+        const idx = state.entries.findIndex(item => item.id === state.editingId);
+        if (idx !== -1) {
+            state.entries[idx] = {
+                id: state.editingId,
+                datum,
+                begintijd,
+                eindtijd,
+                pauzetijd,
+                pauze,
+                directeWerkzaamheden,
+                omschrijving
+            };
+        }
+        state.editingId = null;
+        document.getElementById('btnSubmitForm').textContent = 'Invoer Opslaan';
+        document.getElementById('btnCancelEdit').classList.add('hidden');
+    } else {
+        const newEntry = {
+            id: Date.now().toString(),
+            datum,
+            begintijd,
+            eindtijd,
+            pauzetijd,
+            pauze,
+            directeWerkzaamheden,
+            omschrijving
+        };
+        state.entries.push(newEntry);
+    }
+
+    saveEntries();
+    resetForm();
+    refreshDashboard();
+}
+
+function editEntry(id) {
+    const entry = state.entries.find(e => e.id === id);
+    if (!entry) return;
+
+    state.editingId = id;
+    document.getElementById('inputDatum').value = entry.datum;
+    document.getElementById('inputBegintijd').value = formatTime24(entry.begintijd);
+    document.getElementById('inputEindtijd').value = formatTime24(entry.eindtijd);
+    document.getElementById('inputPauzetijd').value = formatTime24(entry.pauzetijd || '12:00');
+    document.getElementById('inputPauze').value = entry.pauze || 0;
+    document.getElementById('inputDirecteWerkzaamheden').checked = entry.directeWerkzaamheden !== false;
+    document.getElementById('inputOmschrijving').value = entry.omschrijving || '';
+
+    document.getElementById('btnSubmitForm').textContent = 'Wijziging Opslaan';
+    document.getElementById('btnCancelEdit').classList.remove('hidden');
+
+    updateFormPreview();
+    document.getElementById('entryFormContainer').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelEdit() {
+    state.editingId = null;
+    document.getElementById('btnSubmitForm').textContent = 'Invoer Opslaan';
+    document.getElementById('btnCancelEdit').classList.add('hidden');
+    resetForm();
+}
+
+function deleteEntry(id) {
+    if (confirm('Weet u zeker dat u deze regel wilt verwijderen?')) {
+        state.entries = state.entries.filter(e => e.id !== id);
+        saveEntries();
+        refreshDashboard();
+    }
+}
+
+function resetForm() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('inputDatum').value = todayStr;
+    document.getElementById('inputBegintijd').value = '08:00';
+    document.getElementById('inputEindtijd').value = '16:30';
+    document.getElementById('inputPauzetijd').value = '12:00';
+    document.getElementById('inputPauze').value = '30';
+    document.getElementById('inputDirecteWerkzaamheden').checked = true;
+    document.getElementById('inputOmschrijving').value = '';
+    updateFormPreview();
+}
+
+// CSV Import Handler (Using PapaParse)
+function handleCsvUpload(file) {
+    if (!file) return;
+
+    Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: false,
+        complete: function(results) {
+            if (results.errors && results.errors.length > 0) {
+                console.warn('CSV Parse Warnings:', results.errors);
+            }
+
+            const parsed = [];
+            results.data.forEach((row, idx) => {
+                const datum = row['Datum'] || row['datum'] || row['Date'] || '';
+                const begintijd = row['Begintijd'] || row['begintijd'] || row['Start'] || row['Begin'] || '';
+                const eindtijd = row['Eindtijd'] || row['eindtijd'] || row['End'] || row['Eind'] || '';
+                const pauzetijd = row['PauzeTijd'] || row['pauzetijd'] || row['PauzeTijdstip'] || '12:00';
+                const pauze = row['Pauze'] || row['pauze'] || row['Pauze (minuten)'] || 0;
+                const directeStr = String(row['DirecteWerkzaamheden'] || row['Direct'] || row['direct'] || 'Ja').toLowerCase();
+                const directeWerkzaamheden = ['ja', 'true', '1', 'yes'].includes(directeStr);
+                const omschrijving = row['Omschrijving'] || row['omschrijving'] || row['Note'] || row['Opmerking'] || '';
+
+                if (datum && begintijd && eindtijd) {
+                    let stdDatum = datum.trim();
+                    if (stdDatum.includes('/')) {
+                        const parts = stdDatum.split('/');
+                        if (parts[0].length === 4) stdDatum = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+                        else stdDatum = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                    } else if (stdDatum.includes('-') && stdDatum.split('-')[0].length === 2) {
+                        const parts = stdDatum.split('-');
+                        stdDatum = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                    }
+
+                    parsed.push({
+                        id: (Date.now() + idx).toString(),
+                        datum: stdDatum,
+                        begintijd: formatTime24(begintijd),
+                        eindtijd: formatTime24(eindtijd),
+                        pauzetijd: formatTime24(pauzetijd),
+                        pauze: parseInt(pauze, 10) || 0,
+                        directeWerkzaamheden,
+                        omschrijving: omschrijving.trim()
+                    });
+                }
+            });
+
+            if (parsed.length > 0) {
+                if (confirm(`Er zijn ${parsed.length} regels gevonden in het CSV-bestand. Wilt u deze toevoegen aan uw huidige dashboard?`)) {
+                    state.entries = parsed;
+                    saveEntries();
+                    refreshDashboard();
+                    alert('CSV-bestand succesvol geïmporteerd!');
+                }
+            } else {
+                alert('Geen geldige urenregistratie regels gevonden in dit CSV-bestand. Controleer de kolomnamen (Datum, Begintijd, Eindtijd, Pauze).');
+            }
+        },
+        error: function(err) {
+            alert('Fout bij verwerken van CSV-bestand: ' + err.message);
+        }
+    });
+}
+
+// CSV Export Handler
+function exportCsv() {
+    if (state.entries.length === 0) {
+        downloadBlankTemplate();
+        return;
+    }
+
+    const dataToExport = state.entries.map(e => ({
+        Datum: e.datum,
+        Begintijd: formatTime24(e.begintijd),
+        Eindtijd: formatTime24(e.eindtijd),
+        PauzeTijd: formatTime24(e.pauzetijd || '12:00'),
+        'Pauze (minuten)': e.pauze || 0,
+        DirecteWerkzaamheden: e.directeWerkzaamheden !== false ? 'Ja' : 'Nee',
+        Omschrijving: e.omschrijving || ''
+    }));
+
+    const delimiter = state.exportDelimiter;
+    const csvContent = Papa.unparse(dataToExport, {
+        delimiter: delimiter
+    });
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    const todayStr = new Date().toISOString().split('T')[0];
+    link.setAttribute('href', url);
+    link.setAttribute('download', `urenregistratie_${todayStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Print / PDF Report Generator Functionality
+function openPrintModal() {
+    const modal = document.getElementById('printModal');
+    if (!modal) return;
+
+    const select = document.getElementById('printPeriodSelect');
+    const monthsSet = new Set();
+    state.entries.forEach(e => {
+        if (e.datum && e.datum.length >= 7) monthsSet.add(e.datum.substring(0, 7));
+    });
+    const sortedMonths = Array.from(monthsSet).sort().reverse();
+    const monthNamesNL = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
+
+    let html = '<option value="ALL">Alle geregistreerde uren</option>';
+    sortedMonths.forEach(m => {
+        const [year, monthNum] = m.split('-').map(Number);
+        html += `<option value="${m}">${monthNamesNL[monthNum - 1]} ${year}</option>`;
+    });
+
+    select.innerHTML = html;
+    modal.classList.remove('hidden');
+}
+
+function closePrintModal() {
+    const modal = document.getElementById('printModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function triggerPrintReport() {
+    const period = document.getElementById('printPeriodSelect').value;
+
+    let printEntries = state.entries;
+    let periodTitle = 'Alle geregistreerde uren';
+
+    if (period !== 'ALL') {
+        printEntries = state.entries.filter(e => e.datum.substring(0, 7) === period);
+        const [y, m] = period.split('-').map(Number);
+        const monthNamesNL = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
+        periodTitle = `${monthNamesNL[m - 1]} ${y}`;
+    }
+
+    printEntries.sort((a, b) => a.datum.localeCompare(b.datum));
+
+    const totals = calculateTotals(printEntries);
+    const printContainer = document.getElementById('printableArea');
+
+    let rowsHtml = '';
+    printEntries.forEach(entry => {
+        const calc = calculateEntryHours(entry);
+        const pauzeTijdDisplay = entry.pauze > 0 ? `${formatTime24(entry.pauzetijd || '12:00')} (${entry.pauze}m)` : '0m';
+
+        rowsHtml += `
+            <tr>
+                <td>${formatDateNL(entry.datum)}</td>
+                <td>${formatTime24(entry.begintijd)} - ${formatTime24(entry.eindtijd)}</td>
+                <td>${pauzeTijdDisplay}</td>
+                <td><strong>${formatHours(calc.netto)} u</strong></td>
+                <td>${formatHours(calc.normaal)} u</td>
+                <td>${formatHours(calc.verschoven)} u</td>
+                <td>${formatHours(calc.overwerk40)} u</td>
+                <td>${formatHours(calc.overwerk50)} u</td>
+                <td>${formatHours(calc.overwerk100)} u</td>
+                <td>${entry.omschrijving || '-'}</td>
+            </tr>
+        `;
+    });
+
+    printContainer.innerHTML = `
+        <div class="print-header">
+            <div>
+                <h1 style="font-size: 18pt; font-weight: bold; margin: 0;">Uren- en Overwerktotaal</h1>
+                <p style="color: #4b5563; margin-top: 4px; font-size: 11pt;">Periode: <strong>${periodTitle}</strong> | Gegenereerd op: ${formatDateNL(new Date().toISOString().split('T')[0])}</p>
+            </div>
+        </div>
+
+        <div class="print-summary-box">
+            <h3 style="margin-top: 0; font-size: 12pt; margin-bottom: 10px;">Samenvatting Uren & Toeslagen</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #000000; text-align: left;">
+                        <th style="padding: 6px;">Categorie</th>
+                        <th style="padding: 6px;">Toeslag %</th>
+                        <th style="padding: 6px; text-align: right;">Aantal Uren</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="padding: 6px;">Normale Uren (Dagrooster max 8h)</td><td style="padding: 6px;">0%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.normaal)} u</td></tr>
+                    <tr><td style="padding: 6px;">Verschoven Uren (<08:00 / >16:30)</td><td style="padding: 6px;">30%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.verschoven)} u</td></tr>
+                    <tr><td style="padding: 6px;">Overwerk doordeweeks (1e & 2e overuur)</td><td style="padding: 6px;">40%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.overwerk40)} u</td></tr>
+                    <tr><td style="padding: 6px;">Overwerk doordeweeks (vanaf 3e overuur) / Zaterdag</td><td style="padding: 6px;">50%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.overwerk50)} u</td></tr>
+                    <tr><td style="padding: 6px;">Overwerk Zondag & Feestdagen</td><td style="padding: 6px;">100%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.overwerk100)} u</td></tr>
+                    <tr style="border-top: 2px solid #000000; font-weight: bold;">
+                        <td style="padding: 8px 6px;">TOTAAL GEWERKTE UREN (Netto)</td>
+                        <td style="padding: 8px 6px;">-</td>
+                        <td style="padding: 8px 6px; text-align: right;">${formatHours(totals.netto)} u</td>
+                    </tr>
+                    <tr style="background-color: #f3f4f6; font-weight: bold;">
+                        <td style="padding: 8px 6px;">TOTAAL TE VERGOEDEN UREN (Incl. toeslag)</td>
+                        <td style="padding: 8px 6px;">-</td>
+                        <td style="padding: 8px 6px; text-align: right;">${formatHours(totals.totaalUitbetalen)} u</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 style="font-size: 12pt; margin-top: 20px; margin-bottom: 8px;">Gedetailleerd Urenoverzicht</h3>
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Werktijd</th>
+                    <th>Pauze Tijdstip</th>
+                    <th>Netto</th>
+                    <th>Normaal</th>
+                    <th>Shift 30%</th>
+                    <th>Over 40%</th>
+                    <th>Over 50%</th>
+                    <th>Over 100%</th>
+                    <th>Omschrijving</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rowsHtml.length > 0 ? rowsHtml : '<tr><td colspan="10" style="text-align: center;">Geen uren geregistreerd in deze periode.</td></tr>'}
+            </tbody>
+        </table>
+    `;
+
+    closePrintModal();
+    window.print();
+}
+
+// Refresh Dashboard Views
+function refreshDashboard() {
+    populateMonthFilter();
+    const filtered = getFilteredEntries();
+    const totals = calculateTotals(filtered);
+
+    renderStatsCards(totals);
+    renderTable(filtered);
+    renderCharts(totals, filtered);
+}
+
+// Attach Event Listeners on Page Load
+document.addEventListener('DOMContentLoaded', () => {
+    loadEntries();
+    resetForm();
+
+    document.getElementById('entryForm').addEventListener('submit', handleFormSubmit);
+    document.getElementById('btnCancelEdit').addEventListener('click', cancelEdit);
+
+    ['inputDatum', 'inputBegintijd', 'inputEindtijd', 'inputPauzetijd', 'inputPauze', 'inputDirecteWerkzaamheden'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', updateFormPreview);
+            el.addEventListener('change', updateFormPreview);
+        }
+    });
+
+    // Auto-select entire text on focus for fast typing
+    ['inputBegintijd', 'inputEindtijd', 'inputPauzetijd', 'inputDatum', 'inputOmschrijving'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('focus', function() {
+                this.select();
+            });
+        }
+    });
+
+    ['inputBegintijd', 'inputEindtijd', 'inputPauzetijd'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('blur', (e) => {
+                if (e.target.value) {
+                    e.target.value = formatTime24(e.target.value);
+                }
+                updateFormPreview();
+            });
+        }
+    });
+
+    document.getElementById('filterMonth').addEventListener('change', (e) => {
+        state.filterMonth = e.target.value;
+        refreshDashboard();
+    });
+
+    document.getElementById('filterStartDate').addEventListener('change', (e) => {
+        state.filterStartDate = e.target.value;
+        refreshDashboard();
+    });
+
+    document.getElementById('filterEndDate').addEventListener('change', (e) => {
+        state.filterEndDate = e.target.value;
+        refreshDashboard();
+    });
+
+    document.getElementById('searchQuery').addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        refreshDashboard();
+    });
+
+    document.getElementById('btnResetFilters').addEventListener('click', () => {
+        state.filterMonth = 'ALL';
+        state.filterStartDate = '';
+        state.filterEndDate = '';
+        state.searchQuery = '';
+        document.getElementById('filterStartDate').value = '';
+        document.getElementById('filterEndDate').value = '';
+        const sq = document.getElementById('searchQuery');
+        if (sq) sq.value = '';
+        refreshDashboard();
+    });
+
+    const btnCurrentMonth = document.getElementById('btnCurrentMonth');
+    if (btnCurrentMonth) {
+        btnCurrentMonth.addEventListener('click', () => {
+            const now = new Date();
+            const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            state.filterMonth = ym;
+            state.filterStartDate = '';
+            state.filterEndDate = '';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            refreshDashboard();
+        });
+    }
+
+    const btnLastMonth = document.getElementById('btnLastMonth');
+    if (btnLastMonth) {
+        btnLastMonth.addEventListener('click', () => {
+            const now = new Date();
+            now.setMonth(now.getMonth() - 1);
+            const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            state.filterMonth = ym;
+            state.filterStartDate = '';
+            state.filterEndDate = '';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            refreshDashboard();
+        });
+    }
+
+    document.getElementById('btnClearAll').addEventListener('click', clearAllEntries);
+
+    document.getElementById('csvFileInput').addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleCsvUpload(e.target.files[0]);
+            e.target.value = '';
+        }
+    });
+
+    document.getElementById('btnExportCsv').addEventListener('click', exportCsv);
+    document.getElementById('btnPrintReport').addEventListener('click', openPrintModal);
+    document.getElementById('btnClosePrintModal').addEventListener('click', closePrintModal);
+    document.getElementById('btnConfirmPrint').addEventListener('click', triggerPrintReport);
+
+    const delimiterEl = document.getElementById('exportDelimiterSelect');
+    if (delimiterEl) {
+        delimiterEl.addEventListener('change', (e) => {
+            state.exportDelimiter = e.target.value;
+        });
+    }
+
+    const rulesModal = document.getElementById('rulesModal');
+    const printModal = document.getElementById('printModal');
+    const timePickerModal = document.getElementById('timePickerModal');
+
+    document.getElementById('btnShowRules').addEventListener('click', () => rulesModal.classList.remove('hidden'));
+    document.getElementById('btnCloseRulesModal').addEventListener('click', () => rulesModal.classList.add('hidden'));
+
+    const btnCloseRulesModalBtn = document.getElementById('btnCloseRulesModalBtn');
+    if (btnCloseRulesModalBtn) {
+        btnCloseRulesModalBtn.addEventListener('click', () => rulesModal.classList.add('hidden'));
+    }
+
+    [printModal, rulesModal, timePickerModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (printModal) printModal.classList.add('hidden');
+            if (rulesModal) rulesModal.classList.add('hidden');
+            if (timePickerModal) timePickerModal.classList.add('hidden');
+        }
+    });
+
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+
+    refreshDashboard();
+});
+    </script>
+</body>
+</html>
