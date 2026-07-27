@@ -1179,6 +1179,11 @@ function calculateEntryHours(entry) {
         pauzeStart += 24;
     }
 
+    // Pauze-fallback: als pauze buiten de werktijd valt (bijv. 12:00 bij nachtdienst), plaats pauze halverwege de dienst
+    if (pauzeUren > 0 && (pauzeStart < start || pauzeStart >= end)) {
+        pauzeStart = start + (end - start) / 2 - (pauzeUren / 2);
+    }
+
     let pauzeEnd = pauzeStart + pauzeUren;
     pauzeStart = Math.max(start, Math.min(end, pauzeStart));
     pauzeEnd = Math.max(start, Math.min(end, pauzeEnd));
@@ -1234,6 +1239,13 @@ function calculateEntryHours(entry) {
         const rawHolidayName = isDutchHoliday(currentDatum);
         const holidayName = (feestdagAlsZondag !== false) ? rawHolidayName : false;
 
+        const minuteOfDay = m % 1440;
+        const isShiftedTime = (minuteOfDay < 480 || minuteOfDay >= 990);
+
+        if (directeWerkzaamheden && isShiftedTime) {
+            verschovenMinutes++;
+        }
+
         if (holidayName || dayOfWeek === 0) { // Sunday / Holiday = 100%
             overwerk100Minutes++;
             if (holidayName && !result.feestdagNaam) {
@@ -1244,11 +1256,7 @@ function calculateEntryHours(entry) {
             overwerk50Minutes++;
         } else { // Monday-Friday
             if (workedMinutes <= 480) { // First 8 hours of shift = regular
-                const minuteOfDay = m % 1440;
-                const isShiftedTime = (minuteOfDay < 480 || minuteOfDay >= 990);
-                if (directeWerkzaamheden && isShiftedTime) {
-                    verschovenMinutes++;
-                } else {
+                if (!isShiftedTime || !directeWerkzaamheden) {
                     normaalMinutes++;
                 }
             } else if (workedMinutes <= 600) { // Overtime 40%
