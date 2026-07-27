@@ -659,9 +659,15 @@ h1, h2, h3, h4, .font-heading {
                         <label class="form-label" for="inputOmschrijving">Omschrijving / Opmerking (Optioneel)</label>
                         <input type="text" id="inputOmschrijving" tabindex="6" class="form-input" placeholder="">
                     </div>
+                    <div class="form-group flex flex-col justify-end hidden" id="groupFeestdagAlsZondag">
+                        <label class="flex items-center gap-2 text-sm font-semibold cursor-pointer py-2 border p-2 bg-white" title="Vink uit als deze feestdag niet als zondag betaald wordt">
+                            <input type="checkbox" id="inputFeestdagAlsZondag" tabindex="7" checked class="w-4 h-4">
+                            Feestdag als zondag
+                        </label>
+                    </div>
                     <div class="form-group flex flex-col justify-end">
                         <label class="flex items-center gap-2 text-sm font-semibold cursor-pointer py-2 border p-2 bg-white">
-                            <input type="checkbox" id="inputDirecteWerkzaamheden" tabindex="7" checked class="w-4 h-4">
+                            <input type="checkbox" id="inputDirecteWerkzaamheden" tabindex="8" checked class="w-4 h-4">
                             Directe werkzaamheden
                         </label>
                     </div>
@@ -1095,7 +1101,7 @@ function timeToHours(timeStr) {
 
 // Calculate hours and surcharge breakdown with calendar day splitting at 00:00 (Personeelsgids Chapter 11)
 function calculateEntryHours(entry) {
-    const { datum, begintijd, eindtijd, pauzetijd = '12:00', pauze = 0, directeWerkzaamheden = true } = entry;
+    const { datum, begintijd, eindtijd, pauzetijd = '12:00', pauze = 0, directeWerkzaamheden = true, feestdagAlsZondag = true } = entry;
 
     let start = timeToHours(begintijd);
     let end = timeToHours(eindtijd);
@@ -1163,7 +1169,8 @@ function calculateEntryHours(entry) {
         const currentDatum = (m >= 1440) ? nextDateStr : datum;
         const dateObj = new Date(currentDatum + 'T00:00:00');
         const dayOfWeek = dateObj.getDay();
-        const holidayName = isDutchHoliday(currentDatum);
+        const rawHolidayName = isDutchHoliday(currentDatum);
+        const holidayName = (feestdagAlsZondag !== false) ? rawHolidayName : false;
 
         if (holidayName || dayOfWeek === 0) { // Sunday / Holiday = 100%
             overwerk100Minutes++;
@@ -1486,14 +1493,34 @@ function renderCharts(totals, entriesList) {
     });
 }
 
+function checkHolidayUI(isDateChange = false) {
+    const datum = document.getElementById('inputDatum').value;
+    const group = document.getElementById('groupFeestdagAlsZondag');
+    const checkbox = document.getElementById('inputFeestdagAlsZondag');
+    if (!group || !checkbox) return;
+
+    const isHoliday = !!isDutchHoliday(datum);
+    if (isHoliday) {
+        group.classList.remove('hidden');
+        if (isDateChange) {
+            checkbox.checked = true;
+        }
+    } else {
+        group.classList.add('hidden');
+    }
+}
+
 // Live Form Calculation Preview
 function updateFormPreview() {
+    checkHolidayUI(false);
     const datum = document.getElementById('inputDatum').value;
     const begintijd = document.getElementById('inputBegintijd').value;
     const eindtijd = document.getElementById('inputEindtijd').value;
     const pauzetijd = document.getElementById('inputPauzetijd').value || '12:00';
     const pauze = parseInt(document.getElementById('inputPauze').value, 10) || 0;
     const directeWerkzaamheden = document.getElementById('inputDirecteWerkzaamheden').checked;
+    const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
+    const feestdagAlsZondag = feestdagCheckbox ? feestdagCheckbox.checked : true;
 
     const previewEl = document.getElementById('formPreviewBox');
     if (!begintijd || !eindtijd) {
@@ -1504,7 +1531,7 @@ function updateFormPreview() {
     const tStart24 = formatTime24(begintijd);
     const tEnd24 = formatTime24(eindtijd);
     const tPauze24 = formatTime24(pauzetijd);
-    const calc = calculateEntryHours({ datum, begintijd: tStart24, eindtijd: tEnd24, pauzetijd: tPauze24, pauze, directeWerkzaamheden });
+    const calc = calculateEntryHours({ datum, begintijd: tStart24, eindtijd: tEnd24, pauzetijd: tPauze24, pauze, directeWerkzaamheden, feestdagAlsZondag });
 
     let details = [];
     if (calc.normaal > 0) details.push(`<span>Normaal: <strong>${formatHours(calc.normaal)}u</strong></span>`);
@@ -1539,6 +1566,8 @@ function handleFormSubmit(e) {
     const pauzetijd = formatTime24(document.getElementById('inputPauzetijd').value || '12:00');
     const pauze = parseInt(document.getElementById('inputPauze').value, 10) || 0;
     const directeWerkzaamheden = document.getElementById('inputDirecteWerkzaamheden').checked;
+    const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
+    const feestdagAlsZondag = feestdagCheckbox ? feestdagCheckbox.checked : true;
     const omschrijving = document.getElementById('inputOmschrijving').value.trim();
 
     if (!datum || !begintijd || !eindtijd) {
@@ -1557,6 +1586,7 @@ function handleFormSubmit(e) {
                 pauzetijd,
                 pauze,
                 directeWerkzaamheden,
+                feestdagAlsZondag,
                 omschrijving
             };
         }
@@ -1572,6 +1602,7 @@ function handleFormSubmit(e) {
             pauzetijd,
             pauze,
             directeWerkzaamheden,
+            feestdagAlsZondag,
             omschrijving
         };
         state.entries.push(newEntry);
@@ -1593,8 +1624,11 @@ function editEntry(id) {
     document.getElementById('inputPauzetijd').value = formatTime24(entry.pauzetijd || '12:00');
     document.getElementById('inputPauze').value = entry.pauze || 0;
     document.getElementById('inputDirecteWerkzaamheden').checked = entry.directeWerkzaamheden !== false;
+    const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
+    if (feestdagCheckbox) feestdagCheckbox.checked = entry.feestdagAlsZondag !== false;
     document.getElementById('inputOmschrijving').value = entry.omschrijving || '';
 
+    checkHolidayUI(false);
     document.getElementById('btnSubmitForm').textContent = 'Wijziging Opslaan';
     document.getElementById('btnCancelEdit').classList.remove('hidden');
 
@@ -1625,7 +1659,10 @@ function resetForm() {
     document.getElementById('inputPauzetijd').value = '12:00';
     document.getElementById('inputPauze').value = '30';
     document.getElementById('inputDirecteWerkzaamheden').checked = true;
+    const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
+    if (feestdagCheckbox) feestdagCheckbox.checked = true;
     document.getElementById('inputOmschrijving').value = '';
+    checkHolidayUI(true);
     updateFormPreview();
 }
 
@@ -1651,6 +1688,8 @@ function handleCsvUpload(file) {
                 const pauze = row['Pauze'] || row['pauze'] || row['Pauze (minuten)'] || 0;
                 const directeStr = String(row['DirecteWerkzaamheden'] || row['Direct'] || row['direct'] || 'Ja').toLowerCase();
                 const directeWerkzaamheden = ['ja', 'true', '1', 'yes'].includes(directeStr);
+                const feestdagAlsZondagStr = String(row['FeestdagAlsZondag'] || row['feestdagAlsZondag'] || row['Feestdag als zondag'] || 'Ja').toLowerCase();
+                const feestdagAlsZondag = !['nee', 'false', '0', 'no'].includes(feestdagAlsZondagStr);
                 const omschrijving = row['Omschrijving'] || row['omschrijving'] || row['Note'] || row['Opmerking'] || '';
 
                 if (datum && begintijd && eindtijd) {
@@ -1672,6 +1711,7 @@ function handleCsvUpload(file) {
                         pauzetijd: formatTime24(pauzetijd),
                         pauze: parseInt(pauze, 10) || 0,
                         directeWerkzaamheden,
+                        feestdagAlsZondag,
                         omschrijving: omschrijving.trim()
                     });
                 }
@@ -1708,6 +1748,7 @@ function exportCsv() {
         PauzeTijd: formatTime24(e.pauzetijd || '12:00'),
         'Pauze (minuten)': e.pauze || 0,
         DirecteWerkzaamheden: e.directeWerkzaamheden !== false ? 'Ja' : 'Nee',
+        FeestdagAlsZondag: e.feestdagAlsZondag !== false ? 'Ja' : 'Nee',
         Omschrijving: e.omschrijving || ''
     }));
 
@@ -1878,13 +1919,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('entryForm').addEventListener('submit', handleFormSubmit);
     document.getElementById('btnCancelEdit').addEventListener('click', cancelEdit);
 
-    ['inputDatum', 'inputBegintijd', 'inputEindtijd', 'inputPauzetijd', 'inputPauze', 'inputDirecteWerkzaamheden'].forEach(id => {
+    ['inputDatum', 'inputBegintijd', 'inputEindtijd', 'inputPauzetijd', 'inputPauze', 'inputDirecteWerkzaamheden', 'inputFeestdagAlsZondag'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', updateFormPreview);
             el.addEventListener('change', updateFormPreview);
         }
     });
+
+    const datumEl = document.getElementById('inputDatum');
+    if (datumEl) {
+        datumEl.addEventListener('change', () => checkHolidayUI(true));
+        datumEl.addEventListener('input', () => checkHolidayUI(true));
+    }
 
     // Auto-select entire text on focus for fast typing
     ['inputBegintijd', 'inputEindtijd', 'inputPauzetijd', 'inputDatum', 'inputOmschrijving'].forEach(id => {
