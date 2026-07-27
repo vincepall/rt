@@ -592,6 +592,10 @@ h1, h2, h3, h4, .font-heading {
                 <span class="stat-label">Over/Feest (100%)</span>
                 <span class="stat-value" id="statOverwerk100">0,00 u</span>
             </div>
+            <div class="stat-card">
+                <span class="stat-label">Reistijd (100-200%)</span>
+                <span class="stat-value" id="statReistijd">0,00 u</span>
+            </div>
         </section>
 
         <!-- Hours Entry Form -->
@@ -660,16 +664,51 @@ h1, h2, h3, h4, .font-heading {
                         <input type="text" id="inputOmschrijving" tabindex="6" class="form-input" placeholder="">
                     </div>
                     <div class="form-group flex flex-col justify-end hidden" id="groupFeestdagAlsZondag">
-                        <label class="flex items-center gap-2 text-sm font-semibold cursor-pointer py-2 border p-2 bg-white" title="Vink uit als deze feestdag niet als zondag betaald wordt">
-                            <input type="checkbox" id="inputFeestdagAlsZondag" tabindex="7" checked class="w-4 h-4">
-                            Feestdag als zondag
-                        </label>
+                        <div class="flex items-center gap-2 text-sm font-semibold py-2 border p-2 bg-white" title="Vink uit als deze feestdag niet als zondag betaald wordt">
+                            <input type="checkbox" id="inputFeestdagAlsZondag" tabindex="7" checked class="w-4 h-4 cursor-pointer">
+                            <span>Feestdag als zondag</span>
+                        </div>
                     </div>
                     <div class="form-group flex flex-col justify-end">
-                        <label class="flex items-center gap-2 text-sm font-semibold cursor-pointer py-2 border p-2 bg-white">
-                            <input type="checkbox" id="inputDirecteWerkzaamheden" tabindex="8" checked class="w-4 h-4">
-                            Directe werkzaamheden
-                        </label>
+                        <div class="flex items-center gap-2 text-sm font-semibold py-2 border p-2 bg-white">
+                            <input type="checkbox" id="inputDirecteWerkzaamheden" tabindex="8" checked class="w-4 h-4 cursor-pointer">
+                            <span>Directe werkzaamheden</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reistijd Invoer Sectie -->
+                <div class="form-row mt-3 pt-3" style="border-top: 1px dashed #000000;">
+                    <div class="form-group flex flex-col justify-end">
+                        <div class="flex items-center gap-2 text-sm font-semibold py-2 border p-2 bg-white">
+                            <input type="checkbox" id="inputHasReistijd" tabindex="9" class="w-4 h-4 cursor-pointer">
+                            <span>🚗 Reistijd toevoegen</span>
+                        </div>
+                    </div>
+                    <div class="form-group hidden" id="groupReistijdDuur">
+                        <label class="form-label" for="inputReistijdMinuten">Reistijd Duur</label>
+                        <select id="inputReistijdMinuten" tabindex="10" class="form-select">
+                            <option value="15">15 minuten</option>
+                            <option value="30">30 minuten</option>
+                            <option value="45">45 minuten</option>
+                            <option value="60" selected>60 minuten (1 uur)</option>
+                            <option value="90">90 minuten (1,5 uur)</option>
+                            <option value="120">120 minuten (2 uur)</option>
+                            <option value="150">150 minuten (2,5 uur)</option>
+                            <option value="180">180 minuten (3 uur)</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex flex-col justify-end hidden" id="groupReistijdChauffeur">
+                        <div class="flex items-center gap-2 text-sm font-semibold py-2 border p-2 bg-white" title="Bestuurder/Chauffeur van bedrijfsauto ontvangt doordeweeks 125% vergoeding">
+                            <input type="checkbox" id="inputIsChauffeur" tabindex="11" checked class="w-4 h-4 cursor-pointer">
+                            <span>Bestuurder / Chauffeur (125%)</span>
+                        </div>
+                    </div>
+                    <div class="form-group flex flex-col justify-end hidden" id="groupReistijd30MinRegel">
+                        <div class="flex items-center gap-2 text-sm font-semibold py-2 border p-2 bg-white" title="Past de 30 minuten eigen reistijd aftrek toe op doordeweekse dagen (vervalt in het weekend)">
+                            <input type="checkbox" id="inputReistijd30MinRegel" tabindex="12" class="w-4 h-4 cursor-pointer">
+                            <span>30 min eigen tijd aftrek</span>
+                        </div>
                     </div>
                 </div>
 
@@ -726,6 +765,7 @@ h1, h2, h3, h4, .font-heading {
                             <th>Overwerk (40%)</th>
                             <th>Overwerk (50%)</th>
                             <th>Overwerk (100%)</th>
+                            <th>Reistijd</th>
                             <th>Omschrijving</th>
                             <th class="text-right">Acties</th>
                         </tr>
@@ -858,6 +898,10 @@ h1, h2, h3, h4, .font-heading {
                         <tr><td class="p-2">Zondag (alle uren)</td><td class="p-2 font-bold">100%</td></tr>
                         <tr><td class="p-2">Feestdag (alle uren)</td><td class="p-2 font-bold">100%</td></tr>
                         <tr><td class="p-2">Verschoven uren (voor 08:00 of na 16:30, directe werkzaamheden)</td><td class="p-2 font-bold">30%</td></tr>
+                        <tr><td class="p-2">Reistijd doordeweeks (Bestuurder / Chauffeur van bedrijfsauto)</td><td class="p-2 font-bold">125%</td></tr>
+                        <tr><td class="p-2">Reistijd doordeweeks (Niet-bestuurder / Bijrijder)</td><td class="p-2 font-bold">100%</td></tr>
+                        <tr><td class="p-2">Reistijd Zaterdag</td><td class="p-2 font-bold">150%</td></tr>
+                        <tr><td class="p-2">Reistijd Zondag & Feestdagen</td><td class="p-2 font-bold">200%</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1101,7 +1145,19 @@ function timeToHours(timeStr) {
 
 // Calculate hours and surcharge breakdown with calendar day splitting at 00:00 (Personeelsgids Chapter 11)
 function calculateEntryHours(entry) {
-    const { datum, begintijd, eindtijd, pauzetijd = '12:00', pauze = 0, directeWerkzaamheden = true, feestdagAlsZondag = true } = entry;
+    const { 
+        datum, 
+        begintijd, 
+        eindtijd, 
+        pauzetijd = '12:00', 
+        pauze = 0, 
+        directeWerkzaamheden = true, 
+        feestdagAlsZondag = true,
+        hasReistijd = false,
+        reistijdMinuten = 0,
+        isChauffeur = true,
+        reistijd30MinRegel = false
+    } = entry;
 
     let start = timeToHours(begintijd);
     let end = timeToHours(eindtijd);
@@ -1136,6 +1192,9 @@ function calculateEntryHours(entry) {
         overwerk40: 0,
         overwerk50: 0,
         overwerk100: 0,
+        reistijdUren: 0,
+        reistijdPerc: 100,
+        reistijdToeslagUren: 0,
         toeslagUrenTotaal: 0,
         isWeekend: false,
         isFeestdag: false,
@@ -1203,11 +1262,62 @@ function calculateEntryHours(entry) {
     result.overwerk50 = overwerk50Minutes / 60;
     result.overwerk100 = overwerk100Minutes / 60;
 
+    // Calculate Travel Time (Reistijd) & Surcharges (Personeelsgids Paragraaf 9.3.4 & 12.2)
+    let reistijdMin = (hasReistijd ? (parseInt(reistijdMinuten, 10) || 0) : 0);
+    let reistijdUren = 0;
+    let reistijdPerc = 100;
+    let reistijdToeslagUren = 0;
+
+    if (reistijdMin > 0 && datum) {
+        const dObj = new Date(datum + 'T00:00:00');
+        const dayOfWeek = dObj.getDay();
+        const rawHolidayName = isDutchHoliday(datum);
+        const isFeest = (feestdagAlsZondag !== false) ? !!rawHolidayName : false;
+
+        let effectiveReistijdMin = reistijdMin;
+
+        // Apply 30 min eigen tijd rule on Mon-Fri if enabled (not on weekend/holiday)
+        if (reistijd30MinRegel && dayOfWeek >= 1 && dayOfWeek <= 5 && !isFeest) {
+            if (nettoUren < 8) {
+                const spaceTo8hMin = Math.round((8 - nettoUren) * 60);
+                const fillMin = Math.min(reistijdMin, spaceTo8hMin);
+                const remainingReistijdMin = Math.max(0, reistijdMin - fillMin);
+                const excessMin = Math.max(0, remainingReistijdMin - 30);
+                effectiveReistijdMin = fillMin + excessMin;
+            } else {
+                effectiveReistijdMin = Math.max(0, reistijdMin - 30);
+            }
+        }
+
+        reistijdUren = effectiveReistijdMin / 60;
+
+        if (isFeest || dayOfWeek === 0) {
+            reistijdPerc = 200;
+            reistijdToeslagUren = reistijdUren * 1.00; // 200% = 100% base + 100% surcharge
+        } else if (dayOfWeek === 6) {
+            reistijdPerc = 150;
+            reistijdToeslagUren = reistijdUren * 0.50; // 150% = 100% base + 50% surcharge
+        } else {
+            if (isChauffeur !== false) {
+                reistijdPerc = 125;
+                reistijdToeslagUren = reistijdUren * 0.25; // 125% = 100% base + 25% surcharge
+            } else {
+                reistijdPerc = 100;
+                reistijdToeslagUren = 0; // 100% = 100% base + 0% surcharge
+            }
+        }
+    }
+
+    result.reistijdUren = reistijdUren;
+    result.reistijdPerc = reistijdPerc;
+    result.reistijdToeslagUren = reistijdToeslagUren;
+
     result.toeslagUrenTotaal = 
         (result.verschoven * 0.30) +
         (result.overwerk40 * 0.40) +
         (result.overwerk50 * 0.50) +
-        (result.overwerk100 * 1.00);
+        (result.overwerk100 * 1.00) +
+        result.reistijdToeslagUren;
 
     return result;
 }
@@ -1329,6 +1439,8 @@ function calculateTotals(entriesList) {
         overwerk40: 0,
         overwerk50: 0,
         overwerk100: 0,
+        reistijdUren: 0,
+        reistijdToeslagUren: 0,
         toeslagUrenTotaal: 0,
         totaalUitbetalen: 0
     };
@@ -1341,10 +1453,12 @@ function calculateTotals(entriesList) {
         totals.overwerk40 += calc.overwerk40;
         totals.overwerk50 += calc.overwerk50;
         totals.overwerk100 += calc.overwerk100;
+        totals.reistijdUren += calc.reistijdUren;
+        totals.reistijdToeslagUren += calc.reistijdToeslagUren;
         totals.toeslagUrenTotaal += calc.toeslagUrenTotaal;
     });
 
-    totals.totaalUitbetalen = totals.netto + totals.toeslagUrenTotaal;
+    totals.totaalUitbetalen = totals.netto + totals.reistijdUren + totals.toeslagUrenTotaal;
     return totals;
 }
 
@@ -1381,6 +1495,8 @@ function renderStatsCards(totals) {
     document.getElementById('statOverwerk40').textContent = formatHours(totals.overwerk40) + ' u';
     document.getElementById('statOverwerk50').textContent = formatHours(totals.overwerk50) + ' u';
     document.getElementById('statOverwerk100').textContent = formatHours(totals.overwerk100) + ' u';
+    const statReistijdEl = document.getElementById('statReistijd');
+    if (statReistijdEl) statReistijdEl.textContent = formatHours(totals.reistijdUren) + ' u';
 }
 
 // Render Data Table
@@ -1413,6 +1529,7 @@ function renderTable(entriesList) {
             : (calc.isWeekend ? `<span class="badge badge-weekend">Weekend</span>` : '');
 
         const pauzeTijdDisplay = entry.pauze > 0 ? `${formatTime24(entry.pauzetijd || '12:00')} (${entry.pauze}m)` : '0 min';
+        const reistijdDisplay = calc.reistijdUren > 0 ? `${formatHours(calc.reistijdUren)} u (${calc.reistijdPerc}%)` : '-';
 
         html += `
             <tr class="hover:bg-slate-50 transition-colors">
@@ -1428,6 +1545,7 @@ function renderTable(entriesList) {
                 <td>${formatHours(calc.overwerk40)} u</td>
                 <td>${formatHours(calc.overwerk50)} u</td>
                 <td>${formatHours(calc.overwerk100)} u</td>
+                <td class="font-mono text-xs">${reistijdDisplay}</td>
                 <td class="text-xs truncate max-w-xs" title="${entry.omschrijving || ''}">${entry.omschrijving || '-'}</td>
                 <td class="text-right whitespace-nowrap">
                     <button onclick="editEntry('${entry.id}')" class="btn-icon btn-secondary text-xs mr-1" title="Bewerken">
@@ -1510,9 +1628,27 @@ function checkHolidayUI(isDateChange = false) {
     }
 }
 
+function checkReistijdUI() {
+    const hasReistijd = document.getElementById('inputHasReistijd').checked;
+    const gDuur = document.getElementById('groupReistijdDuur');
+    const gChauffeur = document.getElementById('groupReistijdChauffeur');
+    const g30Min = document.getElementById('groupReistijd30MinRegel');
+
+    if (hasReistijd) {
+        if (gDuur) gDuur.classList.remove('hidden');
+        if (gChauffeur) gChauffeur.classList.remove('hidden');
+        if (g30Min) g30Min.classList.remove('hidden');
+    } else {
+        if (gDuur) gDuur.classList.add('hidden');
+        if (gChauffeur) gChauffeur.classList.add('hidden');
+        if (g30Min) g30Min.classList.add('hidden');
+    }
+}
+
 // Live Form Calculation Preview
 function updateFormPreview() {
     checkHolidayUI(false);
+    checkReistijdUI();
     const datum = document.getElementById('inputDatum').value;
     const begintijd = document.getElementById('inputBegintijd').value;
     const eindtijd = document.getElementById('inputEindtijd').value;
@@ -1521,6 +1657,11 @@ function updateFormPreview() {
     const directeWerkzaamheden = document.getElementById('inputDirecteWerkzaamheden').checked;
     const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
     const feestdagAlsZondag = feestdagCheckbox ? feestdagCheckbox.checked : true;
+
+    const hasReistijd = document.getElementById('inputHasReistijd').checked;
+    const reistijdMinuten = parseInt(document.getElementById('inputReistijdMinuten').value, 10) || 0;
+    const isChauffeur = document.getElementById('inputIsChauffeur').checked;
+    const reistijd30MinRegel = document.getElementById('inputReistijd30MinRegel').checked;
 
     const previewEl = document.getElementById('formPreviewBox');
     if (!begintijd || !eindtijd) {
@@ -1531,7 +1672,19 @@ function updateFormPreview() {
     const tStart24 = formatTime24(begintijd);
     const tEnd24 = formatTime24(eindtijd);
     const tPauze24 = formatTime24(pauzetijd);
-    const calc = calculateEntryHours({ datum, begintijd: tStart24, eindtijd: tEnd24, pauzetijd: tPauze24, pauze, directeWerkzaamheden, feestdagAlsZondag });
+    const calc = calculateEntryHours({ 
+        datum, 
+        begintijd: tStart24, 
+        eindtijd: tEnd24, 
+        pauzetijd: tPauze24, 
+        pauze, 
+        directeWerkzaamheden, 
+        feestdagAlsZondag,
+        hasReistijd,
+        reistijdMinuten,
+        isChauffeur,
+        reistijd30MinRegel
+    });
 
     let details = [];
     if (calc.normaal > 0) details.push(`<span>Normaal: <strong>${formatHours(calc.normaal)}u</strong></span>`);
@@ -1539,6 +1692,7 @@ function updateFormPreview() {
     if (calc.overwerk40 > 0) details.push(`<span>Overwerk (40%): <strong>${formatHours(calc.overwerk40)}u</strong></span>`);
     if (calc.overwerk50 > 0) details.push(`<span>Overwerk (50%): <strong>${formatHours(calc.overwerk50)}u</strong></span>`);
     if (calc.overwerk100 > 0) details.push(`<span>Overwerk/Feestdag (100%): <strong>${formatHours(calc.overwerk100)}u</strong></span>`);
+    if (calc.reistijdUren > 0) details.push(`<span>Reistijd (${calc.reistijdPerc}%): <strong>${formatHours(calc.reistijdUren)}u</strong></span>`);
 
     let holidayInfo = calc.isFeestdag ? ` <span class="badge badge-holiday">Feestdag: ${calc.feestdagNaam}</span>` : '';
     let pauzeInfo = pauze > 0 ? ` (Pauze: ${tPauze24} - ${pauze}m)` : ' (Geen pauze)';
@@ -1568,6 +1722,12 @@ function handleFormSubmit(e) {
     const directeWerkzaamheden = document.getElementById('inputDirecteWerkzaamheden').checked;
     const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
     const feestdagAlsZondag = feestdagCheckbox ? feestdagCheckbox.checked : true;
+
+    const hasReistijd = document.getElementById('inputHasReistijd').checked;
+    const reistijdMinuten = parseInt(document.getElementById('inputReistijdMinuten').value, 10) || 0;
+    const isChauffeur = document.getElementById('inputIsChauffeur').checked;
+    const reistijd30MinRegel = document.getElementById('inputReistijd30MinRegel').checked;
+
     const omschrijving = document.getElementById('inputOmschrijving').value.trim();
 
     if (!datum || !begintijd || !eindtijd) {
@@ -1575,20 +1735,25 @@ function handleFormSubmit(e) {
         return;
     }
 
+    const entryData = {
+        datum,
+        begintijd,
+        eindtijd,
+        pauzetijd,
+        pauze,
+        directeWerkzaamheden,
+        feestdagAlsZondag,
+        hasReistijd,
+        reistijdMinuten,
+        isChauffeur,
+        reistijd30MinRegel,
+        omschrijving
+    };
+
     if (state.editingId) {
         const idx = state.entries.findIndex(item => item.id === state.editingId);
         if (idx !== -1) {
-            state.entries[idx] = {
-                id: state.editingId,
-                datum,
-                begintijd,
-                eindtijd,
-                pauzetijd,
-                pauze,
-                directeWerkzaamheden,
-                feestdagAlsZondag,
-                omschrijving
-            };
+            state.entries[idx] = { id: state.editingId, ...entryData };
         }
         state.editingId = null;
         document.getElementById('btnSubmitForm').textContent = 'Invoer Opslaan';
@@ -1596,14 +1761,7 @@ function handleFormSubmit(e) {
     } else {
         const newEntry = {
             id: Date.now().toString(),
-            datum,
-            begintijd,
-            eindtijd,
-            pauzetijd,
-            pauze,
-            directeWerkzaamheden,
-            feestdagAlsZondag,
-            omschrijving
+            ...entryData
         };
         state.entries.push(newEntry);
     }
@@ -1626,9 +1784,16 @@ function editEntry(id) {
     document.getElementById('inputDirecteWerkzaamheden').checked = entry.directeWerkzaamheden !== false;
     const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
     if (feestdagCheckbox) feestdagCheckbox.checked = entry.feestdagAlsZondag !== false;
+
+    document.getElementById('inputHasReistijd').checked = entry.hasReistijd === true;
+    document.getElementById('inputReistijdMinuten').value = entry.reistijdMinuten || 60;
+    document.getElementById('inputIsChauffeur').checked = entry.isChauffeur !== false;
+    document.getElementById('inputReistijd30MinRegel').checked = entry.reistijd30MinRegel === true;
+
     document.getElementById('inputOmschrijving').value = entry.omschrijving || '';
 
     checkHolidayUI(false);
+    checkReistijdUI();
     document.getElementById('btnSubmitForm').textContent = 'Wijziging Opslaan';
     document.getElementById('btnCancelEdit').classList.remove('hidden');
 
@@ -1661,8 +1826,15 @@ function resetForm() {
     document.getElementById('inputDirecteWerkzaamheden').checked = true;
     const feestdagCheckbox = document.getElementById('inputFeestdagAlsZondag');
     if (feestdagCheckbox) feestdagCheckbox.checked = true;
+
+    document.getElementById('inputHasReistijd').checked = false;
+    document.getElementById('inputReistijdMinuten').value = '60';
+    document.getElementById('inputIsChauffeur').checked = true;
+    document.getElementById('inputReistijd30MinRegel').checked = false;
+
     document.getElementById('inputOmschrijving').value = '';
     checkHolidayUI(true);
+    checkReistijdUI();
     updateFormPreview();
 }
 
@@ -1692,6 +1864,11 @@ function handleCsvUpload(file) {
                 const feestdagAlsZondag = !['nee', 'false', '0', 'no'].includes(feestdagAlsZondagStr);
                 const omschrijving = row['Omschrijving'] || row['omschrijving'] || row['Note'] || row['Opmerking'] || '';
 
+                const hasReistijd = ['ja', 'true', '1', 'yes'].includes(String(row['ReistijdToevoegen'] || row['Reistijd (ja/nee)'] || row['HasReistijd'] || 'Nee').toLowerCase());
+                const reistijdMinuten = parseInt(row['ReistijdMinuten'] || row['Reistijd (minuten)'] || row['Reistijd'] || 0, 10) || 0;
+                const isChauffeur = !['nee', 'false', '0', 'no'].includes(String(row['IsChauffeur'] || row['Chauffeur'] || 'Ja').toLowerCase());
+                const reistijd30MinRegel = ['ja', 'true', '1', 'yes'].includes(String(row['Reistijd30MinRegel'] || row['30MinRegel'] || 'Nee').toLowerCase());
+
                 if (datum && begintijd && eindtijd) {
                     let stdDatum = datum.trim();
                     if (stdDatum.includes('/')) {
@@ -1712,6 +1889,10 @@ function handleCsvUpload(file) {
                         pauze: parseInt(pauze, 10) || 0,
                         directeWerkzaamheden,
                         feestdagAlsZondag,
+                        hasReistijd: hasReistijd || reistijdMinuten > 0,
+                        reistijdMinuten,
+                        isChauffeur,
+                        reistijd30MinRegel,
                         omschrijving: omschrijving.trim()
                     });
                 }
@@ -1749,6 +1930,10 @@ function exportCsv() {
         'Pauze (minuten)': e.pauze || 0,
         DirecteWerkzaamheden: e.directeWerkzaamheden !== false ? 'Ja' : 'Nee',
         FeestdagAlsZondag: e.feestdagAlsZondag !== false ? 'Ja' : 'Nee',
+        ReistijdToevoegen: e.hasReistijd ? 'Ja' : 'Nee',
+        'Reistijd (minuten)': e.hasReistijd ? (e.reistijdMinuten || 0) : 0,
+        Chauffeur: e.isChauffeur !== false ? 'Ja' : 'Nee',
+        '30MinRegel': e.reistijd30MinRegel ? 'Ja' : 'Nee',
         Omschrijving: e.omschrijving || ''
     }));
 
@@ -1819,6 +2004,7 @@ function triggerPrintReport() {
     printEntries.forEach(entry => {
         const calc = calculateEntryHours(entry);
         const pauzeTijdDisplay = entry.pauze > 0 ? `${formatTime24(entry.pauzetijd || '12:00')} (${entry.pauze}m)` : '0m';
+        const reistijdDisplay = calc.reistijdUren > 0 ? `${formatHours(calc.reistijdUren)} u (${calc.reistijdPerc}%)` : '-';
 
         rowsHtml += `
             <tr>
@@ -1831,6 +2017,7 @@ function triggerPrintReport() {
                 <td>${formatHours(calc.overwerk40)} u</td>
                 <td>${formatHours(calc.overwerk50)} u</td>
                 <td>${formatHours(calc.overwerk100)} u</td>
+                <td>${reistijdDisplay}</td>
                 <td>${entry.omschrijving || '-'}</td>
             </tr>
         `;
@@ -1860,13 +2047,14 @@ function triggerPrintReport() {
                     <tr><td style="padding: 6px;">Overwerk doordeweeks (1e & 2e overuur)</td><td style="padding: 6px;">40%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.overwerk40)} u</td></tr>
                     <tr><td style="padding: 6px;">Overwerk doordeweeks (vanaf 3e overuur) / Zaterdag</td><td style="padding: 6px;">50%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.overwerk50)} u</td></tr>
                     <tr><td style="padding: 6px;">Overwerk Zondag & Feestdagen</td><td style="padding: 6px;">100%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.overwerk100)} u</td></tr>
+                    <tr><td style="padding: 6px;">Reistijd (Bovenmatige reistijd / Reistijdtoeslag)</td><td style="padding: 6px;">100% - 200%</td><td style="padding: 6px; text-align: right;">${formatHours(totals.reistijdUren)} u</td></tr>
                     <tr style="border-top: 2px solid #000000; font-weight: bold;">
-                        <td style="padding: 8px 6px;">TOTAAL GEWERKTE UREN (Netto)</td>
+                        <td style="padding: 8px 6px;">TOTAAL GEWERKTE UREN (Netto ex. reistijd)</td>
                         <td style="padding: 8px 6px;">-</td>
                         <td style="padding: 8px 6px; text-align: right;">${formatHours(totals.netto)} u</td>
                     </tr>
                     <tr style="background-color: #f3f4f6; font-weight: bold;">
-                        <td style="padding: 8px 6px;">TOTAAL TE VERGOEDEN UREN (Incl. toeslag)</td>
+                        <td style="padding: 8px 6px;">TOTAAL TE VERGOEDEN UREN (Incl. reistijd & toeslagen)</td>
                         <td style="padding: 8px 6px;">-</td>
                         <td style="padding: 8px 6px; text-align: right;">${formatHours(totals.totaalUitbetalen)} u</td>
                     </tr>
@@ -1887,11 +2075,12 @@ function triggerPrintReport() {
                     <th>Over 40%</th>
                     <th>Over 50%</th>
                     <th>Over 100%</th>
+                    <th>Reistijd</th>
                     <th>Omschrijving</th>
                 </tr>
             </thead>
             <tbody>
-                ${rowsHtml.length > 0 ? rowsHtml : '<tr><td colspan="10" style="text-align: center;">Geen uren geregistreerd in deze periode.</td></tr>'}
+                ${rowsHtml.length > 0 ? rowsHtml : '<tr><td colspan="11" style="text-align: center;">Geen uren geregistreerd in deze periode.</td></tr>'}
             </tbody>
         </table>
     `;
@@ -1919,7 +2108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('entryForm').addEventListener('submit', handleFormSubmit);
     document.getElementById('btnCancelEdit').addEventListener('click', cancelEdit);
 
-    ['inputDatum', 'inputBegintijd', 'inputEindtijd', 'inputPauzetijd', 'inputPauze', 'inputDirecteWerkzaamheden', 'inputFeestdagAlsZondag'].forEach(id => {
+    ['inputDatum', 'inputBegintijd', 'inputEindtijd', 'inputPauzetijd', 'inputPauze', 'inputDirecteWerkzaamheden', 'inputFeestdagAlsZondag', 'inputHasReistijd', 'inputReistijdMinuten', 'inputIsChauffeur', 'inputReistijd30MinRegel'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', updateFormPreview);
