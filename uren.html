@@ -243,9 +243,21 @@ h1, h2, h3, h4, .font-heading {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
     margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .stat-card {
@@ -577,6 +589,14 @@ h1, h2, h3, h4, .font-heading {
                 <span class="stat-value" id="statNormaal">0,00 u</span>
             </div>
             <div class="stat-card">
+                <span class="stat-label">Uren met Toeslag</span>
+                <span class="stat-value" id="statToeslagGewerkt">0,00 u</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Reistijd (100-200%)</span>
+                <span class="stat-value" id="statReistijd">0,00 u</span>
+            </div>
+            <div class="stat-card">
                 <span class="stat-label">Verschoven (30%)</span>
                 <span class="stat-value" id="statVerschoven">0,00 u</span>
             </div>
@@ -591,10 +611,6 @@ h1, h2, h3, h4, .font-heading {
             <div class="stat-card">
                 <span class="stat-label">Over/Feest (100%)</span>
                 <span class="stat-value" id="statOverwerk100">0,00 u</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Reistijd (100-200%)</span>
-                <span class="stat-value" id="statReistijd">0,00 u</span>
             </div>
         </section>
 
@@ -1070,7 +1086,7 @@ function getDutchHolidays(year) {
         return formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
     };
 
-    // Goede Vrijdag is geen erkende/betaalde feestdag in CAO Metalektro / Applus+
+    
     holidays[addDays(easterSunday, 1)] = '2e Paasdag';
     holidays[addDays(easterSunday, 39)] = 'Hemelvaartsdag';
     holidays[addDays(easterSunday, 50)] = '2e Pinksterdag';
@@ -1242,10 +1258,6 @@ function calculateEntryHours(entry) {
         const minuteOfDay = m % 1440;
         const isShiftedTime = (minuteOfDay < 480 || minuteOfDay >= 990);
 
-        if (directeWerkzaamheden && isShiftedTime) {
-            verschovenMinutes++;
-        }
-
         if (holidayName || dayOfWeek === 0) { // Sunday / Holiday = 100%
             overwerk100Minutes++;
             if (holidayName && !result.feestdagNaam) {
@@ -1255,8 +1267,10 @@ function calculateEntryHours(entry) {
         } else if (dayOfWeek === 6) { // Saturday = 50%
             overwerk50Minutes++;
         } else { // Monday-Friday
-            if (workedMinutes <= 480) { // First 8 hours of shift = regular
-                if (!isShiftedTime || !directeWerkzaamheden) {
+            if (workedMinutes <= 480) { // First 8 hours of shift = regular or shifted
+                if (directeWerkzaamheden && isShiftedTime) {
+                    verschovenMinutes++;
+                } else {
                     normaalMinutes++;
                 }
             } else if (workedMinutes <= 600) { // Overtime 40%
@@ -1452,6 +1466,7 @@ function calculateTotals(entriesList) {
         overwerk100: 0,
         reistijdUren: 0,
         reistijdToeslagUren: 0,
+        toeslagGewerktUren: 0,
         toeslagUrenTotaal: 0,
         totaalUitbetalen: 0
     };
@@ -1469,6 +1484,7 @@ function calculateTotals(entriesList) {
         totals.toeslagUrenTotaal += calc.toeslagUrenTotaal;
     });
 
+    totals.toeslagGewerktUren = totals.verschoven + totals.overwerk40 + totals.overwerk50 + totals.overwerk100;
     totals.totaalUitbetalen = totals.netto + totals.reistijdUren + totals.toeslagUrenTotaal;
     return totals;
 }
@@ -1508,6 +1524,9 @@ function renderStatsCards(totals) {
     document.getElementById('statOverwerk100').textContent = formatHours(totals.overwerk100) + ' u';
     const statReistijdEl = document.getElementById('statReistijd');
     if (statReistijdEl) statReistijdEl.textContent = formatHours(totals.reistijdUren) + ' u';
+
+    const statToeslagGewerktEl = document.getElementById('statToeslagGewerkt');
+    if (statToeslagGewerktEl) statToeslagGewerktEl.textContent = formatHours(totals.toeslagGewerktUren) + ' u';
 }
 
 // Render Data Table
