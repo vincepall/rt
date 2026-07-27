@@ -1162,7 +1162,7 @@ function calculateEntryHours(entry) {
     let start = timeToHours(begintijd);
     let end = timeToHours(eindtijd);
 
-    if (end <= start && end > 0) {
+    if (end < start) {
         end += 24;
     }
 
@@ -1172,7 +1172,7 @@ function calculateEntryHours(entry) {
     let pauzeStart = timeToHours(pauzetijd || '12:00');
     if (pauzeStart < start && end > 24) {
         pauzeStart += 24;
-    } else if (pauzeStart < start && (pauzeStart + 24) < end) {
+    } else if (pauzeStart < start && (pauzeStart + 24) <= end) {
         pauzeStart += 24;
     }
 
