@@ -1033,7 +1033,10 @@ function getDutchHolidays(year) {
     };
 
     holidays[formatDate(year, 1, 1)] = 'Nieuwjaarsdag';
-    holidays[formatDate(year, 5, 5)] = 'Bevrijdingsdag';
+    // Bevrijdingsdag is conform CAO Metalektro uitsluitend een erkende feestdag in lustrumjaren (om de 5 jaar: 2020, 2025, 2030)
+    if (year % 5 === 0) {
+        holidays[formatDate(year, 5, 5)] = 'Bevrijdingsdag';
+    }
     holidays[formatDate(year, 12, 25)] = '1e Kerstdag';
     holidays[formatDate(year, 12, 26)] = '2e Kerstdag';
 
@@ -1067,7 +1070,7 @@ function getDutchHolidays(year) {
         return formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
     };
 
-    holidays[addDays(easterSunday, -2)] = 'Goede Vrijdag';
+    // Goede Vrijdag is geen erkende/betaalde feestdag in CAO Metalektro / Applus+
     holidays[addDays(easterSunday, 1)] = '2e Paasdag';
     holidays[addDays(easterSunday, 39)] = 'Hemelvaartsdag';
     holidays[addDays(easterSunday, 50)] = '2e Pinksterdag';
