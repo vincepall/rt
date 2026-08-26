@@ -115,7 +115,8 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .container {
-    max-width: 1280px;
+    max-width: 1680px;
+    width: 96%;
     margin: 0 auto;
     padding: 20px;
 }
@@ -346,18 +347,38 @@ h1, h2, h3, h4, .font-heading {
 /* Tables */
 .table-container {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 700px; /* Toont maximaal circa 15 regels tegelijk met scrollmogelijkheid */
     border: 2px solid #000000;
+}
+
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+.table-container::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+}
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
 }
 
 .table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 13px;
     text-align: left;
     background: #ffffff;
 }
 
 .table th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     background-color: #f3f4f6;
     color: #000000;
     font-weight: 700;
@@ -366,12 +387,18 @@ h1, h2, h3, h4, .font-heading {
     letter-spacing: 0.5px;
     padding: 12px 14px;
     border-bottom: 2px solid #000000;
+    box-shadow: inset 0 -2px 0 #000000;
 }
 
 .table td {
     padding: 12px 14px;
     border-bottom: 1px solid #e5e7eb;
     color: #000000;
+    background-color: #ffffff;
+}
+
+.table tr:hover td {
+    background-color: #f8fafc;
 }
 
 .table tr:last-child td {
@@ -1537,7 +1564,7 @@ function renderTable(entriesList) {
     if (entriesList.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="11" class="text-center py-8 text-muted">
+                <td colspan="12" class="text-center py-8 text-muted">
                     <p class="mb-2 font-medium">Nog geen uren geregistreerd.</p>
                     <p class="text-xs mb-3">Upload een CSV-bestand of vul hierboven een urenregel in.</p>
                     <button onclick="downloadBlankTemplate()" class="btn btn-secondary text-xs">
