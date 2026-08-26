@@ -288,26 +288,28 @@
         ];
         let remoteItems = [];
 
-        for (const page of pages) {
-          try {
-            const res = await fetch(page);
-            if (res.ok) {
-              const text = await res.text();
-              const parser = new DOMParser();
-              const doc = parser.parseFromString(text, "text/html");
-              const items = Array.from(doc.querySelectorAll(".link-list li"));
+        await Promise.all(
+          pages.map(async (page) => {
+            try {
+              const res = await fetch(page);
+              if (res.ok) {
+                const text = await res.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, "text/html");
+                const items = Array.from(doc.querySelectorAll(".link-list li"));
 
-              items.forEach((li) => {
-                remoteItems.push({
-                  element: li,
-                  text: li.textContent.toLowerCase(),
+                items.forEach((li) => {
+                  remoteItems.push({
+                    element: li,
+                    text: li.textContent.toLowerCase(),
+                  });
                 });
-              });
+              }
+            } catch (e) {
+              console.warn("Could not fetch " + page, e);
             }
-          } catch (e) {
-            console.warn("Could not fetch " + page, e);
-          }
-        }
+          })
+        );
 
         searchBar.addEventListener("input", (e) => {
           const term = e.target.value.toLowerCase().trim();
@@ -326,21 +328,41 @@
             if (filtered.length > 0) {
               // Deduplicate by href
               const seenHrefs = new Set();
+              const uniqueMatches = [];
+
               filtered.forEach((item) => {
                 const link = item.element.querySelector("a");
                 const href = link ? link.getAttribute("href") : null;
                 if (href && !seenHrefs.has(href)) {
                   seenHrefs.add(href);
                   list.appendChild(item.element);
+                  if (link) uniqueMatches.push(link);
                 } else if (!href) {
                   list.appendChild(item.element);
+                  if (link) uniqueMatches.push(link);
                 }
               });
+
+              if (uniqueMatches.length === 1) {
+                const target = uniqueMatches[0];
+                searchBar.blur();
+                if (target.target === "_blank") {
+                  window.open(target.href, "_blank");
+                } else {
+                  target.click();
+                }
+              }
             } else {
               list.innerHTML =
                 '<p style="width: 100%; text-align: center;">Geen resultaten gevonden</p>';
             }
           }
+        });
+
+        window.addEventListener("pageshow", () => {
+          searchBar.value = "";
+          list.innerHTML = "";
+          localItems.forEach((li) => list.appendChild(li));
         });
       });
     </script>
