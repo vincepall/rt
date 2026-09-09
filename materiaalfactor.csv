@@ -1,7 +1,90 @@
-materiaal,factor
-Hasteloy C22 (2.4602),1.5
-Hasteloy C4 (2.4610),1.5
-Inconel,1.3
-Koper,1.4
-Brons,1.3
-1.4876H (Alloy 800H),1.3
+materiaal,werkstoff,groep,factor_150kv,factor_200kv,factor_250kv,factor_300kv,dichtheid_g_cm3,opmerking
+Hastelloy C-276,2.4819 / UNS N10276,Hastelloy,8.26,3.79,2.65,2.17,8.89,Ni-Mo16-Cr16-W4-Fe5
+Hastelloy C-22,2.4602 / UNS N06022,Hastelloy,5.39,2.91,2.19,1.87,8.69,Ni-Cr22-Mo13-W3-Fe3
+Hastelloy C-4,2.4610 / UNS N06455,Hastelloy,3.22,2.12,1.75,1.57,8.64,Ni-Mo16-Cr16
+Hastelloy C-2000,2.4675 / UNS N06200,Hastelloy,3.05,2.05,1.71,1.54,8.5,Ni-Cr23-Mo16-Cu1.6
+Hastelloy B-2,2.4617 / UNS N10665,Hastelloy,6.86,3.4,2.47,2.07,9.22,Ni-Mo28-Fe2
+Hastelloy B-3,2.4600 / UNS N10675,Hastelloy,9.06,3.98,2.75,2.23,9.22,Ni-Mo28.5-Cr1.5-W1.5
+Hastelloy X,2.4665 / UNS N06002,Hastelloy,2.08,1.59,1.4,1.31,8.22,Ni-Cr22-Fe18-Mo9
+Hastelloy G-30,2.4603 / UNS N06030,Hastelloy,2.78,1.92,1.61,1.46,8.22,Ni-Cr30-Fe15-Mo5.5-W2.5
+Hastelloy G-35,2.4643 / UNS N06035,Hastelloy,1.82,1.47,1.33,1.26,8.18,Ni-Cr33-Mo8
+Hastelloy N,2.4607 / UNS N10003,Hastelloy,3.51,2.24,1.82,1.62,8.86,Ni-Mo16-Cr7-Fe4
+Hastelloy W,2.4612 / UNS N10004,Hastelloy,5.06,2.8,2.13,1.83,9.03,Ni-Mo24-Cr5-Fe5
+Inconel 625 (Alloy 625),2.4856 / UNS N06625,Inconel,2.5,1.8,1.55,1.42,8.44,Ni-Cr21.5-Mo9-Nb3.6
+Inconel 718 (Alloy 718),2.4668 / UNS N07718,Inconel,1.79,1.45,1.32,1.24,8.19,Ni-Cr19-Fe18-Nb5-Mo3
+Inconel 600 (Alloy 600),2.4816 / UNS N06600,Inconel,1.47,1.29,1.22,1.18,8.47,Ni-Cr16-Fe8
+Inconel 601 (Alloy 601),2.4851 / UNS N06601,Inconel,1.24,1.16,1.12,1.1,8.11,Ni-Cr23-Fe14-Al1.4
+Inconel 617 (Alloy 617),2.4663 / UNS N06617,Inconel,2.04,1.59,1.41,1.32,8.36,Ni-Cr22-Co12.5-Mo9
+Inconel 686 (Alloy 686),2.4606 / UNS N06686,Inconel,7.12,3.43,2.45,2.03,8.73,Ni-Cr21-Mo16-W4
+Inconel 690 (Alloy 690),2.4642 / UNS N06690,Inconel,1.26,1.17,1.12,1.1,8.19,Ni-Cr29-Fe10
+Inconel X-750,2.4669 / UNS N07750,Inconel,1.53,1.33,1.25,1.2,8.28,Ni-Cr15.5-Fe7-Ti2.5
+Inconel 725 (Alloy 725),UNS N07725,Inconel,2.17,1.64,1.44,1.34,8.31,Ni-Cr21-Mo8-Nb3.5-Ti1.5
+Incoloy 800 / 800H (Alloy 800),1.4876 / UNS N08800/N08810,Incoloy,1.11,1.07,1.06,1.05,7.94,Fe-Ni32-Cr21
+Incoloy 825 (Alloy 825),2.4858 / UNS N08825,Incoloy,1.39,1.24,1.18,1.14,8.14,Ni-Fe30-Cr21.5-Mo3-Cu2
+Incoloy 925 (Alloy 925),UNS N09925,Incoloy,1.39,1.24,1.18,1.14,8.08,Ni-Fe28-Cr21-Mo3-Cu2-Ti2
+Incoloy A-286,1.4980 / UNS S66286,Incoloy,1.13,1.08,1.06,1.05,7.92,Fe-Ni26-Cr15-Ti2-Mo1.3
+Incoloy 803,UNS S35045,Incoloy,1.1,1.07,1.06,1.05,7.97,Fe-Ni35-Cr27
+Monel 400 (Alloy 400),2.4360 / UNS N04400,Monel,2.18,1.69,1.5,1.4,8.8,Ni67-Cu31
+Monel K-500 (Alloy K-500),2.4375 / UNS N05500,Monel,1.8,1.48,1.35,1.28,8.44,Ni65-Cu30-Al3
+Stellite 6 (CoCr-A),2.4994 / CoCr-A,Kobaltbasis,3.4,2.18,1.77,1.57,8.44,Co60-Cr28-W4.5
+Stellite 21 (CoCr-E),CoCr-E,Kobaltbasis,1.46,1.28,1.2,1.16,8.33,Co62-Cr27-Mo5.5
+Stellite 12 (CoCr-B),CoCr-B,Kobaltbasis,8.0,3.68,2.56,2.08,8.53,Co55-Cr29-W8.5
+Haynes 25 (Alloy L-605),2.4964 / UNS R30605,Kobaltbasis,41.36,9.98,5.22,3.63,9.13,Co50-Cr20-W15-Ni10
+Haynes 188,2.4683 / UNS R30188,Kobaltbasis,31.67,8.47,4.63,3.3,8.98,Co39-Ni22-Cr22-W14
+MP35N,2.4999 / UNS R30035,Kobaltbasis,2.13,1.63,1.44,1.34,8.43,Co35-Ni35-Cr20-Mo10
+Titanium Grade 1 & 2 (CP Ti),3.7035 / UNS R50400,Titanium,0.19,0.3,0.38,0.43,4.51,Zuiver Ti
+Titanium Grade 5 (Ti-6Al-4V),3.7164 / UNS R56400,Titanium,0.18,0.29,0.36,0.42,4.43,Ti-6Al-4V
+Titanium Grade 7 (Ti-Pd),3.7235 / UNS R52400,Titanium,0.19,0.3,0.38,0.43,4.51,Ti-0.15Pd
+Titanium Grade 9 (Ti-3Al-2.5V),3.7194 / UNS R56320,Titanium,0.19,0.3,0.37,0.43,4.48,Ti-3Al-2.5V
+Titanium Grade 12 (Ti-Mo-Ni),3.7105 / UNS R53400,Titanium,0.2,0.3,0.38,0.44,4.51,Ti-0.8Ni-0.3Mo
+Koolstofstaal (Referentie),1.0460 / P250GH / C22,RVS & Duplex,1.0,1.0,1.0,1.0,7.85,Staal Referentie = 1.00
+RVS 304 / 304L,1.4301 / 1.4307 / 304L,RVS & Duplex,0.99,1.0,1.0,1.0,7.93,CrNi 18/8
+RVS 316 / 316L,1.4401 / 1.4404 / 316L,RVS & Duplex,1.14,1.09,1.07,1.06,8.0,CrNiMo 17/12/2
+RVS 316Ti,1.4571 / AISI 316Ti,RVS & Duplex,1.11,1.07,1.05,1.04,8.0,Ti-gestabiliseerd 316
+RVS 321,1.4541 / AISI 321,RVS & Duplex,0.96,0.98,0.98,0.98,7.92,Ti-gestabiliseerd 304
+RVS 347,1.4550 / AISI 347,RVS & Duplex,1.03,1.02,1.01,1.01,7.96,Nb-gestabiliseerd 304
+RVS 310S,1.4845 / AISI 310S,RVS & Duplex,0.98,0.99,0.99,0.99,7.9,Hittebestendig 25/20
+RVS 309S,1.4828 / AISI 309S,RVS & Duplex,0.94,0.96,0.97,0.98,7.9,Hittebestendig 23/12
+Duplex 2205,1.4462 / UNS S32205,RVS & Duplex,1.08,1.04,1.03,1.02,7.82,22Cr-5Ni-3Mo
+Lean Duplex 2101,1.4162 / UNS S32101,RVS & Duplex,0.88,0.92,0.93,0.94,7.8,21Cr-1.5Ni-5Mn
+Lean Duplex 2304,1.4362 / UNS S32304,RVS & Duplex,0.92,0.94,0.96,0.96,7.8,23Cr-4.5Ni
+Super Duplex 2507,1.4410 / UNS S32750,RVS & Duplex,1.14,1.08,1.06,1.05,7.8,25Cr-7Ni-4Mo
+Super Duplex Zeron 100,1.4501 / UNS S32760,RVS & Duplex,1.32,1.19,1.13,1.1,7.84,25Cr-7Ni-3.7Mo-W-Cu
+254 SMO (6Mo),1.4547 / UNS S31254,RVS & Duplex,1.38,1.23,1.16,1.13,8.0,20Cr-18Ni-6Mo
+904L,1.4539 / UNS N08904,RVS & Duplex,1.32,1.19,1.14,1.11,8.05,20Cr-25Ni-4.5Mo-Cu
+Alloy 20 (Carpenter 20),2.4660 / UNS N08020,RVS & Duplex,1.38,1.23,1.17,1.13,8.05,Ni35-Fe38-Cr20-Cu3.5
+Sanicro 28 (Alloy 28),1.4563 / UNS N08028,RVS & Duplex,1.18,1.1,1.07,1.05,8.0,31Ni-27Cr-3.5Mo
+Alloy 31,1.4562 / UNS N08031,RVS & Duplex,1.41,1.24,1.17,1.13,8.05,31Ni-27Cr-6.5Mo
+253 MA,1.4835 / UNS S30815,RVS & Duplex,0.94,0.96,0.97,0.97,7.8,21Cr-11Ni-Si-Ce
+17-4 PH (AISI 630),1.4542 / UNS S17400,RVS & Duplex,0.93,0.94,0.95,0.96,7.75,Precipitation Hardening
+16Mo3 (15Mo3),1.5415 / 16Mo3,Ketelstaal,1.0,1.0,1.0,1.0,7.85,Mo-gelegeerd ketelstaal
+13CrMo4-5 (P11 / T11),1.7335 / A335 P11,Ketelstaal,1.01,1.0,1.0,1.0,7.85,1Cr-0.5Mo warmvast
+10CrMo9-10 (P22 / T22),1.7380 / A335 P22,Ketelstaal,1.03,1.02,1.01,1.01,7.85,2.25Cr-1Mo ketelbuis
+11CrMo9-10,1.7383,Ketelstaal,1.01,1.0,1.0,1.0,7.85,2.5Cr-1Mo ketelstaal
+14MoV6-3,1.7715,Ketelstaal,1.0,1.0,1.0,1.0,7.85,CrMoV stoomleidingen
+X10CrMoVNb9-1 (P91 / T91),1.4903 / A335 P91,Ketelstaal,0.97,0.97,0.98,0.98,7.8,9Cr-1Mo-V-Nb martensitisch
+X10CrWMoVNb9-2 (P92 / T92),1.4901 / A335 P92,Ketelstaal,1.47,1.27,1.19,1.14,7.85,9Cr-0.5Mo-1.8W
+VM12-SHC (12Cr),1.4915,Ketelstaal,1.36,1.21,1.14,1.11,7.82,12Cr superkritisch
+Koper Zuiver (Cu-ETP / Cu-DHP),2.0060 / 2.0090 / CW004A,Koper & Brons,2.42,1.79,1.55,1.43,8.94,Roodkoper / Zuiver koper
+Messing / Geelkoper (CuZn37),2.0321 / CW508L,Koper & Brons,2.21,1.66,1.45,1.34,8.44,Cu-Zn messing
+Messing (CuZn39Pb3),2.0401 / CW614N,Koper & Brons,5.04,2.8,2.12,1.8,8.47,Verspaanbaar messing
+Tinbrons (CuSn8),2.1030 / CW453K,Koper & Brons,3.99,2.4,1.9,1.66,8.8,Fosforbrons / Tinbrons
+Tinbrons (CuSn6),2.1020 / CW452K,Koper & Brons,3.52,2.23,1.8,1.6,8.82,Fosforbrons / CuSn6
+Roodbrons (Rg7 / CuSn7ZnPb),2.1090 / CC493K,Koper & Brons,8.45,3.82,2.65,2.15,8.8,Lagerbrons / Rg7
+Aluminiumbrons (CuAl10Fe5Ni5),2.0966 / CW307G,Koper & Brons,1.25,1.13,1.08,1.05,7.6,Corrosievast brons
+Cupro-nikkel 90/10,2.0872 / CW352H,Koper & Brons,2.36,1.76,1.54,1.42,8.9,Zeewaterbestendig 90/10
+Cupro-nikkel 70/30,2.0882 / CW354H,Koper & Brons,2.4,1.79,1.56,1.45,8.95,Zeewaterbestendig 70/30
+Nikkel 200 / 201 (Zuiver Nikkel),2.4066 / UNS N02200,Exotisch & Speciaal,2.19,1.71,1.52,1.42,8.89,Zuiver Ni
+Zirkonium 702 (Zr 702),UNS R60702,Exotisch & Speciaal,7.49,3.1,2.1,1.69,6.51,Zuiver Zirkonium
+Zirkonium 705 (Zr 705),UNS R60705,Exotisch & Speciaal,7.63,3.13,2.11,1.7,6.51,Zr-2.5Nb legering
+Tantaal (Zuiver Ta),2.4560 / UNS R05200,Exotisch & Speciaal,4025243454291.6,7955465.5,38461.08,2277.06,16.65,Vuurvast chemisch bestendig
+Niobium (Columbium),UNS R04200,Exotisch & Speciaal,32.84,7.97,4.28,3.05,8.57,Zuiver Niobium
+Molybdeen (Puur Mo),UNS R03600,Exotisch & Speciaal,108.74,16.84,7.46,4.8,10.22,Vuurvast metaal
+Wolfraam (Tungsten),W 99.95%,Exotisch & Speciaal,791487612384826.2,126701142.39,230090.05,8115.6,19.25,Zwaar / hittebestendig metaal
+Lood (Pb),2.3020 / PB970R,Exotisch & Speciaal,5467215224.25,1745959.64,13253.8,997.07,11.34,Stralingsafscherming
+Tin (Sn),Sn 99.9%,Exotisch & Speciaal,147.57,17.66,7.01,4.25,7.31,Zuiver tin
+Zink (Zn),Zn 99.9%,Exotisch & Speciaal,1.55,1.26,1.15,1.09,7.14,Zuiver zink
+Aluminium Zuiver (1050A),3.0255 / EN AW-1050A,Exotisch & Speciaal,0.05,0.12,0.18,0.23,2.7,Al 99.5%
+Aluminium AlMg3,3.3535 / EN AW-5754,Exotisch & Speciaal,0.05,0.12,0.18,0.23,2.66,AlMg3 scheepsbouw
+Aluminium AlMg4.5Mn,3.3547 / EN AW-5083,Exotisch & Speciaal,0.05,0.12,0.18,0.23,2.66,5083 zeewaterbestendig
+Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,Ultra lichtgewicht
