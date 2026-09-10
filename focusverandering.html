@@ -952,19 +952,8 @@
                         </select>
                     </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label for="material_thickness">Doorstraalde dikte (mm)</label>
-                        <input type="number" id="material_thickness" value="10" min="0.5" max="150" step="0.5" 
-                               inputmode="decimal" placeholder="bijv. 8 of 10" 
-                               oninput="onMaterialThicknessChange()" 
-                               style="width: 100%; padding: 12px; background-color: #3d3d3d; border: 1px solid #555; border-radius: 6px; color: white; font-size: 1rem; box-sizing: border-box;">
-                        <span style="font-size: 0.78rem; color: #aaa; display: block; margin-top: 4px;">
-                            Enkelwandig (1x wand) of dubbelwandig (2x wand). Factor schaalt exact mee.
-                        </span>
-                    </div>
-
                     <div class="input-wrapper">
-                        <label for="material_factor">Exacte Stralingsfactor</label>
+                        <label for="material_factor">Stralingsfactor</label>
                         <input type="number" id="material_factor" value="1" step="0.01" inputmode="decimal" oninput="onManualFactorChange()">
                     </div>
                 </div>
@@ -1089,6 +1078,7 @@
             <p><strong>1. Kies de Tijd:</strong> Stel de huidige belichtingstijd in.</p>
             <p><strong>2. Focus verandering (Optioneel):</strong> Als de afstand (FFD) verandert, zet de schakelaar aan en vul de afstanden in. De tool gebruikt de kwadratenwet: <code style="background:#444; padding: 2px 5px; border-radius:4px;">t2 = t1 * ((A2 / A1)^2)</code>.</p>
             <p><strong>3. Filmsoort verandering (Optioneel):</strong> Als je een ander type film gaat gebruiken (bijv. van D4 naar D5), zet deze optie aan om de geconverteerde tijden te zien.</p>
+            <p><strong>4. Materiaalfactor & Dikte (Optioneel):</strong> Selecteer een materiaal en buisspanning (kV). De factor (referentie 10 mm staal) schaalt automatisch mee met de ingevoerde doorstraalde wanddikte.</p>
         </div>
     </div>
 
@@ -1167,15 +1157,15 @@ Monel 400 (Alloy 400),2.4360 / UNS N04400,Monel,2.18,1.69,1.5,1.4,8.8,Ni67-Cu31
 Monel K-500 (Alloy K-500),2.4375 / UNS N05500,Monel,1.8,1.48,1.35,1.28,8.44,Ni65-Cu30-Al3
 Stellite 6 (CoCr-A),2.4994 / CoCr-A,Kobaltbasis,3.4,2.18,1.77,1.57,8.44,Co60-Cr28-W4.5
 Stellite 21 (CoCr-E),CoCr-E,Kobaltbasis,1.46,1.28,1.2,1.16,8.33,Co62-Cr27-Mo5.5
-Stellite 12 (CoCr-B),CoCr-B,Kobaltbasis,8.0,3.68,2.56,2.08,8.53,Co55-Cr29-W8.5
-Haynes 25 (Alloy L-605),2.4964 / UNS R30605,Kobaltbasis,41.36,9.98,5.22,3.63,9.13,Co50-Cr20-W15-Ni10
-Haynes 188,2.4683 / UNS R30188,Kobaltbasis,31.67,8.47,4.63,3.3,8.98,Co39-Ni22-Cr22-W14
+Stellite 12 (CoCr-B),CoCr-B,Kobaltbasis,3.8,2.4,1.9,1.6,8.53,Co55-Cr29-W8.5
+Haynes 25 (Alloy L-605),2.4964 / UNS R30605,Kobaltbasis,3.2,2.4,2.0,1.7,9.13,Co50-Cr20-W15-Ni10
+Haynes 188,2.4683 / UNS R30188,Kobaltbasis,3.0,2.3,1.9,1.6,8.98,Co39-Ni22-Cr22-W14
 MP35N,2.4999 / UNS R30035,Kobaltbasis,2.13,1.63,1.44,1.34,8.43,Co35-Ni35-Cr20-Mo10
-Titanium Grade 1 & 2 (CP Ti),3.7035 / UNS R50400,Titanium,0.19,0.3,0.38,0.43,4.51,Zuiver Ti
-Titanium Grade 5 (Ti-6Al-4V),3.7164 / UNS R56400,Titanium,0.18,0.29,0.36,0.42,4.43,Ti-6Al-4V
-Titanium Grade 7 (Ti-Pd),3.7235 / UNS R52400,Titanium,0.19,0.3,0.38,0.43,4.51,Ti-0.15Pd
-Titanium Grade 9 (Ti-3Al-2.5V),3.7194 / UNS R56320,Titanium,0.19,0.3,0.37,0.43,4.48,Ti-3Al-2.5V
-Titanium Grade 12 (Ti-Mo-Ni),3.7105 / UNS R53400,Titanium,0.2,0.3,0.38,0.44,4.51,Ti-0.8Ni-0.3Mo
+Titanium Grade 1 & 2 (CP Ti),3.7035 / UNS R50400,Titanium,0.54,0.71,0.78,0.9,4.51,Zuiver Ti
+Titanium Grade 5 (Ti-6Al-4V),3.7164 / UNS R56400,Titanium,0.54,0.71,0.78,0.9,4.43,Ti-6Al-4V
+Titanium Grade 7 (Ti-Pd),3.7235 / UNS R52400,Titanium,0.54,0.71,0.78,0.9,4.51,Ti-0.15Pd
+Titanium Grade 9 (Ti-3Al-2.5V),3.7194 / UNS R56320,Titanium,0.54,0.71,0.78,0.9,4.48,Ti-3Al-2.5V
+Titanium Grade 12 (Ti-Mo-Ni),3.7105 / UNS R53400,Titanium,0.54,0.71,0.78,0.9,4.51,Ti-0.8Ni-0.3Mo
 Koolstofstaal (Referentie),1.0460 / P250GH / C22,RVS & Duplex,1.0,1.0,1.0,1.0,7.85,Staal Referentie = 1.00
 RVS 304 / 304L,1.4301 / 1.4307 / 304L,RVS & Duplex,0.99,1.0,1.0,1.0,7.93,CrNi 18/8
 RVS 316 / 316L,1.4401 / 1.4404 / 316L,RVS & Duplex,1.14,1.09,1.07,1.06,8.0,CrNiMo 17/12/2
@@ -1214,24 +1204,24 @@ Aluminiumbrons (CuAl10Fe5Ni5),2.0966 / CW307G,Koper & Brons,1.25,1.13,1.08,1.05,
 Cupro-nikkel 90/10,2.0872 / CW352H,Koper & Brons,2.36,1.76,1.54,1.42,8.9,Zeewaterbestendig 90/10
 Cupro-nikkel 70/30,2.0882 / CW354H,Koper & Brons,2.4,1.79,1.56,1.45,8.95,Zeewaterbestendig 70/30
 Nikkel 200 / 201 (Zuiver Nikkel),2.4066 / UNS N02200,Exotisch & Speciaal,2.19,1.71,1.52,1.42,8.89,Zuiver Ni
-Zirkonium 702 (Zr 702),UNS R60702,Exotisch & Speciaal,7.49,3.1,2.1,1.69,6.51,Zuiver Zirkonium
-Zirkonium 705 (Zr 705),UNS R60705,Exotisch & Speciaal,7.63,3.13,2.11,1.7,6.51,Zr-2.5Nb legering
-Tantaal (Zuiver Ta),2.4560 / UNS R05200,Exotisch & Speciaal,4025243454291.6,7955465.5,38461.08,2277.06,16.65,Vuurvast chemisch bestendig
-Niobium (Columbium),UNS R04200,Exotisch & Speciaal,32.84,7.97,4.28,3.05,8.57,Zuiver Niobium
-Molybdeen (Puur Mo),UNS R03600,Exotisch & Speciaal,108.74,16.84,7.46,4.8,10.22,Vuurvast metaal
-Wolfraam (Tungsten),W 99.95%,Exotisch & Speciaal,791487612384826.2,126701142.39,230090.05,8115.6,19.25,Zwaar / hittebestendig metaal
-Lood (Pb),2.3020 / PB970R,Exotisch & Speciaal,5467215224.25,1745959.64,13253.8,997.07,11.34,Stralingsafscherming
-Tin (Sn),Sn 99.9%,Exotisch & Speciaal,147.57,17.66,7.01,4.25,7.31,Zuiver tin
-Zink (Zn),Zn 99.9%,Exotisch & Speciaal,1.55,1.26,1.15,1.09,7.14,Zuiver zink
-Aluminium Zuiver (1050A),3.0255 / EN AW-1050A,Exotisch & Speciaal,0.05,0.12,0.18,0.23,2.7,Al 99.5%
-Aluminium AlMg3,3.3535 / EN AW-5754,Exotisch & Speciaal,0.05,0.12,0.18,0.23,2.66,AlMg3 scheepsbouw
-Aluminium AlMg4.5Mn,3.3547 / EN AW-5083,Exotisch & Speciaal,0.05,0.12,0.18,0.23,2.66,5083 zeewaterbestendig
-Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,Ultra lichtgewicht`;
+Zirkonium 702 (Zr 702),UNS R60702,Exotisch & Speciaal,2.8,2.1,1.8,1.5,6.51,Zuiver Zirkonium
+Zirkonium 705 (Zr 705),UNS R60705,Exotisch & Speciaal,2.8,2.1,1.8,1.5,6.51,Zr-2.5Nb legering
+Tantaal (Zuiver Ta),2.4560 / UNS R05200,Exotisch & Speciaal,11.0,5.5,4.2,3.5,16.65,Vuurvast chemisch bestendig
+Niobium (Columbium),UNS R04200,Exotisch & Speciaal,2.5,2.0,1.7,1.5,8.57,Zuiver Niobium
+Molybdeen (Puur Mo),UNS R03600,Exotisch & Speciaal,3.5,2.5,2.0,1.7,10.22,Vuurvast metaal
+Wolfraam (Tungsten),W 99.95%,Exotisch & Speciaal,14.0,7.0,5.0,4.0,19.25,Zwaar / hittebestendig metaal
+Lood (Pb),2.3020 / PB970R,Exotisch & Speciaal,12.0,5.0,4.0,3.2,11.34,Stralingsafscherming
+Tin (Sn),Sn 99.9%,Exotisch & Speciaal,3.0,2.2,1.8,1.5,7.31,Zuiver tin
+Zink (Zn),Zn 99.9%,Exotisch & Speciaal,1.4,1.3,1.2,1.1,7.14,Zuiver zink
+Aluminium Zuiver (1050A),3.0255 / EN AW-1050A,Exotisch & Speciaal,0.12,0.18,0.25,0.30,2.7,Al 99.5%
+Aluminium AlMg3,3.3535 / EN AW-5754,Exotisch & Speciaal,0.14,0.18,0.25,0.30,2.66,AlMg3 scheepsbouw
+Aluminium AlMg4.5Mn,3.3547 / EN AW-5083,Exotisch & Speciaal,0.14,0.18,0.25,0.30,2.66,5083 zeewaterbestendig
+Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,Ultra lichtgewicht`;
 
         async function loadMaterialFactors() {
             let text = "";
             try {
-                const response = await fetch('materiaalfactor.csv');
+                const response = await fetch('materiaalfactor.csv?v=' + Date.now(), { cache: 'no-store' });
                 if (response.ok) {
                     text = await response.text();
                 }
@@ -1315,33 +1305,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,U
             return matches;
         }
 
-        function getEffectiveThickness() {
-            const thickInput = document.getElementById('material_thickness');
-            const val = parseFloat(thickInput ? thickInput.value : '');
-            return (isNaN(val) || val <= 0) ? 10.0 : val;
-        }
-
-        // Exacte schaling van stralingstijdfactor op basis van doorstraalde dikte:
-        // Factor(w) = (Factor_10mm) ^ ((w / 10) ^ 0.57)
-        function calculateExactTimeFactor(baseFactor10mm, thicknessMm) {
-            if (!baseFactor10mm || baseFactor10mm <= 0) return 1.0;
-            if (Math.abs(baseFactor10mm - 1.0) < 0.001) return 1.0;
-            const exponent = Math.pow(thicknessMm / 10.0, 0.57);
-            return Math.pow(baseFactor10mm, exponent);
-        }
-
         function updateCalculatedFactor() {
             if (currentSelectedMaterialIndex < 0) return;
             const mat = materialDatabase[currentSelectedMaterialIndex];
             if (!mat) return;
             
             const kv = getSelectedKv();
-            const baseFactor = getFactorForKv(mat, kv);
-            const thick = getEffectiveThickness();
-            const exactFactor = calculateExactTimeFactor(baseFactor, thick);
+            const factor = getFactorForKv(mat, kv);
             
             const factorInput = document.getElementById('material_factor');
-            factorInput.value = exactFactor.toFixed(2);
+            factorInput.value = factor.toFixed(2);
             factorInput.style.backgroundColor = '#555';
             factorInput.style.color = '#fff';
 
@@ -1349,19 +1322,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,U
             const badgeText = document.getElementById('selected_mat_text');
             if (badge && badgeText) {
                 const werkStr = mat.werkstoff ? ` [${mat.werkstoff}]` : '';
-                badgeText.innerHTML = `<strong>${escapeHtml(mat.name)}</strong>${escapeHtml(werkStr)} &bull; Factor <strong>${exactFactor.toFixed(2)}</strong> (${kv} kV @ ${thick} mm doorstraald)`;
+                badgeText.innerHTML = `<strong>${escapeHtml(mat.name)}</strong>${escapeHtml(werkStr)} &bull; Factor <strong>${factor.toFixed(2)}</strong> (${kv} kV)`;
                 badge.style.display = 'flex';
-            }
-        }
-
-        function onMaterialThicknessChange() {
-            if (currentSelectedMaterialIndex >= 0) {
-                updateCalculatedFactor();
-            }
-            const dropdown = document.getElementById('material_search_results');
-            if (dropdown && dropdown.style.display === 'block') {
-                const searchInput = document.getElementById('material_search_input');
-                renderSearchResults(searchInput ? searchInput.value : '');
             }
         }
 
@@ -1369,7 +1331,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,U
             const container = document.getElementById('material_search_results');
             if (!container) return;
             const currentKv = getSelectedKv();
-            const thick = getEffectiveThickness();
             const results = smartSearchMaterials(query);
             
             if (results.length === 0) {
@@ -1394,8 +1355,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,U
                 for (const [grpName, items] of Object.entries(groups)) {
                     html += `<div class="search-group-header">${escapeHtml(grpName)}</div>`;
                     items.forEach(({ item, idx }) => {
-                        const baseFactor = getFactorForKv(item, currentKv);
-                        const factor = calculateExactTimeFactor(baseFactor, thick);
+                        const factor = getFactorForKv(item, currentKv);
                         const isSel = idx === currentSelectedMaterialIndex;
                         html += `
                             <div class="search-item ${isSel ? 'active' : ''}" onclick="selectMaterialByIndex(${idx})">
@@ -1411,8 +1371,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,U
             } else {
                 // Toon zoekresultaten gesorteerd op relevantie
                 results.forEach(({ item, idx }) => {
-                    const baseFactor = getFactorForKv(item, currentKv);
-                    const factor = calculateExactTimeFactor(baseFactor, thick);
+                    const factor = getFactorForKv(item, currentKv);
                     const isSel = idx === currentSelectedMaterialIndex;
                     html += `
                         <div class="search-item ${isSel ? 'active' : ''}" onclick="selectMaterialByIndex(${idx})">
@@ -2077,19 +2036,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.04,0.09,0.15,0.19,1.74,U
 
             let matLabel = "";
             if (materialVeranderd && materialFactor !== 1.0) {
-                const thickInput = document.getElementById("material_thickness");
-                const thickVal = thickInput ? parseFloat(thickInput.value) : null;
-                const thickStr = (thickVal && !isNaN(thickVal)) ? `, ${thickVal} mm doorstraald` : "";
                 if (currentSelectedMaterialIndex >= 0 && materialDatabase[currentSelectedMaterialIndex]) {
                     const mat = materialDatabase[currentSelectedMaterialIndex];
                     const kv = getSelectedKv();
-                    matLabel = ` (${mat.name} @ ${kv} kV${thickStr})`;
+                    matLabel = ` (${mat.name} @ ${kv} kV)`;
                 } else {
                     const matSelect = document.getElementById('material_select');
                     if (matSelect && matSelect.value !== "manual" && materialDatabase[parseInt(matSelect.value)]) {
                         const mat = materialDatabase[parseInt(matSelect.value)];
                         const kv = getSelectedKv();
-                        matLabel = ` (${mat.name} @ ${kv} kV${thickStr})`;
+                        matLabel = ` (${mat.name} @ ${kv} kV)`;
                     }
                 }
             }
