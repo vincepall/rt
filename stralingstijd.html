@@ -35,8 +35,9 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             width: 100%;
-            max-width: 400px;
+            max-width: 440px;
             border: 1px solid #555;
+            box-sizing: border-box;
         }
 
         .input-group {
@@ -68,6 +69,307 @@
             box-shadow: 0 0 5px rgba(245, 223, 77, 0.5);
         }
 
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            background: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #555;
+        }
+        .checkbox-label {
+            color: #fff;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .checkbox-label input {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* Toggle Switch Factor */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #3d3d3d;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border: 1px solid #555;
+            transition: border-color 0.3s;
+        }
+        .toggle-container:hover {
+            border-color: #F5DF4D;
+        }
+        .toggle-label {
+            margin: 0;
+            color: #f4f4f4;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #F5DF4D;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-color: #333;
+        }
+
+        /* Materiaalfactor Sectie */
+        .keuze-sectie {
+            background-color: #262626;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            border: 1px solid #555;
+            animation: fadeIn 0.3s ease-in-out;
+            text-align: left;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .active-source-indicator {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .active-source-indicator strong {
+            color: #F5DF4D;
+            font-size: 1rem;
+        }
+
+        .material-search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .search-box-wrapper {
+            display: flex;
+            align-items: center;
+            position: relative;
+            gap: 8px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: #777;
+            font-size: 0.95rem;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 42px 12px 36px !important;
+            background-color: #f4f4f4;
+            border: 1px solid #555;
+            border-radius: 8px;
+            color: #222;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #F5DF4D;
+            box-shadow: 0 0 5px rgba(245, 223, 77, 0.5);
+        }
+        .clear-search-btn {
+            position: absolute;
+            right: 54px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 6px 8px;
+            line-height: 1;
+            z-index: 2;
+        }
+        .clear-search-btn:hover {
+            color: #222;
+        }
+        .browse-btn {
+            background-color: #404040;
+            border: 1px solid #555;
+            color: #F5DF4D;
+            padding: 12px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .browse-btn:hover {
+            background-color: #4f4f4f;
+            border-color: #F5DF4D;
+        }
+
+        .search-results-dropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            max-height: 280px;
+            overflow-y: auto;
+            background-color: #1e1e1e;
+            border: 1px solid #555;
+            border-radius: 8px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            -webkit-overflow-scrolling: touch;
+            text-align: left;
+        }
+        .search-group-header {
+            padding: 7px 12px;
+            background-color: #111;
+            color: #F5DF4D;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .search-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid #2d2d2d;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 48px;
+            box-sizing: border-box;
+            transition: background-color 0.15s;
+        }
+        .search-item:active, .search-item:hover {
+            background-color: #333;
+        }
+        .search-item.active {
+            background-color: #38341e;
+            border-left: 3px solid #F5DF4D;
+        }
+        .search-item-info {
+            flex: 1;
+            padding-right: 10px;
+        }
+        .search-item-title {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 0.95rem;
+            line-height: 1.2;
+        }
+        .search-item-sub {
+            font-size: 0.78rem;
+            color: #aaa;
+            margin-top: 3px;
+        }
+        .search-item-factor {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #F5DF4D;
+            white-space: nowrap;
+            background: rgba(245, 223, 77, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(245, 223, 77, 0.25);
+        }
+        .search-no-results {
+            padding: 15px;
+            text-align: center;
+            color: #aaa;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .selected-badge {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #1e1e1e;
+            border-left: 3px solid #F5DF4D;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .selected-badge-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #eee;
+        }
+        .badge-remove-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        .badge-remove-btn:hover {
+            color: #ff5555;
+        }
+
         .result-box {
             margin-top: 25px;
             background-color: #222;
@@ -77,32 +379,62 @@
             text-align: center;
         }
 
-        .time-big {
-            font-size: 2rem;
+        /* Resultaat items met timer knop */
+        .result-item {
+            font-size: 1.15rem;
+            margin: 10px 0;
+            color: #f4f4f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #3d3d3d;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-item-left {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            text-align: left;
+        }
+        .result-filmtype {
             font-weight: bold;
+            color: #fff;
+            font-size: 1.25rem;
+            min-width: 32px;
+        }
+        .result-time {
             color: #F5DF4D;
-            display: block;
-            margin-bottom: 5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-weight: bold;
+            font-size: 1.45rem;
         }
-
-        .debug-info {
-            font-size: 0.9rem;
-            color: #aaa;
-            margin-top: 5px;
+        .timer-open-btn {
+            background-color: #383838;
+            color: #F5DF4D;
+            border: 1px solid #F5DF4D;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
-
-        .formula-note {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #888;
-            border-top: 1px solid #444;
-            padding-top: 10px;
-            text-align: center;
+        .timer-open-btn:hover {
+            background-color: #F5DF4D;
+            color: #1a1a1a;
+            transform: scale(1.03);
+        }
+        .timer-open-btn:active {
+            transform: scale(0.97);
         }
         
-        /* Adjust home icon specifically for this page if needed, 
-           but styles.css should handle it generally */
         .home-icon {
             position: absolute;
             top: 20px;
@@ -114,17 +446,260 @@
         }
         
         .home-icon:hover {
+            color: #F5DF4D;
+        }
+
+        /* --- TIMER MODAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+        }
+        .modal-content {
+            background-color: #262626;
+            margin: 35px auto;
+            padding: 25px 20px;
+            border: 2px solid #555;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+            box-sizing: border-box;
+            text-align: center;
+            animation: modalFadeIn 0.25s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: #F5DF4D;
+        }
+
+        .timer-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .timer-header h2 {
+            margin: 0;
             color: #fff;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .timer-film-badge {
+            background: #F5DF4D;
+            color: #1a1a1a;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Countdown display */
+        .timer-display-box {
+            background: #181818;
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 20px 15px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        .timer-countdown-text {
+            display: block;
+            font-size: 3.4rem;
+            font-weight: bold;
+            color: #F5DF4D;
+            font-family: 'Roboto Condensed', monospace;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            text-shadow: 0 0 15px rgba(245, 223, 77, 0.3);
+        }
+        .timer-status-text {
+            font-size: 0.95rem;
+            color: #aaa;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .flashing-box {
+            animation: timerAlarmFlash 0.5s infinite alternate !important;
+            border-color: #ff3333 !important;
+        }
+        @keyframes timerAlarmFlash {
+            from { background-color: #181818; box-shadow: 0 0 10px rgba(255, 50, 50, 0.4); }
+            to { background-color: #771111; box-shadow: 0 0 25px rgba(255, 50, 50, 0.9); }
+        }
+
+        /* Tijd aanpassen */
+        .timer-adjust-group {
+            background: #202020;
+            border: 1px solid #3d3d3d;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .timer-adjust-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ddd;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .timer-inputs-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+        .timer-input-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90px;
+        }
+        .timer-input-wrap input {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 8px;
+            background: #111;
+            color: #F5DF4D;
+            border: 1px solid #555;
+            border-radius: 6px;
+        }
+        .timer-unit {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+        .timer-colon {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 18px;
+        }
+
+        /* Controls: Start, Pauze, Reset */
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .timer-ctrl-btn {
+            flex: 1;
+            padding: 12px 10px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: transform 0.1s, opacity 0.2s, background-color 0.2s;
+        }
+        .timer-ctrl-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .timer-ctrl-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+        }
+        .timer-ctrl-btn:not(:disabled):active {
+            transform: translateY(0);
+        }
+        .btn-start {
+            background-color: #F5DF4D;
+            color: #1a1a1a;
+        }
+        .btn-pause {
+            background-color: #ff9800;
+            color: #1a1a1a;
+        }
+        .btn-reset {
+            background-color: #4a4a4a;
+            color: #fff;
+        }
+        .btn-alarm-stop {
+            background-color: #e53935;
+            color: #fff;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.15rem;
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+
+        /* Floating mini timer badge when modal is closed while running */
+        .active-timer-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e1e1e;
+            color: #F5DF4D;
+            border: 2px solid #F5DF4D;
+            padding: 10px 16px;
+            border-radius: 30px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 1500;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: floatIn 0.3s ease-out;
+        }
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 600px) {
             .calculator-card {
-                padding: 1.5rem;
+                padding: 1.25rem;
             }
-            
             h1 {
                 font-size: 1.8rem;
-                margin-top: 40px; /* Space for home icon */
+                margin-top: 40px;
+            }
+            .timer-countdown-text {
+                font-size: 2.8rem;
             }
         }
     </style>
@@ -148,7 +723,7 @@
         <label>Activiteit (Ci)</label>
         <input type="number" id="ci" step="0.1" oninput="calculate()">
     </div>
-    <!-- Display current activity nicely for CSV sources (optional, but input is now visible) -->
+    
     <div style="margin-bottom: 15px; color: #aaa; font-size: 0.9rem; display:none;" id="activityInfoText">
         Automatisch berekend op basis van verval.
     </div>
@@ -178,51 +753,136 @@
         </div>
     </div>
 
+    <!-- Materiaalfactor Toggle -->
+    <div class="toggle-container" onclick="toggleMaterial()">
+        <label class="toggle-label">Factor</label>
+        <label class="switch">
+            <input type="checkbox" id="material_veranderd">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- Materiaalfactor Sectie (Verborgen) -->
+    <div id="material_keuze" class="keuze-sectie" style="display: none;">
+        <div class="active-source-indicator">
+            <i class="fas fa-radiation"></i> Bron voor factor: <strong id="current_source_badge">Ir192</strong>
+        </div>
+
+        <div class="form-group">
+            <label for="material_search_input">Materiaal zoeken (89 soorten)</label>
+            <div class="material-search-container" id="material_search_wrapper">
+                <div class="search-box-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="material_search_input" 
+                           placeholder="Zoek bijv. 625, C276, Koper, Duplex, P91..." 
+                           autocomplete="off" 
+                           class="search-input"
+                           onfocus="onMaterialSearchFocus()"
+                           oninput="onMaterialSearchInput()">
+                    <button type="button" id="clear_material_search" 
+                            onclick="clearMaterialSelection()" 
+                            class="clear-search-btn" 
+                            style="display: none;" title="Wissen">✕</button>
+                    <button type="button" id="btn_toggle_mat_list" 
+                            onclick="toggleMaterialResultsList(event)" 
+                            class="browse-btn" 
+                            title="Toon alle categorieën">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+                
+                <!-- Badge voor geselecteerd materiaal -->
+                <div id="selected_mat_badge" class="selected-badge" style="display: none;">
+                    <div class="selected-badge-content">
+                        <i class="fas fa-check-circle" style="color: #F5DF4D;"></i>
+                        <span id="selected_mat_text"></span>
+                    </div>
+                    <button type="button" onclick="clearMaterialSelection()" class="badge-remove-btn" title="Verwijderen">&times;</button>
+                </div>
+
+                <!-- Dropdown zoekresultaten -->
+                <div id="material_search_results" class="search-results-dropdown" style="display: none;">
+                </div>
+
+                <!-- Fallback / sync select -->
+                <select id="material_select" style="display: none;">
+                    <option value="manual">Handmatig invoeren...</option>
+                </select>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 0;">
+                <label for="material_factor" id="material_factor_label">Stralingsfactor (Ir192)</label>
+                <input type="number" id="material_factor" value="1.00" step="0.01" min="0.01" inputmode="decimal" oninput="onManualFactorChange()">
+            </div>
+        </div>
+    </div>
+
     <div class="result-box">
         <div id="resultsContainer">
-            <!-- Results will be injected here -->
             <div class="result-item">Selecteer een bron...</div>
         </div>
     </div>
 </div>
 
-<style>
-    .checkbox-group {
-        display: flex;
-        gap: 20px; /* Increased gap */
-        justify-content: center;
-        background: #333; /* Darker background */
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #555;
-    }
-    .checkbox-label {
-        color: #fff; /* White text */
-        margin-bottom: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 1.2rem; /* Larger text */
-        font-weight: bold;
-    }
-    .checkbox-label input {
-        width: 20px;
-        height: 20px;
-        margin: 0;
-        cursor: pointer;
-    }
-    .result-item {
-        font-size: 1.2rem;
-        margin: 8px 0;
-        color: #f4f4f4;
-    }
-    .result-time {
-        color: #F5DF4D;
-        font-weight: bold;
-        font-size: 1.5rem;
-    }
-</style>
+<!-- Countdown Timer Modal -->
+<div id="timerModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeTimerModal()">&times;</span>
+        <div class="timer-header">
+            <h2><i class="fas fa-stopwatch" style="color: #F5DF4D;"></i> Timer <span id="timerFilmBadge" class="timer-film-badge">D7</span></h2>
+        </div>
+        
+        <!-- Grote aftelklok weergave -->
+        <div id="timerDisplayBox" class="timer-display-box">
+            <span id="timerCountdownText" class="timer-countdown-text">00:00</span>
+            <div id="timerStatusText" class="timer-status-text">Klaar voor start</div>
+        </div>
+
+        <!-- Tijd handmatig aanpassen -->
+        <div class="timer-adjust-group">
+            <label class="timer-adjust-label"><i class="fas fa-sliders-h"></i> Tijd aanpassen</label>
+            <div class="timer-inputs-row">
+                <div class="timer-input-wrap">
+                    <input type="number" id="timerInputMinutes" min="0" max="999" value="0" oninput="onTimerInputsChanged()">
+                    <span class="timer-unit">Minuten</span>
+                </div>
+                <span class="timer-colon">:</span>
+                <div class="timer-input-wrap">
+                    <input type="number" id="timerInputSeconds" min="0" max="59" value="0" oninput="onTimerInputsChanged()">
+                    <span class="timer-unit">Seconden</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timer bedieningsknoppen -->
+        <div class="timer-controls">
+            <button type="button" id="btnTimerStart" class="timer-ctrl-btn btn-start" onclick="startTimer()">
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button type="button" id="btnTimerPause" class="timer-ctrl-btn btn-pause" onclick="pauseTimer()" disabled>
+                <i class="fas fa-pause"></i> Pauze
+            </button>
+            <button type="button" id="btnTimerReset" class="timer-ctrl-btn btn-reset" onclick="resetTimer()">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+
+        <!-- Alarm Stop Knop bij afloop -->
+        <div id="alarmStopContainer" style="display: none; margin-top: 15px;">
+            <button type="button" class="timer-ctrl-btn btn-alarm-stop" onclick="stopAlarm()">
+                <i class="fas fa-bell-slash"></i> Stop Alarm
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Zwevende mini-timer widget als modal gesloten is tijdens aftellen -->
+<div id="activeTimerFloat" class="active-timer-float" onclick="openActiveTimerModal()">
+    <i class="fas fa-stopwatch fa-spin"></i>
+    <span id="floatCountdown">00:00</span>
+</div>
+
+<audio id="alarmSound" src="alarm.wav" preload="auto"></audio>
 
 <script>
     // --- CONFIGURATION ---
@@ -232,10 +892,137 @@
     };
 
     let sourcesData = [];
+    let materialDatabase = [];
+    let currentSelectedMaterialIndex = -1;
 
-    // Load CSV on start
+    // --- TIMER SYSTEM VARIABLES ---
+    let timerInterval = null;
+    let timerConfiguredSeconds = 0;
+    let timerRemainingSeconds = 0;
+    let timerState = 'stopped'; // 'stopped', 'running', 'paused', 'finished'
+    let currentTimerFilm = 'D7';
+    let wakeLock = null;
+
+    // Ingebouwde materiaallijst fallback (werkt ook standalone / offline via file:///)
+    const EMBEDDED_MATERIAL_CSV = `materiaal,werkstoff,groep,factor_150kv,factor_200kv,factor_250kv,factor_300kv,dichtheid_g_cm3,opmerking,factor_se75,factor_ir192
+Hastelloy C-276,2.4819 / UNS N10276,Hastelloy,8.26,3.79,2.65,2.17,8.89,Ni-Mo16-Cr16-W4-Fe5,3.40,1.79
+Hastelloy C-22,2.4602 / UNS N06022,Hastelloy,5.39,2.91,2.19,1.87,8.69,Ni-Cr22-Mo13-W3-Fe3,2.67,1.62
+Hastelloy C-4,2.4610 / UNS N06455,Hastelloy,3.22,2.12,1.75,1.57,8.64,Ni-Mo16-Cr16,1.99,1.43
+Hastelloy C-2000,2.4675 / UNS N06200,Hastelloy,3.05,2.05,1.71,1.54,8.5,Ni-Cr23-Mo16-Cu1.6,1.93,1.40
+Hastelloy B-2,2.4617 / UNS N10665,Hastelloy,6.86,3.4,2.47,2.07,9.22,Ni-Mo28-Fe2,3.08,1.75
+Hastelloy B-3,2.4600 / UNS N10675,Hastelloy,9.06,3.98,2.75,2.23,9.22,Ni-Mo28.5-Cr1.5-W1.5,3.56,1.82
+Hastelloy X,2.4665 / UNS N06002,Hastelloy,2.08,1.59,1.4,1.31,8.22,Ni-Cr22-Fe18-Mo9,1.53,1.24
+Hastelloy G-30,2.4603 / UNS N06030,Hastelloy,2.78,1.92,1.61,1.46,8.22,Ni-Cr30-Fe15-Mo5.5-W2.5,1.81,1.34
+Hastelloy G-35,2.4643 / UNS N06035,Hastelloy,1.82,1.47,1.33,1.26,8.18,Ni-Cr33-Mo8,1.42,1.20
+Hastelloy N,2.4607 / UNS N10003,Hastelloy,3.51,2.24,1.82,1.62,8.86,Ni-Mo16-Cr7-Fe4,2.10,1.46
+Hastelloy W,2.4612 / UNS N10004,Hastelloy,5.06,2.8,2.13,1.83,9.03,Ni-Mo24-Cr5-Fe5,2.57,1.59
+Inconel 625 (Alloy 625),2.4856 / UNS N06625,Inconel,2.5,1.8,1.55,1.42,8.44,Ni-Cr21.5-Mo9-Nb3.6,1.72,1.32
+Inconel 718 (Alloy 718),2.4668 / UNS N07718,Inconel,1.79,1.45,1.32,1.24,8.19,Ni-Cr19-Fe18-Nb5-Mo3,1.41,1.18
+Inconel 600 (Alloy 600),2.4816 / UNS N06600,Inconel,1.47,1.29,1.22,1.18,8.47,Ni-Cr16-Fe8,1.27,1.15
+Inconel 601 (Alloy 601),2.4851 / UNS N06601,Inconel,1.24,1.16,1.12,1.1,8.11,Ni-Cr23-Fe14-Al1.4,1.15,1.08
+Inconel 617 (Alloy 617),2.4663 / UNS N06617,Inconel,2.04,1.59,1.41,1.32,8.36,Ni-Cr22-Co12.5-Mo9,1.53,1.25
+Inconel 686 (Alloy 686),2.4606 / UNS N06686,Inconel,7.12,3.43,2.45,2.03,8.73,Ni-Cr21-Mo16-W4,3.10,1.70
+Inconel 690 (Alloy 690),2.4642 / UNS N06690,Inconel,1.26,1.17,1.12,1.1,8.19,Ni-Cr29-Fe10,1.15,1.08
+Inconel X-750,2.4669 / UNS N07750,Inconel,1.53,1.33,1.25,1.2,8.28,Ni-Cr15.5-Fe7-Ti2.5,1.30,1.16
+Inconel 725 (Alloy 725),UNS N07725,Inconel,2.17,1.64,1.44,1.34,8.31,Ni-Cr21-Mo8-Nb3.5-Ti1.5,1.57,1.26
+Incoloy 800 / 800H (Alloy 800),1.4876 / UNS N08800/N08810,Incoloy,1.11,1.07,1.06,1.05,7.94,Fe-Ni32-Cr21,1.07,1.04
+Incoloy 825 (Alloy 825),2.4858 / UNS N08825,Incoloy,1.39,1.24,1.18,1.14,8.14,Ni-Fe30-Cr21.5-Mo3-Cu2,1.22,1.11
+Incoloy 925 (Alloy 925),UNS N09925,Incoloy,1.39,1.24,1.18,1.14,8.08,Ni-Fe28-Cr21-Mo3-Cu2-Ti2,1.22,1.11
+Incoloy A-286,1.4980 / UNS S66286,Incoloy,1.13,1.08,1.06,1.05,7.92,Fe-Ni26-Cr15-Ti2-Mo1.3,1.07,1.04
+Incoloy 803,UNS S35045,Incoloy,1.1,1.07,1.06,1.05,7.97,Fe-Ni35-Cr27,1.07,1.04
+Monel 400 (Alloy 400),2.4360 / UNS N04400,Monel,2.18,1.69,1.5,1.4,8.8,Ni67-Cu31,1.63,1.32
+Monel K-500 (Alloy K-500),2.4375 / UNS N05500,Monel,1.8,1.48,1.35,1.28,8.44,Ni65-Cu30-Al3,1.44,1.22
+Stellite 6 (CoCr-A),2.4994 / CoCr-A,Kobaltbasis,3.4,2.18,1.77,1.57,8.44,Co60-Cr28-W4.5,2.04,1.41
+Stellite 21 (CoCr-E),CoCr-E,Kobaltbasis,1.46,1.28,1.2,1.16,8.33,Co62-Cr27-Mo5.5,1.25,1.13
+Stellite 12 (CoCr-B),CoCr-B,Kobaltbasis,3.8,2.4,1.9,1.6,8.53,Co55-Cr29-W8.5,2.23,1.36
+Haynes 25 (Alloy L-605),2.4964 / UNS R30605,Kobaltbasis,3.2,2.4,2.0,1.7,9.13,Co50-Cr20-W15-Ni10,2.26,1.46
+Haynes 188,2.4683 / UNS R30188,Kobaltbasis,3.0,2.3,1.9,1.6,8.98,Co39-Ni22-Cr22-W14,2.16,1.36
+MP35N,2.4999 / UNS R30035,Kobaltbasis,2.13,1.63,1.44,1.34,8.43,Co35-Ni35-Cr20-Mo10,1.57,1.26
+Titanium Grade 1 & 2 (CP Ti),3.7035 / UNS R50400,Titanium,0.54,0.71,0.78,0.9,4.51,Zuiver Ti,0.71,0.90
+Titanium Grade 5 (Ti-6Al-4V),3.7164 / UNS R56400,Titanium,0.54,0.71,0.78,0.9,4.43,Ti-6Al-4V,0.71,0.90
+Titanium Grade 7 (Ti-Pd),3.7235 / UNS R52400,Titanium,0.54,0.71,0.78,0.9,4.51,Ti-0.15Pd,0.71,0.90
+Titanium Grade 9 (Ti-3Al-2.5V),3.7194 / UNS R56320,Titanium,0.54,0.71,0.78,0.9,4.48,Ti-3Al-2.5V,0.71,0.90
+Titanium Grade 12 (Ti-Mo-Ni),3.7105 / UNS R53400,Titanium,0.54,0.71,0.78,0.9,4.51,Ti-0.8Ni-0.3Mo,0.71,0.90
+Koolstofstaal (Referentie),1.0460 / P250GH / C22,RVS & Duplex,1.0,1.0,1.0,1.0,7.85,Staal Referentie = 1.00,1.00,1.00
+RVS 304 / 304L,1.4301 / 1.4307 / 304L,RVS & Duplex,0.99,1.0,1.0,1.0,7.93,CrNi 18/8,1.00,1.00
+RVS 316 / 316L,1.4401 / 1.4404 / 316L,RVS & Duplex,1.14,1.09,1.07,1.06,8.0,CrNiMo 17/12/2,1.08,1.05
+RVS 316Ti,1.4571 / AISI 316Ti,RVS & Duplex,1.11,1.07,1.05,1.04,8.0,Ti-gestabiliseerd 316,1.06,1.03
+RVS 321,1.4541 / AISI 321,RVS & Duplex,0.96,0.98,0.98,0.98,7.92,Ti-gestabiliseerd 304,0.98,0.98
+RVS 347,1.4550 / AISI 347,RVS & Duplex,1.03,1.02,1.01,1.01,7.96,Nb-gestabiliseerd 304,1.02,1.01
+RVS 310S,1.4845 / AISI 310S,RVS & Duplex,0.98,0.99,0.99,0.99,7.9,Hittebestendig 25/20,0.99,0.99
+RVS 309S,1.4828 / AISI 309S,RVS & Duplex,0.94,0.96,0.97,0.98,7.9,Hittebestendig 23/12,0.96,0.99
+Duplex 2205,1.4462 / UNS S32205,RVS & Duplex,1.08,1.04,1.03,1.02,7.82,22Cr-5Ni-3Mo,1.04,1.01
+Lean Duplex 2101,1.4162 / UNS S32101,RVS & Duplex,0.88,0.92,0.93,0.94,7.8,21Cr-1.5Ni-5Mn,0.92,0.95
+Lean Duplex 2304,1.4362 / UNS S32304,RVS & Duplex,0.92,0.94,0.96,0.96,7.8,23Cr-4.5Ni,0.95,0.96
+Super Duplex 2507,1.4410 / UNS S32750,RVS & Duplex,1.14,1.08,1.06,1.05,7.8,25Cr-7Ni-4Mo,1.07,1.04
+Super Duplex Zeron 100,1.4501 / UNS S32760,RVS & Duplex,1.32,1.19,1.13,1.1,7.84,25Cr-7Ni-3.7Mo-W-Cu,1.17,1.08
+254 SMO (6Mo),1.4547 / UNS S31254,RVS & Duplex,1.38,1.23,1.16,1.13,8.0,20Cr-18Ni-6Mo,1.21,1.11
+904L,1.4539 / UNS N08904,RVS & Duplex,1.32,1.19,1.14,1.11,8.05,20Cr-25Ni-4.5Mo-Cu,1.17,1.09
+Alloy 20 (Carpenter 20),2.4660 / UNS N08020,RVS & Duplex,1.38,1.23,1.17,1.13,8.05,Ni35-Fe38-Cr20-Cu3.5,1.21,1.10
+Sanicro 28 (Alloy 28),1.4563 / UNS N08028,RVS & Duplex,1.18,1.1,1.07,1.05,8.0,31Ni-27Cr-3.5Mo,1.09,1.03
+Alloy 31,1.4562 / UNS N08031,RVS & Duplex,1.41,1.24,1.17,1.13,8.05,31Ni-27Cr-6.5Mo,1.22,1.10
+253 MA,1.4835 / UNS S30815,RVS & Duplex,0.94,0.96,0.97,0.97,7.8,21Cr-11Ni-Si-Ce,0.96,0.97
+17-4 PH (AISI 630),1.4542 / UNS S17400,RVS & Duplex,0.93,0.94,0.95,0.96,7.75,Precipitation Hardening,0.94,0.97
+16Mo3 (15Mo3),1.5415 / 16Mo3,Ketelstaal,1.0,1.0,1.0,1.0,7.85,Mo-gelegeerd ketelstaal,1.00,1.00
+13CrMo4-5 (P11 / T11),1.7335 / A335 P11,Ketelstaal,1.01,1.0,1.0,1.0,7.85,1Cr-0.5Mo warmvast,1.00,1.00
+10CrMo9-10 (P22 / T22),1.7380 / A335 P22,Ketelstaal,1.03,1.02,1.01,1.01,7.85,2.25Cr-1Mo ketelbuis,1.02,1.01
+11CrMo9-10,1.7383,Ketelstaal,1.01,1.0,1.0,1.0,7.85,2.5Cr-1Mo ketelstaal,1.00,1.00
+14MoV6-3,1.7715,Ketelstaal,1.0,1.0,1.0,1.0,7.85,CrMoV stoomleidingen,1.00,1.00
+X10CrMoVNb9-1 (P91 / T91),1.4903 / A335 P91,Ketelstaal,0.97,0.97,0.98,0.98,7.8,9Cr-1Mo-V-Nb martensitisch,0.97,0.98
+X10CrWMoVNb9-2 (P92 / T92),1.4901 / A335 P92,Ketelstaal,1.47,1.27,1.19,1.14,7.85,9Cr-0.5Mo-1.8W,1.24,1.10
+VM12-SHC (12Cr),1.4915,Ketelstaal,1.36,1.21,1.14,1.11,7.82,12Cr superkritisch,1.19,1.09
+Koper Zuiver (Cu-ETP / Cu-DHP),2.0060 / 2.0090 / CW004A,Koper & Brons,2.42,1.79,1.55,1.43,8.94,Roodkoper / Zuiver koper,1.71,1.33
+Messing / Geelkoper (CuZn37),2.0321 / CW508L,Koper & Brons,2.21,1.66,1.45,1.34,8.44,Cu-Zn messing,1.59,1.25
+Messing (CuZn39Pb3),2.0401 / CW614N,Koper & Brons,5.04,2.8,2.12,1.8,8.47,Verspaanbaar messing,2.57,1.55
+Tinbrons (CuSn8),2.1030 / CW453K,Koper & Brons,3.99,2.4,1.9,1.66,8.8,Fosforbrons / Tinbrons,2.23,1.47
+Tinbrons (CuSn6),2.1020 / CW452K,Koper & Brons,3.52,2.23,1.8,1.6,8.82,Fosforbrons / CuSn6,2.08,1.44
+Roodbrons (Rg7 / CuSn7ZnPb),2.1090 / CC493K,Koper & Brons,8.45,3.82,2.65,2.15,8.8,Lagerbrons / Rg7,3.42,1.75
+Aluminiumbrons (CuAl10Fe5Ni5),2.0966 / CW307G,Koper & Brons,1.25,1.13,1.08,1.05,7.6,Corrosievast brons,1.11,1.03
+Cupro-nikkel 90/10,2.0872 / CW352H,Koper & Brons,2.36,1.76,1.54,1.42,8.9,Zeewaterbestendig 90/10,1.69,1.32
+Cupro-nikkel 70/30,2.0882 / CW354H,Koper & Brons,2.4,1.79,1.56,1.45,8.95,Zeewaterbestendig 70/30,1.71,1.36
+Nikkel 200 / 201 (Zuiver Nikkel),2.4066 / UNS N02200,Exotisch & Speciaal,2.19,1.71,1.52,1.42,8.89,Zuiver Ni,1.65,1.34
+Zirkonium 702 (Zr 702),UNS R60702,Exotisch & Speciaal,2.8,2.1,1.8,1.5,6.51,Zuiver Zirkonium,2.00,1.26
+Zirkonium 705 (Zr 705),UNS R60705,Exotisch & Speciaal,2.8,2.1,1.8,1.5,6.51,Zr-2.5Nb legering,2.00,1.26
+Tantaal (Zuiver Ta),2.4560 / UNS R05200,Exotisch & Speciaal,11.0,5.5,4.2,3.5,16.65,Vuurvast chemisch bestendig,5.06,2.94
+Niobium (Columbium),UNS R04200,Exotisch & Speciaal,2.5,2.0,1.7,1.5,8.57,Zuiver Niobium,1.90,1.34
+Molybdeen (Puur Mo),UNS R03600,Exotisch & Speciaal,3.5,2.5,2.0,1.7,10.22,Vuurvast metaal,2.33,1.46
+Wolfraam (Tungsten),W 99.95%,Exotisch & Speciaal,14.0,7.0,5.0,4.0,19.25,Zwaar / hittebestendig metaal,6.32,3.21
+Lood (Pb),2.3020 / PB970R,Exotisch & Speciaal,12.0,5.0,4.0,3.2,11.34,Stralingsafscherming,4.66,2.56
+Tin (Sn),Sn 99.9%,Exotisch & Speciaal,3.0,2.2,1.8,1.5,7.31,Zuiver tin,2.06,1.26
+Zink (Zn),Zn 99.9%,Exotisch & Speciaal,1.4,1.3,1.2,1.1,7.14,Zuiver zink,1.27,1.02
+Aluminium Zuiver (1050A),3.0255 / EN AW-1050A,Exotisch & Speciaal,0.12,0.18,0.25,0.30,2.7,Al 99.5%,0.20,0.35
+Aluminium AlMg3,3.3535 / EN AW-5754,Exotisch & Speciaal,0.14,0.18,0.25,0.30,2.66,AlMg3 scheepsbouw,0.20,0.35
+Aluminium AlMg4.5Mn,3.3547 / EN AW-5083,Exotisch & Speciaal,0.14,0.18,0.25,0.30,2.66,5083 zeewaterbestendig,0.20,0.35
+Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,Ultra lichtgewicht,0.08,0.08`;
+
     document.addEventListener('DOMContentLoaded', async () => {
         await loadSources();
+        await loadMaterialFactors();
+
+        // Klik buiten zoekdropdown sluit dropdown
+        document.addEventListener('click', (e) => {
+            const wrapper = document.getElementById('material_search_wrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                closeMaterialDropdown();
+            }
+        });
+
+        // Klik buiten modal sluit modal
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('timerModal');
+            if (e.target === modal) {
+                closeTimerModal();
+            }
+        });
+
+        // Event listener direct op checkbox voor toggling
+        const matToggle = document.getElementById('material_veranderd');
+        if (matToggle) {
+            matToggle.addEventListener('change', function() {
+                document.getElementById('material_keuze').style.display = this.checked ? 'block' : 'none';
+                calculate();
+            });
+        }
     });
 
     async function loadSources() {
@@ -243,7 +1030,7 @@
             const select = document.getElementById('sourceSelect');
             select.innerHTML = '<option value="" disabled selected>Kies een bron...</option>';
 
-            // Add Manual Options first
+            // Manual Options
             const manualIr = document.createElement('option');
             manualIr.value = "manual_Ir192";
             manualIr.text = "Ir192 (Handmatig)";
@@ -260,9 +1047,9 @@
             divider.text = "--- Opgeslagen Bronnen ---";
             select.appendChild(divider);
 
-            const response = await fetch('bronnen.csv');
+            const response = await fetch('bronnen.csv?v=' + Date.now(), { cache: 'no-store' });
             const text = await response.text();
-            const lines = text.trim().split('\n').slice(1); // Skip header
+            const lines = text.trim().split('\n').slice(1);
 
             sourcesData = lines.map(line => {
                 const cols = line.split(',');
@@ -277,28 +1064,90 @@
 
             sourcesData.forEach((src, index) => {
                 const opt = document.createElement('option');
-                opt.value = index; // Use index to retrieve data later
+                opt.value = index;
                 const currentCi = calculateCurrentActivity(src.initialActivity, src.type, src.date);
                 opt.text = `${src.name} (${src.type}) [${currentCi.toFixed(2)} Ci]`;
                 select.appendChild(opt);
             });
             
         } catch (err) {
-            console.error("Error loading CSV:", err);
-            // Even on error, keep manual options
+            console.error("Error loading bronnen CSV:", err);
         }
     }
 
-    function calculateCurrentActivity(initialCi, type, dateStr) {
-        // Parse date DD-MM-YYYY
-        const parts = dateStr.split('-');
-        const sourceDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`); // YYYY-MM-DD
-        const today = new Date();
-        
-        // Calculate diff in days (positive or negative)
-        const days = (today - sourceDate) / (1000 * 60 * 60 * 24);
+    function parseCsvRow(row) {
+        const cells = [];
+        let inQuotes = false;
+        let val = '';
+        for (let i = 0; i < row.length; i++) {
+            const c = row[i];
+            if (c === '"') {
+                inQuotes = !inQuotes;
+            } else if (c === ',' && !inQuotes) {
+                cells.push(val.trim());
+                val = '';
+            } else {
+                val += c;
+            }
+        }
+        cells.push(val.trim());
+        return cells;
+    }
 
-        let halfLife = (type === 'Se75') ? 120 : 74;
+    async function loadMaterialFactors() {
+        let text = "";
+        try {
+            const response = await fetch('materiaalfactor.csv?v=' + Date.now(), { cache: 'no-store' });
+            if (response.ok) {
+                text = await response.text();
+            }
+        } catch (e) {
+            console.info("materiaalfactor.csv niet via HTTP geladen, ingebedde lijst wordt gebruikt.");
+        }
+        if (!text || text.trim().length <= 1) {
+            text = EMBEDDED_MATERIAL_CSV;
+        }
+        const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length <= 1) return;
+
+        materialDatabase = [];
+        for (let i = 1; i < lines.length; i++) {
+            const cols = parseCsvRow(lines[i]);
+            if (cols.length < 5) continue;
+            materialDatabase.push({
+                name: cols[0],
+                werkstoff: cols[1] || '',
+                groep: cols[2] || 'Overig',
+                f150: parseFloat((cols[3] || '1').replace(',', '.')) || 1.0,
+                f200: parseFloat((cols[4] || '1').replace(',', '.')) || 1.0,
+                f250: parseFloat((cols[5] || '1').replace(',', '.')) || 1.0,
+                f300: parseFloat((cols[6] || '1').replace(',', '.')) || 1.0,
+                density: cols[7] ? parseFloat(cols[7].replace(',', '.')) : null,
+                notes: cols[8] || '',
+                f_se75: cols[9] ? (parseFloat(cols[9].replace(',', '.')) || 1.0) : 1.0,
+                f_ir192: cols[10] ? (parseFloat(cols[10].replace(',', '.')) || 1.0) : 1.0
+            });
+        }
+
+        syncMaterialSelectOptions();
+    }
+
+    function getIsotope() {
+        const isoElem = document.getElementById('isotope');
+        return (isoElem && isoElem.value === 'Se75') ? 'Se75' : 'Ir192';
+    }
+
+    function getFactorForIsotope(mat, iso) {
+        if (!mat) return 1.0;
+        return (iso === 'Se75') ? mat.f_se75 : mat.f_ir192;
+    }
+
+    function calculateCurrentActivity(initialCi, type, dateStr) {
+        const parts = dateStr.split('-');
+        const sourceDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+        const today = new Date();
+        const days = (today - sourceDate) / (1000 * 60 * 60 * 24);
+        const halfLife = (type === 'Se75') ? 120 : 74;
         return initialCi / Math.pow(2, days / halfLife);
     }
 
@@ -312,7 +1161,7 @@
             ciInput.readOnly = false;
             ciInput.style.backgroundColor = "#f4f4f4";
             ciInput.style.color = "#333";
-            ciInput.value = ""; // Clear for user input
+            ciInput.value = "";
             ciInput.placeholder = "Vul activiteit in";
             activityInfo.style.display = "none";
         } else if (val === "manual_Se75") {
@@ -324,30 +1173,281 @@
             ciInput.placeholder = "Vul activiteit in";
             activityInfo.style.display = "none";
         } else if (val !== "") {
-            // CSV Source
             const src = sourcesData[parseInt(val)];
             const currentCi = calculateCurrentActivity(src.initialActivity, src.type, src.date);
-            
             document.getElementById('isotope').value = src.type;
             
             ciInput.value = currentCi.toFixed(2);
             ciInput.readOnly = true;
-            ciInput.style.backgroundColor = "#e0e0e0"; // Grey out
+            ciInput.style.backgroundColor = "#e0e0e0";
             ciInput.style.color = "#555";
-            
             activityInfo.style.display = "block";
-            calculate();
+        }
+
+        onIsotopeChange();
+        calculate();
+    }
+
+    function onIsotopeChange() {
+        const currentIso = getIsotope();
+        
+        const badgeElem = document.getElementById('current_source_badge');
+        if (badgeElem) badgeElem.textContent = currentIso;
+
+        const factorLabel = document.getElementById('material_factor_label');
+        if (factorLabel) factorLabel.textContent = `Stralingsfactor (${currentIso})`;
+
+        if (currentSelectedMaterialIndex >= 0) {
+            updateCalculatedFactor();
+        }
+
+        const dropdown = document.getElementById('material_search_results');
+        if (dropdown && dropdown.style.display === 'block') {
+            const searchInput = document.getElementById('material_search_input');
+            renderSearchResults(searchInput ? searchInput.value : '');
         }
     }
 
+    function toggleMaterial() {
+        const checkbox = document.getElementById("material_veranderd");
+        setTimeout(() => {
+            const keuzeDiv = document.getElementById('material_keuze');
+            keuzeDiv.style.display = checkbox.checked ? 'block' : 'none';
+            calculate();
+        }, 10);
+    }
+
+    // Fuzzy search engine
+    function smartSearchMaterials(query) {
+        const qRaw = (query || '').toLowerCase().trim();
+        if (!qRaw) return materialDatabase.map((m, idx) => ({ item: m, idx, score: 0 }));
+        
+        const qClean = qRaw.replace(/[\s\-\/\.]/g, '');
+        const qWords = qRaw.split(/\s+/).filter(w => w.length > 0);
+        
+        const matches = [];
+        materialDatabase.forEach((mat, idx) => {
+            const nameLower = mat.name.toLowerCase();
+            const werkstoffLower = mat.werkstoff.toLowerCase();
+            const groupLower = mat.groep.toLowerCase();
+            const notesLower = mat.notes.toLowerCase();
+            const fullText = `${nameLower} ${werkstoffLower} ${groupLower} ${notesLower}`;
+            const fullClean = fullText.replace(/[\s\-\/\.]/g, '');
+            
+            let score = 0;
+            const nameClean = nameLower.replace(/[\s\-\/\.]/g, '');
+            if (nameClean === qClean) score += 100;
+            else if (nameClean.startsWith(qClean)) score += 60;
+            else if (nameClean.includes(qClean)) score += 40;
+            else if (werkstoffLower.includes(qRaw) || werkstoffLower.replace(/[\s\-\/\.]/g, '').includes(qClean)) score += 35;
+            else if (qWords.every(w => nameLower.includes(w))) score += 30;
+            else if (fullClean.includes(qClean) || qWords.every(w => fullText.includes(w))) {
+                if (groupLower.includes(qRaw)) score += 15;
+                else score += 10;
+            }
+            
+            if (score > 0) {
+                matches.push({ item: mat, idx, score });
+            }
+        });
+        matches.sort((a, b) => b.score - a.score);
+        return matches;
+    }
+
+    function renderSearchResults(query = '') {
+        const container = document.getElementById('material_search_results');
+        if (!container) return;
+        const currentIso = getIsotope();
+        const results = smartSearchMaterials(query);
+        
+        if (results.length === 0) {
+            container.innerHTML = `
+                <div class="search-no-results">
+                    Geen materialen gevonden voor "${escapeHtml(query)}".<br>
+                    <span style="font-size: 0.8rem; color: #888;">Voer de factor hieronder handmatig in of wis de zoekopdracht.</span>
+                </div>`;
+            container.style.display = 'block';
+            return;
+        }
+
+        let html = '';
+        if (!query.trim()) {
+            const groups = {};
+            results.forEach(({ item, idx }) => {
+                if (!groups[item.groep]) groups[item.groep] = [];
+                groups[item.groep].push({ item, idx });
+            });
+
+            for (const [grpName, items] of Object.entries(groups)) {
+                html += `<div class="search-group-header">${escapeHtml(grpName)}</div>`;
+                items.forEach(({ item, idx }) => {
+                    const factor = getFactorForIsotope(item, currentIso);
+                    const isSel = idx === currentSelectedMaterialIndex;
+                    html += `
+                        <div class="search-item ${isSel ? 'active' : ''}" onclick="selectMaterialByIndex(${idx})">
+                            <div class="search-item-info">
+                                <div class="search-item-title">${escapeHtml(item.name)}</div>
+                                <div class="search-item-sub">${item.werkstoff ? escapeHtml(item.werkstoff) + ' &bull; ' : ''}${escapeHtml(item.notes || item.groep)}</div>
+                            </div>
+                            <div class="search-item-factor">${factor.toFixed(2)}</div>
+                        </div>
+                    `;
+                });
+            }
+        } else {
+            results.forEach(({ item, idx }) => {
+                const factor = getFactorForIsotope(item, currentIso);
+                const isSel = idx === currentSelectedMaterialIndex;
+                html += `
+                    <div class="search-item ${isSel ? 'active' : ''}" onclick="selectMaterialByIndex(${idx})">
+                        <div class="search-item-info">
+                            <div class="search-item-title">${escapeHtml(item.name)}</div>
+                            <div class="search-item-sub">${escapeHtml(item.groep)}${item.werkstoff ? ' &bull; ' + escapeHtml(item.werkstoff) : ''}</div>
+                        </div>
+                        <div class="search-item-factor">${factor.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+        }
+
+        container.innerHTML = html;
+        container.style.display = 'block';
+    }
+
+    function selectMaterialByIndex(idx) {
+        currentSelectedMaterialIndex = idx;
+        const mat = materialDatabase[idx];
+        if (!mat) return;
+        
+        const searchInput = document.getElementById('material_search_input');
+        if (searchInput) searchInput.value = mat.name;
+        
+        const clearBtn = document.getElementById('clear_material_search');
+        if (clearBtn) clearBtn.style.display = 'block';
+
+        updateCalculatedFactor();
+        closeMaterialDropdown();
+
+        const select = document.getElementById('material_select');
+        if (select) select.value = idx.toString();
+
+        calculate();
+    }
+
+    function updateCalculatedFactor() {
+        if (currentSelectedMaterialIndex < 0) return;
+        const mat = materialDatabase[currentSelectedMaterialIndex];
+        if (!mat) return;
+        
+        const currentIso = getIsotope();
+        const factor = getFactorForIsotope(mat, currentIso);
+        
+        const factorInput = document.getElementById('material_factor');
+        factorInput.value = factor.toFixed(2);
+
+        const badge = document.getElementById('selected_mat_badge');
+        const badgeText = document.getElementById('selected_mat_text');
+        if (badge && badgeText) {
+            const werkStr = mat.werkstoff ? ` [${mat.werkstoff}]` : '';
+            badgeText.innerHTML = `<strong>${escapeHtml(mat.name)}</strong>${escapeHtml(werkStr)} &bull; Factor <strong>${factor.toFixed(2)}</strong> (${currentIso})`;
+            badge.style.display = 'flex';
+        }
+    }
+
+    function clearMaterialSelection() {
+        currentSelectedMaterialIndex = -1;
+        const searchInput = document.getElementById('material_search_input');
+        if (searchInput) searchInput.value = '';
+        
+        const clearBtn = document.getElementById('clear_material_search');
+        if (clearBtn) clearBtn.style.display = 'none';
+
+        const badge = document.getElementById('selected_mat_badge');
+        if (badge) badge.style.display = 'none';
+
+        const factorInput = document.getElementById('material_factor');
+        factorInput.value = "1.00";
+
+        const select = document.getElementById('material_select');
+        if (select) select.value = 'manual';
+
+        closeMaterialDropdown();
+        calculate();
+    }
+
+    function onManualFactorChange() {
+        currentSelectedMaterialIndex = -1;
+        const badge = document.getElementById('selected_mat_badge');
+        if (badge) badge.style.display = 'none';
+        
+        const searchInput = document.getElementById('material_search_input');
+        if (searchInput) searchInput.value = '';
+        
+        const clearBtn = document.getElementById('clear_material_search');
+        if (clearBtn) clearBtn.style.display = 'none';
+
+        calculate();
+    }
+
+    function onMaterialSearchFocus() {
+        const searchInput = document.getElementById('material_search_input');
+        renderSearchResults(searchInput ? searchInput.value : '');
+    }
+
+    function onMaterialSearchInput() {
+        const searchInput = document.getElementById('material_search_input');
+        const clearBtn = document.getElementById('clear_material_search');
+        const val = searchInput ? searchInput.value : '';
+        if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
+        renderSearchResults(val);
+    }
+
+    function toggleMaterialResultsList(e) {
+        if (e) e.stopPropagation();
+        const dropdown = document.getElementById('material_search_results');
+        if (!dropdown) return;
+        if (dropdown.style.display === 'block') {
+            closeMaterialDropdown();
+        } else {
+            const searchInput = document.getElementById('material_search_input');
+            renderSearchResults(searchInput ? searchInput.value : '');
+        }
+    }
+
+    function closeMaterialDropdown() {
+        const dropdown = document.getElementById('material_search_results');
+        if (dropdown) dropdown.style.display = 'none';
+    }
+
+    function syncMaterialSelectOptions() {
+        const select = document.getElementById('material_select');
+        if (!select) return;
+        select.innerHTML = '<option value="manual">Handmatig invoeren...</option>';
+        materialDatabase.forEach((mat, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx.toString();
+            opt.textContent = `${mat.name} (${mat.groep})`;
+            select.appendChild(opt);
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function calculate() {
-        const iso = document.getElementById('isotope').value;
+        const iso = document.getElementById('isotope').value || 'Ir192';
         const ci = parseFloat(document.getElementById('ci').value);
         const thick = parseFloat(document.getElementById('thickness').value);
         const ffd_cm = parseFloat(document.getElementById('ffd').value);
 
         if (!ci || !thick || !ffd_cm) {
-             // Optional: clear results or show placeholder
              return;
         }
 
@@ -361,7 +1461,18 @@
 
         if (iso === 'Se75') time_d7 *= 1.05;
 
-        // Calculate for types
+        // Materiaalfactor toepassing
+        let matFactor = 1.0;
+        const matVeranderd = document.getElementById('material_veranderd');
+        if (matVeranderd && matVeranderd.checked) {
+            const parsed = parseFloat(document.getElementById('material_factor').value);
+            if (!isNaN(parsed) && parsed > 0) {
+                matFactor = parsed;
+            }
+        }
+        time_d7 *= matFactor;
+
+        // Berekening voor filmtypes
         // D7 = Base
         // D4 = D7 * 2.44
         // D5 = D4 / 1.6666
@@ -385,14 +1496,30 @@
                 hasChecked = true;
                 resultsContainer.innerHTML += `
                     <div class="result-item">
-                        ${type.name}: <span class="result-time">${formatTime(type.val)}</span>
+                        <div class="result-item-left">
+                            <span class="result-filmtype">${type.name}:</span>
+                            <span class="result-time">${formatTime(type.val)}</span>
+                        </div>
+                        <button type="button" class="timer-open-btn" onclick="openTimerModal('${type.name}', ${type.val})" title="Open timer voor ${type.name}">
+                            <i class="fas fa-stopwatch"></i> Timer
+                        </button>
                     </div>
                 `;
             }
         });
 
         if (!hasChecked) {
-            resultsContainer.innerHTML = '<div class="result-item" style="color:#aaa">Vink een filmtype aan.</div>';
+            resultsContainer.innerHTML = '<div class="result-item" style="color:#aaa; justify-content: center;">Vink een filmtype aan.</div>';
+        } else if (matVeranderd && matVeranderd.checked && matFactor !== 1.0) {
+            let matDesc = "";
+            if (currentSelectedMaterialIndex >= 0 && materialDatabase[currentSelectedMaterialIndex]) {
+                matDesc = ` (${escapeHtml(materialDatabase[currentSelectedMaterialIndex].name)})`;
+            }
+            resultsContainer.innerHTML += `
+                <div style="margin-top: 14px; font-size: 0.95rem; color: #F5DF4D; border-top: 1px solid #444; padding-top: 10px;">
+                    <i class="fas fa-layer-group"></i> Inclusief factor <strong>${matFactor.toFixed(2)}</strong>${matDesc}
+                </div>
+            `;
         }
     }
 
@@ -401,6 +1528,287 @@
         let s = Math.round((minutesFloat - m) * 60);
         if (s === 60) { m++; s = 0; }
         return `${m}m ${s}s`;
+    }
+
+    // --- TIMER SYSTEM FUNCTIONS ---
+    function formatCountdown(sec) {
+        if (isNaN(sec) || sec < 0) sec = 0;
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        const pad = (n) => (n < 10 ? '0' + n : n);
+        if (h > 0) {
+            return `${h}:${pad(m)}:${pad(s)}`;
+        }
+        return `${pad(m)}:${pad(s)}`;
+    }
+
+    function openTimerModal(filmType, totalMinutesFloat) {
+        currentTimerFilm = filmType;
+        document.getElementById('timerFilmBadge').textContent = filmType;
+
+        // Bepaal exacte seconden
+        const totalSec = Math.max(1, Math.round(totalMinutesFloat * 60));
+        timerConfiguredSeconds = totalSec;
+        timerRemainingSeconds = totalSec;
+
+        // Vul invoervelden in
+        document.getElementById('timerInputMinutes').value = Math.floor(totalSec / 60);
+        document.getElementById('timerInputSeconds').value = totalSec % 60;
+
+        // Reset weergave
+        document.getElementById('timerCountdownText').textContent = formatCountdown(totalSec);
+        document.getElementById('timerStatusText').textContent = 'Klaar voor start';
+        document.getElementById('timerDisplayBox').classList.remove('flashing-box');
+        document.getElementById('alarmStopContainer').style.display = 'none';
+
+        // Knoppen resetten
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        timerState = 'stopped';
+        updateTimerControls();
+
+        // Modal tonen
+        document.getElementById('timerModal').style.display = 'block';
+        hideFloatingTimer();
+    }
+
+    function openActiveTimerModal() {
+        document.getElementById('timerModal').style.display = 'block';
+        hideFloatingTimer();
+    }
+
+    function closeTimerModal() {
+        document.getElementById('timerModal').style.display = 'none';
+        if (timerState === 'finished') {
+            stopAlarm();
+        } else if (timerState === 'running') {
+            showFloatingTimer();
+        }
+    }
+
+    function showFloatingTimer() {
+        const floatBox = document.getElementById('activeTimerFloat');
+        if (!floatBox) return;
+        updateFloatingTimerDisplay();
+        floatBox.style.display = 'flex';
+    }
+
+    function hideFloatingTimer() {
+        const floatBox = document.getElementById('activeTimerFloat');
+        if (floatBox) floatBox.style.display = 'none';
+    }
+
+    function updateFloatingTimerDisplay() {
+        const floatText = document.getElementById('floatCountdown');
+        if (floatText) {
+            floatText.textContent = `${formatCountdown(timerRemainingSeconds)} (${currentTimerFilm})`;
+        }
+        const floatBox = document.getElementById('activeTimerFloat');
+        if (floatBox) {
+            if (timerState === 'finished') {
+                floatBox.classList.add('flashing-box');
+            } else {
+                floatBox.classList.remove('flashing-box');
+            }
+        }
+    }
+
+    function onTimerInputsChanged() {
+        let m = parseInt(document.getElementById('timerInputMinutes').value) || 0;
+        let s = parseInt(document.getElementById('timerInputSeconds').value) || 0;
+        if (s >= 60) {
+            m += Math.floor(s / 60);
+            s = s % 60;
+            document.getElementById('timerInputMinutes').value = m;
+            document.getElementById('timerInputSeconds').value = s;
+        }
+        if (m < 0) m = 0;
+        if (s < 0) s = 0;
+
+        const newTotal = m * 60 + s;
+        timerConfiguredSeconds = newTotal;
+        timerRemainingSeconds = newTotal;
+
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        timerState = 'stopped';
+
+        document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
+        document.getElementById('timerStatusText').textContent = 'Aangepast • Klaar voor start';
+        document.getElementById('timerDisplayBox').classList.remove('flashing-box');
+        document.getElementById('alarmStopContainer').style.display = 'none';
+
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+    }
+
+    async function startTimer() {
+        if (timerRemainingSeconds <= 0) {
+            timerRemainingSeconds = timerConfiguredSeconds;
+        }
+        if (timerRemainingSeconds <= 0) {
+            alert('Stel een geldige tijd in.');
+            return;
+        }
+
+        timerState = 'running';
+        document.getElementById('timerStatusText').textContent = 'Bezig met aftellen...';
+        document.getElementById('timerDisplayBox').classList.remove('flashing-box');
+        document.getElementById('alarmStopContainer').style.display = 'none';
+        updateTimerControls();
+
+        // Audio initialiseren
+        const audio = document.getElementById('alarmSound');
+        if (audio) {
+            audio.load();
+        }
+
+        // Scherm actief houden via WakeLock
+        await requestWakeLock();
+
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timerRemainingSeconds--;
+            document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
+            updateFloatingTimerDisplay();
+
+            if (timerRemainingSeconds <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                onTimerFinished();
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        if (timerState !== 'running') return;
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        timerState = 'paused';
+        document.getElementById('timerStatusText').textContent = 'Gepauzeerd';
+        releaseWakeLock();
+        updateTimerControls();
+    }
+
+    function resetTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        stopAlarm();
+        timerRemainingSeconds = timerConfiguredSeconds;
+        timerState = 'stopped';
+
+        document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
+        document.getElementById('timerStatusText').textContent = 'Gereset • Klaar voor start';
+        document.getElementById('timerDisplayBox').classList.remove('flashing-box');
+        document.getElementById('alarmStopContainer').style.display = 'none';
+
+        releaseWakeLock();
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+        hideFloatingTimer();
+    }
+
+    function onTimerFinished() {
+        timerState = 'finished';
+        document.getElementById('timerCountdownText').textContent = '00:00';
+        document.getElementById('timerStatusText').textContent = 'TIJD VERSTREKEN!';
+        document.getElementById('timerDisplayBox').classList.add('flashing-box');
+        document.getElementById('alarmStopContainer').style.display = 'block';
+
+        const audio = document.getElementById('alarmSound');
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log('Audio play error:', e));
+        }
+
+        // Vibratie op mobiel
+        if ('vibrate' in navigator) {
+            navigator.vibrate([500, 250, 500, 250, 1000]);
+        }
+
+        // Notificatie
+        if ('Notification' in window && Notification.permission === 'granted') {
+            try {
+                new Notification('RT Stralingstijd Voltooid!', {
+                    body: `De stralingstijd voor film ${currentTimerFilm} is afgelopen!`,
+                    icon: 'RT192.png'
+                });
+            } catch (e) {}
+        }
+
+        releaseWakeLock();
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+    }
+
+    function stopAlarm() {
+        const audio = document.getElementById('alarmSound');
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        document.getElementById('timerDisplayBox').classList.remove('flashing-box');
+        document.getElementById('alarmStopContainer').style.display = 'none';
+
+        // Automatisch resetten naar de oorspronkelijke/geconfigureerde tijd
+        timerRemainingSeconds = timerConfiguredSeconds;
+        timerState = 'stopped';
+        document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
+        document.getElementById('timerStatusText').textContent = 'Klaar voor start';
+
+        releaseWakeLock();
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+        hideFloatingTimer();
+    }
+
+    function updateTimerControls() {
+        const btnStart = document.getElementById('btnTimerStart');
+        const btnPause = document.getElementById('btnTimerPause');
+        const btnReset = document.getElementById('btnTimerReset');
+
+        if (timerState === 'running') {
+            btnStart.disabled = true;
+            btnPause.disabled = false;
+            btnReset.disabled = false;
+            btnStart.innerHTML = '<i class="fas fa-play"></i> Start';
+        } else if (timerState === 'paused') {
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            btnReset.disabled = false;
+            btnStart.innerHTML = '<i class="fas fa-play"></i> Hervat';
+        } else { // stopped of finished
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            btnReset.disabled = false;
+            btnStart.innerHTML = '<i class="fas fa-play"></i> Start';
+        }
+    }
+
+    async function requestWakeLock() {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            }
+        } catch (err) {
+            console.log('Wake Lock error:', err);
+        }
+    }
+
+    function releaseWakeLock() {
+        if (wakeLock) {
+            wakeLock.release().catch(() => {});
+            wakeLock = null;
+        }
     }
 </script>
 
