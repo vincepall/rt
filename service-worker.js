@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v19";
+const CACHE_NAME = "pwa-cache-v20";
 
 // Lijst van bestanden om te cachen bij installatie
 const FILES_TO_CACHE = [
@@ -49,6 +49,7 @@ const FILES_TO_CACHE = [
   "/rt/tape3.PNG",
   "/rt/tape4.PNG",
   "/rt/bglight.png",
+  "/rt/bgpunk.png",
   "/rt/schuif1.png",
   "/rt/schuif2.png",
   "/rt/schuif3.png",
