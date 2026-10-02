@@ -215,7 +215,7 @@
     <script src="script.js"></script>
 
     <div style="margin-bottom: 20px">
-      <input type="text" id="searchBar" placeholder="Zoeken..." />
+      <input type="text" id="searchBar" placeholder="Zoeken..." autofocus />
     </div>
 
     <ul class="link-list">
@@ -266,6 +266,7 @@
           .catch((err) => console.log("Background update failed (offline)"));
 
         const searchBar = document.getElementById("searchBar");
+        searchBar.focus();
         const list = document.querySelector(".link-list");
 
         // Store original local items
@@ -363,6 +364,7 @@
           searchBar.value = "";
           list.innerHTML = "";
           localItems.forEach((li) => list.appendChild(li));
+          searchBar.focus();
         });
       });
     </script>
