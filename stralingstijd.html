@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
     <style>
         body {
             font-family: 'Roboto Condensed', sans-serif;
@@ -19,6 +18,7 @@
             padding: 20px;
             margin: 0;
             min-height: 100vh;
+            position: relative;
         }
 
         h1 {
@@ -449,6 +449,32 @@
             color: #F5DF4D;
         }
 
+        .watch-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            z-index: 10;
+            transition: color 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .watch-link:hover {
+            color: #F5DF4D;
+            transform: scale(1.15);
+        }
+
+        @media (max-width: 768px), (hover: none) and (pointer: coarse) {
+            .watch-link {
+                display: none !important;
+            }
+        }
+
         /* --- TIMER MODAL --- */
         .modal {
             display: none;
@@ -706,7 +732,17 @@
 </head>
 <body>
 
-<h1>Gamma Stralingstijd</h1>
+    <a href="index.html" class="home-icon" title="Terug naar Home"><i class="fas fa-home"></i></a>
+    <a href="https://github.com/vincepall/stralingstijd-watch" target="_blank" rel="noopener noreferrer" class="watch-link" title="Wear OS Watch App op GitHub (stralingstijd-watch)" aria-label="Wear OS Watch App op GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="6"/>
+            <polyline points="12 10 12 12 14 14"/>
+            <path d="m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.64a2 2 0 0 0-2 1.61l-.81 4.05"/>
+            <path d="m7.87 16.34.81 4.05a2 2 0 0 0 2 1.61h2.64a2 2 0 0 0 2-1.61l.81-4.05"/>
+        </svg>
+    </a>
+
+    <h1>Gamma Stralingstijd</h1>
 
 <div class="calculator-card">
     <div class="input-group">
