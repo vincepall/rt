@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v20";
+const CACHE_NAME = "pwa-cache-v21";
 
 // Lijst van bestanden om te cachen bij installatie
 const FILES_TO_CACHE = [
@@ -31,7 +31,6 @@ const FILES_TO_CACHE = [
   "/rt/opstelling13klassea.png",
   "/rt/opstelling2klassea.png",
   "/rt/alarm.wav",
-  "/rt/timer.html",
   "/rt/handigelinks.html",
   "/rt/verzet.html",
   "/rt/buistabel.html",
