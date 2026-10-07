@@ -245,6 +245,327 @@
           margin-top: 5px;
         }
       }
+
+      /* --- TIMER & STRALINGSTIJD STYLES --- */
+      .timer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .timer-row:last-child {
+        border-bottom: none;
+      }
+      .timer-open-btn {
+        background-color: #383838;
+        color: #f5df4d;
+        border: 1px solid #f5df4d;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        text-shadow: none;
+      }
+      .timer-open-btn:hover {
+        background-color: #f5df4d;
+        color: #1a1a1a;
+        transform: scale(1.03);
+      }
+      .timer-open-btn:active {
+        transform: scale(0.97);
+      }
+
+      /* --- TIMER MODAL --- */
+      #timerModal.modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(4px);
+        overflow-y: auto;
+      }
+      #timerModal .modal-content {
+        background-color: #262626;
+        margin: 35px auto;
+        padding: 25px 20px;
+        border: 2px solid #555;
+        width: 90%;
+        max-width: 420px;
+        border-radius: 16px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+        box-sizing: border-box;
+        text-align: center;
+        animation: timerModalFadeIn 0.25s ease-out;
+        color: #f4f4f4;
+        text-shadow: none;
+        font-size: 1rem;
+      }
+      @keyframes timerModalFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      #timerModal .modal-close {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s;
+        text-shadow: none;
+      }
+      #timerModal .modal-close:hover {
+        color: #f5df4d;
+      }
+
+      .timer-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .timer-header h2 {
+        margin: 0;
+        color: #fff;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-shadow: none;
+      }
+      .timer-film-badge {
+        background: #f5df4d;
+        color: #1a1a1a;
+        padding: 2px 10px;
+        border-radius: 6px;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      /* Countdown display */
+      .timer-display-box {
+        background: #181818;
+        border: 2px solid #444;
+        border-radius: 12px;
+        padding: 20px 15px;
+        margin-bottom: 20px;
+        transition: border-color 0.3s, background-color 0.3s;
+      }
+      .timer-countdown-text {
+        display: block;
+        font-size: 3.4rem;
+        font-weight: bold;
+        color: #f5df4d;
+        font-family: 'Roboto Condensed', monospace;
+        letter-spacing: 2px;
+        line-height: 1.1;
+        text-shadow: 0 0 15px rgba(245, 223, 77, 0.3);
+      }
+      .timer-status-text {
+        font-size: 0.95rem;
+        color: #aaa;
+        margin-top: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        text-shadow: none;
+      }
+
+      .flashing-box {
+        animation: timerAlarmFlash 0.5s infinite alternate !important;
+        border-color: #ff3333 !important;
+      }
+      @keyframes timerAlarmFlash {
+        from { background-color: #181818; box-shadow: 0 0 10px rgba(255, 50, 50, 0.4); }
+        to { background-color: #771111; box-shadow: 0 0 25px rgba(255, 50, 50, 0.9); }
+      }
+
+      /* Tijd aanpassen */
+      .timer-adjust-group {
+        background: #202020;
+        border: 1px solid #3d3d3d;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+      .timer-adjust-label {
+        display: block;
+        margin-bottom: 10px;
+        color: #ddd;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-shadow: none;
+      }
+      .timer-inputs-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 0;
+      }
+      .timer-input-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 90px;
+      }
+      .timer-input-wrap input {
+        text-align: center;
+        font-size: 1.4rem !important;
+        font-weight: bold !important;
+        padding: 8px !important;
+        background: #111 !important;
+        color: #f5df4d !important;
+        border: 1px solid #555 !important;
+        border-radius: 6px !important;
+        width: 100% !important;
+        max-width: 90px !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+      }
+      .timer-input-wrap input:focus {
+        border-color: #f5df4d !important;
+        box-shadow: 0 0 5px rgba(245, 223, 77, 0.5) !important;
+        outline: none !important;
+      }
+      .timer-unit {
+        font-size: 0.75rem;
+        color: #888;
+        margin-top: 4px;
+        text-transform: uppercase;
+        text-shadow: none;
+      }
+      .timer-colon {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #888;
+        margin-bottom: 18px;
+        text-shadow: none;
+      }
+
+      /* Controls: Start, Pauze, Reset */
+      .timer-controls {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .timer-ctrl-btn {
+        flex: 1;
+        padding: 12px 10px;
+        font-size: 1.05rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: transform 0.1s, opacity 0.2s, background-color 0.2s;
+        text-shadow: none;
+      }
+      .timer-ctrl-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+      .timer-ctrl-btn:not(:disabled):hover {
+        transform: translateY(-2px);
+      }
+      .timer-ctrl-btn:not(:disabled):active {
+        transform: translateY(0);
+      }
+      .btn-start {
+        background-color: #f5df4d;
+        color: #1a1a1a;
+      }
+      .btn-pause {
+        background-color: #ff9800;
+        color: #1a1a1a;
+      }
+      .btn-reset {
+        background-color: #4a4a4a;
+        color: #fff;
+      }
+      .btn-alarm-stop {
+        background-color: #e53935;
+        color: #fff;
+        width: 100%;
+        padding: 14px;
+        font-size: 1.15rem;
+        animation: pulse 1s infinite alternate;
+        text-shadow: none;
+      }
+      @keyframes pulse {
+        from { transform: scale(1); }
+        to { transform: scale(1.03); }
+      }
+
+      .timer-lock-warning {
+        margin-top: 15px;
+        padding: 9px 12px;
+        background-color: rgba(245, 223, 77, 0.1);
+        border: 1px solid rgba(245, 223, 77, 0.35);
+        border-radius: 8px;
+        color: #e0d080;
+        font-size: 0.82rem;
+        line-height: 1.35;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+        text-shadow: none;
+      }
+      .timer-lock-warning i {
+        color: #f5df4d;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+      }
+
+      /* Floating mini timer badge when modal is closed while running */
+      .active-timer-float {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #1e1e1e;
+        color: #f5df4d;
+        border: 2px solid #f5df4d;
+        padding: 10px 16px;
+        border-radius: 30px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        z-index: 1500;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        animation: floatIn 0.3s ease-out;
+        text-shadow: none;
+      }
+      @keyframes floatIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
     </style>
   </head>
   <body>
@@ -431,7 +752,7 @@
         <p id="wire-result"></p>
         <p id="min-ffd-result"></p>
         <p id="film-quality-result"></p>
-        <p id="exposure-time-result"></p>
+        <div id="exposure-time-result" style="display: none;"></div>
         <p id="verzet-result"></p>
         <p id="max-kv-result"></p>
         <p id="activity-result"></p>
@@ -559,7 +880,11 @@
         var modals = document.getElementsByClassName("modal");
         for (var i = 0; i < modals.length; i++) {
           if (event.target == modals[i]) {
-            modals[i].style.display = "none";
+            if (modals[i].id === "timerModal") {
+              closeTimerModal();
+            } else {
+              modals[i].style.display = "none";
+            }
           }
         }
       };
@@ -2110,7 +2435,7 @@
                     m++;
                     s = 0;
                   }
-                  return `${m}m${s}s`;
+                  return `${m}m ${s}s`;
                 }
 
                 let showD4 = false;
@@ -2127,21 +2452,33 @@
                   showD4 = true;
                 } else if (ft.includes("D4")) {
                   showD4 = true;
+                } else {
+                  showD4 = true;
+                  showD5 = true;
+                  showD7 = true;
                 }
 
                 const time_d4 = time_minutes_d7 * 2.44;
                 const time_d5 = time_d4 / 1.6666;
 
                 let results = [];
-                if (showD4) results.push(`D4≈ ${formatTime(time_d4)}`);
-                if (showD5) results.push(`D5≈ ${formatTime(time_d5)}`);
-                if (showD7) results.push(`D7≈ ${formatTime(time_minutes_d7)}`);
+                if (showD4) results.push({ name: "D4", val: time_d4 });
+                if (showD5) results.push({ name: "D5", val: time_d5 });
+                if (showD7) results.push({ name: "D7", val: time_minutes_d7 });
 
                 if (results.length > 0) {
-                  exposureTimeElement.innerHTML =
-                    "Stralingstijd: <strong>" +
-                    results.join("<br>") +
-                    "</strong>";
+                  let html = '<div style="color: yellow; font-weight: bold; margin-bottom: 6px;">Stralingstijd:</div>';
+                  results.forEach((r) => {
+                    html += `
+                      <div class="timer-row">
+                        <span style="color: #fff;">${r.name}≈ <strong>${formatTime(r.val)}</strong></span>
+                        <button type="button" class="timer-open-btn" onclick="openTimerModal('${r.name}', ${r.val})" title="Open timer voor ${r.name}">
+                          <i class="fas fa-stopwatch"></i> Timer
+                        </button>
+                      </div>
+                    `;
+                  });
+                  exposureTimeElement.innerHTML = html;
                   exposureTimeElement.style.display = "block";
                 }
               }
@@ -3185,6 +3522,344 @@
           updateVisualizer();
         }
       });
+
+      // --- TIMER SYSTEM VARIABLES ---
+      let timerInterval = null;
+      let timerConfiguredSeconds = 0;
+      let timerRemainingSeconds = 0;
+      let timerEndTime = null;
+      let timerState = "stopped"; // 'stopped', 'running', 'paused', 'finished'
+      let currentTimerFilm = "D7";
+      let wakeLock = null;
+
+      // --- TIMER SYSTEM FUNCTIONS ---
+      function formatCountdown(sec) {
+        if (isNaN(sec) || sec < 0) sec = 0;
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        const pad = (n) => (n < 10 ? "0" + n : n);
+        if (h > 0) {
+          return `${h}:${pad(m)}:${pad(s)}`;
+        }
+        return `${pad(m)}:${pad(s)}`;
+      }
+
+      function openTimerModal(filmType, totalMinutesFloat) {
+        currentTimerFilm = filmType;
+        document.getElementById("timerFilmBadge").textContent = filmType;
+
+        // Bepaal exacte seconden
+        const totalSec = Math.max(1, Math.round(totalMinutesFloat * 60));
+        timerConfiguredSeconds = totalSec;
+        timerRemainingSeconds = totalSec;
+
+        // Vul invoervelden in
+        document.getElementById("timerInputMinutes").value = Math.floor(totalSec / 60);
+        document.getElementById("timerInputSeconds").value = totalSec % 60;
+
+        // Reset weergave
+        document.getElementById("timerCountdownText").textContent = formatCountdown(totalSec);
+        document.getElementById("timerStatusText").textContent = "Klaar voor start";
+        document.getElementById("timerDisplayBox").classList.remove("flashing-box");
+        document.getElementById("alarmStopContainer").style.display = "none";
+
+        // Knoppen resetten
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        timerEndTime = null;
+        timerState = "stopped";
+        updateTimerControls();
+
+        // Modal tonen
+        document.getElementById("timerModal").style.display = "block";
+        hideFloatingTimer();
+      }
+
+      function openActiveTimerModal() {
+        document.getElementById("timerModal").style.display = "block";
+        hideFloatingTimer();
+      }
+
+      function closeTimerModal() {
+        document.getElementById("timerModal").style.display = "none";
+        if (timerState === "finished") {
+          stopAlarm();
+        } else if (timerState === "running") {
+          showFloatingTimer();
+        }
+      }
+
+      function showFloatingTimer() {
+        const floatBox = document.getElementById("activeTimerFloat");
+        if (!floatBox) return;
+        updateFloatingTimerDisplay();
+        floatBox.style.display = "flex";
+      }
+
+      function hideFloatingTimer() {
+        const floatBox = document.getElementById("activeTimerFloat");
+        if (floatBox) floatBox.style.display = "none";
+      }
+
+      function updateFloatingTimerDisplay() {
+        const floatText = document.getElementById("floatCountdown");
+        if (floatText) {
+          floatText.textContent = `${formatCountdown(timerRemainingSeconds)} (${currentTimerFilm})`;
+        }
+        const floatBox = document.getElementById("activeTimerFloat");
+        if (floatBox) {
+          if (timerState === "finished") {
+            floatBox.classList.add("flashing-box");
+          } else {
+            floatBox.classList.remove("flashing-box");
+          }
+        }
+      }
+
+      function syncTimerRemaining() {
+        if (timerState !== "running" || !timerEndTime) return;
+        const now = Date.now();
+        const diffMs = timerEndTime - now;
+        const remainingSec = Math.max(0, Math.ceil(diffMs / 1000));
+
+        timerRemainingSeconds = remainingSec;
+        document.getElementById("timerCountdownText").textContent = formatCountdown(timerRemainingSeconds);
+        updateFloatingTimerDisplay();
+
+        if (diffMs <= 0) {
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+          timerEndTime = null;
+          onTimerFinished();
+        }
+      }
+
+      function onTimerInputsChanged() {
+        let m = parseInt(document.getElementById("timerInputMinutes").value) || 0;
+        let s = parseInt(document.getElementById("timerInputSeconds").value) || 0;
+        if (s >= 60) {
+          m += Math.floor(s / 60);
+          s = s % 60;
+          document.getElementById("timerInputMinutes").value = m;
+          document.getElementById("timerInputSeconds").value = s;
+        }
+        if (m < 0) m = 0;
+        if (s < 0) s = 0;
+
+        const newTotal = m * 60 + s;
+        timerConfiguredSeconds = newTotal;
+        timerRemainingSeconds = newTotal;
+
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        timerEndTime = null;
+        timerState = "stopped";
+
+        document.getElementById("timerCountdownText").textContent = formatCountdown(timerRemainingSeconds);
+        document.getElementById("timerStatusText").textContent = "Aangepast • Klaar voor start";
+        document.getElementById("timerDisplayBox").classList.remove("flashing-box");
+        document.getElementById("alarmStopContainer").style.display = "none";
+
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+      }
+
+      async function startTimer() {
+        if (timerRemainingSeconds <= 0) {
+          timerRemainingSeconds = timerConfiguredSeconds;
+        }
+        if (timerRemainingSeconds <= 0) {
+          alert("Stel een geldige tijd in.");
+          return;
+        }
+
+        timerEndTime = Date.now() + (timerRemainingSeconds * 1000);
+        timerState = "running";
+        document.getElementById("timerStatusText").textContent = "Bezig met aftellen...";
+        document.getElementById("timerDisplayBox").classList.remove("flashing-box");
+        document.getElementById("alarmStopContainer").style.display = "none";
+        updateTimerControls();
+
+        // Audio initialiseren
+        const audio = document.getElementById("alarmSound");
+        if (audio) {
+          audio.load();
+        }
+
+        // Vraag notificatie permissie als nodig
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
+
+        // Scherm actief houden via WakeLock
+        await requestWakeLock();
+
+        if (timerInterval) clearInterval(timerInterval);
+        syncTimerRemaining();
+        timerInterval = setInterval(() => {
+          syncTimerRemaining();
+        }, 250);
+      }
+
+      function pauseTimer() {
+        if (timerState !== "running") return;
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        if (timerEndTime) {
+          timerRemainingSeconds = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
+          timerEndTime = null;
+        }
+        timerState = "paused";
+        document.getElementById("timerCountdownText").textContent = formatCountdown(timerRemainingSeconds);
+        document.getElementById("timerStatusText").textContent = "Gepauzeerd";
+        releaseWakeLock();
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+      }
+
+      function resetTimer() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        timerEndTime = null;
+        stopAlarm();
+        timerRemainingSeconds = timerConfiguredSeconds;
+        timerState = "stopped";
+
+        document.getElementById("timerCountdownText").textContent = formatCountdown(timerRemainingSeconds);
+        document.getElementById("timerStatusText").textContent = "Gereset • Klaar voor start";
+        document.getElementById("timerDisplayBox").classList.remove("flashing-box");
+        document.getElementById("alarmStopContainer").style.display = "none";
+
+        releaseWakeLock();
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+        hideFloatingTimer();
+      }
+
+      function onTimerFinished() {
+        timerState = "finished";
+        document.getElementById("timerCountdownText").textContent = "00:00";
+        document.getElementById("timerStatusText").textContent = "TIJD VERSTREKEN!";
+        document.getElementById("timerDisplayBox").classList.add("flashing-box");
+        document.getElementById("alarmStopContainer").style.display = "block";
+
+        const audio = document.getElementById("alarmSound");
+        if (audio) {
+          audio.currentTime = 0;
+          audio.play().catch((e) => console.log("Audio play error:", e));
+        }
+
+        // Vibratie op mobiel
+        if ("vibrate" in navigator) {
+          navigator.vibrate([500, 250, 500, 250, 1000]);
+        }
+
+        // Notificatie
+        if ("Notification" in window && Notification.permission === "granted") {
+          try {
+            new Notification("P.R.U.T.S Stralingstijd Voltooid!", {
+              body: `De stralingstijd voor film ${currentTimerFilm} is afgelopen!`,
+              icon: "RT192.png",
+            });
+          } catch (e) {}
+        }
+
+        releaseWakeLock();
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+      }
+
+      function stopAlarm() {
+        const audio = document.getElementById("alarmSound");
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        timerEndTime = null;
+        document.getElementById("timerDisplayBox").classList.remove("flashing-box");
+        document.getElementById("alarmStopContainer").style.display = "none";
+
+        // Automatisch resetten naar de oorspronkelijke/geconfigureerde tijd
+        timerRemainingSeconds = timerConfiguredSeconds;
+        timerState = "stopped";
+        document.getElementById("timerCountdownText").textContent = formatCountdown(timerRemainingSeconds);
+        document.getElementById("timerStatusText").textContent = "Klaar voor start";
+
+        releaseWakeLock();
+        updateTimerControls();
+        updateFloatingTimerDisplay();
+        hideFloatingTimer();
+      }
+
+      function updateTimerControls() {
+        const btnStart = document.getElementById("btnTimerStart");
+        const btnPause = document.getElementById("btnTimerPause");
+        const btnReset = document.getElementById("btnTimerReset");
+
+        if (timerState === "running") {
+          btnStart.disabled = true;
+          btnPause.disabled = false;
+          btnReset.disabled = false;
+          btnStart.innerHTML = '<i class="fas fa-play"></i> Start';
+        } else if (timerState === "paused") {
+          btnStart.disabled = false;
+          btnPause.disabled = true;
+          btnReset.disabled = false;
+          btnStart.innerHTML = '<i class="fas fa-play"></i> Hervat';
+        } else {
+          btnStart.disabled = false;
+          btnPause.disabled = true;
+          btnReset.disabled = false;
+          btnStart.innerHTML = '<i class="fas fa-play"></i> Start';
+        }
+      }
+
+      async function requestWakeLock() {
+        try {
+          if ("wakeLock" in navigator) {
+            wakeLock = await navigator.wakeLock.request("screen");
+          }
+        } catch (err) {
+          console.log("Wake Lock error:", err);
+        }
+      }
+
+      function releaseWakeLock() {
+        if (wakeLock) {
+          wakeLock.release().catch(() => {});
+          wakeLock = null;
+        }
+      }
+
+      document.addEventListener("visibilitychange", async () => {
+        if (document.visibilityState === "visible" && timerState === "running") {
+          syncTimerRemaining();
+          if (timerState === "running") {
+            await requestWakeLock();
+          }
+        }
+      });
+
+      window.addEventListener("focus", () => {
+        if (timerState === "running") {
+          syncTimerRemaining();
+        }
+      });
     </script>
     <div style="height: 200px"></div>
     <div style="height: 200px"></div>
@@ -3210,5 +3885,70 @@
         <p id="easterEggMessage" style="color: black; text-shadow: none"></p>
       </div>
     </div>
+
+    <!-- Countdown Timer Modal -->
+    <div id="timerModal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeTimerModal()">&times;</span>
+        <div class="timer-header">
+          <h2><i class="fas fa-stopwatch" style="color: #f5df4d;"></i> Timer <span id="timerFilmBadge" class="timer-film-badge">D7</span></h2>
+        </div>
+
+        <!-- Grote aftelklok weergave -->
+        <div id="timerDisplayBox" class="timer-display-box">
+          <span id="timerCountdownText" class="timer-countdown-text">00:00</span>
+          <div id="timerStatusText" class="timer-status-text">Klaar voor start</div>
+        </div>
+
+        <!-- Tijd handmatig aanpassen -->
+        <div class="timer-adjust-group">
+          <label class="timer-adjust-label"><i class="fas fa-sliders-h"></i> Tijd aanpassen</label>
+          <div class="timer-inputs-row">
+            <div class="timer-input-wrap">
+              <input type="number" id="timerInputMinutes" min="0" max="999" value="0" oninput="onTimerInputsChanged()">
+              <span class="timer-unit">Minuten</span>
+            </div>
+            <span class="timer-colon">:</span>
+            <div class="timer-input-wrap">
+              <input type="number" id="timerInputSeconds" min="0" max="59" value="0" oninput="onTimerInputsChanged()">
+              <span class="timer-unit">Seconden</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timer bedieningsknoppen -->
+        <div class="timer-controls">
+          <button type="button" id="btnTimerStart" class="timer-ctrl-btn btn-start" onclick="startTimer()">
+            <i class="fas fa-play"></i> Start
+          </button>
+          <button type="button" id="btnTimerPause" class="timer-ctrl-btn btn-pause" onclick="pauseTimer()" disabled>
+            <i class="fas fa-pause"></i> Pauze
+          </button>
+          <button type="button" id="btnTimerReset" class="timer-ctrl-btn btn-reset" onclick="resetTimer()">
+            <i class="fas fa-undo"></i> Reset
+          </button>
+        </div>
+
+        <div class="timer-lock-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span><strong>Let op:</strong> Vergrendel je telefoon niet handmatig. Het scherm blijft automatisch aan zodat het alarm betrouwbaar afgaat.</span>
+        </div>
+
+        <!-- Alarm Stop Knop bij afloop -->
+        <div id="alarmStopContainer" style="display: none; margin-top: 15px;">
+          <button type="button" class="timer-ctrl-btn btn-alarm-stop" onclick="stopAlarm()">
+            <i class="fas fa-bell-slash"></i> Stop Alarm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zwevende mini-timer widget als modal gesloten is tijdens aftellen -->
+    <div id="activeTimerFloat" class="active-timer-float" onclick="openActiveTimerModal()">
+      <i class="fas fa-stopwatch fa-spin"></i>
+      <span id="floatCountdown">00:00</span>
+    </div>
+
+    <audio id="alarmSound" src="alarm.wav" preload="auto"></audio>
   </body>
 </html>

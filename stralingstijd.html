@@ -691,6 +691,26 @@
             to { transform: scale(1.03); }
         }
 
+        .timer-lock-warning {
+            margin-top: 15px;
+            padding: 9px 12px;
+            background-color: rgba(245, 223, 77, 0.1);
+            border: 1px solid rgba(245, 223, 77, 0.35);
+            border-radius: 8px;
+            color: #e0d080;
+            font-size: 0.82rem;
+            line-height: 1.35;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+        .timer-lock-warning i {
+            color: #F5DF4D;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
         /* Floating mini timer badge when modal is closed while running */
         .active-timer-float {
             position: fixed;
@@ -903,6 +923,11 @@
             </button>
         </div>
 
+        <div class="timer-lock-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span><strong>Let op:</strong> Vergrendel je telefoon niet handmatig. Het scherm blijft automatisch aan zodat het alarm betrouwbaar afgaat.</span>
+        </div>
+
         <!-- Alarm Stop Knop bij afloop -->
         <div id="alarmStopContainer" style="display: none; margin-top: 15px;">
             <button type="button" class="timer-ctrl-btn btn-alarm-stop" onclick="stopAlarm()">
@@ -935,6 +960,7 @@
     let timerInterval = null;
     let timerConfiguredSeconds = 0;
     let timerRemainingSeconds = 0;
+    let timerEndTime = null;
     let timerState = 'stopped'; // 'stopped', 'running', 'paused', 'finished'
     let currentTimerFilm = 'D7';
     let wakeLock = null;
@@ -1603,6 +1629,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             clearInterval(timerInterval);
             timerInterval = null;
         }
+        timerEndTime = null;
         timerState = 'stopped';
         updateTimerControls();
 
@@ -1652,6 +1679,26 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         }
     }
 
+    function syncTimerRemaining() {
+        if (timerState !== 'running' || !timerEndTime) return;
+        const now = Date.now();
+        const diffMs = timerEndTime - now;
+        const remainingSec = Math.max(0, Math.ceil(diffMs / 1000));
+
+        timerRemainingSeconds = remainingSec;
+        document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
+        updateFloatingTimerDisplay();
+
+        if (diffMs <= 0) {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            timerEndTime = null;
+            onTimerFinished();
+        }
+    }
+
     function onTimerInputsChanged() {
         let m = parseInt(document.getElementById('timerInputMinutes').value) || 0;
         let s = parseInt(document.getElementById('timerInputSeconds').value) || 0;
@@ -1672,6 +1719,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             clearInterval(timerInterval);
             timerInterval = null;
         }
+        timerEndTime = null;
         timerState = 'stopped';
 
         document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
@@ -1692,6 +1740,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             return;
         }
 
+        timerEndTime = Date.now() + (timerRemainingSeconds * 1000);
         timerState = 'running';
         document.getElementById('timerStatusText').textContent = 'Bezig met aftellen...';
         document.getElementById('timerDisplayBox').classList.remove('flashing-box');
@@ -1704,21 +1753,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             audio.load();
         }
 
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
         // Scherm actief houden via WakeLock
         await requestWakeLock();
 
         if (timerInterval) clearInterval(timerInterval);
+        syncTimerRemaining();
         timerInterval = setInterval(() => {
-            timerRemainingSeconds--;
-            document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
-            updateFloatingTimerDisplay();
-
-            if (timerRemainingSeconds <= 0) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-                onTimerFinished();
-            }
-        }, 1000);
+            syncTimerRemaining();
+        }, 250);
     }
 
     function pauseTimer() {
@@ -1727,10 +1773,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             clearInterval(timerInterval);
             timerInterval = null;
         }
+        if (timerEndTime) {
+            timerRemainingSeconds = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
+            timerEndTime = null;
+        }
         timerState = 'paused';
+        document.getElementById('timerCountdownText').textContent = formatCountdown(timerRemainingSeconds);
         document.getElementById('timerStatusText').textContent = 'Gepauzeerd';
         releaseWakeLock();
         updateTimerControls();
+        updateFloatingTimerDisplay();
     }
 
     function resetTimer() {
@@ -1738,6 +1790,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             clearInterval(timerInterval);
             timerInterval = null;
         }
+        timerEndTime = null;
         stopAlarm();
         timerRemainingSeconds = timerConfiguredSeconds;
         timerState = 'stopped';
@@ -1792,6 +1845,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             audio.pause();
             audio.currentTime = 0;
         }
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        timerEndTime = null;
         document.getElementById('timerDisplayBox').classList.remove('flashing-box');
         document.getElementById('alarmStopContainer').style.display = 'none';
 
@@ -1846,6 +1904,21 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             wakeLock = null;
         }
     }
+
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible' && timerState === 'running') {
+            syncTimerRemaining();
+            if (timerState === 'running') {
+                await requestWakeLock();
+            }
+        }
+    });
+
+    window.addEventListener('focus', () => {
+        if (timerState === 'running') {
+            syncTimerRemaining();
+        }
+    });
 </script>
 
 </body>
