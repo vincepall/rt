@@ -361,6 +361,8 @@
                             <option value="MT">MT</option>
                             <option value="PT">PT</option>
                             <option value="UT">UT</option>
+                            <option value="VT">VT</option>
+                            <option value="PMI">PMI</option>
                             <option value="Reistijd">Reistijd</option>
                             <option value="Pauze">Pauze</option>
                         </select>
@@ -444,7 +446,7 @@
             }
 
             let currentText = textarea.value.trim();
-            const regex = /^(\([^)]*\)\s*|[\d.,]+\s*uur\s*\([^)]*\)\s*|(?:\d+(?:[.,]\d+)?\s*uur(?:\s+(?:RT|MT|PT|UT))?(?:,\s*)?)+[.]?\s*|[\d.,]+\s*uur\s*)/i;
+            const regex = /^(\([^)]*\)\s*|[\d.,]+\s*uur\s*\([^)]*\)\s*|(?:\d+(?:[.,]\d+)?\s*uur(?:\s+(?:RT|MT|PT|UT|VT|PMI))?(?:,\s*)?)+[.]?\s*|[\d.,]+\s*uur\s*)/i;
             let match = currentText.match(regex);
             
             let restOfSentence = match ? currentText.substring(match[0].length) : currentText;
