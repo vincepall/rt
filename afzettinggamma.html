@@ -46,9 +46,9 @@
         function bereken() {
             const keuze = document.querySelector('input[name="bron"]:checked').value;
             const Ci = parseFloat(document.getElementById("Ci").value);
-            const wanddikte_pb = parseFloat(document.getElementById("wanddikte_pb").value);
-            const wanddikte_fe = parseFloat(document.getElementById("wanddikte_fe").value);
-            const gewenste_dosis = parseFloat(document.getElementById("gewenste_dosis").value);
+            const wanddikte_pb = parseFloat(document.getElementById("wanddikte_pb").value) || 0;
+            const wanddikte_fe = parseFloat(document.getElementById("wanddikte_fe").value) || 0;
+            const gewenste_dosis = parseFloat(document.getElementById("gewenste_dosis").value) || 10;
 
             let resultaat;
             if (keuze === "Ir192") {
@@ -57,9 +57,23 @@
                 resultaat = berekenAfzettingSe75(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis);
             }
 
-            document.getElementById("resultaat").innerHTML =
-                "De benodigde afzetting is: " + resultaat.afzetting.toFixed(2) + " meter<br>" +
-                "De afstand achter de collimator is: " + resultaat.afstand_collimator.toFixed(2) + " meter";
+            let html = "";
+            if (wanddikte_fe > 0 || wanddikte_pb > 0) {
+                const openRes = keuze === "Ir192" 
+                    ? berekenAfzettingIr192(Ci, 0, 0, gewenste_dosis)
+                    : berekenAfzettingSe75(Ci, 0, 0, gewenste_dosis);
+                html += "• In de open bundel (zonder afscherming): " + openRes.afzetting.toFixed(2) + " meter<br>";
+                html += "• Achter de collimator: " + resultaat.afstand_collimator.toFixed(2) + " meter<br>";
+                const afschermingTekst = (wanddikte_fe > 0 ? wanddikte_fe + " mm staal" : "") + 
+                                         (wanddikte_fe > 0 && wanddikte_pb > 0 ? " + " : "") + 
+                                         (wanddikte_pb > 0 ? wanddikte_pb + " mm lood" : "");
+                html += "• In de bundel achter afscherming (" + afschermingTekst + "): " + resultaat.afzetting.toFixed(2) + " meter";
+            } else {
+                html += "• In de open bundel: " + resultaat.afzetting.toFixed(2) + " meter<br>";
+                html += "• Achter de collimator: " + resultaat.afstand_collimator.toFixed(2) + " meter";
+            }
+
+            document.getElementById("resultaat").innerHTML = html;
 
             // Scroll to the result after calculation
             document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
@@ -192,5 +206,6 @@
     <h2>Resultaat</h2>
     <h2 id="resultaat" style="color: #F5DF4D;"></h2>
 <div style="height: 200px;"></div>
+<script src="rt-assistant.js?v=6.15"></script>
 </body>
 </html>

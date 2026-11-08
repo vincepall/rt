@@ -1,10 +1,11 @@
-const CACHE_NAME = "pwa-cache-v22";
+const CACHE_NAME = "pwa-cache-v29";
 
 // Lijst van bestanden om te cachen bij installatie
 const FILES_TO_CACHE = [
   "/rt/",
   "/rt/index.html",
   "/rt/styles.css",
+  "/rt/rt-assistant.js",
   "/rt/Draadjesv2.html",
   "/rt/manifest.json",
   "/rt/LW_Verdeler.html",
@@ -17,6 +18,7 @@ const FILES_TO_CACHE = [
   "/rt/afzettinggamma.html",
   "/rt/bronnen.csv",
   "/rt/materiaalfactor.csv",
+  "/rt/pruts.png",
   "/rt/stralingstijd.html",
   "/rt/cw2.html",
   "/rt/filmsoortverandering.html",

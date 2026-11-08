@@ -271,3 +271,57 @@ input[type="radio"]:checked {
   background-color: #051aff;
 }
 
+/* RT Assistent Zoekbalk & Trigger knop op index.html */
+.search-ai-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 620px;
+  margin: 0 auto 24px auto;
+  padding: 0 10px;
+}
+
+.search-ai-container #searchBar {
+  max-width: 280px;
+  width: auto;
+  flex: 1 1 200px;
+  margin: 0;
+}
+
+.rt-ai-trigger-btn {
+  background-color: #F5DF4D;
+  color: #000000;
+  border: 4px solid #333333;
+  border-radius: 1.05em;
+  padding: 6px 18px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: 'Roboto Condensed', sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+  height: 44px;
+  box-sizing: border-box;
+  text-shadow: none;
+}
+
+.rt-ai-trigger-btn:hover {
+  transform: scale(1.04);
+  background-color: #ffe600;
+  border-color: #000000;
+  box-shadow: 3px 5px 12px rgba(0, 0, 0, 0.35);
+}
+
+.rt-ai-trigger-btn i {
+  font-size: 1.15rem;
+  color: #000000;
+}
+
+

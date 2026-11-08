@@ -96,7 +96,7 @@
     <label for="diameter">Diameter van de pijp (De) in mm:</label>
     <input type="number" id="diameter" min="0" step="0.01" required>
 
-    <label for="brongrootteInput">Brongrootte (b) in mm:</label>
+    <label for="brongrootteInput">Brongrootte (d) in mm:</label>
     <input type="number" id="brongrootteInput" name="brongrootte" list="bronKeuzes" step="0.01" required placeholder="Kies of vul in (mm)">
 
     <datalist id="bronKeuzes">
@@ -104,6 +104,11 @@
 
     <label for="isolatie">Isolatiedikte in mm:</label>
     <input type="number" id="isolatie" value="0" min="0" step="0.01">
+
+    <div id="wanddikteGroup" style="display: none;">
+        <label for="wanddikte">Nominale wanddikte (t) in mm (voor DWSI bij De &ge; 150 mm):</label>
+        <input type="number" id="wanddikte" min="0" step="0.01" placeholder="Bijv. 6.5 mm">
+    </div>
 
     <button type="button" class="calculate-btn" onclick="berekenFFD()">Bereken Minimale FFD</button>
 </form>
@@ -164,6 +169,15 @@
     }
 
 
+    function checkWanddikteZichtbaarheid() {
+        const proc = document.getElementById("procedure").value;
+        const deVal = parseFloat(document.getElementById("diameter").value);
+        const grp = document.getElementById("wanddikteGroup");
+        if (grp) {
+            grp.style.display = (proc === "dubbelwand" && !isNaN(deVal) && deVal >= 150) ? "block" : "none";
+        }
+    }
+
     function berekenFFD() {
         const procedure = document.getElementById("procedure").value;
         const klasse = document.getElementById("klasse").value;
@@ -172,16 +186,21 @@
         const b = parseFloat(document.getElementById("brongrootteInput").value); 
         const Iso = parseFloat(document.getElementById("isolatie").value);
 
-        // PDD en OFD berekeningen
-        const PDD = (De / 2) + Iso;
-        const OFD = De + Iso;
-
-        let minimaleFFD = 0;
-
         if (isNaN(De) || isNaN(b) || isNaN(Iso)) {
             document.getElementById("resultaat").innerHTML = "Vul alle vereiste velden correct in.";
             return;
         }
+
+        // PDD en OFD berekeningen
+        const PDD = (De / 2) + Iso;
+        const isDWSI = procedure === "dubbelwand" && De >= 150;
+        let OFD = De + Iso;
+        const tVal = parseFloat(document.getElementById("wanddikte").value);
+        if (isDWSI && !isNaN(tVal) && tVal > 0) {
+            OFD = tVal + Iso;
+        }
+
+        let minimaleFFD = 0;
 
         if (procedure === "tangentiaal") {
             if (klasse === "TA") {
@@ -194,14 +213,14 @@
                 minimaleFFD = Math.max(ffd1, ffd2);
             }
         } else if (procedure === "dubbelwand") {
-            if (klasse === "TA") {
-                minimaleFFD = (b * OFD) / 0.6;
-            } else if (klasse === "TB") {
-                minimaleFFD = (b * OFD) / 0.3;
-            }
+            const ug = klasse === "TB" ? 0.3 : 0.6;
+            const ffdOnscherpte = (b * OFD) / ug;
+            const ffdFysiek = De + 2 * Iso;
+            minimaleFFD = isDWSI ? Math.max(ffdOnscherpte, ffdFysiek) : ffdOnscherpte;
         }
 
-        document.getElementById("resultaat").innerHTML = "Minimale FFD: " + minimaleFFD.toFixed(2) + " mm";
+        let extraInfo = isDWSI ? ` (DWSI: OFD = ${OFD.toFixed(1)} mm vanaf binnenwand filmzijde)` : "";
+        document.getElementById("resultaat").innerHTML = "Minimale FFD: " + minimaleFFD.toFixed(2) + " mm" + extraInfo;
 
         document.getElementById("resultaat").scrollIntoView({ behavior: 'smooth' });
     }
@@ -209,10 +228,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Laad de bronnen zodra de pagina geladen is
         laadBronnenCSV(); 
+        document.getElementById("procedure").addEventListener("change", checkWanddikteZichtbaarheid);
+        document.getElementById("diameter").addEventListener("input", checkWanddikteZichtbaarheid);
     });
 
 </script>
 
 <div style="height: 200px;"></div>
+<script src="rt-assistant.js?v=6.15"></script>
 </body>
 </html>

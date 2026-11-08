@@ -214,8 +214,11 @@
 
     <script src="script.js"></script>
 
-    <div style="margin-bottom: 20px">
+    <div class="search-ai-container">
       <input type="text" id="searchBar" placeholder="Zoeken..." autofocus />
+      <button type="button" id="btn-index-ai-trigger" class="rt-ai-trigger-btn" title="Stel een vraag met spraak of tekst aan R.A.D.I (Radiografie Assistent Deterministische Inferentie)" onclick="window.RtAssistant && window.RtAssistant.openAssistant(false)">
+        <i class="fas fa-robot"></i><span>R.A.D.I</span>
+      </button>
     </div>
 
     <ul class="link-list">
@@ -367,5 +370,6 @@
         });
       });
     </script>
+    <script src="rt-assistant.js?v=6.15"></script>
   </body>
 </html>

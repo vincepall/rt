@@ -156,17 +156,67 @@
         min-width: 20px;
       }
       h1 {
+        position: relative;
         background-color: white;
         font-size: 30px;
         color: black;
-        padding: 10px;
+        padding: 12px 65px 12px 25px;
         border-radius: 30px;
         text-align: center;
-        max-width: 500px;
+        max-width: 520px;
         margin: 20px auto;
         border-style: solid;
         border-color: black;
         text-shadow: none;
+      }
+      #ai-top-toggle-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 14px;
+        background: #1a1a1a;
+        border: 2px solid #1a1a1a;
+        color: #f5df4d;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        transition: all 0.2s ease;
+        padding: 0;
+        z-index: 10;
+      }
+      #ai-top-toggle-btn:hover {
+        transform: translateY(-50%) scale(1.08);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+        border-color: #f5df4d;
+      }
+      #ai-top-toggle-btn .ai-mic-badge {
+        position: absolute;
+        bottom: -3px;
+        right: -7px;
+        background: #f5df4d;
+        color: #1a1a1a;
+        font-size: 9px;
+        font-weight: 900;
+        padding: 1px 3px;
+        border-radius: 3px;
+        line-height: 1;
+        border: 1px solid #1a1a1a;
+        font-family: Arial, sans-serif;
+      }
+      #ai-top-toggle-btn.active {
+        background: #f5df4d;
+        color: #1a1a1a;
+        border-color: #1a1a1a;
+      }
+      #ai-top-toggle-btn.active .ai-mic-badge {
+        background: #1a1a1a;
+        color: #f5df4d;
+        border-color: #f5df4d;
       }
       #pruts-image {
         position: absolute;
@@ -227,7 +277,13 @@
         h1 {
           font-size: 20px !important;
           margin: 10px auto;
-          border-radius: 15px;
+          border-radius: 20px;
+          padding: 10px 56px 10px 16px;
+        }
+        #ai-top-toggle-btn {
+          right: 10px;
+          width: 38px;
+          height: 38px;
         }
         .image-container {
           width: 100% !important;
@@ -566,6 +622,123 @@
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
       }
+
+      /* --- MATERIAAL MODAL & ITEMS --- */
+      #materialModal.modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(4px);
+        overflow-y: auto;
+      }
+      #materialModal .modal-content {
+        background-color: #242424;
+        margin: 35px auto;
+        padding: 20px;
+        border: 2px solid #555;
+        width: 92%;
+        max-width: 620px;
+        border-radius: 16px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+        box-sizing: border-box;
+        text-align: left;
+        animation: matModalFadeIn 0.25s ease-out;
+        color: #f4f4f4;
+        text-shadow: none;
+        font-size: 1rem;
+      }
+      @keyframes matModalFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .mat-group-header {
+        background-color: #1a1a1a;
+        padding: 6px 12px;
+        color: #f5df4d;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+      .mat-item {
+        padding: 10px 12px;
+        border-bottom: 1px solid #2d2d2d;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 48px;
+        box-sizing: border-box;
+        transition: background-color 0.15s;
+      }
+      .mat-item:hover, .mat-item:active {
+        background-color: #333;
+      }
+      .mat-item.selected {
+        background-color: #38341e;
+        border-left: 3px solid #f5df4d;
+      }
+      .mat-item-info {
+        flex: 1;
+        padding-right: 10px;
+      }
+      .mat-item-title {
+        font-weight: bold;
+        color: #ffffff;
+        font-size: 0.95rem;
+        line-height: 1.2;
+      }
+      .mat-item-sub {
+        font-size: 0.78rem;
+        color: #aaa;
+        margin-top: 3px;
+      }
+      .mat-item-factor {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #f5df4d;
+        white-space: nowrap;
+        background: rgba(245, 223, 77, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(245, 223, 77, 0.25);
+        text-shadow: none !important;
+      }
+      .material-factor-badge {
+        display: none;
+        background-color: #f5df4d;
+        color: #111111;
+        font-weight: 600;
+        font-size: 0.82rem;
+        padding: 2px 7px;
+        border-radius: 5px;
+        margin-left: 6px;
+        text-shadow: none !important;
+        letter-spacing: 0.3px;
+        vertical-align: middle;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .material-wire-warning {
+        margin-top: 10px;
+        padding: 10px 14px;
+        background: rgba(255, 152, 0, 0.15);
+        border-left: 4px solid #ff9800;
+        border-radius: 6px;
+        color: #ffb74d;
+        font-size: 0.92rem;
+        text-align: left;
+        line-height: 1.4;
+      }
     </style>
   </head>
   <body>
@@ -578,6 +751,17 @@
     <h1>
       Hallo, Ik ben P.R.U.T.S <br />
       (Pijplas Radiografie Ultieme Technische Sidekick)
+      <button
+        type="button"
+        id="ai-top-toggle-btn"
+        onclick="window.RtAssistant && window.RtAssistant.openAssistant(true)"
+        title="Open R.A.D.I (Radiografie Assistent Deterministische Inferentie)"
+      >
+        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center;">
+          <i class="fas fa-microphone" style="font-size: 20px;"></i>
+          <span class="ai-mic-badge">AI</span>
+        </span>
+      </button>
     </h1>
 
     <div class="form-container">
@@ -622,6 +806,30 @@
           step="0.01"
           required
         />
+      </div>
+      <div class="form-item" id="material-form-item">
+        <label for="material_input">Materiaal:
+          <span id="material_factor_badge" class="material-factor-badge">1.00x</span>
+        </label>
+        <div style="flex: 1; min-width: 200px; position: relative; display: flex; align-items: center;">
+          <input
+            type="text"
+            id="material_input"
+            name="material_input"
+            value="Staal / RVS (referentie)"
+            readonly
+            onclick="openMaterialModal()"
+            style="cursor: pointer; padding-right: 36px; background-color: #d9d2a3; color: #000000; width: 100%; box-sizing: border-box; text-shadow: none;"
+            title="Klik om een ander materiaal te selecteren"
+          />
+          <button
+            type="button"
+            id="clearMaterialBtn"
+            onclick="resetMaterialToDefault(event)"
+            style="display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #b30000; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 2px 6px; font-weight: bold; text-shadow: none;"
+            title="Herstel naar standaard Staal / RVS"
+          >&times;</button>
+        </div>
       </div>
       <div class="form-item">
         <label for="technique">Opstelling:</label>
@@ -891,8 +1099,8 @@
 
       function getFloatValue(id) {
         const element = document.getElementById(id);
-        if (element && element.value) {
-          return parseFloat(element.value.replace(",", "."));
+        if (element && element.value !== undefined && element.value !== null && element.value !== "") {
+          return parseFloat(String(element.value).replace(",", "."));
         }
         return NaN;
       }
@@ -933,11 +1141,664 @@
         openModal("easterEggModal");
       }
 
-      let bronnenData = [];
+      function calculateActivityForCSV(ci1, type, firstDate, secondDate) {
+        const firstDateObj = new Date(firstDate.split("-").reverse().join("-"));
+        const timeDifference = secondDate - firstDateObj;
+        const days = timeDifference / (1000 * 3600 * 24);
+        let ci2 = 0;
+
+        if (type === "Se75") {
+          ci2 = ci1 / Math.pow(2, days / 120);
+        } else if (type === "Ir192") {
+          ci2 = ci1 / Math.pow(2, days / 74);
+        }
+
+        return ci2;
+      }
+
+      const STANDAARD_BRONNEN_CSV = [
+        { name: "35598P", type: "Ir192", size: 2.879, initialActivity: 67.9, date: "25-09-2026" },
+        { name: "35041P", type: "Ir192", size: 2.358, initialActivity: 56.4, date: "31-07-2026" },
+        { name: "97969M", type: "Se75", size: 3.524, initialActivity: 84.50, date: "21-04-2026" },
+        { name: "RR3508", type: "Se75", size: 3.0, initialActivity: 94.73, date: "24-02-2026" },
+        { name: "RR4083", type: "Se75", size: 3.0, initialActivity: 72.69, date: "08-09-2026" },
+        { name: "RR3999", type: "Se75", size: 3.0, initialActivity: 70.54, date: "03-09-2026" },
+      ];
+
+      function bouwBronnenData(lijst) {
+        const today = new Date();
+        return lijst.map((b) => {
+          const act = calculateActivityForCSV(b.initialActivity, b.type, b.date, today);
+          return {
+            name: b.name,
+            type: b.type,
+            size: b.size,
+            label: `${b.name} (${b.size} mm) [${act.toFixed(2)} Ci]`,
+            initialActivity: b.initialActivity,
+            date: b.date,
+          };
+        });
+      }
+
+      var bronnenData = bouwBronnenData(STANDAARD_BRONNEN_CSV);
+      window.bronnenData = bronnenData;
+
+      // --- MATERIAAL DATABASE & FACTOREN ---
+      function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function parseCsvRow(row) {
+        const cells = [];
+        let inQuotes = false;
+        let val = "";
+        for (let i = 0; i < row.length; i++) {
+          const c = row[i];
+          if (c === '"') {
+            inQuotes = !inQuotes;
+          } else if (c === "," && !inQuotes) {
+            cells.push(val.trim());
+            val = "";
+          } else {
+            val += c;
+          }
+        }
+        cells.push(val.trim());
+        return cells;
+      }
+
+      const EMBEDDED_MATERIAL_CSV = `materiaal,werkstoff,groep,factor_150kv,factor_200kv,factor_250kv,factor_300kv,dichtheid_g_cm3,opmerking,factor_se75,factor_ir192
+Hastelloy C-276,2.4819 / UNS N10276,Hastelloy,8.26,3.79,2.65,2.17,8.89,Ni-Mo16-Cr16-W4-Fe5,3.40,1.79
+Hastelloy C-22,2.4602 / UNS N06022,Hastelloy,5.39,2.91,2.19,1.87,8.69,Ni-Cr22-Mo13-W3-Fe3,2.67,1.62
+Hastelloy C-4,2.4610 / UNS N06455,Hastelloy,3.22,2.12,1.75,1.57,8.64,Ni-Mo16-Cr16,1.99,1.43
+Hastelloy C-2000,2.4675 / UNS N06200,Hastelloy,3.05,2.05,1.71,1.54,8.5,Ni-Cr23-Mo16-Cu1.6,1.93,1.40
+Hastelloy B-2,2.4617 / UNS N10665,Hastelloy,6.86,3.4,2.47,2.07,9.22,Ni-Mo28-Fe2,3.08,1.75
+Hastelloy B-3,2.4600 / UNS N10675,Hastelloy,9.06,3.98,2.75,2.23,9.22,Ni-Mo28.5-Cr1.5-W1.5,3.56,1.82
+Hastelloy X,2.4665 / UNS N06002,Hastelloy,2.08,1.59,1.4,1.31,8.22,Ni-Cr22-Fe18-Mo9,1.53,1.24
+Hastelloy G-30,2.4603 / UNS N06030,Hastelloy,2.78,1.92,1.61,1.46,8.22,Ni-Cr30-Fe15-Mo5.5-W2.5,1.81,1.34
+Hastelloy G-35,2.4643 / UNS N06035,Hastelloy,1.82,1.47,1.33,1.26,8.18,Ni-Cr33-Mo8,1.42,1.20
+Hastelloy N,2.4607 / UNS N10003,Hastelloy,3.51,2.24,1.82,1.62,8.86,Ni-Mo16-Cr7-Fe4,2.10,1.46
+Hastelloy W,2.4612 / UNS N10004,Hastelloy,5.06,2.8,2.13,1.83,9.03,Ni-Mo24-Cr5-Fe5,2.57,1.59
+Inconel 625 (Alloy 625),2.4856 / UNS N06625,Inconel,2.5,1.8,1.55,1.42,8.44,Ni-Cr21.5-Mo9-Nb3.6,1.72,1.32
+Inconel 718 (Alloy 718),2.4668 / UNS N07718,Inconel,1.79,1.45,1.32,1.24,8.19,Ni-Cr19-Fe18-Nb5-Mo3,1.41,1.18
+Inconel 600 (Alloy 600),2.4816 / UNS N06600,Inconel,1.47,1.29,1.22,1.18,8.47,Ni-Cr16-Fe8,1.27,1.15
+Inconel 601 (Alloy 601),2.4851 / UNS N06601,Inconel,1.24,1.16,1.12,1.1,8.11,Ni-Cr23-Fe14-Al1.4,1.15,1.08
+Inconel 617 (Alloy 617),2.4663 / UNS N06617,Inconel,2.04,1.59,1.41,1.32,8.36,Ni-Cr22-Co12.5-Mo9,1.53,1.25
+Inconel 686 (Alloy 686),2.4606 / UNS N06686,Inconel,7.12,3.43,2.45,2.03,8.73,Ni-Cr21-Mo16-W4,3.10,1.70
+Inconel 690 (Alloy 690),2.4642 / UNS N06690,Inconel,1.26,1.17,1.12,1.1,8.19,Ni-Cr29-Fe10,1.15,1.08
+Inconel X-750,2.4669 / UNS N07750,Inconel,1.53,1.33,1.25,1.2,8.28,Ni-Cr15.5-Fe7-Ti2.5,1.30,1.16
+Inconel 725 (Alloy 725),UNS N07725,Inconel,2.17,1.64,1.44,1.34,8.31,Ni-Cr21-Mo8-Nb3.5-Ti1.5,1.57,1.26
+Incoloy 800 / 800H (Alloy 800),1.4876 / UNS N08800/N08810,Incoloy,1.11,1.07,1.06,1.05,7.94,Fe-Ni32-Cr21,1.07,1.04
+Incoloy 825 (Alloy 825),2.4858 / UNS N08825,Incoloy,1.39,1.24,1.18,1.14,8.14,Ni-Fe30-Cr21.5-Mo3-Cu2,1.22,1.11
+Incoloy 925 (Alloy 925),UNS N09925,Incoloy,1.39,1.24,1.18,1.14,8.08,Ni-Fe28-Cr21-Mo3-Cu2-Ti2,1.22,1.11
+Incoloy A-286,1.4980 / UNS S66286,Incoloy,1.13,1.08,1.06,1.05,7.92,Fe-Ni26-Cr15-Ti2-Mo1.3,1.07,1.04
+Incoloy 803,UNS S35045,Incoloy,1.1,1.07,1.06,1.05,7.97,Fe-Ni35-Cr27,1.07,1.04
+Monel 400 (Alloy 400),2.4360 / UNS N04400,Monel,2.18,1.69,1.5,1.4,8.8,Ni67-Cu31,1.63,1.32
+Monel K-500 (Alloy K-500),2.4375 / UNS N05500,Monel,1.8,1.48,1.35,1.28,8.44,Ni65-Cu30-Al3,1.44,1.22
+Stellite 6 (CoCr-A),2.4994 / CoCr-A,Kobaltbasis,3.4,2.18,1.77,1.57,8.44,Co60-Cr28-W4.5,2.04,1.41
+Stellite 21 (CoCr-E),CoCr-E,Kobaltbasis,1.46,1.28,1.2,1.16,8.33,Co62-Cr27-Mo5.5,1.25,1.13
+Stellite 12 (CoCr-B),CoCr-B,Kobaltbasis,3.8,2.4,1.9,1.6,8.53,Co55-Cr29-W8.5,2.23,1.36
+Haynes 25 (Alloy L-605),2.4964 / UNS R30605,Kobaltbasis,3.2,2.4,2.0,1.7,9.13,Co50-Cr20-W15-Ni10,2.26,1.46
+Haynes 188,2.4683 / UNS R30188,Kobaltbasis,3.0,2.3,1.9,1.6,8.98,Co39-Ni22-Cr22-W14,2.16,1.36
+MP35N,2.4999 / UNS R30035,Kobaltbasis,2.13,1.63,1.44,1.34,8.43,Co35-Ni35-Cr20-Mo10,1.57,1.26
+Titanium Grade 1 & 2 (CP Ti),3.7035 / UNS R50400,Titanium,0.54,0.71,0.78,0.9,4.51,Zuiver Ti,0.71,0.90
+Titanium Grade 5 (Ti-6Al-4V),3.7164 / UNS R56400,Titanium,0.54,0.71,0.78,0.9,4.43,Ti-6Al-4V,0.71,0.90
+Titanium Grade 7 (Ti-Pd),3.7235 / UNS R52400,Titanium,0.54,0.71,0.78,0.9,4.51,Ti-0.15Pd,0.71,0.90
+Titanium Grade 9 (Ti-3Al-2.5V),3.7194 / UNS R56320,Titanium,0.54,0.71,0.78,0.9,4.48,Ti-3Al-2.5V,0.71,0.90
+Titanium Grade 12 (Ti-Mo-Ni),3.7105 / UNS R53400,Titanium,0.54,0.71,0.78,0.9,4.51,Ti-0.8Ni-0.3Mo,0.71,0.90
+Koolstofstaal (Referentie),1.0460 / P250GH / C22,RVS & Duplex,1.0,1.0,1.0,1.0,7.85,Staal Referentie = 1.00,1.00,1.00
+RVS 304 / 304L,1.4301 / 1.4307 / 304L,RVS & Duplex,0.99,1.0,1.0,1.0,7.93,CrNi 18/8,1.00,1.00
+RVS 316 / 316L,1.4401 / 1.4404 / 316L,RVS & Duplex,1.14,1.09,1.07,1.06,8.0,CrNiMo 17/12/2,1.08,1.05
+RVS 316Ti,1.4571 / AISI 316Ti,RVS & Duplex,1.11,1.07,1.05,1.04,8.0,Ti-gestabiliseerd 316,1.06,1.03
+RVS 321,1.4541 / AISI 321,RVS & Duplex,0.96,0.98,0.98,0.98,7.92,Ti-gestabiliseerd 304,0.98,0.98
+RVS 347,1.4550 / AISI 347,RVS & Duplex,1.03,1.02,1.01,1.01,7.96,Nb-gestabiliseerd 304,1.02,1.01
+RVS 310S,1.4845 / AISI 310S,RVS & Duplex,0.98,0.99,0.99,0.99,7.9,Hittebestendig 25/20,0.99,0.99
+RVS 309S,1.4828 / AISI 309S,RVS & Duplex,0.94,0.96,0.97,0.98,7.9,Hittebestendig 23/12,0.96,0.99
+Duplex 2205,1.4462 / UNS S32205,RVS & Duplex,1.08,1.04,1.03,1.02,7.82,22Cr-5Ni-3Mo,1.04,1.01
+Lean Duplex 2101,1.4162 / UNS S32101,RVS & Duplex,0.88,0.92,0.93,0.94,7.8,21Cr-1.5Ni-5Mn,0.92,0.95
+Lean Duplex 2304,1.4362 / UNS S32304,RVS & Duplex,0.92,0.94,0.96,0.96,7.8,23Cr-4.5Ni,0.95,0.96
+Super Duplex 2507,1.4410 / UNS S32750,RVS & Duplex,1.14,1.08,1.06,1.05,7.8,25Cr-7Ni-4Mo,1.07,1.04
+Super Duplex Zeron 100,1.4501 / UNS S32760,RVS & Duplex,1.32,1.19,1.13,1.1,7.84,25Cr-7Ni-3.7Mo-W-Cu,1.17,1.08
+254 SMO (6Mo),1.4547 / UNS S31254,RVS & Duplex,1.38,1.23,1.16,1.13,8.0,20Cr-18Ni-6Mo,1.21,1.11
+904L,1.4539 / UNS N08904,RVS & Duplex,1.32,1.19,1.14,1.11,8.05,20Cr-25Ni-4.5Mo-Cu,1.17,1.09
+Alloy 20 (Carpenter 20),2.4660 / UNS N08020,RVS & Duplex,1.38,1.23,1.17,1.13,8.05,Ni35-Fe38-Cr20-Cu3.5,1.21,1.10
+Sanicro 28 (Alloy 28),1.4563 / UNS N08028,RVS & Duplex,1.18,1.1,1.07,1.05,8.0,31Ni-27Cr-3.5Mo,1.09,1.03
+Alloy 31,1.4562 / UNS N08031,RVS & Duplex,1.41,1.24,1.17,1.13,8.05,31Ni-27Cr-6.5Mo,1.22,1.10
+253 MA,1.4835 / UNS S30815,RVS & Duplex,0.94,0.96,0.97,0.97,7.8,21Cr-11Ni-Si-Ce,0.96,0.97
+17-4 PH (AISI 630),1.4542 / UNS S17400,RVS & Duplex,0.93,0.94,0.95,0.96,7.75,Precipitation Hardening,0.94,0.97
+16Mo3 (15Mo3),1.5415 / 16Mo3,Ketelstaal,1.0,1.0,1.0,1.0,7.85,Mo-gelegeerd ketelstaal,1.00,1.00
+13CrMo4-5 (P11 / T11),1.7335 / A335 P11,Ketelstaal,1.01,1.0,1.0,1.0,7.85,1Cr-0.5Mo warmvast,1.00,1.00
+10CrMo9-10 (P22 / T22),1.7380 / A335 P22,Ketelstaal,1.03,1.02,1.01,1.01,7.85,2.25Cr-1Mo ketelbuis,1.02,1.01
+11CrMo9-10,1.7383,Ketelstaal,1.01,1.0,1.0,1.0,7.85,2.5Cr-1Mo ketelstaal,1.00,1.00
+14MoV6-3,1.7715,Ketelstaal,1.0,1.0,1.0,1.0,7.85,CrMoV stoomleidingen,1.00,1.00
+X10CrMoVNb9-1 (P91 / T91),1.4903 / A335 P91,Ketelstaal,0.97,0.97,0.98,0.98,7.8,9Cr-1Mo-V-Nb martensitisch,0.97,0.98
+X10CrWMoVNb9-2 (P92 / T92),1.4901 / A335 P92,Ketelstaal,1.47,1.27,1.19,1.14,7.85,9Cr-0.5Mo-1.8W,1.24,1.10
+VM12-SHC (12Cr),1.4915,Ketelstaal,1.36,1.21,1.14,1.11,7.82,12Cr superkritisch,1.19,1.09
+Koper Zuiver (Cu-ETP / Cu-DHP),2.0060 / 2.0090 / CW004A,Koper & Brons,2.42,1.79,1.55,1.43,8.94,Roodkoper / Zuiver koper,1.71,1.33
+Messing / Geelkoper (CuZn37),2.0321 / CW508L,Koper & Brons,2.21,1.66,1.45,1.34,8.44,Cu-Zn messing,1.59,1.25
+Messing (CuZn39Pb3),2.0401 / CW614N,Koper & Brons,5.04,2.8,2.12,1.8,8.47,Verspaanbaar messing,2.57,1.55
+Tinbrons (CuSn8),2.1030 / CW453K,Koper & Brons,3.99,2.4,1.9,1.66,8.8,Fosforbrons / Tinbrons,2.23,1.47
+Tinbrons (CuSn6),2.1020 / CW452K,Koper & Brons,3.52,2.23,1.8,1.6,8.82,Fosforbrons / CuSn6,2.08,1.44
+Roodbrons (Rg7 / CuSn7ZnPb),2.1090 / CC493K,Koper & Brons,8.45,3.82,2.65,2.15,8.8,Lagerbrons / Rg7,3.42,1.75
+Aluminiumbrons (CuAl10Fe5Ni5),2.0966 / CW307G,Koper & Brons,1.25,1.13,1.08,1.05,7.6,Corrosievast brons,1.11,1.03
+Cupro-nikkel 90/10,2.0872 / CW352H,Koper & Brons,2.36,1.76,1.54,1.42,8.9,Zeewaterbestendig 90/10,1.69,1.32
+Cupro-nikkel 70/30,2.0882 / CW354H,Koper & Brons,2.4,1.79,1.56,1.45,8.95,Zeewaterbestendig 70/30,1.71,1.36
+Nikkel 200 / 201 (Zuiver Nikkel),2.4066 / UNS N02200,Exotisch & Speciaal,2.19,1.71,1.52,1.42,8.89,Zuiver Ni,1.65,1.34
+Zirkonium 702 (Zr 702),UNS R60702,Exotisch & Speciaal,2.8,2.1,1.8,1.5,6.51,Zuiver Zirkonium,2.00,1.26
+Zirkonium 705 (Zr 705),UNS R60705,Exotisch & Speciaal,2.8,2.1,1.8,1.5,6.51,Zr-2.5Nb legering,2.00,1.26
+Tantaal (Zuiver Ta),2.4560 / UNS R05200,Exotisch & Speciaal,11.0,5.5,4.2,3.5,16.65,Vuurvast chemisch bestendig,5.06,2.94
+Niobium (Columbium),UNS R04200,Exotisch & Speciaal,2.5,2.0,1.7,1.5,8.57,Zuiver Niobium,1.90,1.34
+Molybdeen (Puur Mo),UNS R03600,Exotisch & Speciaal,3.5,2.5,2.0,1.7,10.22,Vuurvast metaal,2.33,1.46
+Wolfraam (Tungsten),W 99.95%,Exotisch & Speciaal,14.0,7.0,5.0,4.0,19.25,Zwaar / hittebestendig metaal,6.32,3.21
+Lood (Pb),2.3020 / PB970R,Exotisch & Speciaal,12.0,5.0,4.0,3.2,11.34,Stralingsafscherming,4.66,2.56
+Tin (Sn),Sn 99.9%,Exotisch & Speciaal,3.0,2.2,1.8,1.5,7.31,Zuiver tin,2.06,1.26
+Zink (Zn),Zn 99.9%,Exotisch & Speciaal,1.4,1.3,1.2,1.1,7.14,Zuiver zink,1.27,1.02
+Aluminium Zuiver (1050A),3.0255 / EN AW-1050A,Exotisch & Speciaal,0.12,0.18,0.25,0.30,2.7,Al 99.5%,0.20,0.35
+Aluminium AlMg3,3.3535 / EN AW-5754,Exotisch & Speciaal,0.14,0.18,0.25,0.30,2.66,AlMg3 scheepsbouw,0.20,0.35
+Aluminium AlMg4.5Mn,3.3547 / EN AW-5083,Exotisch & Speciaal,0.14,0.18,0.25,0.30,2.66,5083 zeewaterbestendig,0.20,0.35
+Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,Ultra lichtgewicht,0.08,0.08`;
+
+      const DEFAULT_MATERIAL = {
+        name: "Staal / RVS (referentie)",
+        werkstoff: "1.0038 / 1.4301 e.a.",
+        groep: "Staal",
+        f150: 1.0,
+        f200: 1.0,
+        f250: 1.0,
+        f300: 1.0,
+        f_se75: 1.0,
+        f_ir192: 1.0,
+        notes: "Referentiemateriaal (factor 1.00)",
+        isDefault: true,
+      };
+
+      let materialDatabase = [];
+      let selectedMaterial = null;
+
+      function isStandardSteel(mat) {
+        if (!mat) return true;
+        if (mat.isDefault) return true;
+        const n = (mat.name || "").toLowerCase();
+        if (n.includes("staal / rvs") || n === "koolstofstaal (referentie)" || n === "staal" || n === "rvs") {
+          return true;
+        }
+        return false;
+      }
+
+      function isAluminiumMaterial(mat) {
+        if (!mat || isStandardSteel(mat)) return false;
+        const nameLower = (mat.name || "").toLowerCase();
+        const groupLower = (mat.groep || "").toLowerCase();
+        // Aluminiumbrons is een koperlegering en volgt NIET de aluminium kV-regel
+        if (
+          nameLower.includes("aluminiumbrons") ||
+          nameLower.includes("alubrons") ||
+          nameLower.includes("brons") ||
+          groupLower.includes("koper")
+        ) {
+          return false;
+        }
+        return (
+          nameLower.includes("aluminium") ||
+          nameLower.includes("alu") ||
+          groupLower.includes("aluminium") ||
+          groupLower.includes("alu")
+        );
+      }
+
+      function getActiveSourceType() {
+        const srcEl = document.getElementById("source");
+        if (srcEl && (srcEl.value === "Se75" || srcEl.value === "Ir192" || srcEl.value === "X-ray")) {
+          return srcEl.value;
+        }
+        return "Ir192";
+      }
+
+      function getMaterialFactor(mat, sourceType) {
+        if (!mat || isStandardSteel(mat)) return 1.0;
+        const iso = sourceType || getActiveSourceType();
+        if (iso === "Se75") return mat.f_se75 !== undefined && mat.f_se75 !== null ? mat.f_se75 : 1.0;
+        if (iso === "Ir192") return mat.f_ir192 !== undefined && mat.f_ir192 !== null ? mat.f_ir192 : 1.0;
+        if (iso === "X-ray") return mat.f300 || mat.f250 || mat.f200 || mat.f150 || 1.0;
+        return mat.f_ir192 || 1.0;
+      }
+
+      function geefBkiSetsVoorDraad(wireNum, matGroup = "FE") {
+        const num = parseInt(wireNum, 10);
+        if (isNaN(num)) return `10 ${matGroup} EN of 13 ${matGroup} EN`;
+        const sets = [];
+        if (num >= 1 && num <= 7) sets.push(`1 ${matGroup} EN`);
+        if (num >= 6 && num <= 12) sets.push(`6 ${matGroup} EN`);
+        if (num >= 10 && num <= 16) sets.push(`10 ${matGroup} EN`);
+        if (num >= 13 && num <= 19) sets.push(`13 ${matGroup} EN`);
+        return sets.length > 0 ? sets.join(" of ") : `10 ${matGroup} EN`;
+      }
+
+      function geefAsmeSetVoorDraad(asmeNum) {
+        const num = parseInt(asmeNum, 10);
+        if (isNaN(num)) return "";
+        const sets = [];
+        if (num >= 1 && num <= 6) sets.push("Set A");
+        if (num >= 6 && num <= 11) sets.push("Set B");
+        if (num >= 11 && num <= 16) sets.push("Set C");
+        if (num >= 16 && num <= 21) sets.push("Set D");
+        return sets.join(" of ");
+      }
+
+      function bepaalBkiWaarschuwing(material, wireString) {
+        if (!material || isStandardSteel(material)) return "";
+
+        const nameLower = (material.name || "").toLowerCase();
+        const groupLower = (material.groep || "").toLowerCase();
+
+        // Haal EN draadnummer en evt ASME nummer uit wireString (bijv. "EN W14, ASME 4" of "W14")
+        let wireNum = 14;
+        const numMatch = (wireString || "").match(/W\s*(\d+)/i) || (wireString || "").match(/\b(\d+)\b/);
+        if (numMatch) {
+          wireNum = parseInt(numMatch[1], 10);
+        }
+
+        const asmeMatch = (wireString || "").match(/ASME\s*(\d+)/i);
+        const asmeNum = asmeMatch ? parseInt(asmeMatch[1], 10) : null;
+
+        // Bepaal de ISO 19232-1 materiaalgroep
+        let matGroup = "FE";
+        let normGroepInfo = "";
+
+        if (nameLower.includes("tita") || nameLower.includes("ti") || groupLower.includes("titaan")) {
+          matGroup = "TI";
+          normGroepInfo = "Titanium (ASTM groep 01)";
+        } else if (nameLower.includes("alum") && !nameLower.includes("brons") && !groupLower.includes("koper")) {
+          matGroup = "AL";
+          normGroepInfo = "Aluminium (ASTM groep 02)";
+        } else if (nameLower.includes("aluminiumbrons") || nameLower.includes("nikkel-aluminium")) {
+          matGroup = "FE";
+          normGroepInfo = "Aluminiumbrons / Ni-Al-brons (ASTM groep 2)";
+        } else if (
+          nameLower.includes("inconel") ||
+          nameLower.includes("hastelloy") ||
+          nameLower.includes("nimonic") ||
+          nameLower.includes("maraging") ||
+          groupLower.includes("inconel") ||
+          groupLower.includes("hastelloy")
+        ) {
+          matGroup = "FE";
+          normGroepInfo = `Ni-Cr-Fe legering (${escapeHtml(material.name)}, ASTM groep 3)`;
+        } else if (
+          nameLower.includes("monel") ||
+          nameLower.includes("nikkel 200") ||
+          nameLower.includes("nikkel 201") ||
+          nameLower.includes("zuiver nikkel") ||
+          nameLower.includes("cu-ni") ||
+          nameLower.includes("cupro") ||
+          groupLower.includes("monel")
+        ) {
+          matGroup = "CU";
+          normGroepInfo = `${escapeHtml(material.name)} (Ni-Cu / Zuiver Nikkel, ASTM groep 4)`;
+        } else if (
+          nameLower.includes("tinbrons") ||
+          nameLower.includes("fosforbrons") ||
+          nameLower.includes("roodbrons") ||
+          nameLower.includes("rg7")
+        ) {
+          matGroup = "CU";
+          normGroepInfo = "Tinbrons / Roodbrons (ASTM groep 5)";
+        } else if (
+          nameLower.includes("brons") ||
+          nameLower.includes("koper") ||
+          nameLower.includes("cu") ||
+          nameLower.includes("messing") ||
+          groupLower.includes("koper")
+        ) {
+          matGroup = "CU";
+          normGroepInfo = "Koper / Messing (ASTM groep 4)";
+        } else {
+          matGroup = "FE";
+          normGroepInfo = `${escapeHtml(material.name)} (ISO groep FE)`;
+        }
+
+        const bkiSets = geefBkiSetsVoorDraad(wireNum, matGroup);
+        const asmeSetText = asmeNum ? ` &bull; ASME: <strong>${geefAsmeSetVoorDraad(asmeNum)}</strong> (ASTM groep ${matGroup === "AL" ? "02" : matGroup === "TI" ? "01" : matGroup === "CU" ? "4/5" : "1/2/3"})` : "";
+
+        let opmerkingNi = "";
+        if (
+          nameLower.includes("inconel") ||
+          nameLower.includes("hastelloy") ||
+          nameLower.includes("monel") ||
+          nameLower.includes("nikkel")
+        ) {
+          opmerkingNi = ` <em>(Let op: ISO 19232-1 kent géén "NI" BKI; ${matGroup === "FE" ? "Inconel en Hastelloy vallen onder FE" : "Monel en Nikkel vallen onder CU"}).</em>`;
+        }
+
+        const voorbeeldTekst = `Voor <strong>${normGroepInfo}</strong> moet draad <strong>W${wireNum}</strong> zichtbaar zijn op BKI houder: <strong>${bkiSets}</strong>${asmeSetText}.${opmerkingNi}`;
+
+        return `
+          <div class="material-wire-warning">
+            <div style="font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; color: #ffa726;">
+              <span style="display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-exclamation-triangle"></i> Let op, materiaalsoort kan een ander BKI type vereisen!
+              </span>
+              <button type="button" onclick="openModal('bkiModal')" style="background: rgba(245,223,77,0.15); border: 1px solid #f5df4d; color: #f5df4d; border-radius: 4px; padding: 2px 8px; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Bekijk ISO 19232-1 / ASTM E747 BKI Normtabel">
+                <i class="fas fa-table"></i> BKI Tabel
+              </button>
+            </div>
+            <div>${voorbeeldTekst} (Gekozen materiaal: <strong>${escapeHtml(material.name)}</strong>)</div>
+          </div>
+        `;
+      }
+
+      async function laadMaterialenCSV() {
+        let text = "";
+        try {
+          const response = await fetch("materiaalfactor.csv?v=" + Date.now(), { cache: "no-store" });
+          if (response.ok) {
+            text = await response.text();
+          }
+        } catch (e) {
+          console.info("materiaalfactor.csv niet via HTTP geladen, ingebedde fallback wordt gebruikt.");
+        }
+        if (!text || text.trim().length <= 1) {
+          text = EMBEDDED_MATERIAL_CSV;
+        }
+        const lines = text.trim().split("\n").map((l) => l.trim()).filter((l) => l.length > 0);
+        if (lines.length <= 1) return;
+
+        materialDatabase = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCsvRow(lines[i]);
+          if (cols.length < 5) continue;
+          materialDatabase.push({
+            name: cols[0],
+            werkstoff: cols[1] || "",
+            groep: cols[2] || "Overig",
+            f150: parseFloat((cols[3] || "1").replace(",", ".")) || 1.0,
+            f200: parseFloat((cols[4] || "1").replace(",", ".")) || 1.0,
+            f250: parseFloat((cols[5] || "1").replace(",", ".")) || 1.0,
+            f300: parseFloat((cols[6] || "1").replace(",", ".")) || 1.0,
+            density: cols[7] ? parseFloat(cols[7].replace(",", ".")) : null,
+            notes: cols[8] || "",
+            f_se75: cols[9] ? (parseFloat(cols[9].replace(",", ".")) || 1.0) : 1.0,
+            f_ir192: cols[10] ? (parseFloat(cols[10].replace(",", ".")) || 1.0) : 1.0,
+          });
+        }
+        window.materialDatabase = materialDatabase;
+      }
+
+      function smartSearchMaterials(query) {
+        const qRaw = (query || "").toLowerCase().trim();
+        if (!qRaw) return materialDatabase.map((m, idx) => ({ item: m, idx, score: 0 }));
+
+        const qClean = qRaw.replace(/[\s\-\/\.]/g, "");
+        const qWords = qRaw.split(/\s+/).filter((w) => w.length > 0);
+
+        const matches = [];
+        materialDatabase.forEach((mat, idx) => {
+          const nameLower = mat.name.toLowerCase();
+          const werkstoffLower = mat.werkstoff.toLowerCase();
+          const groupLower = mat.groep.toLowerCase();
+          const notesLower = mat.notes.toLowerCase();
+          const fullText = `${nameLower} ${werkstoffLower} ${groupLower} ${notesLower}`;
+          const fullClean = fullText.replace(/[\s\-\/\.]/g, "");
+
+          let score = 0;
+          const nameClean = nameLower.replace(/[\s\-\/\.]/g, "");
+          if (nameClean === qClean) score += 100;
+          else if (nameClean.startsWith(qClean)) score += 60;
+          else if (nameClean.includes(qClean)) score += 40;
+          else if (werkstoffLower.includes(qRaw) || werkstoffLower.replace(/[\s\-\/\.]/g, "").includes(qClean)) score += 35;
+          else if (qWords.every((w) => nameLower.includes(w))) score += 30;
+          else if (fullClean.includes(qClean) || qWords.every((w) => fullText.includes(w))) {
+            if (groupLower.includes(qRaw)) score += 15;
+            else score += 10;
+          }
+
+          if (score > 0) {
+            matches.push({ item: mat, idx, score });
+          }
+        });
+        matches.sort((a, b) => b.score - a.score);
+        return matches;
+      }
+
+      function updateMaterialFactorBadge() {
+        const badgeEl = document.getElementById("material_factor_badge");
+        const modalBadge = document.getElementById("modalActiveSourceBadge");
+        const src = getActiveSourceType();
+        if (modalBadge) {
+          modalBadge.textContent = src;
+        }
+        if (selectedMaterial && !isStandardSteel(selectedMaterial) && badgeEl) {
+          const factor = getMaterialFactor(selectedMaterial, src);
+          badgeEl.textContent = `${factor.toFixed(2)}x`;
+          badgeEl.style.display = "inline-block";
+        } else if (badgeEl) {
+          badgeEl.style.display = "none";
+        }
+      }
+
+      function renderModalMaterialList(query = "") {
+        const container = document.getElementById("modalMaterialList");
+        if (!container) return;
+        const countEl = document.getElementById("modalMaterialCount");
+        const clearBtn = document.getElementById("clearModalSearchBtn");
+        if (clearBtn) clearBtn.style.display = query ? "block" : "none";
+
+        const currentSource = getActiveSourceType();
+        const results = smartSearchMaterials(query);
+
+        if (countEl) {
+          countEl.textContent = `${results.length} materiaal${results.length === 1 ? "" : "en"}`;
+        }
+
+        if (results.length === 0) {
+          container.innerHTML = `
+            <div style="padding: 25px; text-align: center; color: #aaa; font-size: 0.95rem;">
+              Geen materialen gevonden voor "<strong>${escapeHtml(query)}</strong>".<br>
+              <span style="font-size: 0.82rem; color: #888;">Wis de zoekbalk of kies standaard Staal / RVS.</span>
+            </div>`;
+          return;
+        }
+
+        let html = "";
+
+        // Bovenaan standaard Staal / RVS als query leeg is of staal/rvs/referentie bevat
+        if (!query.trim() || "staal rvs referentie koolstofstaal".includes(query.toLowerCase())) {
+          const isStandardActive = !selectedMaterial || isStandardSteel(selectedMaterial);
+          html += `
+            <div class="mat-group-header">Standaard Referentie</div>
+            <div class="mat-item ${isStandardActive ? "selected" : ""}" onclick="selectMaterial(DEFAULT_MATERIAL); closeModal('materialModal');">
+              <div class="mat-item-info">
+                <div class="mat-item-title">Staal / RVS (referentie)</div>
+                <div class="mat-item-sub">Koolstofstaal &bull; P250GH &bull; RVS 304/316 (factor 1.00)</div>
+              </div>
+              <div class="mat-item-factor">1.00x</div>
+            </div>
+          `;
+        }
+
+        if (!query.trim()) {
+          const groups = {};
+          results.forEach(({ item, idx }) => {
+            if (item.name === "Koolstofstaal (Referentie)") return;
+            if (!groups[item.groep]) groups[item.groep] = [];
+            groups[item.groep].push({ item, idx });
+          });
+
+          for (const [grpName, items] of Object.entries(groups)) {
+            html += `<div class="mat-group-header">${escapeHtml(grpName)}</div>`;
+            items.forEach(({ item, idx }) => {
+              const factor = getMaterialFactor(item, currentSource);
+              const isSel = selectedMaterial && selectedMaterial.name === item.name;
+              html += `
+                <div class="mat-item ${isSel ? "selected" : ""}" onclick="selectMaterialByIndex(${idx}); closeModal('materialModal');">
+                  <div class="mat-item-info">
+                    <div class="mat-item-title">${escapeHtml(item.name)}</div>
+                    <div class="mat-item-sub">${item.werkstoff ? escapeHtml(item.werkstoff) + " &bull; " : ""}${escapeHtml(item.notes || item.groep)}</div>
+                  </div>
+                  <div class="mat-item-factor">${factor.toFixed(2)}x</div>
+                </div>
+              `;
+            });
+          }
+        } else {
+          results.forEach(({ item, idx }) => {
+            const factor = getMaterialFactor(item, currentSource);
+            const isSel = selectedMaterial && selectedMaterial.name === item.name;
+            html += `
+              <div class="mat-item ${isSel ? "selected" : ""}" onclick="selectMaterialByIndex(${idx}); closeModal('materialModal');">
+                <div class="mat-item-info">
+                  <div class="mat-item-title">${escapeHtml(item.name)}</div>
+                  <div class="mat-item-sub">${escapeHtml(item.groep)}${item.werkstoff ? " &bull; " + escapeHtml(item.werkstoff) : ""}</div>
+                </div>
+                <div class="mat-item-factor">${factor.toFixed(2)}x</div>
+              </div>
+            `;
+          });
+        }
+
+        container.innerHTML = html;
+      }
+
+      function openMaterialModal() {
+        const modal = document.getElementById("materialModal");
+        if (!modal) return;
+        updateMaterialFactorBadge();
+        const searchInput = document.getElementById("modalMaterialSearch");
+        if (searchInput) searchInput.value = "";
+        renderModalMaterialList("");
+        openModal("materialModal");
+        setTimeout(() => {
+          if (searchInput) searchInput.focus();
+        }, 100);
+      }
+
+      function clearModalSearch() {
+        const searchInput = document.getElementById("modalMaterialSearch");
+        if (searchInput) {
+          searchInput.value = "";
+          searchInput.focus();
+        }
+        renderModalMaterialList("");
+      }
+
+      function selectMaterialByIndex(idx) {
+        if (materialDatabase && materialDatabase[idx]) {
+          selectMaterial(materialDatabase[idx]);
+        }
+      }
+
+      function selectMaterial(mat) {
+        if (!mat || isStandardSteel(mat)) {
+          resetMaterialToDefault();
+          return;
+        }
+        selectedMaterial = mat;
+        const inputEl = document.getElementById("material_input");
+        const badgeEl = document.getElementById("material_factor_badge");
+        const clearBtn = document.getElementById("clearMaterialBtn");
+
+        const factor = getMaterialFactor(mat, getActiveSourceType());
+        if (inputEl) inputEl.value = mat.name;
+        if (badgeEl) {
+          badgeEl.textContent = `${factor.toFixed(2)}x`;
+          badgeEl.style.display = "inline-block";
+        }
+        if (clearBtn) clearBtn.style.display = "block";
+
+        if (typeof window !== "undefined" && window.RtAssistant && window.RtAssistant.actiefGespreksGeheugen) {
+          window.RtAssistant.actiefGespreksGeheugen.materiaalNaam = mat.name;
+          window.RtAssistant.actiefGespreksGeheugen.materiaalfactor = factor;
+        }
+
+        if (typeof autoCalculate === "function") autoCalculate(false);
+        else calculateResults();
+      }
+
+      function resetMaterialToDefault(event) {
+        if (event) {
+          event.stopPropagation();
+        }
+        selectedMaterial = null;
+        const inputEl = document.getElementById("material_input");
+        const badgeEl = document.getElementById("material_factor_badge");
+        const clearBtn = document.getElementById("clearMaterialBtn");
+
+        if (inputEl) inputEl.value = "Staal / RVS (referentie)";
+        if (badgeEl) badgeEl.style.display = "none";
+        if (clearBtn) clearBtn.style.display = "none";
+
+        if (typeof window !== "undefined" && window.RtAssistant && window.RtAssistant.actiefGespreksGeheugen) {
+          window.RtAssistant.actiefGespreksGeheugen.materiaalNaam = null;
+          window.RtAssistant.actiefGespreksGeheugen.materiaalfactor = 1.0;
+        }
+
+        if (typeof autoCalculate === "function") autoCalculate(false);
+        else calculateResults();
+      }
+
+      function zoekMateriaalInDatabase(term) {
+        if (!term || !materialDatabase || materialDatabase.length === 0) return null;
+        const t = String(term).toLowerCase().trim();
+        if (t === "staal" || t === "rvs" || t.includes("staal / rvs") || t === "koolstofstaal") {
+          return DEFAULT_MATERIAL;
+        }
+        if (t === "aluminium" || t === "alu") {
+          const pureAl = materialDatabase.find((m) => m.name.toLowerCase().includes("aluminium zuiver"));
+          if (pureAl) return pureAl;
+        }
+        if (t === "koper" || t === "copper" || t === "cu") {
+          const pureCu = materialDatabase.find((m) => m.name.toLowerCase().includes("koper zuiver"));
+          if (pureCu) return pureCu;
+        }
+        if (t === "titanium" || t === "titaan" || t === "ti") {
+          const pureTi = materialDatabase.find((m) => m.name.toLowerCase().includes("titanium grade 1"));
+          if (pureTi) return pureTi;
+        }
+        let found = materialDatabase.find((m) => m.name.toLowerCase() === t);
+        if (found) return found;
+        found = materialDatabase.find((m) => m.name.toLowerCase().startsWith(t) && !m.name.toLowerCase().includes("brons"));
+        if (found) return found;
+        found = materialDatabase.find((m) => m.name.toLowerCase().startsWith(t));
+        if (found) return found;
+        found = materialDatabase.find((m) => m.name.toLowerCase().includes(t) || m.werkstoff.toLowerCase().includes(t));
+        if (found) return found;
+        const matches = smartSearchMaterials(t);
+        if (matches.length > 0 && matches[0].score > 25) {
+          return matches[0].item;
+        }
+        return null;
+      }
+
+      window.setPrutsMaterial = function (matName) {
+        if (!materialDatabase || materialDatabase.length === 0) {
+          laadMaterialenCSV();
+        }
+        const found = zoekMateriaalInDatabase(matName);
+        if (found) {
+          selectMaterial(found);
+        } else {
+          resetMaterialToDefault();
+        }
+      };
+
+      window.resetPrutsMaterial = function () {
+        resetMaterialToDefault();
+      };
+      // --- EINDE MATERIAAL DATABASE & FACTOREN ---
       let minFFD = 0;
+      let ofaManuallyEdited = false;
       let sfdManuallyEdited = false;
       let lasoverdikteManuallyEdited = false;
 
+      document.getElementById("ofa").addEventListener("input", () => {
+        ofaManuallyEdited = true;
+      });
       document.getElementById("sfd").addEventListener("input", () => {
         sfdManuallyEdited = true;
       });
@@ -1053,7 +1914,15 @@
 
       document
         .getElementById("source")
-        .addEventListener("change", updateBronGrootteOptions);
+        .addEventListener("change", function () {
+          updateBronGrootteOptions();
+          updateMaterialFactorBadge();
+          const modal = document.getElementById("materialModal");
+          if (modal && modal.style.display === "block") {
+            const searchInput = document.getElementById("modalMaterialSearch");
+            renderModalMaterialList(searchInput ? searchInput.value : "");
+          }
+        });
 
       // 'optie' is onderdeel van fieldsThatTriggerAutoFill, dus deze aparte listener is niet nodig
       // document.getElementById("optie").addEventListener("change", calculateAndFill);
@@ -1110,8 +1979,8 @@
 
       function getFloatValue(id) {
         const element = document.getElementById(id);
-        if (element && element.value) {
-          return parseFloat(element.value.replace(",", "."));
+        if (element && element.value !== undefined && element.value !== null && element.value !== "") {
+          return parseFloat(String(element.value).replace(",", "."));
         }
         return NaN;
       }
@@ -1631,6 +2500,7 @@
           const response = await fetch("bronnen.csv");
           const csvText = await response.text();
           const rows = csvText.trim().split("\n").slice(1);
+          const nieuweData = [];
           rows.forEach((row) => {
             const columns = row.split(",");
             if (columns.length >= 5) {
@@ -1643,7 +2513,7 @@
                 const today = new Date();
                 const currentActivity = calculateActivityForCSV(activiteit, bronType, datum, today);
                 const label = `${bronNaam} (${bronGrootte} mm) [${currentActivity.toFixed(2)} Ci]`;
-                bronnenData.push({
+                nieuweData.push({
                   name: bronNaam,
                   type: bronType,
                   size: parseFloat(bronGrootte),
@@ -1654,6 +2524,10 @@
               }
             }
           });
+          if (nieuweData.length > 0) {
+            bronnenData = nieuweData;
+            window.bronnenData = bronnenData;
+          }
           updateBronGrootteOptions();
         } catch (error) {
           console.error("Kon bronnen.csv niet laden.", error);
@@ -1845,6 +2719,7 @@
       }
 
       function calculateResults() {
+        updateMaterialFactorBadge();
         // Hide and clear the new elements at the start
 
         document.getElementById("omtrek-calculator").style.display = "none";
@@ -2225,8 +3100,9 @@
           bkiPositie = " (BKI filmzijde)";
         }
 
+        const bkiWaarschuwing = bepaalBkiWaarschuwing(selectedMaterial, wire);
         document.getElementById("wire-result").innerHTML =
-          "Vereist draadje: <strong>" + wire + "</strong>" + bkiPositie;
+          "Vereist draadje: <strong>" + wire + "</strong>" + bkiPositie + bkiWaarschuwing;
 
         let minFFDOutput =
           "Minimale FFD: " +
@@ -2277,18 +3153,27 @@
         const maxKvResultElement = document.getElementById("max-kv-result");
 
         let maxKv = 0; // Declare maxKv here
+        let maxKvUitzondering = 0;
 
         if (source === "X-ray" && !isNaN(wanddikte)) {
-          if (technique === "SWSI") {
-            maxKv = 100 + 8 * wanddikte;
-          } else if (technique === "DWDI" || technique === "DWSI") {
-            maxKv = 100 + 8 * (2 * wanddikte);
+          const doorstraaldeDikteKv = technique === "SWSI" ? wanddikte : 2 * wanddikte;
+          const isAlu = isAluminiumMaterial(selectedMaterial);
+
+          if (isAlu) {
+            // Aluminium kV-regel (conform kvregel.html): 50 + (2 * doorstraalde dikte), max +30 kV bij uitzondering
+            maxKv = 50 + 2 * doorstraaldeDikteKv;
+            maxKvUitzondering = maxKv + 30;
+          } else {
+            // Standaard Staal kV-regel: 100 + (8 * doorstraalde dikte), max +50 kV bij uitzondering
+            maxKv = 100 + 8 * doorstraaldeDikteKv;
+            maxKvUitzondering = maxKv + 50;
           }
 
           if (maxKv > 0) {
-            const maxKvUitzondering = maxKv + 50;
-
-            maxKvResultElement.innerHTML = `Maximale Kv waarde: <strong>${maxKv.toFixed(0)}</strong> (<strong>${maxKvUitzondering.toFixed(0)}</strong> bij uitzondering)`;
+            const regelLabel = isAlu
+              ? ` <span style="font-size:0.85em; opacity:0.9;">(Aluminium KV-regel)</span>`
+              : "";
+            maxKvResultElement.innerHTML = `Maximale Kv waarde: <strong>${maxKv.toFixed(0)}</strong> (<strong>${maxKvUitzondering.toFixed(0)}</strong> bij uitzondering)${regelLabel}`;
 
             maxKvResultElement.style.display = "block";
           } else {
@@ -2362,9 +3247,11 @@
 
         const brongrootteValue = document.getElementById("brongrootte").value;
 
-        const selectedBron = bronnenData.find(
-          (b) => b.label === brongrootteValue,
-        );
+        const selectedBron =
+          bronnenData.find((b) => b.label === brongrootteValue) ||
+          (source === "Se75" || source === "Ir192"
+            ? { type: source, name: source, size: 3 }
+            : null);
 
         if (
           selectedBron &&
@@ -2372,16 +3259,23 @@
         ) {
           const today = new Date();
 
-          const currentActivity = calculateActivityForCSV(
-            selectedBron.initialActivity,
-            selectedBron.type,
-            selectedBron.date,
-            today,
-          );
+          let currentActivity = selectedBron.initialActivity
+            ? calculateActivityForCSV(
+                selectedBron.initialActivity,
+                selectedBron.type,
+                selectedBron.date,
+                today,
+              )
+            : 0;
 
-          activityResultElement.innerHTML = `Bron ${selectedBron.name} is op dit moment: <strong>${currentActivity.toFixed(2)} Ci</strong>.`;
+          if (typeof window !== "undefined" && window.customActivityOverride) {
+            currentActivity = window.customActivityOverride;
+          }
 
-          activityResultElement.style.display = "block";
+          if (currentActivity > 0) {
+            activityResultElement.innerHTML = `Bron ${selectedBron.name} is op dit moment: <strong>${currentActivity.toFixed(2)} Ci</strong>.`;
+            activityResultElement.style.display = "block";
+          }
 
           maxKvResultElement.style.display = "none";
 
@@ -2414,18 +3308,26 @@
                 const ffd_m = sfd / 1000.0;
                 let base_exposure =
                   (consts.ff * (ffd_m * ffd_m)) / (currentActivity * consts.k);
-                // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus 5mm
+                // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus compensatie (+4 DWDI, +5 SWSI/DWSI)
                 let exposureThickness =
                   technique === "SWSI" ? wanddikte : 2 * wanddikte;
+                let compensation = technique === "DWDI" ? 4 : 5;
                 let attenuation = Math.pow(
                   2,
-                  (exposureThickness + 5) / consts.hvl,
+                  (exposureThickness + compensation) / consts.hvl,
                 );
                 let time_minutes_d7 = base_exposure * attenuation;
 
                 // Adjust time for Se75 by 5 percent (user request)
                 if (selectedBron.type === "Se75") {
                   time_minutes_d7 *= 1.05;
+                }
+
+                // Materiaalfactor toepassen indien niet standaard Staal/RVS
+                let matFactor = 1.0;
+                if (selectedMaterial && !isStandardSteel(selectedMaterial)) {
+                  matFactor = getMaterialFactor(selectedMaterial, selectedBron.type);
+                  time_minutes_d7 *= matFactor;
                 }
 
                 function formatTime(mins) {
@@ -2442,7 +3344,11 @@
                 let showD5 = false;
                 let showD7 = false;
 
-                const ft = filmType.toUpperCase();
+                const activeFilm =
+                  typeof window !== "undefined" && window.customFilmTypeOverride
+                    ? window.customFilmTypeOverride
+                    : filmType;
+                const ft = activeFilm.toUpperCase();
                 if (ft.includes("D7")) {
                   showD7 = true;
                   showD5 = true;
@@ -2467,6 +3373,10 @@
                 if (showD7) results.push({ name: "D7", val: time_minutes_d7 });
 
                 if (results.length > 0) {
+                  let matFactorNotice = "";
+                  if (selectedMaterial && !isStandardSteel(selectedMaterial) && matFactor !== 1.0) {
+                    matFactorNotice = `<div style="font-size: 0.85rem; color: #f5df4d; margin-top: 5px; font-weight: normal;">(Inclusief materiaalfactor <strong>${matFactor.toFixed(2)}x</strong> voor ${escapeHtml(selectedMaterial.name)})</div>`;
+                  }
                   let html = '<div style="color: yellow; font-weight: bold; margin-bottom: 6px;">Stralingstijd:</div>';
                   results.forEach((r) => {
                     html += `
@@ -2478,6 +3388,7 @@
                       </div>
                     `;
                   });
+                  html += matFactorNotice;
                   exposureTimeElement.innerHTML = html;
                   exposureTimeElement.style.display = "block";
                 }
@@ -2943,6 +3854,7 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         laadBronnenCSV();
+        laadMaterialenCSV();
         document.getElementById("optieDiv").style.display = "none";
         // Initialiseer de pagina met een berekening en auto-fill
         autoCalculate(true);
@@ -3943,6 +4855,129 @@
       </div>
     </div>
 
+    <!-- Materiaalkeuze Modal -->
+    <div id="materialModal" class="modal">
+      <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 12px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-layer-group" style="color: #f5df4d; font-size: 1.3rem;"></i>
+            <h3 style="margin: 0; color: #fff; font-size: 1.25rem; text-shadow: none;">Selecteer Materiaal</h3>
+          </div>
+          <span class="close" onclick="closeModal('materialModal')" style="cursor: pointer; font-size: 28px; line-height: 1; color: #aaa; text-shadow: none;">&times;</span>
+        </div>
+
+        <div style="font-size: 0.85rem; color: #bbb; margin-bottom: 12px;">
+          Actieve bron: <strong id="modalActiveSourceBadge" style="color: #f5df4d; background: #333; padding: 2px 6px; border-radius: 4px;">Ir-192</strong> &bull; Standaard is Staal/RVS (factor 1.00).
+        </div>
+
+        <!-- Zoekbalk & Reset knop -->
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <div style="position: relative; flex: 1;">
+            <input
+              type="text"
+              id="modalMaterialSearch"
+              placeholder="Zoek materiaal, werkstoff nr, groep..."
+              oninput="renderModalMaterialList(this.value)"
+              style="width: 100%; box-sizing: border-box; padding: 9px 32px 9px 12px; background: #2a2a2a; border: 1px solid #555; color: #fff; border-radius: 6px; font-size: 0.95rem;"
+            />
+            <button
+              type="button"
+              onclick="clearModalSearch()"
+              id="clearModalSearchBtn"
+              style="display: none; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; font-size: 1.2rem; cursor: pointer;"
+            >&times;</button>
+          </div>
+          <button
+            type="button"
+            onclick="resetMaterialToDefault(); closeModal('materialModal');"
+            style="background: #333; color: #fff; border: 1px solid #666; border-radius: 6px; padding: 8px 12px; cursor: pointer; white-space: nowrap; font-size: 0.85rem;"
+            title="Herstel naar standaard Staal / RVS"
+          >
+            <i class="fas fa-undo"></i> Staal / RVS
+          </button>
+        </div>
+
+        <!-- Scrollbare lijst met materialen -->
+        <div id="modalMaterialList" style="max-height: 52vh; overflow-y: auto; border: 1px solid #333; border-radius: 6px; background: #161616;">
+          <!-- Dynamisch gevuld via renderModalMaterialList() -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 0.82rem; color: #888;">
+          <span id="modalMaterialCount">89 materialen</span>
+          <button
+            type="button"
+            onclick="closeModal('materialModal')"
+            style="background: #444; color: #fff; border: none; border-radius: 4px; padding: 6px 14px; cursor: pointer; font-size: 0.9rem;"
+          >Sluiten</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BKI Tabel Modal (ISO 19232-1 & ASTM E747) -->
+    <div id="bkiModal" class="modal">
+      <div class="modal-content" style="max-width: 820px; max-height: 90vh; overflow-y: auto; padding: 22px; background-color: #1e1e1e; border: 2px solid #555; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); box-sizing: border-box; text-align: left; color: #f4f4f4;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 12px; margin-bottom: 15px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-table" style="color: #f5df4d; font-size: 1.4rem;"></i>
+            <h3 style="margin: 0; color: #fff; font-size: 1.25rem; text-shadow: none;">BKI Materiaalgroepen (ISO 19232-1 & ASTM E747)</h3>
+          </div>
+          <span class="close" onclick="closeModal('bkiModal')" style="cursor: pointer; font-size: 28px; line-height: 1; color: #aaa; text-shadow: none;">&times;</span>
+        </div>
+
+        <div style="background: rgba(255, 152, 0, 0.15); border-left: 4px solid #ff9800; padding: 10px 14px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; line-height: 1.4; color: #ffb74d;">
+          <strong>Belangrijke normtoelichting:</strong> In <strong>ISO 19232-1</strong> bestaan uitsluitend de 4 groepen <strong>TI, AL, FE en CU</strong>. Er bestaat <u>géén</u> "NI BKI". Nikkellegeringen vallen conform de norm onder <strong>FE</strong> (Inconel / Hastelloy) of <strong>CU</strong> (Monel / Zuiver Nikkel).
+        </div>
+
+        <!-- EN ISO 19232-1 Draad BKI Sets Overzicht -->
+        <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; font-size: 0.88rem; line-height: 1.5;">
+          <div style="font-weight: bold; color: #f5df4d; margin-bottom: 6px;">
+            <i class="fas fa-layer-group"></i> EN ISO 19232-1 Standaard BKI Sets (elk 7 draden):
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+              <strong>1 EN:</strong> draden W1 t/m W7<br><small style="color: #aaa;">(3.20 mm t/m 0.80 mm)</small>
+            </div>
+            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+              <strong>6 EN:</strong> draden W6 t/m W12<br><small style="color: #aaa;">(1.00 mm t/m 0.25 mm)</small>
+            </div>
+            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+              <strong>10 EN:</strong> draden W10 t/m W16<br><small style="color: #aaa;">(0.40 mm t/m 0.10 mm)</small>
+            </div>
+            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+              <strong>13 EN:</strong> draden W13 t/m W19<br><small style="color: #aaa;">(0.20 mm t/m 0.05 mm)</small>
+            </div>
+          </div>
+          <div style="margin-top: 8px; font-size: 0.82rem; color: #bbb;">
+            <em>Voorbeeld: Draad W14 zit zowel op houder <strong>10 EN</strong> als <strong>13 EN</strong>. Gecombineerd met de materiaalgroep: bijv. <strong>10 FE EN</strong> of <strong>13 FE EN</strong>.</em>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <pre style="background: #111; color: #f5df4d; border: 1px solid #555; border-radius: 8px; padding: 12px 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.78rem; line-height: 1.45; overflow-x: auto; white-space: pre; margin: 0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.7);">====================================================================================================
+               ISO 19232-1 & ASTM E747 BKI MATERIAALGROEPEN (WIRE-TYPE IQI)                         
+====================================================================================================
+┌─────┬──────────────────┬────┬────────────────────────────┬───────────────────────────────────────┐
+│ ISO │ ASTM E747 Groep  │Set │ BKI Materiaal (IQI)        │ Te onderzoeken materiaal              │
+├─────┼──────────────────┼────┼────────────────────────────┼───────────────────────────────────────┤
+│ TI  │ Light materials  │ 01 │ Titanium                   │ Titanium en Ti-legeringen             │
+│ AL  │ (Licht metaal)   │ 02 │ Aluminium                  │ Aluminium en Al-legeringen            │
+├─────┼──────────────────┼────┼────────────────────────────┼───────────────────────────────────────┤
+│ FE  │ Heavy materials  │ 1  │ Koolstofstaal / RVS 300    │ C-staal, laag-gelegeerd, RVS, duplex  │
+│ FE  │ (Zwaar metaal)   │ 2  │ Aluminiumbrons (623 / 630) │ Aluminiumbrons en Ni-Al bronzen       │
+│ FE  │                  │ 3  │ Inconel 600 (Ni-Cr-Fe)     │ Inconel, Hastelloy, 18% Ni-maraging   │
+├─────┼──────────────────┼────┼────────────────────────────┼───────────────────────────────────────┤
+│ CU  │ Heavy materials  │ 4  │ 70-30 Ni-Cu (Monel/Cu-Ni)  │ Zuiver Nikkel, koper, Monel, messing  │
+│ CU  │ (Zwaar metaal)   │ 5  │ Tinbrons (Alloy D B139)    │ Tinbrons, lagerbrons/Rg7, gun-metal   │
+└─────┴──────────────────┴────┴────────────────────────────┴───────────────────────────────────────┘
+====================================================================================================</pre>
+        </div>
+
+        <div style="text-align: right; margin-top: 10px;">
+          <button type="button" onclick="closeModal('bkiModal')" style="background: #444; color: #fff; border: none; border-radius: 4px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem;">Sluiten</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Zwevende mini-timer widget als modal gesloten is tijdens aftellen -->
     <div id="activeTimerFloat" class="active-timer-float" onclick="openActiveTimerModal()">
       <i class="fas fa-stopwatch fa-spin"></i>
@@ -3950,5 +4985,7 @@
     </div>
 
     <audio id="alarmSound" src="alarm.wav" preload="auto"></audio>
+
+    <script src="rt-assistant.js?v=6.15"></script>
   </body>
 </html>
