@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>P.R.U.T.S</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=6.16" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -739,6 +739,60 @@
         text-align: left;
         line-height: 1.4;
       }
+
+      /* --- BKI TABEL MODAL --- */
+      #bkiModal.modal {
+        display: none;
+        position: fixed;
+        z-index: 2500;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(4px);
+        overflow: hidden;
+        padding: 15px 10px;
+        box-sizing: border-box;
+      }
+      #bkiModal .modal-content {
+        background-color: #1e1e1e;
+        margin: 10px auto;
+        padding: 18px 20px;
+        border: 2px solid #555;
+        width: 95%;
+        max-width: 840px;
+        max-height: calc(100vh - 40px);
+        height: calc(100vh - 40px);
+        border-radius: 14px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.95);
+        box-sizing: border-box;
+        text-align: left;
+        color: #f4f4f4;
+        text-shadow: none;
+        font-size: 0.95rem;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      #bkiModal .bki-modal-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        padding-right: 6px;
+      }
+      #bkiModal .bki-modal-footer {
+        flex-shrink: 0;
+        display: flex;
+        justify-content: flex-end;
+        border-top: 1px solid #333;
+        padding-top: 12px;
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body>
@@ -1076,12 +1130,18 @@
     <script>
       function openModal(modalId) {
         var modal = document.getElementById(modalId);
-        modal.style.display = "block";
+        if (modal) {
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden";
+        }
       }
 
       function closeModal(modalId) {
         var modal = document.getElementById(modalId);
-        modal.style.display = "none";
+        if (modal) {
+          modal.style.display = "none";
+          document.body.style.overflow = "";
+        }
       }
 
       window.onclick = function (event) {
@@ -1091,7 +1151,7 @@
             if (modals[i].id === "timerModal") {
               closeTimerModal();
             } else {
-              modals[i].style.display = "none";
+              closeModal(modals[i].id);
             }
           }
         }
@@ -4487,16 +4547,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
         // Modal tonen
         document.getElementById("timerModal").style.display = "block";
+        document.body.style.overflow = "hidden";
         hideFloatingTimer();
       }
 
       function openActiveTimerModal() {
         document.getElementById("timerModal").style.display = "block";
+        document.body.style.overflow = "hidden";
         hideFloatingTimer();
       }
 
       function closeTimerModal() {
         document.getElementById("timerModal").style.display = "none";
+        document.body.style.overflow = "";
         if (timerState === "finished") {
           stopAlarm();
         } else if (timerState === "running") {
@@ -4915,8 +4978,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     <!-- BKI Tabel Modal (ISO 19232-1 & ASTM E747) -->
     <div id="bkiModal" class="modal">
-      <div class="modal-content" style="max-width: 820px; max-height: 90vh; overflow-y: auto; padding: 22px; background-color: #1e1e1e; border: 2px solid #555; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); box-sizing: border-box; text-align: left; color: #f4f4f4;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 12px; margin-bottom: 15px;">
+      <div class="modal-content">
+        <!-- Header (vast aan de bovenkant) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 12px; margin-bottom: 15px; flex-shrink: 0;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-table" style="color: #f5df4d; font-size: 1.4rem;"></i>
             <h3 style="margin: 0; color: #fff; font-size: 1.25rem; text-shadow: none;">BKI Materiaalgroepen (ISO 19232-1 & ASTM E747)</h3>
@@ -4924,36 +4988,38 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           <span class="close" onclick="closeModal('bkiModal')" style="cursor: pointer; font-size: 28px; line-height: 1; color: #aaa; text-shadow: none;">&times;</span>
         </div>
 
-        <div style="background: rgba(255, 152, 0, 0.15); border-left: 4px solid #ff9800; padding: 10px 14px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; line-height: 1.4; color: #ffb74d;">
-          <strong>Belangrijke normtoelichting:</strong> In <strong>ISO 19232-1</strong> bestaan uitsluitend de 4 groepen <strong>TI, AL, FE en CU</strong>. Er bestaat <u>géén</u> "NI BKI". Nikkellegeringen vallen conform de norm onder <strong>FE</strong> (Inconel / Hastelloy) of <strong>CU</strong> (Monel / Zuiver Nikkel).
-        </div>
+        <!-- Scrollbare inhoud (achtergrond pruts.html scrollt niet) -->
+        <div class="bki-modal-body">
+          <div style="background: rgba(255, 152, 0, 0.15); border-left: 4px solid #ff9800; padding: 10px 14px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; line-height: 1.4; color: #ffb74d;">
+            <strong>Belangrijke normtoelichting:</strong> In <strong>ISO 19232-1</strong> bestaan uitsluitend de 4 groepen <strong>TI, AL, FE en CU</strong>. Er bestaat <u>géén</u> "NI BKI". Nikkellegeringen vallen conform de norm onder <strong>FE</strong> (Inconel / Hastelloy) of <strong>CU</strong> (Monel / Zuiver Nikkel).
+          </div>
 
-        <!-- EN ISO 19232-1 Draad BKI Sets Overzicht -->
-        <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; font-size: 0.88rem; line-height: 1.5;">
-          <div style="font-weight: bold; color: #f5df4d; margin-bottom: 6px;">
-            <i class="fas fa-layer-group"></i> EN ISO 19232-1 Standaard BKI Sets (elk 7 draden):
+          <!-- EN ISO 19232-1 Draad BKI Sets Overzicht -->
+          <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; font-size: 0.88rem; line-height: 1.5;">
+            <div style="font-weight: bold; color: #f5df4d; margin-bottom: 6px;">
+              <i class="fas fa-layer-group"></i> EN ISO 19232-1 Standaard BKI Sets (elk 7 draden):
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+              <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+                <strong>1 EN:</strong> draden W1 t/m W7<br><small style="color: #aaa;">(3.20 mm t/m 0.80 mm)</small>
+              </div>
+              <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+                <strong>6 EN:</strong> draden W6 t/m W12<br><small style="color: #aaa;">(1.00 mm t/m 0.25 mm)</small>
+              </div>
+              <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+                <strong>10 EN:</strong> draden W10 t/m W16<br><small style="color: #aaa;">(0.40 mm t/m 0.10 mm)</small>
+              </div>
+              <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
+                <strong>13 EN:</strong> draden W13 t/m W19<br><small style="color: #aaa;">(0.20 mm t/m 0.05 mm)</small>
+              </div>
+            </div>
+            <div style="margin-top: 8px; font-size: 0.82rem; color: #bbb;">
+              <em>Voorbeeld: Draad W14 zit zowel op houder <strong>10 EN</strong> als <strong>13 EN</strong>. Gecombineerd met de materiaalgroep: bijv. <strong>10 FE EN</strong> of <strong>13 FE EN</strong>.</em>
+            </div>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
-            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
-              <strong>1 EN:</strong> draden W1 t/m W7<br><small style="color: #aaa;">(3.20 mm t/m 0.80 mm)</small>
-            </div>
-            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
-              <strong>6 EN:</strong> draden W6 t/m W12<br><small style="color: #aaa;">(1.00 mm t/m 0.25 mm)</small>
-            </div>
-            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
-              <strong>10 EN:</strong> draden W10 t/m W16<br><small style="color: #aaa;">(0.40 mm t/m 0.10 mm)</small>
-            </div>
-            <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; border-left: 3px solid #f5df4d;">
-              <strong>13 EN:</strong> draden W13 t/m W19<br><small style="color: #aaa;">(0.20 mm t/m 0.05 mm)</small>
-            </div>
-          </div>
-          <div style="margin-top: 8px; font-size: 0.82rem; color: #bbb;">
-            <em>Voorbeeld: Draad W14 zit zowel op houder <strong>10 EN</strong> als <strong>13 EN</strong>. Gecombineerd met de materiaalgroep: bijv. <strong>10 FE EN</strong> of <strong>13 FE EN</strong>.</em>
-          </div>
-        </div>
 
-        <div style="margin-bottom: 15px;">
-          <pre style="background: #111; color: #f5df4d; border: 1px solid #555; border-radius: 8px; padding: 12px 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.78rem; line-height: 1.45; overflow-x: auto; white-space: pre; margin: 0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.7);">====================================================================================================
+          <div style="margin-bottom: 10px;">
+            <pre style="background: #111; color: #f5df4d; border: 1px solid #555; border-radius: 8px; padding: 12px 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.78rem; line-height: 1.45; overflow-x: auto; white-space: pre; margin: 0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.7);">====================================================================================================
                ISO 19232-1 & ASTM E747 BKI MATERIAALGROEPEN (WIRE-TYPE IQI)                         
 ====================================================================================================
 ┌─────┬──────────────────┬────┬────────────────────────────┬───────────────────────────────────────┐
@@ -4970,10 +5036,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 │ CU  │ (Zwaar metaal)   │ 5  │ Tinbrons (Alloy D B139)    │ Tinbrons, lagerbrons/Rg7, gun-metal   │
 └─────┴──────────────────┴────┴────────────────────────────┴───────────────────────────────────────┘
 ====================================================================================================</pre>
+          </div>
         </div>
 
-        <div style="text-align: right; margin-top: 10px;">
-          <button type="button" onclick="closeModal('bkiModal')" style="background: #444; color: #fff; border: none; border-radius: 4px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem;">Sluiten</button>
+        <!-- Footer (vast aan de onderkant, altijd in beeld) -->
+        <div class="bki-modal-footer">
+          <button type="button" onclick="closeModal('bkiModal')" style="background: #f5df4d; color: #111; font-weight: bold; border: none; border-radius: 6px; padding: 10px 22px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(245,223,77,0.3); transition: transform 0.1s;" onmouseover="this.style.background='#ffea60'" onmouseout="this.style.background='#f5df4d'">Sluiten</button>
         </div>
       </div>
     </div>
@@ -4986,6 +5054,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     <audio id="alarmSound" src="alarm.wav" preload="auto"></audio>
 
-    <script src="rt-assistant.js?v=6.15"></script>
+    <script src="rt-assistant.js?v=6.16"></script>
   </body>
 </html>
