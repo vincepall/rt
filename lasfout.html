@@ -163,9 +163,9 @@
                         <select id="norm-select" class="block w-full pl-4 pr-10 py-3 text-base bg-dark-900 border border-dark-600 text-gray-200 focus:outline-none focus:ring-1 focus:ring-accent-yellow focus:border-accent-yellow rounded-md transition-all appearance-none cursor-pointer hover:border-gray-500 hover:bg-black/20">
                             <option value="none" selected>- (Geen criteria tonen)</option>
                             <option value="asme">ASME V. UW 51 / App. 4</option>
-                            <option value="en1">EN ISO 5817 Level 1 / B (Hoogste eis)</option>
-                            <option value="en2">EN ISO 5817 Level 2 / C (Normale eis)</option>
-                            <option value="en3">EN ISO 5817 Level 3 / D (Laagste eis)</option>
+                            <option value="en1">EN Level 1 (Hoogste eis)</option>
+                            <option value="en2">EN Level 2 (Normale eis)</option>
+                            <option value="en3">EN Level 3 (Laagste eis)</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-dark-400 group-hover:text-gray-200 transition-colors">
                             <i class="fa-solid fa-chevron-down text-sm"></i>
@@ -408,9 +408,9 @@
                     <th class="border border-gray-500 p-2 w-[5%] text-center">Code</th>
                     <th class="border border-gray-500 p-2 w-[15%]">Lasfout / Omschrijving</th>
                     <th class="border border-gray-500 p-2 w-[20%]">ASME V. UW 51</th>
-                    <th class="border border-gray-500 p-2 w-[20%]">EN ISO 5817 Level 1 / B</th>
-                    <th class="border border-gray-500 p-2 w-[20%]">EN ISO 5817 Level 2 / C</th>
-                    <th class="border border-gray-500 p-2 w-[20%]">EN ISO 5817 Level 3 / D</th>
+                    <th class="border border-gray-500 p-2 w-[20%]">EN Level 1</th>
+                    <th class="border border-gray-500 p-2 w-[20%]">EN Level 2</th>
+                    <th class="border border-gray-500 p-2 w-[20%]">EN Level 3</th>
                 </tr>
             </thead>
             <tbody id="print-tbody" class="divide-y divide-gray-400">
@@ -890,5 +890,6 @@
         // Initialize view
         updateDisplay();
     </script>
+    <script src="rt-assistant.js?v=6.23"></script>
 </body>
 </html>
