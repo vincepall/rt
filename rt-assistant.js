@@ -1487,10 +1487,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         (actiefGespreksGeheugen.laatsteIntentie === "onstream_ffd" || actiefGespreksGeheugen.laatsteIntentie === "onstream_bron") &&
         /\b(klasse\s*t[ab]|tb|ta|isolatie|tangentiaal|dubbelwand)\b/i.test(lower));
     if (isOnstream) {
-      if (/\b(ffd|sfd|focus|afstand|rt21021)\b/i.test(lower) && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang)\b/i.test(lower)) {
+      const vraagtOnstreamFFD = /\b(ffd|sfd|focus|afstand|focusafstand)\b/i.test(lower) && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang)\b/i.test(lower);
+      const vraagtPureOnstreamBron = !vraagtOnstreamFFD && /\b(welke\s+bron|bronkeuze|wat\s+is\s+de\s+wmax|bereken\s+wmax|mag\s+ik.*gebruiken|kan\s+ik.*gebruiken|is\s+.*geschikt)\b/i.test(lower);
+      if (
+        vraagtOnstreamFFD ||
+        (typeof actiefGespreksGeheugen !== "undefined" &&
+          actiefGespreksGeheugen &&
+          actiefGespreksGeheugen.laatsteIntentie === "onstream_ffd" &&
+          !vraagtPureOnstreamBron &&
+          !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang)\b/i.test(lower))
+      ) {
         intenties.push("onstream_ffd");
-      }
-      if (/\b(bron|bronkeuze|geschikt|isotoop|se-75|ir-192|co-60|welke\s+bron|iridium|selenium|kobalt|kan\s+ik|mag\s+ik|gebruiken|wmax|w-max)\b/i.test(lower) && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang|gevuld|water|olie)\b/i.test(lower)) {
+      } else if (/\b(bron|bronkeuze|geschikt|isotoop|se-75|ir-192|co-60|welke\s+bron|iridium|selenium|kobalt|kan\s+ik|mag\s+ik|gebruiken|wmax|w-max)\b/i.test(lower) && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang|gevuld|water|olie)\b/i.test(lower)) {
         intenties.push("onstream_bron");
       }
       if (intenties.length === 0 && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang|gevuld|water|olie|kv|verval)\b/i.test(lower)) {
@@ -1536,7 +1544,20 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // Buistabel / mA*min omrekenen naar belichtingstijd (buistabel.html)
+    const heeftHerinnerdeFocus = Boolean(
+      typeof actiefGespreksGeheugen !== "undefined" &&
+      actiefGespreksGeheugen &&
+      (actiefGespreksGeheugen.sfd || (actiefGespreksGeheugen.oudeFocus && actiefGespreksGeheugen.nieuweFocus))
+    );
+    const heeftMaMinInTekst = /\b(ma\s*\*?\s*min|mamin|(?:mill?i[-\s]?(?:amp[eè]re|amp)|ma)\s*(?:[\*x\s]|per\s+)?(?:minuuten|minuten|minuut|min\b))\b/i.test(lower);
+    const heeftFocusInTekst =
+      /(?<![\d.,]|(?:se|ir|co)[-\s]?\d*)(?:op\s+|bij\s+|van\s+|naar\s+)?(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)\b/i.test(lower) ||
+      /\b(?:ffd|sfd|focus)\s*(?:van|is|op|:)?\s*\d+/i.test(lower);
+    const heeftFocusCombinatieMetGeheugen =
+      (heeftMaMinInTekst || heeftTijdSeenheid) && heeftFocusInTekst && heeftHerinnerdeFocus;
+
     const isEchteFocusWissel =
+      heeftFocusCombinatieMetGeheugen ||
       /\b(focusverandering|focus\s*verandering|ffd\s*verandering|kwadratenwet|ci\s*wissel|curie\s*wissel)\b/i.test(lower) ||
       /\b(van\s+\d+\s*(?:cm|mm)?\s*(?:naar|tot)\s+\d+\s*(?:cm|mm)?\s*(?:ffd|sfd|focus))\b/i.test(lower) ||
       /\b(?:oude\s+focus|oude\s+ffd|nieuwe\s+focus|nieuwe\s+ffd)\b/i.test(lower) ||
@@ -1557,10 +1578,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     const isBuisTabelVraag =
       /\b(buistabel|buis-tabel|buistabellen)\b/i.test(lower) ||
-      (/\b(ma\s*\*?\s*min|mamin|(?:mill?i[-\s]?(?:amp[eè]re|amp)|ma)\s*(?:[\*x\s]|per\s+)?(?:minuuten|minuten|minuut|min\b))\b/i.test(lower) && !isEchteFocusWissel) ||
+      (heeftMaMinInTekst && !isEchteFocusWissel) ||
       (typeof actiefGespreksGeheugen !== "undefined" &&
         actiefGespreksGeheugen &&
         actiefGespreksGeheugen.laatsteIntentie === "buistabel" &&
+        !isEchteFocusWissel &&
         (/\b\d+(?:[.,]\d+)?\s*(?:ma\*min|mamin|ma|milliamp|miliamp|minut(?:en|ie)?)\b/i.test(lower) || /\b\d+(?:[.,]\d+)?\b/.test(lower)));
 
     if (isBuisTabelVraag && !/\b(kv|kilovolt|buisspanning|keverregel)\b/i.test(lower)) {
@@ -1570,6 +1592,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     // Focus & Filmtype Calculator / Focusverandering (focusverandering.html)
     const isFocusVeranderingVraag =
+      heeftFocusCombinatieMetGeheugen ||
       /\b(focusverandering|focus\s*verandering|ffd\s*verandering|kwadratenwet|ci\s*wissel|curie\s*wissel)\b/i.test(lower) ||
       /\b(van\s+\d+\s*(?:cm|mm)?\s*(?:naar|tot)\s+\d+\s*(?:cm|mm)?\s*(?:ffd|sfd|focus))\b/i.test(lower) ||
       /\b(van\s+(?:de\s+)?(?:ffd|sfd|focus)\s+\d+\s*(?:naar|tot)\s+\d+)\b/i.test(lower) ||
@@ -1603,10 +1626,21 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // Afzetting Gamma / Veiligheid / Dosistempo / Looddikte / Halveringsdikte / Dosislimiet
-    if (
-      /\b(afzetting|afzettingsafstand|afzetten|afzettingszone|gecontroleerde\s*zone|dosistempo|microsievert|usv|µsv|veiligheidsafstand|veilige\s*afstand|hoe\s+groot.*afzetting|hoe\s+ver.*afzetten|halveringsdikte|hvl|dosislimiet|jaarlijkse\s+dosis)\b/i.test(lower) ||
-      /\bhoeveel\s+(?:mm\s+)?(?:lood|pb)\b/i.test(lower)
-    ) {
+    const isAfzettingDirect =
+      /\b(afzetting|afzettingsafstand|afzetten|afzettingszone|gecontroleerde\s*zone|dosistempo|microsievert|usv|µsv|veiligheidsafstand|veilige\s*afstand|hoe\s+groot.*afzetting|hoe\s+ver.*afzetten|halveringsdikte|hvl|dosislimiet|jaarlijkse\s+dosis|loodafscherming|loden\s+afscherming)\b/i.test(lower) ||
+      /\b(?:hoeveel|welke)\s+(?:mm\s+|millimeter\s+)?(?:lood|loden|pb|afscherming|staal)\b/i.test(lower) ||
+      (/\b(afscherming|afschermen|lood|loden|pb)\b/i.test(lower) && /\b(nodig|meter|m\b|afzetten|afzetting|dosistempo|microsievert|usv|µsv|iridium|selenium|se-?75|ir-?192|curie|ci|collimator)\b/i.test(lower));
+
+    const isAfzettingVervolg =
+      typeof actiefGespreksGeheugen !== "undefined" &&
+      actiefGespreksGeheugen &&
+      actiefGespreksGeheugen.laatsteIntentie === "afzetting" &&
+      !isStralingstijdVraag &&
+      !isFocusVeranderingVraag &&
+      !/\b(opnames?|draadje|bki|iqi|ffd|sfd|focus|onstream|wmax|lasfout|schedule|langsnaad|verzet|bundel|kv|zwarting)\b/i.test(lower) &&
+      (/\b(\d+(?:[.,]\d+)?\s*(?:meter|m\b|mm|ci|curie)|lood|loden|pb|staal|fe|afscherming|collimator|open\s+bundel|sterkste|zwakste|iridium|selenium|seleen|se-?75|ir-?192|zonder\s+(?:lood|afscherming)|geen\s+(?:lood|afscherming))\b/i.test(lower));
+
+    if (isAfzettingDirect || isAfzettingVervolg) {
       intenties.push("afzetting");
       return intenties;
     }
@@ -1973,14 +2007,64 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       matchPb = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:lood|pb)(?:\s*afscherming)?\b/i);
     }
     if (matchPb) res.pbMm = parseFloat(matchPb[1].replace(",", "."));
+    if (/\b(zonder\s+(?:lood|pb|afscherming)|geen\s+(?:lood|pb|afscherming)|0\s*mm\s*(?:lood|pb))\b/i.test(lower)) {
+      res.pbMm = 0;
+      res.feMm = 0;
+      res.verzetZonderAfscherming = true;
+    }
 
-    const isAfschermingContext = /\b(afzetting|afzettingszone|afscherming|lood|pb|dosis|dosistempo)\b/i.test(lower) || (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.laatsteIntentie === "afzetting");
+    const isAfschermingContext =
+      /\b(afzetting|afzettingsafstand|afzetten|afzettingszone|afscherming|afschermen|lood|loden|pb|dosis|dosistempo|microsievert|usv|µsv|halveringsdikte|hvl)\b/i.test(lower) ||
+      (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.laatsteIntentie === "afzetting");
     if (isAfschermingContext) {
       let matchFe = tekst.match(/(?:staal|fe|ijzer)\s*(?:afscherming\s*)?(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
       if (!matchFe) {
         matchFe = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:staal|fe|ijzer)(?:\s*afscherming)?\b/i);
       }
       if (matchFe) res.feMm = parseFloat(matchFe[1].replace(",", "."));
+
+      // Sub-modus detectie (lood_nodig, dosistempo_op_afstand, afzettingsafstand)
+      const vraagtLoodNodig =
+        /\b(?:hoeveel|welke)\s+(?:mm\s+|millimeter\s+)?(?:lood|loden|pb|afscherming|loodafscherming|extra\s+lood)\b/i.test(lower) ||
+        /\b(?:lood|loden|pb|afscherming|loodafscherming)\b.*?\b(?:nodig|gebruiken|vereist|plaatsen|hebben|om\s+(?:op|binnen|onder|een\s+afzetting)|voor\s+\d+\s*(?:meter|m\b))\b/i.test(lower) ||
+        /\b(?:nodig|gebruiken|hebben)\b.*?\b(?:lood|loden|pb|afscherming|loodafscherming)\b/i.test(lower) ||
+        /\b(?:maximaal|max\.?|binnen|op)\s+\d+(?:[.,]\d+)?\s*(?:meter|m\b)\s*(?:kan\s+)?(?:afzetten|afzetting)\b.*?\b(?:lood|loden|pb|afscherming)\b/i.test(lower);
+
+      const vraagtDosistempo =
+        !vraagtLoodNodig &&
+        /\b(wat\s+is\s+(?:het|de)\s+dosistempo|hoe\s+hoog\s+is\s+(?:het|de)\s+dosistempo|hoeveel\s+(?:microsievert|usv|µsv)|dosistempo\s+(?:op|bij|achter|daar))\b/i.test(lower);
+
+      const vraagtAfzettingsAfstand =
+        !vraagtLoodNodig &&
+        !vraagtDosistempo &&
+        (/\b(hoe\s+ver.*afzetten|hoe\s+groot.*afzetting|wat\s+(?:is|wordt)\s+de\s+afzetting(?:safstand)?|veilige\s+afzetting|afzetting\s+met\s+\d+\s*(?:mm\s*)?(?:lood|pb|staal))\b/i.test(lower) ||
+          (matchPb !== null && !/\b\d+(?:[.,]\d+)?\s*(?:meter|m\b)\b/i.test(lower)));
+
+      if (vraagtLoodNodig) {
+        res.afzettingSubModus = "lood_nodig";
+      } else if (vraagtDosistempo) {
+        res.afzettingSubModus = "dosistempo_op_afstand";
+      } else if (vraagtAfzettingsAfstand) {
+        res.afzettingSubModus = "afzettingsafstand";
+      }
+
+      // Doel-afstand in meter (bijv. "op 15 meter", "afzetting van 15 meter", "maximaal 15 meter afzetten", of los "10 meter" bij vervolgvraag)
+      const mDoelM =
+        lower.match(/(?:op|bij|binnen|naar|voor|van|maximaal|max\.?|tot)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i) ||
+        lower.match(/(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\s*(?:afzetten|afzetting|afstand)/i) ||
+        lower.match(/\b(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\b/i);
+      if (mDoelM) {
+        res.afzettingDoelMeter = parseFloat(mDoelM[1].replace(",", "."));
+      } else if (
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.verwachtParameter === "afzettingDoelMeter"
+      ) {
+        const mBareM = lower.match(/^\s*(?:op\s+|bij\s+)?(\d+(?:[.,]\d+)?)\s*(?:meter|m)?\s*$/i);
+        if (mBareM) {
+          res.afzettingDoelMeter = parseFloat(mBareM[1].replace(",", "."));
+        }
+      }
     }
 
     const matchDosis = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:usv|µsv|microsievert)/i);
@@ -2367,6 +2451,26 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
+    // 1b. mA*min en mA (buistabel.html & focusverandering.html) - vóór focusverandering zodat res.maminVal beschikbaar is!
+    const reMaMinVal = /(?:ma\s*\*?\s*min|mamin|(?:mill?i[-\s]?(?:amp[eè]re|amp)|ma)\s*(?:[\*x\s]|per\s+)?(?:minuuten|minuten|minuut|min\b))/i;
+    let matchMaMinVal = tekst.match(new RegExp(`(\\d+(?:[.,]\\d+)?)\\s*${reMaMinVal.source}\\b`, "i"));
+    if (!matchMaMinVal) {
+      matchMaMinVal = tekst.match(new RegExp(`${reMaMinVal.source}\\s*(?:van|is|op|:)?\\s*(\\d+(?:[.,]\\d+)?)\\b`, "i"));
+    }
+    if (matchMaMinVal) {
+      res.maminVal = parseFloat(matchMaMinVal[1].replace(",", "."));
+    }
+
+    let tekstZonderMaMin = tekst.replace(new RegExp(`\\b\\d+(?:[.,]\\d+)?\\s*${reMaMinVal.source}\\b`, "gi"), "")
+                                .replace(new RegExp(`\\b${reMaMinVal.source}\\s*(?:van|is|op|:)?\\s*\\d+(?:[.,]\\d+)?\\b`, "gi"), "");
+    let matchMaOnly = tekstZonderMaMin.match(/(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
+    if (!matchMaOnly) {
+      matchMaOnly = tekstZonderMaMin.match(/(?:stroom|buisstroom|op|met|bij|kan)\s*(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
+    }
+    if (matchMaOnly) {
+      res.maVal = parseFloat(matchMaOnly[1].replace(",", "."));
+    }
+
     // 2. Focus verandering (Kwadratenwet F1 -> F2)
     // Specifiek spraakpatroon: "ik straal ... op [80], hoelang moet ik stralen op [1 meter 15 / 56 focus]"
     const matchOpHoeLangOp = tekst.match(/(?:op|bij)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?\s*,?\s*(?:hoe\s*lang|hoelang)\s*(?:moet|kan|zal)?\s*(?:ik|men|we)?\s*(?:stralen|belichten)?\s*(?:op|bij|naar|tot)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?/i);
@@ -2382,6 +2486,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const focusHits = [...tekst.matchAll(reFocus)].map((m) => ({
         full: m[0],
         valStr: m[1],
+        index: m.index || 0,
         cm: parseFocusAfstandCm(m[1])
       })).filter((h) => h.cm !== null && h.cm >= 5);
 
@@ -2396,16 +2501,25 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           res.oudeFocus = cmHits[0];
           res.nieuweFocus = cmHits[1];
         } else if (focusHits.length === 1) {
-          // Alleen als focusverandering / kwadratenwet relevant is (bijv. als er een begintijd is of expliciet gevraagd wordt naar oude/nieuwe focus)
+          // Alleen als focusverandering / kwadratenwet relevant is (bijv. als er een begintijd of mA*min is of expliciet gevraagd wordt naar oude/nieuwe focus)
           const isEchteFocusWissel = res.focusBegintijdSec !== null || res.maminVal !== null ||
             /\b(focusverandering|filmwissel|omrekenen|oude\s+focus|huidige\s+focus|nieuwe\s+focus|vanuit|kwadratenwet)\b/i.test(tekst) ||
             /\b(?:naar|tot|omhoog\s*naar|nieuwe)\s+\d+/i.test(focusHits[0].full);
 
           if (isEchteFocusWissel) {
-            if (/\b(?:naar|tot|omhoog\s*naar|nieuwe)\b/i.test(focusHits[0].full) || /\b(?:wat\s+wordt\s+(?:het|de\s+tijd)|hoe\s+lang)\b/i.test(tekst)) {
+            const vraagWoordMatch = tekst.match(/\b(hoelang|hoe\s+lang|wat\s+wordt\s+(?:het|de\s+tijd))\b/i);
+            const focusStaatNaVraagWoord = Boolean(vraagWoordMatch && focusHits[0].index > vraagWoordMatch.index);
+            const isExplicietNieuw = /\b(?:naar|tot|omhoog\s*naar|nieuwe)\b/i.test(focusHits[0].full) || focusStaatNaVraagWoord;
+            if (isExplicietNieuw) {
               res.nieuweFocus = focusHits[0].cm;
             } else {
               res.oudeFocus = focusHits[0].cm;
+              // Als er al een gekozen FFD (sfd) in het gespreksgeheugen stond (bijv. 450 mm van eerdere opnames-vraag),
+              // gebruik die dan als de doel-focus (nieuweFocus) en overschrijf het geheugen-sfd NIET met de buistabel-focus!
+              const memSfdMm = (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.sfd) ? actiefGespreksGeheugen.sfd : null;
+              if (memSfdMm && Math.abs((memSfdMm / 10) - res.oudeFocus) > 0.5) {
+                res.nieuweFocus = memSfdMm / 10;
+              }
             }
           }
         } else {
@@ -2425,8 +2539,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         }
       }
     }
-    if (res.oudeFocus !== null && res.nieuweFocus !== null) {
-      res.sfd = null;
+    if ((res.oudeFocus !== null && res.nieuweFocus !== null) || (res.oudeFocus !== null && (res.maminVal !== null || res.focusBegintijdSec !== null))) {
+      // Voorkom dat de referentiefocus van een buistabel/begintijd (bijv. "10 mA*min op 80 focus") de eerder gekozen FFD (bijv. 450 mm) in het geheugen overschrijft
+      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.sfd) {
+        res.sfd = null;
+      }
     }
 
     // 3. Filmwissel (D2, D3, D4, D5, D7, D8)
@@ -2459,26 +2576,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           res.nieuweCi = ciHits[1];
         }
       }
-    }
-
-    // 5. mA*min en mA (buistabel.html & focusverandering.html)
-    const reMaMinVal = /(?:ma\s*\*?\s*min|mamin|(?:mill?i[-\s]?(?:amp[eè]re|amp)|ma)\s*(?:[\*x\s]|per\s+)?(?:minuuten|minuten|minuut|min\b))/i;
-    let matchMaMinVal = tekst.match(new RegExp(`(\\d+(?:[.,]\\d+)?)\\s*${reMaMinVal.source}\\b`, "i"));
-    if (!matchMaMinVal) {
-      matchMaMinVal = tekst.match(new RegExp(`${reMaMinVal.source}\\s*(?:van|is|op|:)?\\s*(\\d+(?:[.,]\\d+)?)\\b`, "i"));
-    }
-    if (matchMaMinVal) {
-      res.maminVal = parseFloat(matchMaMinVal[1].replace(",", "."));
-    }
-
-    let tekstZonderMaMin = tekst.replace(new RegExp(`\\b\\d+(?:[.,]\\d+)?\\s*${reMaMinVal.source}\\b`, "gi"), "")
-                                .replace(new RegExp(`\\b${reMaMinVal.source}\\s*(?:van|is|op|:)?\\s*\\d+(?:[.,]\\d+)?\\b`, "gi"), "");
-    let matchMaOnly = tekstZonderMaMin.match(/(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
-    if (!matchMaOnly) {
-      matchMaOnly = tekstZonderMaMin.match(/(?:stroom|buisstroom|op|met|bij|kan)\s*(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
-    }
-    if (matchMaOnly) {
-      res.maVal = parseFloat(matchMaOnly[1].replace(",", "."));
     }
 
     // 6. Materiaalfactor & Materiaalherkenning (conform stralingstijd.html en materiaalfactor.csv)
@@ -2810,54 +2907,99 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const hvlFe = isIr ? 13 : 5;
     const collimatorFactor = isIr ? 0.012 : 0.05; // Ir: 1/85, Se: 1/20
 
-    // Specifieke vraag 1: "Wat is het dosistempo op X meter afstand?" (omgevormde afzettingsformule)
-    const isDosistempoOpAfstandVraag =
-      /\b(wat\s+is\s+(?:het|de)\s+dosistempo|hoe\s+hoog\s+is\s+(?:het|de)\s+dosistempo|hoeveel\s+(?:microsievert|usv|µsv)|dosistempo\s+op)\b/i.test(lower);
-    if (isDosistempoOpAfstandVraag) {
-      const mAfst = lower.match(/(?:op|bij)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i);
-      const afstandM = mAfst ? parseFloat(mAfst[1].replace(",", ".")) : (params.sfd && params.sfd >= 1000 ? params.sfd / 1000 : null);
-      if (afstandM && afstandM > 0) {
-        const atten = Math.pow(0.5, pb / hvlPb) * Math.pow(0.5, fe / hvlFe);
-        const dtOpen = (ci * 37000 * k * atten) / (afstandM * afstandM);
-        const dtCollimator = dtOpen * collimatorFactor;
-        const afschermTxt = pb > 0 || fe > 0
-          ? ` met ${pb > 0 ? pb + " mm lood" : ""}${pb > 0 && fe > 0 ? " en " : ""}${fe > 0 ? fe + " mm staal" : ""}`
-          : " zonder afscherming";
-        return (
-          `Dosistempo op <strong>${afstandM} meter</strong> afstand bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${afschermTxt}:<br>` +
-          `• In de open bundel: <strong>${dtOpen.toFixed(1)} μSv/uur</strong> (${(dtOpen / 1000).toFixed(2)} mSv/uur).<br>` +
-          `• Achter een standaard collimator: <strong>${dtCollimator.toFixed(1)} μSv/uur</strong>.<br>` +
-          `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>).</small>`
-        );
-      }
+    // Bepaal sub-modus (lood_nodig, dosistempo_op_afstand, of afzettingsafstand) met behoud voor vervolgvragen
+    const isDosistempoExpliciet =
+      /\b(wat\s+is\s+(?:het|de)\s+dosistempo|hoe\s+hoog\s+is\s+(?:het|de)\s+dosistempo|hoeveel\s+(?:microsievert|usv|µsv)|dosistempo\s+(?:op|bij|achter|daar))\b/i.test(lower) &&
+      !/\b(?:hoeveel|welke)\s+(?:mm\s+|millimeter\s+)?(?:lood|loden|pb|afscherming)\b/i.test(lower);
+    const isLoodNodigExpliciet =
+      /\b(?:hoeveel|welke)\s+(?:mm\s+|millimeter\s+)?(?:lood|loden|pb|afscherming|loodafscherming|extra\s+lood)\b/i.test(lower) ||
+      /\b(?:lood|loden|pb|afscherming|loodafscherming)\b.*?\b(?:nodig|gebruiken|vereist|plaatsen|hebben|om\s+(?:op|binnen|onder|een\s+afzetting)|voor\s+\d+\s*(?:meter|m\b))\b/i.test(lower) ||
+      /\b(?:nodig|gebruiken|hebben)\b.*?\b(?:lood|loden|pb|afscherming|loodafscherming)\b/i.test(lower) ||
+      /\b(?:maximaal|max\.?|binnen|op)\s+\d+(?:[.,]\d+)?\s*(?:meter|m\b)\s*(?:kan\s+)?(?:afzetten|afzetting)\b.*?\b(?:lood|loden|pb|afscherming)\b/i.test(lower);
+
+    let subModus = params.afzettingSubModus || "afzettingsafstand";
+    if (isLoodNodigExpliciet) subModus = "lood_nodig";
+    else if (isDosistempoExpliciet) subModus = "dosistempo_op_afstand";
+    if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.afzettingSubModus = subModus;
     }
 
-    // Specifieke vraag 2: "Hoeveel mm lood heb ik nodig om op X meter uit te komen?" (omgevormde afzettingsformule)
-    const isLoodNodigVraag = /\bhoeveel\s+(?:mm\s+)?(?:lood|pb)\b.*?\b(?:nodig|gebruiken|om\s+op|voor)\b/i.test(lower);
-    if (isLoodNodigVraag) {
-      const mDoel = lower.match(/(?:op|binnen|naar|voor)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i);
-      const doelM = mDoel ? parseFloat(mDoel[1].replace(",", ".")) : null;
-      if (doelM && doelM > 0) {
-        const onafgeschermdOpen = Math.sqrt((ci * 37000 * k) / dosis);
-        const collimatorAfst = Math.sqrt((ci * 37000 * k * collimatorFactor) / dosis);
-        const verhoudingOpen = (ci * 37000 * k) / (doelM * doelM * dosis);
-        const benodigdPbOpen = verhoudingOpen > 1 ? hvlPb * Math.log2(verhoudingOpen) : 0;
-        const verhoudingColl = (ci * 37000 * k * collimatorFactor) / (doelM * doelM * dosis);
-        const benodigdPbColl = verhoudingColl > 1 ? hvlPb * Math.log2(verhoudingColl) : 0;
+    const mAfstInline =
+      lower.match(/(?:op|bij|binnen|naar|voor|van|maximaal|max\.?|tot)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i) ||
+      lower.match(/(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\s*(?:afzetten|afzetting|afstand)/i) ||
+      lower.match(/\b(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\b/i);
+    const doelM = mAfstInline
+      ? parseFloat(mAfstInline[1].replace(",", "."))
+      : (params.afzettingDoelMeter || (params.sfd && params.sfd >= 1000 ? params.sfd / 1000 : null));
 
-        const pbOpenCeil = benodigdPbOpen > 0 ? Math.ceil(benodigdPbOpen) : 0;
-        const pbCollCeil = benodigdPbColl > 0 ? Math.ceil(benodigdPbColl) : 0;
+    if (doelM && doelM > 0 && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.afzettingDoelMeter = doelM;
+    }
 
-        let loodResp = `Om bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong> op een afzettingsafstand van <strong>${doelM} meter</strong> (bij ${dosis} μSv/h) uit te komen (halveringsdikte lood HVL = ${hvlPb} mm):<br>` +
-          `• <strong>In de open bundel (richting van de bundel):</strong> <strong>${pbOpenCeil} mm lood</strong> nodig (reduceert de open bundel van ${onafgeschermdOpen.toFixed(1)} m naar &le; ${doelM} m).<br>`;
-        if (pbCollCeil <= 0) {
-          loodResp += `• <strong>Achter een standaard collimator:</strong> <strong>0 mm extra lood</strong> nodig (de afzettingsafstand achter de collimator is al <strong>${collimatorAfst.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
-        } else {
-          loodResp += `• <strong>Achter een standaard collimator:</strong> nog <strong>${pbCollCeil} mm extra lood</strong> nodig (reduceert van ${collimatorAfst.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+    // Specifieke vraag 1: "Wat is het dosistempo op X meter afstand?" (omgevormde afzettingsformule)
+    if (subModus === "dosistempo_op_afstand") {
+      if (!doelM || doelM <= 0) {
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "afzettingDoelMeter";
         }
-        loodResp += `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>).</small>`;
-        return loodResp;
+        if (chips) chips.push("5 meter", "8 meter", "10 meter", "15 meter", "20 meter");
+        return `Op welke <strong>afstand (in meter)</strong> wil je het dosistempo voor <strong>${ci.toFixed(1)} Curie ${bronType}</strong> weten?`;
       }
+      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.verwachtParameter === "afzettingDoelMeter") {
+        actiefGespreksGeheugen.verwachtParameter = null;
+      }
+      const atten = Math.pow(0.5, pb / hvlPb) * Math.pow(0.5, fe / hvlFe);
+      const dtOpen = (ci * 37000 * k * atten) / (doelM * doelM);
+      const dtCollimator = dtOpen * collimatorFactor;
+      const afschermTxt = pb > 0 || fe > 0
+        ? ` met ${pb > 0 ? pb + " mm lood" : ""}${pb > 0 && fe > 0 ? " en " : ""}${fe > 0 ? fe + " mm staal" : ""}`
+        : " zonder afscherming";
+      if (chips && chips.length === 0) {
+        chips.push(`Hoeveel lood nodig op ${doelM} meter`, "Op 10 meter", "Op 15 meter", isIr ? "Sterkste Se-75" : "Sterkste Ir-192");
+      }
+      return (
+        `Dosistempo op <strong>${doelM} meter</strong> afstand bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${afschermTxt}:<br>` +
+        `• In de open bundel: <strong>${dtOpen.toFixed(1)} μSv/uur</strong> (${(dtOpen / 1000).toFixed(2)} mSv/uur).<br>` +
+        `• Achter een standaard collimator: <strong>${dtCollimator.toFixed(1)} μSv/uur</strong>.<br>` +
+        `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>).</small>`
+      );
+    }
+
+    // Specifieke vraag 2: "Hoeveel mm lood / afscherming heb ik nodig om op X meter uit te komen?" (omgevormde afzettingsformule)
+    if (subModus === "lood_nodig") {
+      if (!doelM || doelM <= 0) {
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "afzettingDoelMeter";
+        }
+        if (chips) chips.push("5 meter", "8 meter", "10 meter", "15 meter", "20 meter");
+        return `Op welke maximale <strong>afzettingsafstand (in meter)</strong> wil je uitkomen met <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam} (bij norm ${dosis} μSv/h)?`;
+      }
+      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.verwachtParameter === "afzettingDoelMeter") {
+        actiefGespreksGeheugen.verwachtParameter = null;
+      }
+      const onafgeschermdOpen = Math.sqrt((ci * 37000 * k) / dosis);
+      const collimatorAfst = Math.sqrt((ci * 37000 * k * collimatorFactor) / dosis);
+      const verhoudingOpen = (ci * 37000 * k) / (doelM * doelM * dosis);
+      const benodigdPbOpen = verhoudingOpen > 1 ? hvlPb * Math.log2(verhoudingOpen) : 0;
+      const verhoudingColl = (ci * 37000 * k * collimatorFactor) / (doelM * doelM * dosis);
+      const benodigdPbColl = verhoudingColl > 1 ? hvlPb * Math.log2(verhoudingColl) : 0;
+
+      const pbOpenCeil = benodigdPbOpen > 0 ? Math.ceil(benodigdPbOpen) : 0;
+      const pbCollCeil = benodigdPbColl > 0 ? Math.ceil(benodigdPbColl) : 0;
+
+      if (chips && chips.length === 0) {
+        chips.push("Op 8 meter", "Op 10 meter", "Op 15 meter", isIr ? "Sterkste Se-75" : "Sterkste Ir-192", `Dosistempo op ${doelM} meter`);
+      }
+
+      let loodResp = `Om bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam} op een afzettingsafstand van <strong>${doelM} meter</strong> (bij ${dosis} μSv/h) uit te komen (halveringsdikte lood HVL = ${hvlPb} mm):<br>` +
+        `• <strong>In de open bundel (richting van de bundel):</strong> <strong>${pbOpenCeil} mm lood</strong> nodig (reduceert de open bundel van ${onafgeschermdOpen.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+      if (pbCollCeil <= 0) {
+        loodResp += `• <strong>Achter een standaard collimator:</strong> <strong>0 mm extra lood</strong> nodig (de afzettingsafstand achter de collimator is al <strong>${collimatorAfst.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
+      } else {
+        loodResp += `• <strong>Achter een standaard collimator:</strong> nog <strong>${pbCollCeil} mm extra lood</strong> nodig (reduceert van ${collimatorAfst.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+      }
+      loodResp += `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>).</small>`;
+      return loodResp;
     }
 
     // 1. In de open bundel (zonder stalen leidingafscherming, tenzij expliciet Pb opgegeven)
@@ -2930,7 +3072,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     return resp;
   }
 
-  // Helper om onstream bronnen te bepalen (bronkeuze2.html)
+  // Helper om alle toegestane onstream bronnen te bepalen (bronkeuze2.html / RT21021 / RT21022)
   function bepaalOnstreamBronnen(wmax, techniek, klasse) {
     let bronnen = [];
     const tech = (techniek || "tangentiaal").toLowerCase();
@@ -2938,12 +3080,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (tech === "tangentiaal") {
       if (kl === "ta") {
         if (wmax < 55.1) bronnen.push("Se-75");
-        else if (wmax < 80.1) bronnen.push("Ir-192");
-        else if (wmax < 120.1) bronnen.push("Co-60");
+        if (wmax > 9.9 && wmax < 80.1) bronnen.push("Ir-192");
+        if (wmax > 39.1 && wmax < 120.1) bronnen.push("Co-60");
       } else {
         if (wmax < 40.1) bronnen.push("Se-75");
-        else if (wmax < 60.1) bronnen.push("Ir-192");
-        else if (wmax < 85.1) bronnen.push("Co-60");
+        if (wmax > 19.9 && wmax < 60.1) bronnen.push("Ir-192");
+        if (wmax > 39.1 && wmax < 85.1) bronnen.push("Co-60");
       }
     } else {
       if (kl === "ta") {
@@ -2957,6 +3099,32 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
     return bronnen;
+  }
+
+  function formatteerOnstreamBronnenMetAdvies(bronnen, wmax) {
+    const warningThresholds = { "Se-75": 41, "Ir-192": 64, "Co-60": 100 };
+    if (!bronnen || bronnen.length === 0) {
+      return {
+        bronTekst: "<strong>Geen geschikte bron (Wmax &gt; toelaatbare grens)</strong>",
+        adviesTekst: "",
+      };
+    }
+    const items = bronnen.map((b) => {
+      const over = warningThresholds[b] && wmax > warningThresholds[b];
+      return over ? `<strong>${b}</strong> <span style="color:#ffb347;">(⚠️ zit tegen de grens)</span>` : `<strong>${b}</strong>`;
+    });
+    let advies = "";
+    if (bronnen.includes("Se-75") && wmax > warningThresholds["Se-75"] && bronnen.includes("Ir-192")) {
+      advies = `<br>• 💡 <em>Advies: <strong>Ir-192</strong> is hier een betere keus omdat <strong>Se-75</strong> (bij Wmax = ${wmax.toFixed(1)} mm) al bijna tegen de grens zit.</em>`;
+    } else if (bronnen.includes("Ir-192") && wmax > warningThresholds["Ir-192"] && bronnen.includes("Co-60")) {
+      advies = `<br>• 💡 <em>Advies: <strong>Co-60</strong> is hier een ruimere keus omdat <strong>Ir-192</strong> (bij Wmax = ${wmax.toFixed(1)} mm) al bijna tegen de grens zit.</em>`;
+    } else if (bronnen.some((b) => warningThresholds[b] && wmax > warningThresholds[b])) {
+      advies = ` ⚠️ <em>Opletten: bron kan gebruikt worden maar zit tegen de grens!</em>`;
+    }
+    return {
+      bronTekst: items.join(", "),
+      adviesTekst: advies,
+    };
   }
 
   // 2. Onstream RT (onstreamffd.html & bronkeuze2.html)
@@ -3016,12 +3184,21 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     const diaLabel = formatMmNaarDuimLabel(De);
-    const isPuurFFDVraag = /\b(ffd|sfd|focus|afstand|focusafstand)\b/i.test(lower) && !/\b(bronkeuze|wmax|w-max|welke\s+bron|iridium|selenium|kobalt|kan\s+ik|mag\s+ik)\b/i.test(lower);
-    const isPuurBronVraag = /\b(bron|bronkeuze|geschikt|isotoop|welke\s+bron|wmax|w-max|iridium|selenium|kobalt|kan\s+ik|mag\s+ik)\b/i.test(lower) && !/\b(ffd|sfd|focus|afstand)\b/i.test(lower);
+    const vraagtExplicietOmFFD = /\b(ffd|sfd|focus|afstand|focusafstand)\b/i.test(lower);
+    const isPuurBronVraag =
+      !vraagtExplicietOmFFD &&
+      /\b(bronkeuze|wmax|w-max|welke\s+bron|kan\s+ik.*gebruiken|mag\s+ik.*gebruiken|is\s+.*geschikt)\b/i.test(lower);
+    const isOnstreamFFDFlow =
+      vraagtExplicietOmFFD ||
+      (typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "onstream_ffd" &&
+        !isPuurBronVraag) ||
+      (!t && !/\b(bron|bronkeuze|geschikt|isotoop|welke\s+bron|wmax|w-max|iridium|selenium|kobalt|kan\s+ik|mag\s+ik)\b/i.test(lower));
 
-    // 1. Specifiek FFD gevraagd (onstreamffd.html) of als wanddikte niet bekend is en geen pure bronvraag
-    // Voor minimale onstream FFD is wanddikte namelijk NIET van toepassing!
-    if (isPuurFFDVraag || (!t && !isPuurBronVraag)) {
+    // 1. Specifiek FFD gevraagd (onstreamffd.html) of lopende onstream_ffd dialoog
+    // Voor minimale onstream FFD wordt eerst de minimale focus berekend, met Wmax / bronkeuze als extra info daaronder!
+    if (isOnstreamFFDFlow) {
       if (!b) {
         if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
           actiefGespreksGeheugen.verwachtParameter = "brongrootte";
@@ -3035,7 +3212,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
                `Welke <strong>brongrootte</strong> (focusafmeting in mm) of welke bron gebruik je?`;
       }
 
-      if (!hasIso) {
+      // Alleen doorvragen naar isolatiedikte als de gebruiker zelf aangaf dat er isolatie is zonder dikte te noemen
+      const noemtIsolatieZonderWaarde = !hasIso && /\b(met\s+isolatie|ge[iï]soleerd|geisoleerd|isolatiedikte)\b/i.test(lower);
+      if (noemtIsolatieZonderWaarde) {
         if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
           actiefGespreksGeheugen.verwachtParameter = "isolatieMm";
         }
@@ -3043,13 +3222,14 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           chips.push("Geen isolatie", "25 mm isolatie", "40 mm isolatie", "50 mm isolatie", "60 mm isolatie", "80 mm isolatie");
           if (!klasse) chips.push("Klasse TA", "Klasse TB");
         }
-        return `Is de leiding van <strong>${diaLabel}</strong> voorzien van isolatie, en zo ja wat is de <strong>isolatiedikte</strong> (in mm)?`;
+        return `Wat is de <strong>isolatiedikte</strong> (in mm) op de leiding van <strong>${diaLabel}</strong>?`;
       }
+      const effIso = hasIso ? Iso : 0;
 
       // Bereken FFD conform onstreamffd.html (als klasse niet gespecificeerd is, default naar TB en toon TA ter vergelijking)
       const effKlasse = klasse || "tb";
       const isDWSI = techniek !== "tangentiaal" && De >= 150;
-      let OFD = De + Iso;
+      let OFD = De + effIso;
       let ofdInfo = "";
 
       if (isDWSI) {
@@ -3058,15 +3238,15 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             actiefGespreksGeheugen.verwachtParameter = "wanddikte";
           }
           if (chips) chips.push("4 mm dik", "6.5 mm dik", "7.1 mm dik", "8 mm dik", "11 mm dik");
-          return `Voor ${diaLabel} bij RT21022 (dubbelwand) is de diameter &ge; 150 mm (6 duimer en groter). Hierbij wordt de <strong>DWSI onstream techniek</strong> gebruikt (alleen de filmzijde wand wordt beoordeeld).<br>De object-film afstand (OFD) is de afstand vanaf de binnenwand van de pijp tot aan de film (${Iso > 0 ? `wanddikte + ${Iso} mm isolatie` : "wanddikte t"}). Wat is de <strong>wanddikte</strong> (in mm)?`;
+          return `Voor ${diaLabel} bij RT21022 (dubbelwand) is de diameter &ge; 150 mm (6 duimer en groter). Hierbij wordt de <strong>DWSI onstream techniek</strong> gebruikt (alleen de filmzijde wand wordt beoordeeld).<br>De object-film afstand (OFD) is de afstand vanaf de binnenwand van de pijp tot aan de film (${effIso > 0 ? `wanddikte + ${effIso} mm isolatie` : "wanddikte t"}). Wat is de <strong>wanddikte</strong> (in mm)?`;
         }
-        OFD = t + Iso;
+        OFD = t + effIso;
         ofdInfo = `${OFD.toFixed(1)} mm (afstand binnenwand filmzijde tot film conform DWSI &ge; 150 mm)`;
       } else {
         ofdInfo = `${OFD.toFixed(1)} mm (${techniek === "tangentiaal" ? "" : "buitendiameter conform DWDI &lt; 150 mm"})`;
       }
 
-      const PDD = De / 2 + Iso;
+      const PDD = De / 2 + effIso;
       let minFFD = 0;
       let ffd1 = 0;
       let ffd2 = 0;
@@ -3079,7 +3259,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         minFFD = Math.max(ffd1, ffd2);
       } else if (isDWSI) {
         ffdOnscherpte = (b * OFD) / (effKlasse === "tb" ? 0.3 : 0.6);
-        ffdFysiek = De + 2 * Iso;
+        ffdFysiek = De + 2 * effIso;
         minFFD = Math.max(ffdOnscherpte, ffdFysiek);
       } else {
         minFFD = (b * OFD) / (effKlasse === "tb" ? 0.3 : 0.6);
@@ -3104,23 +3284,50 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         altFFD = Math.round((b * OFD) / (altKlasse === "tb" ? 0.3 : 0.6));
       }
 
-      let resp = `Voor ${diaLabel} bij een onstream opname conform ${techniek === "tangentiaal" ? "Tangentiaal (RT21021)" : `Dubbelwand (${isDWSI ? "DWSI" : "DWDI"} RT21022)`}, Klasse ${effKlasse.toUpperCase()} met focus ${b} mm${Iso > 0 ? ` en ${Iso} mm isolatie` : " (ongeïsoleerd)"}:<br>` +
+      let resp = `Voor ${diaLabel} bij een onstream opname conform ${techniek === "tangentiaal" ? "Tangentiaal (RT21021)" : `Dubbelwand (${isDWSI ? "DWSI" : "DWDI"} RT21022)`}, Klasse ${effKlasse.toUpperCase()} met focus ${b} mm${effIso > 0 ? ` en ${effIso} mm isolatie` : " (ongeïsoleerd)"}:<br>` +
                  `• <strong>Minimale FFD: ${ffdAfgerond} mm</strong> (${(ffdAfgerond / 10).toFixed(1)} cm).<br>` +
                  `• ${techniek === "tangentiaal" ? `PDD: ${PDD.toFixed(1)} mm (geometrische bundeleis ffd₁ = ${Math.round(ffd1)} mm, toelaatbare onscherpte ffd₂ = ${Math.round(ffd2)} mm bij Ug ${effKlasse === "tb" ? "0.3" : "0.6"} mm).` : `OFD: ${ofdInfo}${isDWSI ? ` (Ug ${effKlasse === "tb" ? "0.3" : "0.6"} mm vereist min. ${Math.round(ffdOnscherpte)} mm FFD, fysieke contact-FFD buitenkant buis is ${Math.round(ffdFysiek)} mm)` : ` (toelaatbare onscherpte bij Ug ${effKlasse === "tb" ? "0.3" : "0.6"} mm)`}.`}<br>` +
                  `<small style="opacity: 0.85;">(Ter vergelijking bij Klasse ${altKlasse.toUpperCase()}: minimale FFD ${altFFD} mm; zie <a href="onstreamffd.html" class="ai-link" target="_blank">onstreamffd.html</a>).</small>`;
 
       if (chips) {
         chips.push(effKlasse === "ta" ? "Klasse TB" : "Klasse TA");
-        if (Iso === 0) chips.push("50 mm isolatie");
+        if (effIso === 0) chips.push("25 mm isolatie", "50 mm isolatie");
         else chips.push("Geen isolatie");
         chips.push(techniek === "tangentiaal" ? "Dubbelwand" : "Tangentiaal");
       }
 
-      // Als wanddikte toevallig ook bekend is in het geheugen, toon ook Wmax
+      // Als wanddikte bekend is (bijv. via schedule of directe invoer), geef Wmax en bronkeuze-check als extra info onder het FFD-antwoord!
       if (t) {
+        const wmaxKlasse = klasse || "ta";
         const wmax = 2 * Math.sqrt(t * (De - t));
-        const bronnen = bepaalOnstreamBronnen(wmax, techniek, klasse);
-        resp += `<br><br><small style="opacity: 0.9;">Bij wanddikte ${t} mm is Wmax = <strong>${wmax.toFixed(1)} mm</strong> &rarr; Geschikte bron: <strong>${bronnen.join(", ") || "Geen geschikte bron"}</strong> (<a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).</small>`;
+        const bronnen = bepaalOnstreamBronnen(wmax, techniek, wmaxKlasse);
+        const { bronTekst, adviesTekst } = formatteerOnstreamBronnenMetAdvies(bronnen, wmax);
+        const maxWmaxTabel = {
+          ta: { "Se-75": 55, "Ir-192": 80, "Co-60": 120 },
+          tb: { "Se-75": 40, "Ir-192": 60, "Co-60": 85 }
+        };
+        const isIrGekozen = /\b(iridium|ir-?192)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Ir-192")) || params.bronType === "Ir192";
+        const isSeGekozen = /\b(selenium|se-?75)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Se-75")) || params.bronType === "Se75";
+        const isCoGekozen = /\b(kobalt|co-?60)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Co-60")) || params.bronType === "Co60";
+
+        let extraWaarschuwing = "";
+        if (isIrGekozen && !bronnen.includes("Ir-192")) {
+          const maxIr = maxWmaxTabel[wmaxKlasse]["Ir-192"];
+          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Ir-192 (Iridium)</strong> is NIET geschikt/toegestaan voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (maximaal toelaatbaar voor Ir-192 is <strong>${maxIr} mm</strong> voor Klasse ${wmaxKlasse.toUpperCase()} volgens Tabel 1 RT21021 / RT21022).`;
+        } else if (isSeGekozen && !bronnen.includes("Se-75")) {
+          const maxSe = maxWmaxTabel[wmaxKlasse]["Se-75"];
+          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Se-75 (Selenium)</strong> is NIET geschikt/toegestaan voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (maximaal toelaatbaar voor Se-75 is <strong>${maxSe} mm</strong> voor Klasse ${wmaxKlasse.toUpperCase()} volgens Tabel 1 RT21021 / RT21022).`;
+        } else if (isCoGekozen && !bronnen.includes("Co-60")) {
+          const maxCo = maxWmaxTabel[wmaxKlasse]["Co-60"];
+          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Co-60 (Kobalt)</strong> is NIET geschikt voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (max. <strong>${maxCo} mm</strong> voor Klasse ${wmaxKlasse.toUpperCase()}).`;
+        }
+
+        resp += `<br><br><div style="padding:8px 10px; background:rgba(255,255,255,0.05); border-left:3px solid ${extraWaarschuwing ? "#ff6b6b" : "#F5DF4D"}; border-radius:4px; font-size:0.92rem;">` +
+                `ℹ️ <strong>Extra info bronkeuze bij wanddikte ${t} mm (<a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>):</strong>` +
+                `${extraWaarschuwing}` +
+                `<br>• Doorstraalde dikte (Klasse ${wmaxKlasse.toUpperCase()}): <strong>Wmax = ${wmax.toFixed(1)} mm</strong>.` +
+                `<br>• Toegestane bron(nen): ${bronTekst}.${adviesTekst}` +
+                `</div>`;
       }
 
       return resp;
@@ -3138,10 +3345,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const effectiveKlasse = klasse || "ta";
     const wmax = 2 * Math.sqrt(t * (De - t));
     const bronnen = bepaalOnstreamBronnen(wmax, techniek, effectiveKlasse);
-    const warningThresholds = { "Se-75": 41, "Ir-192": 64, "Co-60": 100 };
-    const waarschuwing = bronnen.some((bron) => warningThresholds[bron] && wmax > warningThresholds[bron])
-      ? " ⚠️ <em>Opletten: bron kan gebruikt worden maar zit tegen de grens!</em>"
-      : "";
+    const { bronTekst: geformatteerdeBronnen, adviesTekst: waarschuwing } = formatteerOnstreamBronnenMetAdvies(bronnen, wmax);
 
     const regels = [];
 
@@ -3183,13 +3387,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       regels.push(
         `Voor ${diaLabel} van ${t} mm dik is de doorstraalde wanddikte:<br>` +
         `• <strong>Wmax = ${wmax.toFixed(1)} mm</strong> (berekend conform <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).<br>` +
-        `• Aanbevolen bron(nen) (${techniek === "tangentiaal" ? "Tangentiaal RT21021" : "Dubbelwand RT21022"}, klasse ${effectiveKlasse.toUpperCase()}): <strong>${bronnen.join(", ") || "Geen geschikte bron (Wmax > toelaatbare grens)"}</strong>.${waarschuwing}`
+        `• Toegestane bron(nen) (${techniek === "tangentiaal" ? "Tangentiaal RT21021" : "Dubbelwand RT21022"}, klasse ${effectiveKlasse.toUpperCase()}): ${geformatteerdeBronnen}.${waarschuwing}`
       );
     } else {
       regels.push(
         `Onstream ${techniek.toUpperCase()} (${techniek === "tangentiaal" ? "RT21021" : "RT21022"}, klasse ${effectiveKlasse.toUpperCase()}) voor ${diaLabel} van ${t} mm dik:<br>` +
         `• Doorstraalde dikte Wmax = <strong>${wmax.toFixed(1)} mm</strong>.<br>` +
-        `• Aanbevolen bron(nen): <strong>${bronnen.join(", ") || "Geen geschikte bron (Wmax > toelaatbare grens)"}</strong>.${waarschuwing}`
+        `• Toegestane bron(nen): ${geformatteerdeBronnen}.${waarschuwing}`
       );
     }
 
@@ -5034,7 +5238,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (!fOud && fNieuw) {
       fOud = 80;
     }
+    if (fOud && !fNieuw && params.sfd && Math.abs((params.sfd / 10) - fOud) > 0.5) {
+      fNieuw = params.sfd / 10;
+    }
     const heeftFocus = fOud && fNieuw && fOud > 0;
+    if (maminMsg && fOud) {
+      maminMsg = `• Röntgen buistabel (op ${fOud} cm FFD): ${params.maminVal} mA*min bij ${params.maVal} mA = <strong>${formatSecondenKort(begintijdSec)}</strong><br>`;
+    }
     const heeftFilm = Boolean(params.oudeFilmType || params.nieuweFilmType);
     const heeftMateriaal = Boolean(
       (params.materiaalObj && params.materiaalObj.name !== "Koolstofstaal (Referentie)") ||
@@ -5099,7 +5309,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (heeftFocus) {
       const focusFactor = Math.pow(fNieuw / fOud, 2);
       tijdNaFocus = begintijdSec * focusFactor;
-      focusTxt = `• Focusverandering van <strong>${fOud} naar ${fNieuw} cm FFD</strong>: factor <strong>${focusFactor.toFixed(2)}x</strong> &rarr; <strong>${formatSecondenKort(tijdNaFocus)}</strong><br>`;
+      const mmHint = params.sfd && Math.abs((params.sfd / 10) - fNieuw) < 0.5 ? ` (${params.sfd} mm uit geheugen)` : "";
+      focusTxt = `• Focusverandering van <strong>${fOud} naar ${fNieuw} cm FFD${mmHint}</strong>: factor <strong>${focusFactor.toFixed(2)}x</strong> &rarr; <strong>${formatSecondenKort(tijdNaFocus)}</strong><br>`;
     }
 
     // Materiaalfactor
@@ -7580,10 +7791,10 @@ ${stralingstijdPlat}========================================`;
             actiefGespreksGeheugen.verwachtParameter = null;
           }
         } else if (typeof nieuwParsed[k] === "number" && (k === "pbMm" || k === "feMm")) {
-          if (nieuwParsed[k] > 0 || /\b(lood|pb|staal|fe)\b/i.test(gefilterdeTekst)) {
+          if (nieuwParsed[k] > 0 || nieuwParsed.verzetZonderAfscherming || /\b(lood|pb|staal|fe|zonder|geen)\b/i.test(gefilterdeTekst)) {
             actiefGespreksGeheugen[k] = nieuwParsed[k];
           }
-        } else if (k === "onstreamTechniek" || k === "onstreamKlasse") {
+        } else if (k === "onstreamTechniek" || k === "onstreamKlasse" || k === "afzettingDoelMeter" || k === "afzettingSubModus") {
           actiefGespreksGeheugen[k] = nieuwParsed[k];
           if (actiefGespreksGeheugen.verwachtParameter === k) {
             actiefGespreksGeheugen.verwachtParameter = null;
@@ -7705,6 +7916,8 @@ ${stralingstijdPlat}========================================`;
       nieuwParsed.materiaalFactor !== null ||
       (typeof nieuwParsed.pbMm === "number" && nieuwParsed.pbMm > 0) ||
       (typeof nieuwParsed.feMm === "number" && nieuwParsed.feMm > 0) ||
+      Boolean(nieuwParsed.verzetZonderAfscherming) ||
+      nieuwParsed.afzettingDoelMeter !== null ||
       (typeof nieuwParsed.isolatieMm === "number") ||
       nieuwParsed.onstreamKlasse !== null ||
       nieuwParsed.onstreamTechniek !== null ||
@@ -7976,8 +8189,24 @@ ${stralingstijdPlat}========================================`;
             antwoorden.push(`De sterkste ${vraagtSe ? "Se-75" : vraagtIr ? "Ir-192" : "isotopen"} bron is op dit moment <strong>${top.name}</strong> met <strong>${top.act.toFixed(1)} Ci</strong> (${top.size} mm)${rest ? ` (gevolgd door ${rest})` : ""}.`);
           } else if (lijst.length > 0) {
             lijst.sort((a, b) => b.act - a.act);
-            const ov = lijst.map((b) => `${b.name} (${b.type}, ${b.size} mm): <strong>${b.act.toFixed(1)} Ci</strong>`).join("<br>• ");
-            antwoorden.push(`Actuele bronnen uit bronnen.csv:<br>• ${ov}`);
+            const irLijst = lijst.filter((b) => b.type === "Ir192");
+            const seLijst = lijst.filter((b) => b.type === "Se75");
+            const overigeLijst = lijst.filter((b) => b.type !== "Ir192" && b.type !== "Se75");
+
+            const blokken = [];
+            if (irLijst.length > 0) {
+              const irOv = irLijst.map((b) => `• <strong>${b.name}</strong> (${b.size} mm): <strong>${b.act.toFixed(1)} Ci</strong>`).join("<br>");
+              blokken.push(`☢️ <strong>Iridium-192 (Ir-192):</strong><br>${irOv}`);
+            }
+            if (seLijst.length > 0) {
+              const seOv = seLijst.map((b) => `• <strong>${b.name}</strong> (${b.size} mm): <strong>${b.act.toFixed(1)} Ci</strong>`).join("<br>");
+              blokken.push(`☢️ <strong>Selenium-75 (Se-75):</strong><br>${seOv}`);
+            }
+            if (overigeLijst.length > 0) {
+              const ovOv = overigeLijst.map((b) => `• <strong>${b.name}</strong> (${b.type}, ${b.size} mm): <strong>${b.act.toFixed(1)} Ci</strong>`).join("<br>");
+              blokken.push(`☢️ <strong>Overige bronnen:</strong><br>${ovOv}`);
+            }
+            antwoorden.push(`<strong>Actuele bronnen uit bronnen.csv (gesorteerd op sterkte):</strong><br><br>${blokken.join("<br><br>")}`);
           }
         }
       } else if (intentie === "opnames") {

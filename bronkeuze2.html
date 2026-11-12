@@ -140,12 +140,12 @@
             if (techniek === 'tangentiaal') {
                 if (klasse === 'ta') {
                     if (wmax < 55.1) bronnen.push("Se-75");
-                    else if (wmax < 80.1) bronnen.push("Ir-192");
-                    else if (wmax < 120.1) bronnen.push("Co-60");
+                    if (wmax > 9.9 && wmax < 80.1) bronnen.push("Ir-192");
+                    if (wmax > 39.1 && wmax < 120.1) bronnen.push("Co-60");
                 } else if (klasse === 'tb') {
                     if (wmax < 40.1) bronnen.push("Se-75");
-                    else if (wmax < 60.1) bronnen.push("Ir-192");
-                    else if (wmax < 85.1) bronnen.push("Co-60");
+                    if (wmax > 19.9 && wmax < 60.1) bronnen.push("Ir-192");
+                    if (wmax > 39.1 && wmax < 85.1) bronnen.push("Co-60");
                 }
             } else if (techniek === 'dubbel_wand') {
                 if (klasse === 'ta') {
@@ -182,6 +182,6 @@
         }
     </script>
 <div style="height: 200px;"></div>
-<script src="rt-assistant.js?v=6.27"></script>
+<script src="rt-assistant.js?v=6.28"></script>
 </body>
 </html>
