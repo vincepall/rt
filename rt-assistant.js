@@ -8170,6 +8170,15 @@ ${stralingstijdPlat}========================================`;
 
   function injectStyles() {
     if (typeof document === "undefined" || document.getElementById("rt-ai-injected-styles")) return;
+    if (document.querySelector) {
+      const vpMeta = document.querySelector('meta[name="viewport"]');
+      if (vpMeta) {
+        const vpContent = vpMeta.getAttribute("content") || "";
+        if (!vpContent.includes("interactive-widget")) {
+          vpMeta.setAttribute("content", vpContent + ", interactive-widget=resizes-content");
+        }
+      }
+    }
     const style = document.createElement("style");
     style.id = "rt-ai-injected-styles";
     style.textContent = `
@@ -8286,7 +8295,7 @@ ${stralingstijdPlat}========================================`;
         border-radius: 20px;
         width: min(920px, 94vw);
         height: min(880px, 90vh);
-        min-height: 560px;
+        min-height: min(560px, 85vh);
         padding: 20px 24px;
         box-sizing: border-box;
         box-shadow: 0 18px 52px rgba(0,0,0,0.75), 0 0 0 1px rgba(245,223,77,0.25);
@@ -8732,6 +8741,7 @@ ${stralingstijdPlat}========================================`;
           max-width: 100vw !important;
           height: 100% !important;
           max-height: 100% !important;
+          min-height: 0 !important;
           border-radius: 0 !important;
           border: none !important;
           border-top: 4px solid #F5DF4D !important;
@@ -8744,6 +8754,31 @@ ${stralingstijdPlat}========================================`;
           margin: 0 !important;
           background: #252525 !important;
           overscroll-behavior: none !important;
+        }
+        .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-modal {
+          padding-top: 6px !important;
+          padding-bottom: 6px !important;
+        }
+        .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-modal-subtitle {
+          display: none !important;
+        }
+        .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-modal-header {
+          margin-bottom: 4px !important;
+          padding-bottom: 3px !important;
+        }
+        .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-transcript {
+          margin-bottom: 3px !important;
+          min-height: 16px !important;
+          font-size: 0.8rem !important;
+        }
+        .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-response-box {
+          margin-bottom: 6px !important;
+          padding: 8px 10px !important;
+        }
+        .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-mic-btn {
+          width: 44px !important;
+          height: 44px !important;
+          font-size: 20px !important;
         }
         .rt-ai-modal-header {
           margin-bottom: 6px !important;
@@ -9014,21 +9049,23 @@ ${stralingstijdPlat}========================================`;
       }
     }, { passive: false });
 
-    const textInput = document.getElementById("rt-ai-input");
-    if (textInput) {
-      textInput.addEventListener("focus", () => {
-        if (typeof window !== "undefined" && window.innerWidth <= 768) {
-          window.scrollTo(0, 0);
-          setTimeout(updateMobileViewport, 60);
-          setTimeout(updateMobileViewport, 250);
-        }
-      });
-      textInput.addEventListener("blur", () => {
-        if (typeof window !== "undefined" && window.innerWidth <= 768) {
-          setTimeout(updateMobileViewport, 60);
-        }
-      });
-    }
+    overlay.addEventListener("focusin", (e) => {
+      if (e.target && e.target.tagName === "INPUT" && typeof window !== "undefined" && window.innerWidth <= 768) {
+        window.scrollTo(0, 0);
+        updateMobileViewport();
+        setTimeout(updateMobileViewport, 60);
+        setTimeout(updateMobileViewport, 180);
+        setTimeout(updateMobileViewport, 350);
+        setTimeout(updateMobileViewport, 550);
+      }
+    });
+    overlay.addEventListener("focusout", (e) => {
+      if (e.target && e.target.tagName === "INPUT" && typeof window !== "undefined" && window.innerWidth <= 768) {
+        setTimeout(updateMobileViewport, 60);
+        setTimeout(updateMobileViewport, 250);
+        setTimeout(updateMobileViewport, 450);
+      }
+    });
   }
 
   let isPushing = false;
@@ -9261,20 +9298,42 @@ ${stralingstijdPlat}========================================`;
   function updateMobileViewport() {
     if (!assistantModal || assistantModal.style.display === "none") return;
     if (typeof window === "undefined") return;
+    const modalBox = assistantModal.querySelector ? assistantModal.querySelector(".rt-ai-modal") : null;
     if (window.innerWidth > 768) {
       assistantModal.style.removeProperty("--rt-ai-vh");
       assistantModal.style.removeProperty("--rt-ai-vtop");
+      assistantModal.style.height = "";
+      assistantModal.style.maxHeight = "";
+      assistantModal.style.top = "";
+      assistantModal.classList.remove("rt-ai-kb-open");
+      if (modalBox) {
+        modalBox.style.height = "";
+        modalBox.style.maxHeight = "";
+        modalBox.style.minHeight = "";
+      }
       return;
     }
     const vv = window.visualViewport;
-    if (vv) {
-      const height = Math.round(vv.height);
-      const top = Math.round(vv.offsetTop);
-      assistantModal.style.setProperty("--rt-ai-vh", `${height}px`);
-      assistantModal.style.setProperty("--rt-ai-vtop", `${top}px`);
-    } else {
-      assistantModal.style.setProperty("--rt-ai-vh", `${window.innerHeight}px`);
-      assistantModal.style.setProperty("--rt-ai-vtop", "0px");
+    const height = vv ? Math.round(vv.height) : window.innerHeight;
+    const top = vv ? Math.round(vv.offsetTop) : 0;
+
+    assistantModal.style.setProperty("--rt-ai-vh", `${height}px`);
+    assistantModal.style.setProperty("--rt-ai-vtop", `${top}px`);
+    assistantModal.style.top = `${top}px`;
+    assistantModal.style.height = `${height}px`;
+    assistantModal.style.maxHeight = `${height}px`;
+
+    if (modalBox) {
+      modalBox.style.height = `${height}px`;
+      modalBox.style.maxHeight = `${height}px`;
+      modalBox.style.minHeight = "0px";
+    }
+
+    const activeEl = typeof document !== "undefined" ? document.activeElement : null;
+    const isInputFocused = Boolean(activeEl && activeEl.tagName === "INPUT" && assistantModal.contains && assistantModal.contains(activeEl));
+    const isKeyboardOpen = (window.screen && window.screen.height && height < window.screen.height * 0.72) || (isInputFocused && height < 580);
+    if (assistantModal.classList) {
+      assistantModal.classList.toggle("rt-ai-kb-open", Boolean(isKeyboardOpen));
     }
   }
 
@@ -9336,6 +9395,16 @@ ${stralingstijdPlat}========================================`;
     if (assistantModal) {
       assistantModal.style.removeProperty("--rt-ai-vh");
       assistantModal.style.removeProperty("--rt-ai-vtop");
+      assistantModal.style.height = "";
+      assistantModal.style.maxHeight = "";
+      assistantModal.style.top = "";
+      assistantModal.classList.remove("rt-ai-kb-open");
+      const modalBox = assistantModal.querySelector ? assistantModal.querySelector(".rt-ai-modal") : null;
+      if (modalBox) {
+        modalBox.style.height = "";
+        modalBox.style.maxHeight = "";
+        modalBox.style.minHeight = "";
+      }
       assistantModal.style.display = "none";
     }
 
