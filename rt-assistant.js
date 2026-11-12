@@ -8767,9 +8767,7 @@ ${stralingstijdPlat}========================================`;
           padding-bottom: 3px !important;
         }
         .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-transcript {
-          margin-bottom: 3px !important;
-          min-height: 16px !important;
-          font-size: 0.8rem !important;
+          display: none !important;
         }
         .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-response-box {
           margin-bottom: 6px !important;
