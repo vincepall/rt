@@ -1206,7 +1206,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bal\s*touw|baltouw|bauto)\b(?!\s*\(|\s*rondstraler|\s*ceram)/gi, "Balteau (2.5 mm)"],
       // Begrippen
       [/\b(straling\s*tijd|stralings\s*tijd|belichting\s*tijd|belichtings\s*tijd|betalingstijd|vertalingstijd|herhalingstijd|belastingstijd|bestralingstijd|belichtingstijd|schiettijd|schiet\s*tijd|schietteid)\b/gi, "stralingstijd"],
-      [/\b(bron\s*verval|bronverval|halfwaarde\s*tijd|halfwaardetijd|halveringstijd|halverings\s*tijd|vervaltijd|verval\s*tijd)\b/gi, "bronverval"],
+      [/\b(bron\s*verval|vervaltijd|verval\s*tijd)\b/gi, "bronverval"],
+      [/\b(halfwaarde\s*tijd|halverings\s*tijd)\b/gi, "halfwaardetijd"],
       [/\b(schuifje|schuifkaart|schuif\s*kaart|rekenliniaal|reken\s*liniaal|nomogram)\b/gi, "schuifje"],
       [/\b(voorzet|verzetten|ontzet|verzetje|verzetjes)\b/gi, "verzet"],
       [/\b(ovaal|ovaaltje|ovaal\s*tje|of\s*haaltje|op\s*haaltje)\b/gi, "ovaaltje"],
@@ -1439,9 +1440,65 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       !isZwartingTijdSchatting &&
       !heeftVanNaar &&
       (/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang)\b/i.test(lower) ||
+        /\bhoeveel\s*(?:seconden|minuten|sec\b|min\b)\s*(?:moet|duurt|schieten|stralen|belichten|bron\s*eruit)\b/i.test(lower) ||
+        /\b(tijd\s+om\s+te\s+stralen|duur\s+van\s+de\s+opname)\b/i.test(lower) ||
         (/\b(wat\s+wordt\s+(?:het|de\s+tijd)|wat\s+is\s+de\s+(?:stralings|belichtings)?tijd)\b/i.test(lower) &&
           !heeftTijdSeenheid &&
-          !(typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.focusBegintijdSec)));
+          !(typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.focusBegintijdSec)) ||
+        (/\b(?:las)?compensatie\b/i.test(lower) &&
+          typeof actiefGespreksGeheugen !== "undefined" &&
+          actiefGespreksGeheugen &&
+          (actiefGespreksGeheugen.laatsteIntentie === "stralingstijd" || (actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.wanddikte) || actiefGespreksGeheugen.activiteit)));
+
+    // Vraag over de lascompensatie zelf (uitleg / hoe aanpassen)
+    const isCompensatieInfoVraag =
+      !isStralingstijdVraag &&
+      /\b(?:kan\s+(?:ik\s+)?(?:de\s+)?(?:las)?compensatie\s+(?:aanpassen|wijzigen|instellen)|hoeveel\s+(?:las)?compensatie|waarom\s+(?:las)?compensatie|wat\s+is\s+(?:de\s+)?(?:las)?compensatie|lascompensatie\s+uitleg)\b/i.test(lower);
+    if (isCompensatieInfoVraag) {
+      intenties.push("compensatie_info");
+      return intenties;
+    }
+
+    // Voorbeelden van vragen
+    const isVraagVoorbeelden = /\b(wat\s+kan\s+(?:ik\s+)?(?:allemaal\s+)?(?:aan\s+(?:jou|radi)\s+)?vragen|welke\s+vragen\s+(?:kan\s+ik|kan\s+je)|geef\s+(?:mij\s+)?(?:eens\s+)?voorbeelden|voorbeeldvragen|voorbeelden\s+van\s+vragen)\b/i.test(lower);
+    if (isVraagVoorbeelden) {
+      intenties.push("vraag_voorbeelden");
+      return intenties;
+    }
+
+    // Begroeting / Smalltalk / Wie ben je / Wat kun je (als er geen specifieke leiding- of rekenparameters zijn)
+    const isBegroeting = /\b(hallo|hoi|hey|dag\s+radi|goede(?:morgen|middag|avond)|goeie(?:morgen|middag|avond)|wie\s+ben\s+(?:je|jij)|wat\s+kun\s+(?:je|jij)|wat\s+doe\s+(?:je|jij)|help\s*me|kan\s+je\s+me\s+helpen)\b/i.test(lower);
+    if (isBegroeting && !/\b(diameter|wanddikte|dikte|sch\b|schedule|curie|ci|ffd|sfd|focus|opnames|draad|afzetting|meter|lood|buis|onstream|wmax)\b/i.test(lower)) {
+      intenties.push("begroeting");
+      return intenties;
+    }
+
+    // Bedankje
+    const isBedankje = /^(?:dank\s*je|dankjewel|bedankt|top\s*bedankt|super\s*bedankt|super|perfect|held|thanks|thx|top\s*dankje)[\s!.]*$/i.test(lower.trim());
+    if (isBedankje) {
+      intenties.push("bedankje");
+      return intenties;
+    }
+
+    // RT Theorie & Kennisbank vragen (normregels, loodletter B, kwadratenwet theorie, isotopen eigenschappen, etc.)
+    const isRTKennisVraag =
+      /\b(loodletter\s*b|loden\s*letter\s*b|letter\s*b|backscatter|terugverstrooiing|terugstrooiing)\b/i.test(lower) ||
+      (/\b(kwadratenwet|omgekeerde\s*kwadratenwet|inverse\s*square\s*law)\b/i.test(lower) && !/\b(naar|tijd|minuut|sec|van\s+\d+)\b/i.test(lower)) ||
+      (/\b(geometrische\s*onscherpte|wat\s+is\s+ug|formule\s+voor\s+ug|ug\s+eisen|ug\s+norm|ug\s+grenzen)\b/i.test(lower) && !/\b(bereken|wat\s+is\s+de\s+ug\s+bij)\b/i.test(lower)) ||
+      /\b(keverregel|waarom\s+(?:laag|lage)\s*kv|waarom\s+buisspanning\s+beperken|wat\s+is\s+(?:de\s+)?(?:keverregel|kv[-\s]?regel))\b/i.test(lower) ||
+      (/\b(halfwaardetijd|halveringstijd|halveringtijd|eigenschappen\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|isotopen|isotoop|iridium|selenium|kobalt)|energie\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|iridium|selenium|kobalt))\b/i.test(lower) && !/\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower)) ||
+      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5)\b/i.test(lower) ||
+      /\b(verschil\s+tussen\s+(?:een\s+)?(?:draadje|draadjes|wire)(?:\s*bki)?\s+en\s+(?:een\s+)?(?:gaatje|gaatjes|gat|gaten|plaatje|plaatjes|hole)|draadje\s+vs\s+(?:gaatje|gat|plaatje)|wat\s+is\s+(?:een\s+)?2t[-\s]*gat|waarom\s+2t|hole\s*type\s*iqi\s*uitleg)\b/i.test(lower) ||
+      /\b(waarom\s+10\s*(?:microsievert|usv|µsv)|waarom\s+10\s*uur|grens\s+gecontroleerde\s+zone|gecontroleerde\s+zone\s+norm|wettelijke\s+dosislimiet|dosislimiet\s+straling)\b/i.test(lower) ||
+      /\b(strooistraling|secundaire\s*straling|waarom\s+(?:een\s+)?collimator|werking\s+collimator|hoe\s+werkt\s+een\s+collimator|wat\s+doet\s+(?:een\s+)?collimator)\b/i.test(lower) ||
+      /\b(welke\s+normen\s*(?:zijn\s*er|gelden)|overzicht\s+van\s+normen|rt\s+normen|radiografie\s+normen)\b/i.test(lower) ||
+      /\b(verschil\s+tussen\s+iso\s*5817\s+en\s+iso\s*10675|iso\s*5817\s*vs\s*iso\s*10675|wat\s+is\s+iso\s*5817|wat\s+is\s+iso\s*10675)\b/i.test(lower) ||
+      /\b(verschil\s+tussen\s+swsi\s+en\s+dwsi|swsi\s+vs\s+dwsi|verschil\s+tussen\s+dwsi\s+en\s+dwdi|verschil\s+tussen\s+swsi\s+en\s+dwdi)\b/i.test(lower);
+
+    if (isRTKennisVraag) {
+      intenties.push("rt_kennis");
+      return intenties;
+    }
 
     // Over R.A.D.I. / Info / Disclaimer / Contact / Fout melden
     if (/\b(wie\s+ben\s+(je|jij)|wat\s+is\s+radi|hoe\s+werkt\s+(deze\s+app|radi|het)|over\s+radi|disclaimer|eigen\s+risico|fout\s+melden|contact|feedback|over\s+deze\s+app)\b/i.test(lower)) {
@@ -1629,6 +1686,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const isAfzettingDirect =
       /\b(afzetting|afzettingsafstand|afzetten|afzettingszone|gecontroleerde\s*zone|dosistempo|microsievert|usv|µsv|veiligheidsafstand|veilige\s*afstand|hoe\s+groot.*afzetting|hoe\s+ver.*afzetten|halveringsdikte|hvl|dosislimiet|jaarlijkse\s+dosis|loodafscherming|loden\s+afscherming)\b/i.test(lower) ||
       /\b(?:hoeveel|welke)\s+(?:mm\s+|millimeter\s+)?(?:lood|loden|pb|afscherming|staal)\b/i.test(lower) ||
+      /\b(?:lood|afscherming)\s*(?:plakken|hangen|tussen|ervoor|nodig|toevoegen)\b/i.test(lower) ||
+      /\b(afzetlint|lint\s*hangen|waar\s+(?:moet|kan)\s+(?:ik\s+)?(?:het\s+)?lint|veiligheidszone|stralingszone|iedereen\s+weg(?:blijven)?|wegwezen|veilige\s+zone)\b/i.test(lower) ||
+      /\bkan\s+ik\s+(?:binnen|maximaal)\s+\d+.*?(?:afzetten|blijven)\b/i.test(lower) ||
       (/\b(afscherming|afschermen|lood|loden|pb)\b/i.test(lower) && /\b(nodig|meter|m\b|afzetten|afzetting|dosistempo|microsievert|usv|µsv|iridium|selenium|se-?75|ir-?192|curie|ci|collimator)\b/i.test(lower));
 
     const isAfzettingVervolg =
@@ -1721,13 +1781,15 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       intenties.push("stralingstijd");
     }
 
-    // Opnames / omtrek / hoekverdeling (graden draaien)
+    // Opnames / omtrek / hoekverdeling (graden draaien / aantal foto's / aantal shots)
     const lowerZonderFilm = lower.replace(/\b(d[234578]|d\s*[234578])\s+films?\b/gi, "").replace(/\bfilm(?:kwaliteit|type|klasse|soort)\b/gi, "");
     if (
       /\b(hoeveel|aantal)\s*(?:van\s+de\s+)?(films?|opname[ns]?|foto'?s?|shots?|platen|plaatjes)\b/i.test(lowerZonderFilm) ||
-      /\b(films?|opname[ns]?|foto'?s?|shots?|platen|plaatjes)\s*(?:heb\s+ik\s+)?(?:nodig|moet\s+ik|maken|gebruiken)\b/i.test(lowerZonderFilm) ||
+      /\b(hoe\s+vaak|hoeveel\s+keer|hoeveel\s+maal)\s*(?:moet\s+ik\s+)?(?:schieten|stralen|belichten|opnemen|verzetten)\b/i.test(lowerZonderFilm) ||
+      /\b(films?|opname[ns]?|foto'?s?|shots?|platen|plaatjes)\s*(?:heb\s+ik\s+)?(?:nodig|moet\s+ik|maken|gebruiken|schieten|leggen|plakken)\b/i.test(lowerZonderFilm) ||
+      /\bhoeveel\s+(?:foto'?s?|platen?|shots?|films?|opname[ns]?|plaatjes?)\b/i.test(lowerZonderFilm) ||
       /\b(?:om\s+)?hoeveel\s+graden\b.*?\b(?:draaien|verdraaien|verplaatsen|verschuiven|schieten|opname)\b/i.test(lowerZonderFilm) ||
-      (/\b(omtrek|filmverdeling|opnamelocaties?)\b/i.test(lowerZonderFilm) && !isStralingstijdVraag)
+      (/\b(omtrek|filmverdeling|opnameverdeling|aantal\s+posities|opnamelocaties?)\b/i.test(lowerZonderFilm) && !isStralingstijdVraag)
     ) {
       intenties.push("opnames");
     }
@@ -1742,9 +1804,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     ) {
       intenties.push("bki_materiaaltabel");
     } else if (
-      /\b(draad|draadje|draadjes|bki|beeldkwaliteit|iq|iqi|gevoeligheid)\b/i.test(lower) ||
-      /\b(welke\s+kwaliteit|welk[e]?\s+(?:beeld)?kwaliteit|kwaliteit\s+(?:moet|te|worden|behaald|behalen|zien))\b/i.test(lower) ||
-      (/\bkwaliteit\b/i.test(lower) && !/\bfilm(?:kwaliteit)?\b/i.test(lower) && /\b(moet|zien|behalen|behaald|nodig|geëist|geeist)\b/i.test(lower))
+      !/\bverschil\s+tussen\s+(?:een\s+)?(?:draadje|draadjes)(?:\s*bki)?\s+en\s+(?:een\s+)?(?:gaatje|gat|plaatje)\b/i.test(lower) &&
+      (/\b(draad|draadje|draadjes|bki|beeldkwaliteit|iq|iqi|gevoeligheid)\b/i.test(lower) ||
+        /\b(welke\s+kwaliteit|welk[e]?\s+(?:beeld)?kwaliteit|kwaliteit\s+(?:moet|te|worden|behaald|behalen|zien))\b/i.test(lower) ||
+        /\bwat\s+moet\s+(?:ik\s+)?(?:zien|zichtbaar\s+zijn)\s+op\s+de\s+film\b/i.test(lower) ||
+        (/\bkwaliteit\b/i.test(lower) && !/\bfilm(?:kwaliteit)?\b/i.test(lower) && /\b(moet|zien|behalen|behaald|nodig|geëist|geeist)\b/i.test(lower)))
     ) {
       intenties.push("draadje");
     }
@@ -1764,7 +1828,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
-    // Minimale FFD
+    // Minimale FFD & Afstand
     const isPuurFfdWaarde = /^(?:minimale\s+)?(?:ffd|sfd|focus)\s*(?:\(\s*\d+|\s*:\s*\d+|\s*=\s*\d+|\s+van\s+\d+|\s+is\s+\d+)/i.test(lower.trim());
     const wilMinFFDBijStraling =
       isStralingstijdVraag &&
@@ -1772,6 +1836,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       !/\b(wat\s+is\s+de\s+(?:min\w*\s+)?(?:ffd|focus)\s+en\b)/i.test(lower);
     if (
       (/\b(min(?:imale|imum|\.)?\s*ffd|fmin|f-min|f\s+min|minimale\s+(?:focus|bron[-\s]*film|film[-\s]*focus)?\s*afstand|focus\s*afstand|bron\s*film|welke\s*ffd|wat\s+is\s+de\s+(?:min\s*)?ffd|gekozen\s*ffd|minimale\s+focus|hoeveel\s+focus|welke\s+focus|hoeveel\s+ffd|focus\s+aanhouden)\b/i.test(lower) ||
+        /\b(?:hoe\s+ver|op\s+welke\s+afstand|welke\s+afstand|wat\s+is\s+de\s+afstand)\b.*?\b(?:bron|camera|focus|film|schieten|stralen|zetten|staan|aanhouden)\b/i.test(lower) ||
+        /\bafstand\s+(?:van\s+de\s+)?(?:bron|focus|film)\b/i.test(lower) ||
         isBronOpDePijpVraag) &&
       !intenties.includes("mag_ik") &&
       !wilMinFFDBijStraling &&
@@ -1802,11 +1868,14 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // Bronverval op datum/periode (verval2.html)
+    const isPuurTheorieHalfwaarde = /\b(wat\s+is\s+de\s+(?:halfwaardetijd|halveringstijd)|halfwaardetijd\s+van)\b/i.test(lower) && !/\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower);
     const isBronVervalVraag =
-      /\b(bronverval|verval|halfwaardetijd|halveringstijd)\b/i.test(lower) ||
-      (/\b(activiteit|curie|ci)\b/i.test(lower) && /\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower)) ||
-      (/\b(over\s+\d+\s*(?:dagen|weken|maanden|jaar)|na\s+\d+\s*(?:dagen|weken|maanden|jaar)|\d+\s*(?:dagen|weken|maanden|jaar)\s+geleden)\b/i.test(lower) &&
-        /\b(ci|curie|bron|se-75|ir-192|co-60|97969m|35598p|rr\d+)\b/i.test(lower));
+      !isPuurTheorieHalfwaarde &&
+      (/\b(bronverval|verval)\b/i.test(lower) ||
+        (/\b(halfwaardetijd|halveringstijd)\b/i.test(lower) && /\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower)) ||
+        (/\b(activiteit|curie|ci)\b/i.test(lower) && /\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower)) ||
+        (/\b(over\s+\d+\s*(?:dagen|weken|maanden|jaar)|na\s+\d+\s*(?:dagen|weken|maanden|jaar)|\d+\s*(?:dagen|weken|maanden|jaar)\s+geleden)\b/i.test(lower) &&
+          /\b(ci|curie|bron|se-75|ir-192|co-60|97969m|35598p|rr\d+)\b/i.test(lower)));
     if (isBronVervalVraag) {
       intenties.push("bron_verval");
     }
@@ -1998,6 +2067,22 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.verwachtParameter === "isolatieMm") {
       if (/^\s*(?:geen|nee|zonder|0|0\s*mm|onge[iï]soleerd|niet|geen\s*isolatie|geen\s*isolatiedikte|ongeisoleerd)\b/i.test(tekst.trim())) {
         res.isolatieMm = 0;
+      }
+    }
+
+    // Lascompensatie (standaard 5 mm, aanpasbaar door gebruiker, bijv. "met 3 mm compensatie", "lascompensatie 4 mm", "zonder compensatie")
+    if (/\b(?:zonder|geen|0\s*mm)\s+(?:las)?compensatie\b/i.test(lower) || /\b(?:las)?compensatie\s*(?:op|is|=|naar)?\s*0(?:\s*mm)?\b/i.test(lower)) {
+      res.lascompensatie = 0;
+    } else {
+      let matchComp = tekst.match(/(?:las)?compensatie\s*(?:van|is|op|naar|:|=)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
+      if (!matchComp) {
+        matchComp = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:las)?compensatie\b/i);
+      }
+      if (!matchComp) {
+        matchComp = tekst.match(/(?:lasoverhoogte|overdikte)\s*(?:van|is|op|naar|:|=)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
+      }
+      if (matchComp) {
+        res.lascompensatie = parseFloat(matchComp[1].replace(",", "."));
       }
     }
 
@@ -3790,7 +3875,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (!doorstr) {
       doorstr = tech === "SWSI" ? wt : 2 * wt;
     }
-    const comp = tech === "DWDI" ? 4 : 5;
+    let comp = 5; // Standaard 5 mm lascompensatie (lasoverdikte & inbranding conform formule)
+    if (params.lascompensatie !== undefined && params.lascompensatie !== null) {
+      comp = params.lascompensatie;
+    } else if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.lascompensatie !== undefined && actiefGespreksGeheugen.lascompensatie !== null) {
+      comp = actiefGespreksGeheugen.lascompensatie;
+    }
 
     const CONFIG = {
       Ir192: { k: 0.13, hvl: 13.68, ff: 17.1 },
@@ -3879,7 +3969,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const explicieteFilmMatch = vraagTekst.match(/\b(d4|d5|d7)\b/i);
     const explicieteFilm = explicieteFilmMatch ? explicieteFilmMatch[1].toUpperCase() : null;
 
-    let resp = `Stralingstijd (doorstraalde dikte: ${doorstr.toFixed(1)} mm${gevuldExtra}${tech === "DWDI" ? " + 4 compensatie" : ""}, ${bronNaam} van ${ci.toFixed(1)} Curie, ${ffdLabel})${matExtra}:<br>`;
+    const compLabel = comp > 0 ? ` + ${comp} mm lascompensatie` : " (zonder lascompensatie)";
+    let resp = `Stralingstijd (doorstraalde dikte: ${doorstr.toFixed(1)} mm${compLabel}${gevuldExtra}, ${bronNaam} van ${ci.toFixed(1)} Curie, ${ffdLabel})${matExtra}:<br>`;
 
     if (explicieteFilm === "D4") {
       resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>`;
@@ -3915,6 +4006,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const timeMinD4 = time_d4 * factorMin;
       const timeMinD5 = time_d5 * factorMin;
       resp += `<br><small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD / 10).toFixed(1)} cm):</em> D4: <strong>${formatTijd(timeMinD4)}</strong>, D5: <strong>${formatTijd(timeMinD5)}</strong>.</small>`;
+    }
+
+    if (chips) {
+      if (comp !== 5 && !chips.includes("5 mm compensatie")) {
+        chips.push("5 mm compensatie");
+      }
+      if (comp !== 3 && !chips.includes("3 mm compensatie")) {
+        chips.push("3 mm compensatie");
+      }
+      if (comp !== 0 && !chips.includes("Zonder compensatie (0 mm)")) {
+        chips.push("Zonder compensatie (0 mm)");
+      }
     }
 
     return resp;
@@ -5863,6 +5966,274 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     );
   }
 
+  // 10b. RT Kennisbank & Theorie (Kwaliteitsnormen, Loodletter B, Kwadratenwet theorie, Ug theorie, etc.)
+  function geefRTKennisAntwoord(params, vraagTekst, chips = []) {
+    const lower = (vraagTekst || "").toLowerCase();
+
+    // 0. Verschil tussen SWSI, DWSI en DWDI
+    if (/\b(verschil\s+tussen\s+swsi\s+en\s+dwsi|swsi\s+vs\s+dwsi|verschil\s+tussen\s+dwsi\s+en\s+dwdi|verschil\s+tussen\s+swsi\s+en\s+dwdi)\b/i.test(lower)) {
+      if (chips) chips.push("Opstelling 11 (Ovaal)", "Opstelling 13 (DWSI)", "Opstelling 5 (Centraal)");
+      return (
+        "<strong>Verschil tussen SWSI, DWSI en DWDI (EN ISO 17636-1 / ASME):</strong><br><br>" +
+        "• <strong>SWSI (Single Wall Single Image / Enkelwand Enkelbeeld):</strong><br>" +
+        "De stralingsbundel passeert <strong>slechts één wand</strong> en beeldt deze direct af op de film (bijv. vlakke plaat opstelling 1, of leiding van binnenuit met centrale panoramische bron opstelling 5 / A of contact opstelling 2 / C). Biedt de <em>hoogste beeldkwaliteit en scherpte</em>.<br><br>" +
+        "• <strong>DWSI (Double Wall Single Image / Dubbelwand Enkelbeeld):</strong><br>" +
+        "De straling gaat door <strong>twee wanden</strong> van de buis, maar alleen de <strong>wand aan de filmzijde</strong> wordt beoordeeld (bron buiten, film aan de overzijde, opstelling 13 / 14). Wordt standaard voorgeschreven voor leidingen met buitendiameter <strong>&gt; 100 mm</strong>.<br><br>" +
+        "• <strong>DWDI (Double Wall Double Image / Dubbelwand Dubbelbeeld):</strong><br>" +
+        "De straling passeert twee wanden en <strong>beide laswanden worden tegelijk op de film afgebeeld en beoordeeld</strong> (ovaaltje opstelling 11 / F of superpositie opstelling 12 / G). Uitsluitend toegestaan bij leidingen met buitendiameter <strong>&le; 100 mm</strong>."
+      );
+    }
+
+    // 1. Loodletter B & Terugverstrooiing (Backscatter)
+    if (/\b(loodletter\s*b|loden\s*letter\s*b|letter\s*b|backscatter|terugverstrooiing|terugstrooiing)\b/i.test(lower)) {
+      if (chips) chips.push("Afzettingsafstand", "BKI draadje", "Minimale FFD", "Film D4");
+      return (
+        "<strong>Loodletter B &amp; Terugverstrooiing (Backscatter) &ndash; EN ISO 17636-1 &amp; ASME Sec. V Art. 2:</strong><br><br>" +
+        "• <strong>Waarom een loden letter 'B'?</strong><br>" +
+        "Tijdens de belichting botst straling niet alleen op het te onderzoeken werkstuk, maar ook op vloeren, wanden en constructies daarachter. Deze straling verstrooit alle kanten op en kan via de <em>achterzijde</em> van de cassette opnieuw de film binnendringen (terugverstrooiing of <em>backscatter</em>). Dit veroorzaakt een zware sluier en verlies van beeldcontrast.<br><br>" +
+        "• <strong>Hoe werkt de controle?</strong><br>" +
+        "Aan de <strong>achterzijde van de filmcassette</strong> wordt een loden letter <strong>'B'</strong> geplaatst (minimaal <strong>13 mm hoog en 1.5 mm dik</strong> volgens ASME / EN ISO 17636-1).<br><br>" +
+        "• <strong>Beoordeling na ontwikkeling:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Film GOED:</strong> De letter 'B' is <u>niet</u> te zien, of verschijnt donkerder dan de omgeving (geen ontoelaatbare achterwaartse straling).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Film AFKEUR:</strong> Verschijnt er een <strong>lichte afbeelding van de letter 'B'</strong> op de donkere filmachtergrond? Dan is er te veel secundaire straling via de achterzijde binnengedrongen. De opname is direct <strong>normatief ongeldig</strong> en moet worden overgedaan met extra loodafscherming achter de cassette."
+      );
+    }
+
+    // 2. Kwadratenwet theorie
+    if (/\b(kwadratenwet|omgekeerde\s*kwadratenwet|inverse\s*square\s*law)\b/i.test(lower)) {
+      if (chips) chips.push("1m op 80 cm, hoe lang op 56 cm?", "Afzettingsafstand", "Minimale FFD");
+      return (
+        "<strong>De Omgekeerde Kwadratenwet (Inverse Square Law) in Radiografie:</strong><br><br>" +
+        "Straling plant zich vanuit een puntbron bolvormig voort in de ruimte. De stralingsintensiteit (en het dosistempo) neemt daardoor af met het <strong>kwadraat van de afstand</strong>.<br><br>" +
+        "<div style='background:#14171f; border:1px solid rgba(245,223,77,0.4); border-radius:8px; padding:12px 14px; margin:10px 0; box-shadow:inset 0 1px 4px rgba(0,0,0,0.5);'>" +
+          "<div style='font-size:0.8rem; color:#F5DF4D; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>⏱️ Formule voor Belichtingstijd (Focuswissel):</div>" +
+          "<div style='display:flex; align-items:center; justify-content:center; gap:8px; font-family:monospace; font-size:1.15rem; color:#fff; flex-wrap:wrap;'>" +
+            "<span style='font-weight:700; color:#F5DF4D;'>t₂</span>" +
+            "<span>=</span>" +
+            "<span style='font-weight:700; color:#F5DF4D;'>t₁</span>" +
+            "<span>&times;</span>" +
+            "<span style='display:inline-flex; align-items:center;'>" +
+              "<span style='font-size:1.6rem; font-weight:300;'>&#40;</span>" +
+              "<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; padding:0 4px; line-height:1.15;'>" +
+                "<span style='border-bottom:1.5px solid #eee; padding-bottom:2px; font-weight:600;'>FFD₂</span>" +
+                "<span style='padding-top:2px; font-weight:600;'>FFD₁</span>" +
+              "</span>" +
+              "<span style='font-size:1.6rem; font-weight:300;'>&#41;</span><sup style='font-size:0.85rem; color:#F5DF4D; font-weight:bold;'>2</sup>" +
+            "</span>" +
+          "</div>" +
+          "<div style='font-size:0.82rem; color:#ccc; margin-top:8px; text-align:center;'>" +
+            "<em>Nieuwe tijd (t₂) = Oude tijd (t₁) &times; (Nieuwe FFD / Oude FFD)²</em>" +
+          "</div>" +
+        "</div>" +
+        "<div style='background:#14171f; border:1px solid rgba(91,192,222,0.4); border-radius:8px; padding:12px 14px; margin:10px 0; box-shadow:inset 0 1px 4px rgba(0,0,0,0.5);'>" +
+          "<div style='font-size:0.8rem; color:#5bc0de; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>☢️ Formule voor Dosistempo &amp; Afzetting:</div>" +
+          "<div style='display:flex; align-items:center; justify-content:center; gap:8px; font-family:monospace; font-size:1.15rem; color:#fff; flex-wrap:wrap;'>" +
+            "<span style='font-weight:700; color:#5bc0de;'>I₂</span>" +
+            "<span>=</span>" +
+            "<span style='font-weight:700; color:#5bc0de;'>I₁</span>" +
+            "<span>&times;</span>" +
+            "<span style='display:inline-flex; align-items:center;'>" +
+              "<span style='font-size:1.6rem; font-weight:300;'>&#40;</span>" +
+              "<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; padding:0 4px; line-height:1.15;'>" +
+                "<span style='border-bottom:1.5px solid #eee; padding-bottom:2px; font-weight:600;'>D₁</span>" +
+                "<span style='padding-top:2px; font-weight:600;'>D₂</span>" +
+              "</span>" +
+              "<span style='font-size:1.6rem; font-weight:300;'>&#41;</span><sup style='font-size:0.85rem; color:#5bc0de; font-weight:bold;'>2</sup>" +
+            "</span>" +
+          "</div>" +
+          "<div style='font-size:0.82rem; color:#ccc; margin-top:8px; text-align:center;'>" +
+            "<em>Nieuw dosistempo (I₂) = Oud dosistempo (I₁) &times; (Oude afstand / Nieuwe afstand)²</em>" +
+          "</div>" +
+        "</div><br>" +
+        "• <strong>Praktijkgevolgen voor Belichtingstijd:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Afstand verdubbelen</strong> (bijv. van 50 naar 100 cm): factor (100 / 50)² = 2² = <strong>4&times; zo lang belichten</strong>!<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Afstand halveren</strong> (bijv. van 80 naar 40 cm): factor (40 / 80)² = 0.5² = <strong>0.25&times;</strong> (4&times; korter belichten).<br><br>" +
+        "• <strong>Praktijkgevolgen voor Stralingsveiligheid (Afzetting):</strong><br>" +
+        "&nbsp;&nbsp;&bull; Op <strong>2&times;</strong> de afstand is het dosistempo <strong>4&times; lager</strong>.<br>" +
+        "&nbsp;&nbsp;&bull; Op <strong>10&times;</strong> de afstand is het dosistempo zelfs <strong>100&times; lager</strong> (10² = 100).<br><br>" +
+        "<small style='opacity:0.85;'>Tip: Wil je een concrete wissel uitrekenen? Vraag bijv. <em>\"1 minuut op 80 cm, hoe lang op 56 cm?\"</em> of raadpleeg <a href='focusverandering.html' class='ai-link' target='_blank'>focusverandering.html</a>.</small>"
+      );
+    }
+
+    // 3. Geometrische onscherpte (Ug) theorie & normgrenzen
+    if (/\b(geometrische\s*onscherpte|formule\s*voor\s*ug|wat\s*is\s*ug|ug\s*eisen|ug\s*norm|ug\s*grenzen)\b/i.test(lower)) {
+      if (chips) chips.push("Minimale FFD", "Brongrootte Ir-192", "Klasse B FFD");
+      return (
+        "<strong>Geometrische Onscherpte (U<sub>g</sub>) &ndash; Formule en Normgrenzen:</strong><br><br>" +
+        "Omdat een industriële stralingsbron of röntgenbrandvlek geen oneindig klein punt is maar een bepaalde afmeting heeft (brandvlekgrootte <em>F</em>), ontstaat er aan de randen van het object altijd een halfschaduw. Dit is de <strong>geometrische onscherpte (U<sub>g</sub>)</strong>.<br><br>" +
+        "<div style='background:#14171f; border:1px solid rgba(245,223,77,0.4); border-radius:8px; padding:12px 14px; margin:10px 0; box-shadow:inset 0 1px 4px rgba(0,0,0,0.5);'>" +
+          "<div style='font-size:0.8rem; color:#F5DF4D; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>📐 Formule Geometrische Onscherpte:</div>" +
+          "<div style='display:flex; align-items:center; justify-content:center; gap:8px; font-family:monospace; font-size:1.15rem; color:#fff; flex-wrap:wrap;'>" +
+            "<span style='font-weight:700; color:#F5DF4D;'>U<sub>g</sub></span>" +
+            "<span>=</span>" +
+            "<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; padding:0 4px; line-height:1.15;'>" +
+              "<span style='border-bottom:1.5px solid #eee; padding-bottom:2px; font-weight:600;'>F &times; d</span>" +
+              "<span style='padding-top:2px; font-weight:600;'>D</span>" +
+            "</span>" +
+            "<span>=</span>" +
+            "<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; padding:0 4px; line-height:1.15;'>" +
+              "<span style='border-bottom:1.5px solid #eee; padding-bottom:2px; font-weight:600;'>F &times; d</span>" +
+              "<span style='padding-top:2px; font-weight:600;'>FFD &minus; d</span>" +
+            "</span>" +
+          "</div>" +
+          "<div style='font-size:0.82rem; color:#ccc; margin-top:8px; text-align:center;'>" +
+            "<em>F = focusgrootte (mm) &bull; d = OFA / object-tot-film (mm) &bull; D = bron-tot-object afstand (mm)</em>" +
+          "</div>" +
+        "</div><br>" +
+        "Waarbij:<br>" +
+        "• <strong>F</strong> = Brandvlekgrootte / focusafmeting van de bron of buis (in mm)<br>" +
+        "• <strong>d</strong> = Object-tot-film afstand (OFA): afstand van de bronzijde van de las tot de film<br>" +
+        "• <strong>D</strong> = Bron-tot-object afstand (FFD &minus; d)<br><br>" +
+        "• <strong>Normatieve grenzen volgens EN ISO 17636-1:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Klasse A:</strong> U<sub>g</sub> &le; 0.3 mm bij d &le; 12 mm, tot max. 0.5 mm bij d &approx; 40 mm.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Klasse B (streng):</strong> U<sub>g</sub> &le; 0.15 mm bij d &le; 12 mm, tot max. 0.3 mm bij d &approx; 40 mm.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>ASME Sec. V Art. 2 (T-274.2):</strong> U<sub>g</sub> &le; 0.51 mm (0.020″) voor diktes &lt; 50 mm (2″)."
+      );
+    }
+
+    // 4. Keverregel & Buisspanning
+    if (/\b(keverregel|kv[-\s]?regel|maximale\s*buisspanning|max\s*kv|waarom\s*laag\s*kv|waarom\s*spanning\s*beperken)\b/i.test(lower)) {
+      if (chips) chips.push("Max kV 10 mm staal", "Max kV aluminium", "Buisspanning berekenen");
+      return (
+        "<strong>De kV-Regel (Keverregel) &amp; Maximale Buisspanning &ndash; EN ISO 17636-1:</strong><br><br>" +
+        "• <strong>Waarom een lage buisspanning?</strong><br>" +
+        "Bij lagere fotonenenergieën domineert het <strong>foto-elektrisch effect</strong>. Dit zorgt voor maximale contrastverschillen tussen het basismateriaal en lasfouten (zoals poriën, slak en bindingsfouten). Bij een te hoge buisspanning treedt voornamelijk <strong>Compton-verstrooiing</strong> op, waardoor de foto grijs en flets wordt.<br><br>" +
+        "• <strong>De normformule uit EN ISO 17636-1:</strong><br>" +
+        "De norm begrenst de maximale buisspanning afhankelijk van de doorstraalde dikte <em>w</em> en het materiaal:<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Staal / RVS:</strong> Begrensd conform Figuur 1 van EN ISO 17636-1.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Aluminium:</strong> <strong>U<sub>max</sub> &le; 20 kV + (4.5 &times; w)</strong> (waarbij <em>w</em> de doorstraalde dikte in mm is).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Koperlegeringen:</strong> Max. toegestane kV ligt ca. 20-30% lager dan voor staal bij gelijke dikte.<br><br>" +
+        "<small style='opacity:0.85;'>Tip: Bereken direct de exacte limiet via <a href='kvregel.html' class='ai-link' target='_blank'>kvregel.html</a> of vraag bijv. <em>\"Hoeveel kV mag ik op 12 mm staal?\"</em>.</small>"
+      );
+    }
+
+    // 5. Isotopen eigenschappen & Halfwaardetijd
+    if (/\b(halfwaardetijd|halveringstijd|halveringtijd|eigenschappen\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|isotoop|isotopen|iridium|selenium|kobalt)|energie\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|iridium|selenium|kobalt))\b/i.test(lower)) {
+      if (chips) chips.push("Afzetting Ir-192", "Afzetting Se-75", "Bronnenoverzicht");
+      return (
+        "<strong>Belangrijkste Gammabronnen in de Industriële Radiografie:</strong><br><br>" +
+        "1. <strong>Selenium-75 (Se-75):</strong><br>" +
+        "• <strong>Halfwaardetijd (T<sub>&frac12;</sub>):</strong> <strong>119.78 dagen</strong> (~4 maanden)<br>" +
+        "• <strong>Gamma-energie:</strong> 66 t/m 401 keV (gemiddeld ~217 keV)<br>" +
+        "• <strong>Wanddiktebereik staal:</strong> 10 t/m 40 mm (klasse A) / 14 t/m 40 mm (klasse B) conform EN ISO 17636-1; onstream tot 45 mm<br>" +
+        "• <strong>Halveringsdikte lood (HVL):</strong> <strong>2.0 mm Pb</strong> (en <strong>5 mm staal Fe</strong> conform <a href='afzettinggamma.html' class='ai-link' target='_blank'>afzettinggamma.html</a>)<br>" +
+        "• <strong>Dosisconstante &Gamma;:</strong> ca. <strong>2.0 mSv&middot;m&sup2;/(h&middot;Ci)</strong><br><br>" +
+        "2. <strong>Iridium-192 (Ir-192):</strong><br>" +
+        "• <strong>Halfwaardetijd (T<sub>&frac12;</sub>):</strong> <strong>73.83 dagen</strong> (~2.5 maand)<br>" +
+        "• <strong>Gamma-energie:</strong> 296 t/m 612 keV (gemiddeld ~380 keV)<br>" +
+        "• <strong>Wanddiktebereik staal:</strong> 20 t/m 100 mm (klasse A) / 20 t/m 90 mm (klasse B); onstream tot 80 mm<br>" +
+        "• <strong>Halveringsdikte lood (HVL):</strong> <strong>3.0 mm Pb</strong> (en <strong>13 mm staal Fe</strong> conform <a href='afzettinggamma.html' class='ai-link' target='_blank'>afzettinggamma.html</a>)<br>" +
+        "• <strong>Dosisconstante &Gamma;:</strong> ca. <strong>4.8 mSv&middot;m&sup2;/(h&middot;Ci)</strong><br><br>" +
+        "3. <strong>Cobalt-60 (Co-60):</strong><br>" +
+        "• <strong>Halfwaardetijd (T<sub>&frac12;</sub>):</strong> <strong>5.27 jaar</strong><br>" +
+        "• <strong>Gamma-energie:</strong> Zeer doordringend: 1.17 MeV en 1.33 MeV<br>" +
+        "• <strong>Wanddiktebereik:</strong> Zeer dikke wanden (&gt; 40-60 mm t/m 200 mm staal)<br>" +
+        "• <strong>Halveringsdikte lood (HVL):</strong> ca. <strong>12.5 mm Pb</strong>"
+      );
+    }
+
+    // 6. Filmkeuze: D4 vs D7 (en D5 / Filmklassen)
+    if (/\b(waarom\s*d4|verschil\s*tussen\s*d4\s*en\s*d7|verschil\s*tussen\s*d7\s*en\s*d4|filmklasse\s*c[1-5]|wanneer\s*d4|wanneer\s*d7|wanneer\s*d5|filmkwaliteit\s*uitleg)\b/i.test(lower)) {
+      if (chips) chips.push("Film D4 advies", "Film D7 advies", "Klasse B zwarting");
+      return (
+        "<strong>Industriële Röntgenfilms &ndash; Keuze en Filmklassen (ISO 11699-1 / ASTM E1815):</strong><br><br>" +
+        "• <strong>Filmklasse C3 (bijv. Agfa Structurix D4):</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Zeer fijnkorrelig, hoog contrast en minimale filmonscherpte.<br>" +
+        "&nbsp;&nbsp;&bull; <em>Wanneer verplicht / aanbevolen:</em> Verplicht voor <strong>Klasse B</strong> bij gammastraling (Se-75 / Ir-192) en aanbevolen om de strengste BKI-draadeisen te halen. Vereist ca. <strong>2.5 tot 3&times; langere belichtingstijd</strong> dan D7.<br><br>" +
+        "• <strong>Filmklasse C4 (bijv. Agfa Structurix D5):</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Uitstekend compromis tussen korrelgrootte en belichtingstijd.<br>" +
+        "&nbsp;&nbsp;&bull; <em>Toepassing:</em> Veel gebruikt in het veld bij Se-75 op Klasse B.<br><br>" +
+        "• <strong>Filmklasse C5 (bijv. Agfa Structurix D7):</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Snelle, hooggevoelige film met een grovere korrel.<br>" +
+        "&nbsp;&nbsp;&bull; <em>Wanneer toegestaan:</em> Toegestaan voor <strong>Klasse A</strong> en dikkere wanden. In <strong>Klasse B is D7 normatief verboden</strong> voor gammastraling om te voorkomen dat fijne indicaties in de filmkorrel verdwijnen."
+      );
+    }
+
+    // 7. Draadjes vs Plaatjes (Hole-type IQI / 2T-gat)
+    if (/\b(verschil\s*tussen\s*(?:een\s*)?(?:draadje|draadjes|wire)(?:\s*bki)?\s*en\s*(?:een\s*)?(?:plaatje|plaatjes|hole|gaatje|gaatjes|gat|gaten)|draadje\s+vs\s+(?:gaatje|gat|plaatje)|wat\s*is\s*(?:een\s*)?2t[-\s]*gat|waarom\s*2t|hole\s*type\s*iqi\s*uitleg)\b/i.test(lower)) {
+      if (chips) chips.push("2T gat alternatief", "BKI draadjes", "ASME Section V");
+      return (
+        "<strong>Beeldkwaliteit: Draadjes-BKI (ISO 19232-1) vs Plaatjes-IQI (ASME / ASTM E1025):</strong><br><br>" +
+        "• <strong>Draadjes (Wire-type IQI, ISO 19232-1 & ASTM E747):</strong><br>" +
+        "De Europese norm EN ISO 17636-1 schrijft standaard draadjes voor. Een houder bevat 7 draden van afnemende dikte (W1 t/m W19). Het dunste zichtbare draadje op de ontwikkelde film bepaalt de behaalde beeldkwaliteit.<br><br>" +
+        "• <strong>Plaatjes / Shims (Hole-type IQI, ASTM E1025 / ASME Sec. V):</strong><br>" +
+        "In Amerikaanse codes (ASME Boiler & Pressure Vessel Code) gebruikt men vaak een metalen plaatje met dikte <em>T</em> (ca. 2% van de wanddikte). In dit plaatje zitten drie geboorde gaten:<br>" +
+        "&nbsp;&nbsp;&bull; <strong>1T-gat:</strong> diameter gelijk aan 1 &times; T<br>" +
+        "&nbsp;&nbsp;&bull; <strong>2T-gat:</strong> diameter gelijk aan 2 &times; T (standaard vereiste!)<br>" +
+        "&nbsp;&nbsp;&bull; <strong>4T-gat:</strong> diameter gelijk aan 4 &times; T<br><br>" +
+        "• <strong>Wat betekent \"2T-gat moet zichtbaar zijn\"?</strong><br>" +
+        "Bij niveau 2-2T moet het plaatje zelf én het <strong>2T-gaatje</strong> duidelijk rond herkenbaar zijn op de film. Het bewijst zowel voldoende <strong>contrast</strong> (het plaatje) als voldoende <strong>resolutie / scherpte</strong> (het 2T-gat)."
+      );
+    }
+
+    // 8. Afzettingsnorm (10 µSv/h) & Veiligheid
+    if (/\b(waarom\s*10\s*(?:microsievert|usv|µsv)|waarom\s*10\s*uur|grens\s*gecontroleerde\s*zone|gecontroleerde\s*zone\s*norm|wettelijke\s*dosislimiet|dosislimiet\s*straling)\b/i.test(lower)) {
+      if (chips) chips.push("15 meter afzetting", "Collimator factor", "Loodafscherming");
+      return (
+        "<strong>Stralingsbescherming &amp; De Norm van 10 &mu;Sv/h voor Afzettingen:</strong><br><br>" +
+        "• <strong>Waarom precies 10 &mu;Sv/h?</strong><br>" +
+        "Volgens het Besluit basisveiligheidsnormen stralingsbescherming (Bbs / Euratom) markeert <strong>10 &mu;Sv/h</strong> de uiterste grens van de <strong>gecontroleerde zone</strong> tijdens radiografisch onderzoek op locatie. Binnen het afzetlint is het terrein uitsluitend toegankelijk voor gecertificeerde radiografen (blootgestelde werknemers) met persoonlijke dosimetrie.<br><br>" +
+        "• <strong>Dosislimieten per jaar:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Beroepsmatig blootgestelde werknemers (Categorie A):</strong> Maximaal <strong>20 mSv per jaar</strong>.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Niet-blootgestelde personen / publiek:</strong> Maximaal <strong>1 mSv per jaar</strong>.<br><br>" +
+        "• <strong>Praktijktip voor afzettingen:</strong><br>" +
+        "Gebruik altijd een <strong>collimator</strong>! Een standaard wolfraam collimator reduceert de straling zijwaarts en achterwaarts met een factor <strong>85 tot 100</strong>, waardoor je afzettingsafstand met circa <strong>90% afneemt</strong> (bijv. van 150 meter naar slechts 16 meter)."
+      );
+    }
+
+    // 9. Strooistraling & Collimator
+    if (/\b(strooistraling|secundaire\s*straling|waarom\s*(?:een\s*)?collimator|werking\s*collimator|hoe\s*werkt\s*een\s*collimator|wat\s+doet\s+(?:een\s+)?collimator)\b/i.test(lower)) {
+      if (chips) chips.push("Loodletter B", "Afzetting collimator", "Afscherming lood");
+      return (
+        "<strong>Strooistraling (Compton Scatter) &amp; De Werking van een Collimator:</strong><br><br>" +
+        "• <strong>Wat is strooistraling?</strong><br>" +
+        "Wanneer straling botst met het werkstuk, de vloer of constructies, botsen fotonen tegen elektronen en veranderen van richting (Compton-verstrooiing). Deze secundaire straling valt kris-kras op de film en creëert een diffuse sluier, wat resulteert in <strong>drastisch contrastverlies</strong> op de film.<br><br>" +
+        "• <strong>Wat doet een collimator?</strong><br>" +
+        "Een collimator (wolfraam of lood) bundelt de straling tot enkel het noodzakelijke opnamevlak (bijv. 60° x 40°). Dit levert twee enorme voordelen op:<br>" +
+        "&nbsp;&nbsp;&bull; <strong>1. Beeldkwaliteit:</strong> Onnodige strooistraling via de omgeving wordt voorkomen, resulterend in haarscherpe lascontouren.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>2. Veiligheid:</strong> De omgevingsdosis zakt met factor 85 tot 100, waardoor de veilige afzettingsstraal met circa 90% krimpt."
+      );
+    }
+
+    // 10. Overzicht van RT Normen
+    if (/\b(welke\s*normen\s*(?:zijn\s*er|gelden)|overzicht\s*van\s*normen|rt\s*normen|radiografie\s*normen)\b/i.test(lower)) {
+      if (chips) chips.push("EN ISO 17636-1", "ASME Section V", "ISO 5817 Level B");
+      return (
+        "<strong>Belangrijkste Normen voor Industriële Radiografie (RT):</strong><br><br>" +
+        "• <strong>Onderzoekstechniek &amp; Opstellingen:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>EN ISO 17636-1:</strong> Niet-destructief onderzoek van lasverbindingen &ndash; Deel 1: Röntgen- en gammastralingstechnieken met film.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>EN ISO 17636-2:</strong> Deel 2: Digitale radiografie (CR fosforplaten &amp; DDA flat panels).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>ASME Section V Article 2:</strong> Radiographic Examination (Boiler and Pressure Vessel Code).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>RT21021 / RT21022:</strong> Onstream profiel- en wanddikte-radiografie.<br><br>" +
+        "• <strong>Beeldkwaliteit &amp; Beoordeling:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>EN ISO 19232-1:</strong> Beeldkwaliteitsindicatoren van het draadjestype (W1 t/m W19).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>ASTM E747 &amp; ASTM E1025:</strong> Wire-type en Hole-type IQI (plaatjes met 1T, 2T, 4T gaten).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>EN ISO 10675-1:</strong> Acceptatieniveaus voor radiografisch onderzoek van lassen in staal, nikkel en titaan.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>ISO 5817:</strong> Kwaliteitsniveaus voor onvolkomenheden in lasverbindingen (B, C, D).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>ASME Section VIII Div. 1:</strong> UW-51 (Full RT) &amp; UW-52 (Spot RT)."
+      );
+    }
+
+    // 11. ISO 5817 vs ISO 10675-1
+    if (/\b(verschil\s*tussen\s*iso\s*5817\s*en\s*iso\s*10675|iso\s*5817\s*vs\s*iso\s*10675|wat\s*is\s*iso\s*5817|wat\s*is\s*iso\s*10675)\b/i.test(lower)) {
+      if (chips) chips.push("Lasfout porie", "Lasfout slak", "Acceptatiecriteria");
+      return (
+        "<strong>Verschil tussen ISO 5817 en ISO 10675-1:</strong><br><br>" +
+        "• <strong>ISO 5817 (Algemene Laskwaliteit):</strong><br>" +
+        "ISO 5817 definieert de <strong>metallurgische en geometrische kwaliteitsniveaus</strong> van een lasverbinding in drie niveaus: <strong>Niveau B</strong> (streng / hoogste kwaliteit), <strong>Niveau C</strong> (gemiddeld) en <strong>Niveau D</strong> (laag / constructiewerk). Dit geldt onafhankelijk van hoe je inspecteert (visueel, UT of RT).<br><br>" +
+        "• <strong>ISO 10675-1 (Radiografische Acceptatie):</strong><br>" +
+        "ISO 10675-1 vertaalt de eisen uit ISO 5817 naar <strong>wat je daadwerkelijk op een röntgenfilm ziet</strong>. Het kent drie acceptatieniveaus:<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Acceptatieniveau 1:</strong> Komt overeen met ISO 5817 <strong>Niveau B</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Acceptatieniveau 2:</strong> Komt overeen met ISO 5817 <strong>Niveau C</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Acceptatieniveau 3:</strong> Komt overeen met ISO 5817 <strong>Niveau D</strong><br><br>" +
+        "<em>(Scheuren en bindingsfouten zijn op elk niveau verboden; voor poriën en slaklijnen geeft ISO 10675-1 exacte millimetergrenzen en oppervlaktepercentages per wanddiktebereik).</em>"
+      );
+    }
+
+    // Default / fallback
+    return geefOpstellingEnGroeperingInfo(params, vraagTekst, chips);
+  }
+
   // 11. KV-regel Calculator (kvregel.html)
   function berekenKVRegel(params, vraagTekst, chips = []) {
     const lower = vraagTekst.toLowerCase();
@@ -7198,6 +7569,7 @@ ${stralingstijdPlat}========================================`;
     materiaalFactorHandmatig: null,
     // KV-regel, Gevulde leiding & Bronverval
     doorstraaldeDikte: null,
+    lascompensatie: null,
     isGevuldeLeiding: false,
     mediumNaam: null,
     mediumDichtheid: null,
@@ -7293,6 +7665,13 @@ ${stralingstijdPlat}========================================`;
         key: "feMm",
         label: `${actiefGespreksGeheugen.feMm} mm Fe`,
         title: "Staalafscherming",
+      });
+    }
+    if (actiefGespreksGeheugen.lascompensatie !== null && actiefGespreksGeheugen.lascompensatie !== undefined) {
+      items.push({
+        key: "lascompensatie",
+        label: actiefGespreksGeheugen.lascompensatie === 0 ? "0 mm compensatie" : `${actiefGespreksGeheugen.lascompensatie} mm compensatie`,
+        title: "Aangepaste lascompensatie (stralingstijd)",
       });
     }
     if (actiefGespreksGeheugen.isolatieMm !== null && actiefGespreksGeheugen.isolatieMm !== undefined) {
@@ -7451,6 +7830,8 @@ ${stralingstijdPlat}========================================`;
       actiefGespreksGeheugen.schedule = null;
     } else if (key === "doorstraaldeDikte" || key === "doorstraald") {
       actiefGespreksGeheugen.doorstraaldeDikte = null;
+    } else if (key === "lascompensatie" || key === "compensatie") {
+      actiefGespreksGeheugen.lascompensatie = null;
     } else if (key === "isGevuldeLeiding" || key === "gevuld" || key === "medium") {
       actiefGespreksGeheugen.isGevuldeLeiding = false;
       actiefGespreksGeheugen.mediumNaam = null;
@@ -7688,11 +8069,23 @@ ${stralingstijdPlat}========================================`;
     await laadBronnenCsv(true);
 
     // Reset commando
-    if (/\b(reset|wis\s*geheugen|nieuwe\s*vraag|nieuwe\s*berekening|begin\s*opnieuw)\b/i.test(ruweTekst.trim())) {
+    if (/\b(reset|wis\s*geheugen|nieuwe\s*vraag|nieuwe\s*berekening|begin\s*opnieuw|wis\s*alles|geheugen\s*leeg|schone\s*lei|nieuwe\s*klus|nieuwe\s*pijp|nieuwe\s*leiding)\b/i.test(ruweTekst.trim())) {
       resetGespreksGeheugen();
       return {
         text: "Gespreksgeheugen gewist. Waar kan ik je mee helpen? Stel gerust een nieuwe vraag.",
-        chips: [],
+        chips: ["4 duimer sch 40 klasse B", "Hoeveel meter afzetten?", "Stralingstijd omrekenen", "Wat is het verschil tussen klasse A en B?"],
+      };
+    }
+
+    // Direct bedankje (ongeacht eventueel eerder actief geheugen)
+    if (
+      /\b(dank\s*je|dankjewel|bedankt|top\s*bedankt|super\s*bedankt|super\s*dank|thanks|thx)\b/i.test(ruweTekst) &&
+      !/\b(wat|hoe|hoeveel|bereken|welk|welke|zoek|wanneer)\b/i.test(ruweTekst) &&
+      !ruweTekst.includes("?")
+    ) {
+      return {
+        text: "Graag gedaan! Heel veel succes met de opname ☢️. Als je straks nog een andere berekening wilt doen of een FFD wilt controleren, vraag het gerust!",
+        chips: ["Nieuwe berekening", "Geheugen wissen", "Afzettingsafstand", "Bronnenoverzicht"],
       };
     }
 
@@ -8006,11 +8399,15 @@ ${stralingstijdPlat}========================================`;
     // Koppel aanwezige DOM-elementen van pruts.html indien geopend op pruts.html
     const hasPrutsDOM = typeof document !== "undefined" && Boolean(document.getElementById("procedure"));
 
-    // Prioriteit in uitvoering: schietkaart / vergelijkingen bovenaan, gevulde leiding vóór stralingstijd of kv_regel
+    // Prioriteit in uitvoering: begroeting/bedankje/kennis bovenaan, schietkaart / vergelijkingen, gevulde leiding vóór stralingstijd of kv_regel
     const volgordePrio = {
+      begroeting: 0.1,
+      bedankje: 0.2,
+      vraag_voorbeelden: 0.3,
       schietkaart: 0.5,
       asme_draad_vergelijk: 0.8,
       hole_type_iqi: 0.9,
+      rt_kennis: 0.95,
       gevulde_leiding: 1,
       schedule: 1.5,
       bron_verval: 2,
@@ -8038,7 +8435,94 @@ ${stralingstijdPlat}========================================`;
     const uitgevoerdeHandlers = new Set();
 
     for (const intentie of intenties) {
-      if (intentie === "schietkaart") {
+      if (intentie === "begroeting") {
+        if (!uitgevoerdeHandlers.has("begroeting")) {
+          uitgevoerdeHandlers.add("begroeting");
+          chips.push(
+            "4 duimer sch 40 klasse B",
+            "Hoeveel meter afzetten?",
+            "Stralingstijd omrekenen",
+            "Wat is het verschil tussen klasse A en B?",
+            "Bronnenoverzicht"
+          );
+          antwoorden.push(
+            `Hallo! 👋 Ik ben <strong>R.A.D.I.</strong>, jouw AI-assistent voor <strong>radiografisch onderzoek (RT)</strong>.<br><br>` +
+            `Je kunt mij in gewone spreektaal van alles vragen over RT berekeningen, normen en werkkaarten, bijvoorbeeld:<br>` +
+            `• <strong>Opstellingen &amp; FFD:</strong> Minimale focusafstanden en aantal opnames (SWSI, DWSI, DWDI ovaal/superpositie)<br>` +
+            `• <strong>Draadjes &amp; Beeldkwaliteit:</strong> Vereist BKI draadje (ISO / ASME) of 2T-gat<br>` +
+            `• <strong>Veiligheid &amp; Afzetting:</strong> Afzettingsafstanden (open bundel / collimator) en benodigde loodafscherming<br>` +
+            `• <strong>Belichtingstijd &amp; Omrekenen:</strong> Kwadratenwet bij focuswissel, filmwissel (D4 &harr; D7) of mA&middot;min<br>` +
+            `• <strong>Onstream &amp; Wanddiktes:</strong> Restwanddikte $W_{\\text{max}}$, toegestane isotopen en pipe schedules<br>` +
+            `• <strong>Lasfout acceptatie:</strong> Toelaatbaarheid van poriën, slaklijnen en bindingsfouten (ISO 5817 Level B/C/D &amp; ASME)<br><br>` +
+            `Waarmee kan ik je vandaag helpen? Typ je vraag of klik op een van de suggesties hieronder:`
+          );
+        }
+      } else if (intentie === "bedankje") {
+        if (!uitgevoerdeHandlers.has("bedankje")) {
+          uitgevoerdeHandlers.add("bedankje");
+          chips.push("Nieuwe berekening", "Geheugen wissen", "Afzettingsafstand", "Bronnenoverzicht");
+          antwoorden.push("Graag gedaan! Heel veel succes met de opname ☢️. Als je straks nog een andere berekening wilt doen of een FFD wilt controleren, vraag het gerust!");
+        }
+      } else if (intentie === "vraag_voorbeelden") {
+        if (!uitgevoerdeHandlers.has("vraag_voorbeelden")) {
+          uitgevoerdeHandlers.add("vraag_voorbeelden");
+          chips.push(
+            "4 duimer sch 40 klasse B",
+            "1 minuut op 80 cm, hoe lang op 56 cm?",
+            "Hoeveel meter afzetten met 30 Ci Ir-192?",
+            "Welk draadje op 12 mm staal?",
+            "Wat is de wanddikte van 6 duim sch 80?"
+          );
+          antwoorden.push(
+            `<strong>💡 Voorbeelden van vragen die je aan R.A.D.I. kunt stellen:</strong><br><br>` +
+            `• <strong>Opnames &amp; FFD:</strong><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Hoeveel foto's moet ik schieten op een 4 duimer sch 40 klasse B?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Hoe ver moet ik de bron zetten voor een 6 duim sch 80?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Mag ik een 2 duimer ovaal schieten met 10 mm wand?\"</em><br><br>` +
+            `• <strong>Belichtingstijd &amp; Kwadratenwet:</strong><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"1 minuut op 80 cm focus, hoe lang op 56 cm?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Ik heb 10 mA*min op 80 focus en gebruik 5 mA, wat wordt de tijd op 45 focus?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Ik heb zwarting 1.5 op 1m30, hoe ga ik naar 2.5?\"</em><br><br>` +
+            `• <strong>Stralingsveiligheid &amp; Afzetting:</strong><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Hoeveel meter moet ik afzetten met de sterkste Iridium?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Ik kan maximaal 15 meter afzetten, hoeveel lood heb ik nodig met Se-75?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Wat is het dosistempo op 20 meter achter de collimator?\"</em><br><br>` +
+            `• <strong>Beeldkwaliteit &amp; IQI:</strong><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Welk draadje moet zichtbaar zijn op 12 mm staal klasse B?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Welk gat moet zichtbaar zijn bij een hole-type IQI?\"</em><br><br>` +
+            `• <strong>Pipe Schedules &amp; Onstream:</strong><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Hoe dik is een 6 duimer schedule 80?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Welke bron kan ik gebruiken voor een onstream opname op 2 duim 10 dik?\"</em><br><br>` +
+            `• <strong>Theorie &amp; RT Kennis:</strong><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Wat is het verschil tussen Klasse A en Klasse B?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Waarom leggen we een loodletter B achterop de cassette?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Wat is de keverregel?\"</em>`
+          );
+        }
+      } else if (intentie === "rt_kennis") {
+        if (!uitgevoerdeHandlers.has("rt_kennis")) {
+          uitgevoerdeHandlers.add("rt_kennis");
+          antwoorden.push(geefRTKennisAntwoord(params, gefilterdeTekst, chips));
+        }
+      } else if (intentie === "compensatie_info") {
+        if (!uitgevoerdeHandlers.has("compensatie_info")) {
+          uitgevoerdeHandlers.add("compensatie_info");
+          chips.push("Met 3 mm compensatie", "Met 4 mm compensatie", "Zonder compensatie (0 mm)");
+          const actComp = (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.lascompensatie !== null && actiefGespreksGeheugen.lascompensatie !== undefined)
+            ? actiefGespreksGeheugen.lascompensatie
+            : 5;
+          antwoorden.push(
+            `<strong>Lascompensatie bij Gammastralingstijd:</strong><br><br>` +
+            `• <strong>Wat is het?</strong> Bovenop de kale doorstraalde wanddikte wordt standaard <strong>+5 mm lascompensatie</strong> meegerekend voor de lasoverhoogte, grondlas en strooistraling in de laszone (conform de rekenformule van <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a> en <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).<br>` +
+            `• <strong>Huidige instelling:</strong> <strong>${actComp} mm</strong>.<br>` +
+            `• <strong>Kun je dit aanpassen?</strong> <strong>Ja, zeker!</strong> Je kunt op elk moment een eigen compensatiewaarde opgeven door bijvoorbeeld te vragen of typen:<br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Hoe lang stralen met 3 mm compensatie?\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Reken eens met 4 mm lascompensatie\"</em><br>` +
+            `&nbsp;&nbsp;&bull; <em>\"Wat is de tijd zonder compensatie?\"</em> (of <em>\"0 mm compensatie\"</em>)<br><br>` +
+            `RADI onthoudt jouw gekozen waarde en past deze direct toe op de berekende belichtingstijd.`
+          );
+        }
+      } else if (intentie === "schietkaart") {
         if (!uitgevoerdeHandlers.has("schietkaart")) {
           uitgevoerdeHandlers.add("schietkaart");
           antwoorden.push(berekenSchietkaart(params, gefilterdeTekst, chips));
@@ -8271,11 +8755,14 @@ ${stralingstijdPlat}========================================`;
           if (!params.diameter) {
             antwoorden.push("Stel gerust een specifieke vraag over afzetting (bijv. 25 Ci Se-75), onstream (bijv. 6 duim 6 dik), draadjes, opnames of FFD.");
           } else if (!params.wanddikte && !(params.diameter < 100)) {
-            chips.push("4 mm dik", "6 mm dik", "8 mm dik");
-            antwoorden.push(`Om de volledige inspectiegegevens voor ${formatMmNaarDuimLabel(params.diameter)} te berekenen heb ik de <strong>wanddikte</strong> (in mm) nodig. Wat is de wanddikte?`);
+            chips.push("4 mm dik", "6 mm dik", "8 mm dik", "Schedule 40", "Schedule 80");
+            antwoorden.push(`Om de volledige inspectiegegevens voor ${formatMmNaarDuimLabel(params.diameter)} te berekenen heb ik de <strong>wanddikte</strong> of het <strong>schedule</strong> nodig. Wat is de wanddikte?`);
           } else if (!params.procedure) {
-            chips.push("Klasse B", "Klasse A", "ASME");
-            antwoorden.push(`Volgens welke <strong>kwaliteitsklasse of norm</strong> (EN Klasse A, EN Klasse B of ASME) moet ${formatMmNaarDuimLabel(params.diameter)} worden beoordeeld?`);
+            chips.push("Aantal opnames", "Minimale FFD", "BKI draadje", "Klasse B", "Klasse A", "ASME");
+            const diaLabel = formatMmNaarDuimLabel(params.diameter);
+            const schLabel = params.schedule ? ` schedule ${params.schedule}` : "";
+            const wtLabel = params.wanddikte ? ` (${params.wanddikte} mm dik)` : "";
+            antwoorden.push(`Gezien: <strong>${diaLabel}</strong>${schLabel}${wtLabel}.<br><br>Wat wil je voor deze leiding bepalen? Bijvoorbeeld het aantal opnames, minimale FFD of vereist BKI draadje, of kies direct een norm (Klasse B, Klasse A of ASME):`);
           } else {
             const ffd = berekenMinFFD(params, gefilterdeTekst, chips);
             const opn = berekenAantalOpnames(params, gefilterdeTekst, chips);
@@ -10232,6 +10719,7 @@ ${stralingstijdPlat}========================================`;
     berekenBronVerval,
     berekenBkiDraadje,
     geefOpstellingEnGroeperingInfo,
+    geefRTKennisAntwoord,
     berekenSchedule,
     zoekScheduleInfo,
     ASME_PIPE_SCHEDULES,

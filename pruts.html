@@ -3375,10 +3375,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
                 const ffd_m = sfd / 1000.0;
                 let base_exposure =
                   (consts.ff * (ffd_m * ffd_m)) / (currentActivity * consts.k);
-                // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus compensatie (+4 DWDI, +5 SWSI/DWSI)
+                // Gebruik altijd kale wanddikte (1x of 2x) voor stralingstijd, zonder lasoverdikte, plus 5 mm lascompensatie
                 let exposureThickness =
                   technique === "SWSI" ? wanddikte : 2 * wanddikte;
-                let compensation = technique === "DWDI" ? 4 : 5;
+                let compensation = 5;
                 let attenuation = Math.pow(
                   2,
                   (exposureThickness + compensation) / consts.hvl,
@@ -5061,6 +5061,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     <audio id="alarmSound" src="alarm.wav" preload="auto"></audio>
 
-    <script src="rt-assistant.js?v=6.28"></script>
+    <script src="rt-assistant.js?v=6.29"></script>
   </body>
 </html>
