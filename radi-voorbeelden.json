@@ -1,0 +1,326 @@
+[
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Focusverandering (kwadratenwet)",
+    "voorbeeld": "Mijn tijd is 2 minuten op FFD 400 mm, wat wordt de nieuwe tijd op FFD 600 mm?",
+    "toelichting": "Berekent de nieuwe belichtingstijd bij het aanpassen van de FFD."
+  },
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Focusverandering incl. filmtypeverandering",
+    "voorbeeld": "Mijn tijd is 1 minuut 30 op FFD 500 met D7, wat wordt de tijd op FFD 700 met D4?",
+    "toelichting": "Combineert de kwadratenwet (FFD) direct met de filmfactor (D7, D5, D4)."
+  },
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Filmtypeverandering (D7 / D5 / D4)",
+    "voorbeeld": "Ik ga van Agfa D7 naar D5 en mijn tijd was 1 minuut 20, wat wordt de nieuwe tijd?",
+    "toelichting": "Rekent de belichtingstijd om bij wisselen tussen Agfa D7, D5 en D4."
+  },
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Curie-wissel / andere bronsterkte",
+    "voorbeeld": "Vorig jaar met 40 Ci was de tijd 1 minuut 30, wat is de tijd nu met 25 Ci?",
+    "toelichting": " past de belichtingstijd aan op basis van de oude en nieuwe bronactiviteit."
+  },
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Zwarting aanpassen (bijv. van 1.5 naar 2.5)",
+    "voorbeeld": "Ik heb zwarting 1.5 op 1 minuut 30, hoe ga ik van 1.5 naar 2.5?",
+    "toelichting": "Geeft een praktijkschatting van de nieuwe belichtingstijd om de gewenste zwarting te halen."
+  },
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Vereiste zwarting volgens norm",
+    "voorbeeld": "Wat is de minimale zwarting volgens EN Klasse B?",
+    "toelichting": "Toont de minimale en maximale zwartingseisen voor EN Klasse A, Klasse B of ASME."
+  },
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Toegestane filmsoort per klasse",
+    "voorbeeld": "Mag ik een D7 film gebruiken voor Klasse B?",
+    "toelichting": "Controleert of D4, D5 of D7 is toegestaan volgens de gekozen kwaliteitsklasse."
+  },
+  {
+    "categorie": "Focus & Zwarting",
+    "type": "Materiaalfactor opzoeken (RVS, Duplex, etc.)",
+    "voorbeeld": "Hoe reken ik de belichtingstijd om van staal naar RVS of duplex?",
+    "toelichting": "Toont de materiaalcorrectiefactoren voor Se-75, Ir-192 en röntgen (150–300 kV)."
+  },
+  {
+    "categorie": "Stralingstijd",
+    "type": "Stralingstijd gammabron (voorgestelde FFD op buis)",
+    "voorbeeld": "Hoe lang moet ik stralen op een 6 duimer van 8 mm dik met 25 Curie Iridium op D7 film?",
+    "toelichting": "Berekent de stralingstijd direct met de voorgestelde FFD op de leiding."
+  },
+  {
+    "categorie": "Stralingstijd",
+    "type": "Stralingstijd op specifieke FFD (plaat / SWSI)",
+    "voorbeeld": "Hoe lang belichten op een plaat van 15 mm met 30 Ci Ir-192 op FFD 500 mm met D7?",
+    "toelichting": "Berekent de belichtingstijd voor enkelwandige opnames op een opgegeven FFD."
+  },
+  {
+    "categorie": "Stralingstijd",
+    "type": "Stralingstijd panoramisch / centraal",
+    "voorbeeld": "Bereken de stralingstijd voor DN 100, wanddikte 8 mm, 15 Ci Ir-192, panoramisch op D7",
+    "toelichting": "Berekent de SWSI stralingstijd met de bron in het midden (FFD = halve diameter)."
+  },
+  {
+    "categorie": "Stralingstijd",
+    "type": "Stralingstijd incl. materiaalfactor (bijv. RVS)",
+    "voorbeeld": "Wat wordt de tijd als ik RVS schiet, 4 duimer van 6 mm dik, 20 Ci Iridium, D7, FFD 200 mm?",
+    "toelichting": "Past automatisch de materiaalfactor toe op de berekende gammabelichtingstijd."
+  },
+  {
+    "categorie": "Stralingstijd",
+    "type": "Röntgenbuis (X-ray) tijd uit mA·min en mA",
+    "voorbeeld": "Hoe lang moet ik stralen bij 12 mA*min op 3.5 mA?",
+    "toelichting": "Rekent het aantal mA·min uit de buistabel om naar minuten en seconden."
+  },
+  {
+    "categorie": "Stralingstijd",
+    "type": "KV-regel & maximale buisspanning (X-ray)",
+    "voorbeeld": "Hoeveel kV moet ik gebruiken op een 4 duimer van 6 mm dik?",
+    "toelichting": "Berekent de aanbevolen kV (KV-regel) en het normatieve maximum volgens EN ISO 17636-1."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Aantal opnames rondnaad (DWSI)",
+    "voorbeeld": "Hoeveel opnames op een 6 duimer van 8 mm dik op FFD 250 mm volgens Klasse B?",
+    "toelichting": "Berekent het minimaal aantal opnames en de rotatiehoek volgens EN-A, EN-B of ASME."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Aantal opnames kleine diameter (DWDI <= 100 mm)",
+    "voorbeeld": "Hoeveel opnames op een 2 duimer van 12 mm dik?",
+    "toelichting": "Bepaalt of 2 opnames (ovaaltje, <= 8 mm) of 3 opnames (superpositie, > 8 mm) nodig zijn."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Aantal opnames & films bij panoramisch stralen",
+    "voorbeeld": "Hoeveel opnames moet ik maken op een 16 duimer van 12.7 mm dik met de bron in het midden?",
+    "toelichting": "Geeft de omtrek en het benodigde aantal 10x48 films voor 1 panoramische opname."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Aantal graden draaien tussen opnames",
+    "voorbeeld": "Om hoeveel graden moet ik draaien bij 4 opnames op een 6 duimer?",
+    "toelichting": "Berekent de hoekverdraaiing per opname (360° / aantal opnames) of bij een ovaaltje (90°)."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Voorgeschreven opstelling bepalen",
+    "voorbeeld": "Volgens welke opstelling moet ik een 3 duimer van 6 mm dik schieten?",
+    "toelichting": "Adviseert de juiste EN/ASME opstelling (DWDI 11/F, 12/G of DWSI 13/14/E) op basis van de diameter."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Controle of ovaaltje (Opstelling 11 / F) mag",
+    "voorbeeld": "Mag ik een 2 duimer van 4 mm dik met ovaaltje schieten?",
+    "toelichting": "Controleert diameter (<= 100 mm), wanddikte (<= 8 mm) en maximale lasbreedte (De / 4)."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Controle of panoramisch / centraal stralen mag",
+    "voorbeeld": "Mag ik panoramisch stralen op een 8 duimer van 8 mm dik met focus 2.5 mm volgens Klasse B?",
+    "toelichting": "Controleert of de halve buisdiameter voldoet aan de minimale FFD voor opstelling 5 / A."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Toepassingsgebied Ir-192 en Se-75 (diktegrenzen)",
+    "voorbeeld": "Mag ik met Se-75 een wanddikte van 25 mm dubbelwandig schieten?",
+    "toelichting": "Controleert de minimale en maximale doorstraalde dikte voor Se-75 en Ir-192."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Verschil tussen opstellingen of klassen",
+    "voorbeeld": "Wat is het verschil tussen klasse A en klasse B in EN ISO 17636-1?",
+    "toelichting": "Legt het verschil uit tussen bijv. opstelling 11 vs 12, 13 vs 14, of Klasse A vs B."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
+    "type": "Langsnaad filmverdeling & overlap",
+    "voorbeeld": "Hoe verdeel ik een langsnaad van 180 cm met 10x48 films?",
+    "toelichting": "Berekent het aantal films, de effectieve lengte en de overlap per film."
+  },
+  {
+    "categorie": "FFD, Ug & Bundel",
+    "type": "Minimale FFD berekenen",
+    "voorbeeld": "Wat is de minimale FFD voor een 6 duimer van 8 mm dik met focus 2.5 mm volgens Klasse B?",
+    "toelichting": "Berekent de normatieve minimale film-focusafstand volgens EN-A, EN-B of ASME."
+  },
+  {
+    "categorie": "FFD, Ug & Bundel",
+    "type": "Controle contactopname (bron op de pijp)",
+    "voorbeeld": "Kan ik met de bron op de pijp zitten bij een 8 duimer van 8 mm dik en focus 2 mm (klasse B)?",
+    "toelichting": "Vergelijkt de voorgestelde FFD op de buis met de minimaal vereiste FFD."
+  },
+  {
+    "categorie": "FFD, Ug & Bundel",
+    "type": "Geometrische onscherpte (Ug) berekenen",
+    "voorbeeld": "Wat is de Ug bij FFD 400 mm, wanddikte 15 mm en focusgrootte 3 mm?",
+    "toelichting": "Berekent Ug = (F × d) / D en toetst aan de ASME/EN grenswaarde."
+  },
+  {
+    "categorie": "FFD, Ug & Bundel",
+    "type": "Verzet berekenen bij ovaaltje (Opstelling 11 / F)",
+    "voorbeeld": "Wat is het verzet voor een ovaaltje op een 2 duimer van 5 mm dik, lasbreedte 8 mm bij FFD 300 mm?",
+    "toelichting": "Berekent het minimale en ideale bundelverzet om de boven- en onderlas vrij te projecteren."
+  },
+  {
+    "categorie": "FFD, Ug & Bundel",
+    "type": "Stralingsbundelbreedte & film uitlichten",
+    "voorbeeld": "Hoe breed is mijn stralingsbundel op 500 mm afstand met een standaard collimator?",
+    "toelichting": "Berekent de uitgelichte bundelbreedte voor een standaard gammacollimator of Balteau Ceram 300."
+  },
+  {
+    "categorie": "Draadjes & 2T-gat",
+    "type": "Vereist BKI-draadje op plaat (SWSI)",
+    "voorbeeld": "Welk draadje moet ik zien volgens ASME op een wanddikte van 10 mm?",
+    "toelichting": "Bepaalt het vereiste EN/ASME draadje en de bijbehorende BKI-houder (standaard SWSI zonder diameter)."
+  },
+  {
+    "categorie": "Draadjes & 2T-gat",
+    "type": "Vereist BKI-draadje op leiding (DWSI / DWDI)",
+    "voorbeeld": "Welk draadje moet ik halen op een 6 duimer van 8 mm dik volgens Klasse B met Se-75?",
+    "toelichting": "Bepaalt het vereiste draadje op een buis inclusief eventuele gammavermindering (Se-75 / Ir-192)."
+  },
+  {
+    "categorie": "Draadjes & 2T-gat",
+    "type": "BKI-houder bij specifiek draadnummer",
+    "voorbeeld": "Welke BKI houder moet ik pakken voor draadje W13?",
+    "toelichting": "Geeft aan op welke ISO 19232-1 BKI-houders (bijv. 10 FE EN / 13 FE EN) het draadje zit."
+  },
+  {
+    "categorie": "Draadjes & 2T-gat",
+    "type": "ASME vs. EN draadjes vergelijken",
+    "voorbeeld": "Welk EN draadje kan ik gebruiken in plaats van ASME draadje 6?",
+    "toelichting": "Toont het equivalente draadje tussen ASTM E747 en ISO 19232-1 en de normregels."
+  },
+  {
+    "categorie": "Draadjes & 2T-gat",
+    "type": "Vereist 2T-gat (ASME Hole-Type IQI / plaatje)",
+    "voorbeeld": "Welk ASME hole-type IQI en welk gaatje hoort bij een wanddikte van 15 mm enkelwandig?",
+    "toelichting": "Geeft het vereiste ASME plaatje en 2T-gat voor zowel bronzijde als filmzijde."
+  },
+  {
+    "categorie": "Draadjes & 2T-gat",
+    "type": "2T-gat alternatief (ASME Tabel T-283)",
+    "voorbeeld": "Welk alternatief plaatje en gat mag ik gebruiken in plaats van 2T op plaatje 17?",
+    "toelichting": "Geeft de toegestane 1T- en 4T-alternatieven volgens ASME Section V Tabel T-283."
+  },
+  {
+    "categorie": "Draadjes & 2T-gat",
+    "type": "BKI materiaalgroep (Inconel, Monel, RVS, Cu, Al)",
+    "voorbeeld": "Welk materiaal BKI moet ik gebruiken voor Inconel en Monel?",
+    "toelichting": "Geeft de juiste BKI-materiaalgroep volgens ISO 19232-1 en ASTM E747."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Grootte van de afzetting (10 μSv/u)",
+    "voorbeeld": "Wat is de afzettingsafstand voor 50 Ci Se-75 zonder collimator?",
+    "toelichting": "Berekent de afzettingsafstand in de open bundel, achter de collimator en achter de pijp."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Afzetting met loodafscherming",
+    "voorbeeld": "Hoe ver moet ik afzetten met 25 Ci Ir-192, collimator en 6 mm lood?",
+    "toelichting": "Berekent de gereduceerde afzettingsafstand bij gebruik van lood- of staalafscherming."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Dosistempo op een bepaalde afstand",
+    "voorbeeld": "Wat is het dosistempo op 5 meter afstand bij 30 Ci Ir-192 zonder afscherming?",
+    "toelichting": "Berekent het actuele dosistempo (in μSv/u en mSv/u) op een specifieke afstand."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Nodige afscherming (mm lood) voor 10 μSv/u op afstand",
+    "voorbeeld": "Hoeveel mm lood heb ik nodig om het dosistempo onder de 10 te krijgen op 8 meter met 40 Ci Ir-192?",
+    "toelichting": "Berekent (naar boven afgerond op hele mm) hoeveel lood nodig is om op de gewenste afstand uit te komen."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Halveringsdikte (HVL) lood & staal",
+    "voorbeeld": "Welke halveringsdikte heeft lood voor Iridium-192 en voor Seleen-75?",
+    "toelichting": "Toont de halveringsdiktes van lood (Pb) en staal (Fe) voor Ir-192 en Se-75."
+  },
+  {
+    "categorie": "Bronnen & Verval",
+    "type": "Bronnenoverzicht & huidige activiteit",
+    "voorbeeld": "Welke bronnen hebben we en hoeveel Curie hebben ze vandaag?",
+    "toelichting": "Toont alle geregistreerde bronnen uit bronnen.csv met hun actuele sterkte en brongrootte."
+  },
+  {
+    "categorie": "Bronnen & Verval",
+    "type": "Sterkste of zwakste bron opvragen",
+    "voorbeeld": "Wat is op dit moment onze sterkste Se-75 bron?",
+    "toelichting": "Zoekt direct de sterkste of zwakste Se-75 of Ir-192 bron van vandaag."
+  },
+  {
+    "categorie": "Bronnen & Verval",
+    "type": "Bronverval in de toekomst (over X dagen / datum)",
+    "voorbeeld": "Hoeveel Curie heeft bron 35598P over 30 dagen?",
+    "toelichting": "Berekent de resterende activiteit na een aantal dagen, weken, maanden of op een specifieke datum."
+  },
+  {
+    "categorie": "Bronnen & Verval",
+    "type": "Bronverval uit het verleden (wat heeft hij nu nog?)",
+    "voorbeeld": "Mijn Iridium bron was 45 dagen geleden 50 Curie, hoeveel Curie heeft hij nu nog?",
+    "toelichting": "Rekent vanuit een vroegere activiteit uit hoeveel Curie er vandaag nog over is."
+  },
+  {
+    "categorie": "Bronnen & Verval",
+    "type": "Activiteit van een bron in het verleden",
+    "voorbeeld": "Hoeveel Curie had bron 35598P 2 weken geleden?",
+    "toelichting": "Rekent terug hoeveel Curie een bron in het verleden had."
+  },
+  {
+    "categorie": "Onstream & Schedule",
+    "type": "Onstream minimale FFD (tangentiaal / dubbelwand)",
+    "voorbeeld": "Wat is de minimale FFD voor onstream tangentiaal op een 4 duimer met 50 mm isolatie en focus 2 mm (Klasse TB)?",
+    "toelichting": "Berekent de minimale onstream FFD volgens RT21021 (tangentiaal) of RT21022 (dubbelwand)."
+  },
+  {
+    "categorie": "Onstream & Schedule",
+    "type": "Onstream bronkeuze & Wmax",
+    "voorbeeld": "Welke bron moet ik kiezen voor onstream op een 6 duimer van 7.1 mm dik?",
+    "toelichting": "Berekent de maximale doorstraalde wanddikte (Wmax) en adviseert Se-75, Ir-192 of Co-60."
+  },
+  {
+    "categorie": "Onstream & Schedule",
+    "type": "Gevulde leiding (extra staaldikte vloeistof)",
+    "voorbeeld": "Wat is de totale doorstraalde dikte van een 6 duimer van 7.1 mm dik gevuld met water?",
+    "toelichting": "Berekent het staalequivalent van de vloeistofkolom (water, olie, etc.) bij een onstream opname."
+  },
+  {
+    "categorie": "Onstream & Schedule",
+    "type": "Schedule wanddikte opzoeken (ASME B36.10M)",
+    "voorbeeld": "Wat is de wanddikte van een 6 duimer Schedule 80?",
+    "toelichting": "Zoekt de nominale wanddikte, binnendiameter en dubbele wand (2t) op voor elke NPS/Schedule maat."
+  },
+  {
+    "categorie": "Lasfouten & Schietkaart",
+    "type": "Overzicht van alle RT-lasfouten",
+    "voorbeeld": "Welke lasfouten ken je?",
+    "toelichting": "Toont alle 14 gestandaardiseerde RT-lasfouten met ISO 6520-1 codes."
+  },
+  {
+    "categorie": "Lasfouten & Schietkaart",
+    "type": "Lasfout herkennen op de foto + code",
+    "voorbeeld": "Wat betekent een wormgat op de foto en welke lasfoutcode hoort daarbij?",
+    "toelichting": "Legt uit hoe een lasfout (bijv. wormgat, bindingsfout, worteldoorzakking) op de film zichtbaar is."
+  },
+  {
+    "categorie": "Lasfouten & Schietkaart",
+    "type": "Acceptatiecriteria lasfout berekenen",
+    "voorbeeld": "Hoe groot mag een porie zijn bij een wanddikte van 12 mm volgens EN Level 2?",
+    "toelichting": "Berekent de exacte toelaatbare afmetingen volgens EN ISO 10675-1 (Level 1, 2, 3) en ASME."
+  },
+  {
+    "categorie": "Lasfouten & Schietkaart",
+    "type": "Complete schietkaart genereren",
+    "voorbeeld": "Maak een schietkaart voor een 6 duimer van 8 mm dik met 25 Ci Se-75 volgens Klasse B",
+    "toelichting": "Genereert in één overzicht opstelling, FFD, draadje, opnames, belichtingstijd en afzetting."
+  }
+]
