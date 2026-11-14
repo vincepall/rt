@@ -62,12 +62,21 @@
                 const openRes = keuze === "Ir192" 
                     ? berekenAfzettingIr192(Ci, 0, 0, gewenste_dosis)
                     : berekenAfzettingSe75(Ci, 0, 0, gewenste_dosis);
-                html += "• In de open bundel (zonder afscherming): " + openRes.afzetting.toFixed(2) + " meter<br>";
-                html += "• Achter de collimator: " + resultaat.afstand_collimator.toFixed(2) + " meter<br>";
+                const atten = (keuze === "Ir192")
+                    ? Math.pow(0.5, wanddikte_pb / 3) * Math.pow(0.5, wanddikte_fe / 13)
+                    : Math.pow(0.5, wanddikte_pb / 2) * Math.pow(0.5, wanddikte_fe / 5);
+                const collAfgeschermd = Math.sqrt(Math.pow(resultaat.afstand_collimator, 2) * atten);
+
                 const afschermingTekst = (wanddikte_fe > 0 ? wanddikte_fe + " mm staal" : "") + 
                                          (wanddikte_fe > 0 && wanddikte_pb > 0 ? " + " : "") + 
                                          (wanddikte_pb > 0 ? wanddikte_pb + " mm lood" : "");
-                html += "• In de bundel achter afscherming (" + afschermingTekst + "): " + resultaat.afzetting.toFixed(2) + " meter";
+
+                html += "• In de open bundel:<br>" +
+                        "&nbsp;&nbsp;– Excl. afscherming: " + openRes.afzetting.toFixed(2) + " meter<br>" +
+                        "&nbsp;&nbsp;– Incl. afscherming (" + afschermingTekst + "): " + resultaat.afzetting.toFixed(2) + " meter<br><br>";
+                html += "• Achter de collimator:<br>" +
+                        "&nbsp;&nbsp;– Alleen collimator: " + resultaat.afstand_collimator.toFixed(2) + " meter<br>" +
+                        "&nbsp;&nbsp;– Collimator + afscherming (" + afschermingTekst + "): " + collAfgeschermd.toFixed(2) + " meter";
             } else {
                 html += "• In de open bundel: " + resultaat.afzetting.toFixed(2) + " meter<br>";
                 html += "• Achter de collimator: " + resultaat.afstand_collimator.toFixed(2) + " meter";
@@ -206,6 +215,6 @@
     <h2>Resultaat</h2>
     <h2 id="resultaat" style="color: #F5DF4D;"></h2>
 <div style="height: 200px;"></div>
-<script src="rt-assistant.js?v=6.30"></script>
+<script src="rt-assistant.js?v=6.31"></script>
 </body>
 </html>

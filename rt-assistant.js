@@ -3168,12 +3168,15 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       return loodResp;
     }
 
-    // 1. In de open bundel (zonder stalen leidingafscherming, tenzij expliciet Pb opgegeven)
-    const attenOpen = Math.pow(0.5, pb / hvlPb) * Math.pow(0.5, fe / hvlFe);
-    const afzettingOpen = Math.sqrt((ci * 37000 * k * attenOpen) / dosis);
+    // Basis / puur (zonder externe lood/staal afscherming)
+    const afzettingOpenPuur = Math.sqrt((ci * 37000 * k) / dosis);
+    const collimatorAfstandPuur = Math.sqrt((ci * 37000 * k * collimatorFactor) / dosis);
 
-    // 2. Achter een standaard collimator
-    const collimatorAfstand = Math.sqrt((ci * 37000 * k * collimatorFactor) / dosis);
+    // Met externe afscherming (loodplaat / pb / fe)
+    const hasAfscherming = (pb > 0 || fe > 0);
+    const attenAfscherming = Math.pow(0.5, pb / hvlPb) * Math.pow(0.5, fe / hvlFe);
+    const afzettingOpenMetAfscherming = Math.sqrt((ci * 37000 * k * attenAfscherming) / dosis);
+    const collimatorAfstandMetAfscherming = Math.sqrt((ci * 37000 * k * collimatorFactor * attenAfscherming) / dosis);
 
     // 3. Afzetting in de bundel achter de pijp (doorstraalde leidingdikte als afscherming)
     // Geldt wanneer in het geheugen of vraag een las / leiding bekend is (bijv. >100 mm DWSI)
@@ -3198,27 +3201,35 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
-    let afzettingPijp = 0;
+    let afzettingPijpPuur = 0;
+    let afzettingPijpMetAfscherming = 0;
     if (doorstraaldStaal > 0) {
-      const attenPijp = Math.pow(0.5, pb / hvlPb) * Math.pow(0.5, (fe + doorstraaldStaal) / hvlFe);
-      afzettingPijp = Math.sqrt((ci * 37000 * k * attenPijp) / dosis);
+      const attenPijpPuur = Math.pow(0.5, doorstraaldStaal / hvlFe);
+      afzettingPijpPuur = Math.sqrt((ci * 37000 * k * attenPijpPuur) / dosis);
+      afzettingPijpMetAfscherming = Math.sqrt((ci * 37000 * k * attenPijpPuur * attenAfscherming) / dosis);
     }
 
     const diaLabel = params.diameter ? formatMmNaarDuimLabel(params.diameter) : "";
     const isLoodplaatGenoemd = /\b(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen)\b/i.test(lower) || Boolean(params.aantalLoodplaten);
     let loodplaatSuffix = "";
+    let afschermKortLabel = "";
     if (isLoodplaatGenoemd && pb > 0) {
       const nPlaten = params.aantalLoodplaten || (pb % 6 === 0 ? pb / 6 : 1);
       loodplaatSuffix = nPlaten > 1
         ? ` [${nPlaten} loodplaten &times; 6 mm = ${pb} mm Pb]`
         : " [standaard loodplaat 6 mm Pb]";
+      afschermKortLabel = nPlaten > 1 ? `${nPlaten} loodplaten (${pb} mm Pb)` : `loodplaat (${pb} mm Pb)`;
+    } else if (pb > 0 && fe > 0) {
+      afschermKortLabel = `${pb} mm Pb + ${fe} mm staal`;
+    } else if (pb > 0) {
+      afschermKortLabel = `${pb} mm lood`;
+    } else if (fe > 0) {
+      afschermKortLabel = `${fe} mm staal`;
     }
-    const afschermingInfo = pb > 0 || fe > 0
+
+    const afschermingInfo = hasAfscherming
       ? ` met ${pb > 0 ? pb + " mm lood (Pb)" + loodplaatSuffix : ""}${pb > 0 && fe > 0 ? " en " : ""}${fe > 0 ? fe + " mm staal (Fe)" : ""}`
       : "";
-    const openBundelAfschermHaakjes = pb > 0 || fe > 0
-      ? ` (incl. ${pb > 0 ? pb + " mm lood" : ""}${pb > 0 && fe > 0 ? " en " : ""}${fe > 0 ? fe + " mm staal" : ""} afscherming)`
-      : (/zonder\s+collimator/i.test(lower) ? " (zonder collimator)" : "");
 
     if (chips && chips.length === 0) {
       if (doorstraaldStaal === 0 && isLeidingContext) {
@@ -3226,19 +3237,55 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
       if (isSe) chips.push("Ir-192");
       else chips.push("Se-75");
-      if (pb === 0) chips.push("5 mm lood");
+      if (pb === 0) chips.push("6 mm lood (1 plaat)", "12 mm lood (2 platen)");
     }
 
-    let resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam}${afschermingInfo} bij norm ${dosis} μSv/h:<br>` +
-               `• In de open bundel${openBundelAfschermHaakjes}: <strong>${afzettingOpen.toFixed(1)} meter</strong> afzetting.<br>` +
-               `• Achter een standaard collimator: <strong>${collimatorAfstand.toFixed(1)} meter</strong>.<br>`;
+    let resp = "";
+    if (hasAfscherming) {
+      resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam}${afschermingInfo} bij norm ${dosis} μSv/h:<br><br>` +
+             `• <strong>In de open bundel:</strong><br>` +
+             `&nbsp;&nbsp;– Excl. loodafscherming: <strong>${afzettingOpenPuur.toFixed(1)} meter</strong><br>` +
+             `&nbsp;&nbsp;– Incl. ${afschermKortLabel}: <strong>${afzettingOpenMetAfscherming.toFixed(1)} meter</strong> afzetting.<br><br>` +
+             `• <strong>Achter standaard collimator:</strong><br>` +
+             `&nbsp;&nbsp;– Alleen collimator (excl. lood): <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong><br>` +
+             `&nbsp;&nbsp;– Collimator + ${afschermKortLabel}: <strong>${collimatorAfstandMetAfscherming.toFixed(1)} meter</strong> afzetting.<br>`;
 
-    if (doorstraaldStaal > 0) {
-      const detailLabel = diaLabel ? ` op ${diaLabel}` : (isDwsiTechniek ? " DWSI" : "");
-      resp += `• In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}): <strong>${afzettingPijp.toFixed(1)} meter</strong> afzetting.<br>`;
-    } else if (isLeidingContext && !params.wanddikte) {
-      const detailLabel = diaLabel ? ` op ${diaLabel}` : " (DWSI)";
-      resp += `• In de bundel achter de pijp${detailLabel}: geef de wanddikte op om ook direct de gereduceerde afzetting met de doorstraalde leidingdikte als afscherming te berekenen.<br>`;
+      if (doorstraaldStaal > 0) {
+        const detailLabel = diaLabel ? ` op ${diaLabel}` : (isDwsiTechniek ? " DWSI" : "");
+        resp += `<br>• <strong>In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}):</strong><br>` +
+                `&nbsp;&nbsp;– Zonder loodafscherming: <strong>${afzettingPijpPuur.toFixed(1)} meter</strong><br>` +
+                `&nbsp;&nbsp;– Met ${afschermKortLabel}: <strong>${afzettingPijpMetAfscherming.toFixed(1)} meter</strong> afzetting.<br>`;
+      } else if (isLeidingContext && !params.wanddikte) {
+        const detailLabel = diaLabel ? ` op ${diaLabel}` : " (DWSI)";
+        resp += `<br>• <strong>In de bundel achter de pijp${detailLabel}:</strong> geef de wanddikte op om ook direct de gereduceerde afzetting met de doorstraalde leidingdikte als afscherming te berekenen.<br>`;
+      }
+    } else {
+      resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam} bij norm ${dosis} μSv/h:<br>` +
+             `• In de open bundel (zonder collimator / afscherming): <strong>${afzettingOpenPuur.toFixed(1)} meter</strong> afzetting.<br>` +
+             `• Achter een standaard collimator: <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong>.<br>`;
+
+      if (doorstraaldStaal > 0) {
+        const detailLabel = diaLabel ? ` op ${diaLabel}` : (isDwsiTechniek ? " DWSI" : "");
+        resp += `• In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}): <strong>${afzettingPijpPuur.toFixed(1)} meter</strong> afzetting.<br>`;
+      } else if (isLeidingContext && !params.wanddikte) {
+        const detailLabel = diaLabel ? ` op ${diaLabel}` : " (DWSI)";
+        resp += `• In de bundel achter de pijp${detailLabel}: geef de wanddikte op om ook direct de gereduceerde afzetting met de doorstraalde leidingdikte als afscherming te berekenen.<br>`;
+      }
+
+      // Handige vergelijking met 1 standaard loodplaat (6 mm Pb)
+      const attenTip6 = Math.pow(0.5, 6 / hvlPb);
+      const tipOpen = Math.sqrt((ci * 37000 * k * attenTip6) / dosis);
+      const tipColl = Math.sqrt((ci * 37000 * k * collimatorFactor * attenTip6) / dosis);
+      let tipExtra = "";
+      if (doorstraaldStaal > 0) {
+        const tipPijp = Math.sqrt((ci * 37000 * k * Math.pow(0.5, doorstraaldStaal / hvlFe) * attenTip6) / dosis);
+        tipExtra = `<br>• Achter de pijp: ${afzettingPijpPuur.toFixed(1)} m &rarr; <strong>${tipPijp.toFixed(1)} m</strong>`;
+      }
+      resp += `<div style="background:#14171f; border:1px solid rgba(245,223,77,0.3); border-radius:6px; padding:6px 10px; margin:8px 0 4px 0; font-size:0.83rem; color:#ccc;">` +
+              `💡 <em>Ter vergelijking met 1 standaard loodplaat (6 mm Pb):</em><br>` +
+              `• In de open bundel: ${afzettingOpenPuur.toFixed(1)} m &rarr; <strong>${tipOpen.toFixed(1)} m</strong><br>` +
+              `• Achter de collimator: ${collimatorAfstandPuur.toFixed(1)} m &rarr; <strong>${tipColl.toFixed(1)} m</strong>${tipExtra}` +
+              `</div>`;
     }
 
     resp += `<small style="opacity: 0.85;">(Berekend volgens <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a> met collimatorfactor ${collimatorFactor === 0.05 ? "1/20" : "1/85"}).</small>`;
@@ -4357,7 +4404,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const graden = Math.round(360 / gekozenExp);
     const effFilm = (omtrek / gekozenExp).toFixed(1);
 
-    const opstellingTekst = params.opstelling || (techniek === "SWSI" && params.optie === "2" ? "SWSI excentrisch (opstelling 8/B)" : (techniek === "SWSI" ? "SWSI (opstelling 2/C)" : "DWSI, bron buiten"));
+    const opstellingTekst = params.opstelling || (techniek === "SWSI" && params.optie === "2" ? "SWSI excentrisch (opstelling 8/B)" : (techniek === "SWSI" ? "SWSI (opstelling 2/C)" : "DWSI"));
     let resp = `Voor ${diaLabel} van ${t} mm dik volgens ${proc} (${opstellingTekst}, ${sfdInfo}):<br>` +
                `• Minimaal aantal opnames: <strong>${gekozenExp} opnames</strong> (om de ${graden}°).<br>` +
                `• Omtrek: ${omtrekCm} cm (effectieve lengte per opname: ${effFilm} mm).`;
@@ -4365,13 +4412,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (proc === "EN-B" && expA !== expB) {
       const gradenA = Math.round(360 / expA);
       resp += `<br><small style="opacity: 0.85;">(Volgens Klasse A of ASME: minimaal ${expA} opnames om de ${gradenA}° vanwege ruimere 20% diktetolerantie t.o.v. 10% bij Klasse B).</small>`;
-    }
-
-    if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
-      const gekozenTijdMin = explicieteFilm === "D4" ? time_d4 : explicieteFilm === "D5" ? time_d5 : (explicieteFilm === "D7" ? time_d7 : (isKlasseB ? time_d4 : time_d7));
-      const secBerekend = Math.round(gekozenTijdMin * 60);
-      actiefGespreksGeheugen.focusBegintijdSec = secBerekend;
-      actiefGespreksGeheugen.laatsteStralingstijdSec = secBerekend;
     }
 
     const berekendeMinFFD = (params.brongrootte || params.bronTekst) ? bepaalNumeriekeMinFFD(params, vraagTekst) : null;
@@ -4719,7 +4759,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
     const proc = params.procedure;
 
-    let opstellingNaam = params.opstelling || (isDWDI ? "DWDI (dubbelwand dubbelbeeld, OFA = diameter)" : "DWSI (bron buiten)");
+    let opstellingNaam = params.opstelling || (isDWDI ? "DWDI (dubbelwand dubbelbeeld, OFA = diameter)" : "DWSI");
     if (proc === "ASME") {
       opstellingNaam = isDWDI ? "ASME Section V (DWDI, OFA = diameter)" : "ASME Section V";
     } else if (isCentraal) {
@@ -7582,9 +7622,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       tech = "DWSI";
       const isGamma = params.bronType === "Se75" || params.bronType === "Ir192" || params.bronType === "Co60" || (params.bronTekst && /se|ir|co|gamma|isotoop/i.test(params.bronTekst));
       if (isGamma) {
-        opstellingNaam = "Opstelling 14 / E (DWSI gammabron, bron buitenzijde)";
+        opstellingNaam = "Opstelling 14 / E (DWSI gammabron)";
       } else {
-        opstellingNaam = "Opstelling 13 / E (DWSI röntgenbuis, bron buitenzijde)";
+        opstellingNaam = "Opstelling 13 / E (DWSI röntgenbuis)";
       }
     }
     params.technique = tech;
@@ -7762,7 +7802,12 @@ ${stralingstijdPlat}========================================`;
     if (typeof document !== "undefined") {
       const container = document.getElementById("rt-ai-context-container");
       if (container) {
-        container.outerHTML = `<div id="rt-ai-context-container" style="margin-top: 12px; font-size: 0.82rem; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px; opacity:0.7;">🧠 <em>Geheugen is gewist.</em></div>`;
+        container.outerHTML = `<div id="rt-ai-context-container" style="margin-top: 12px; font-size: 0.82rem; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px; color:#a3e635; display:flex; align-items:center; gap:6px;"><i class="fas fa-check-circle" style="color:#a3e635;"></i> <em>Geheugen gewist &mdash; schone lei voor een nieuwe berekening!</em></div>`;
+      } else {
+        const respEl = document.getElementById("rt-ai-response");
+        if (respEl && (respEl.innerHTML.includes("Stel je vraag") || respEl.innerHTML.includes("Bewerken"))) {
+          respEl.innerHTML = `<span style="color:#a3e635;"><i class="fas fa-check-circle"></i> Geheugen gewist &mdash; schone lei voor een nieuwe berekening!</span>`;
+        }
       }
     }
   }
@@ -8100,7 +8145,7 @@ ${stralingstijdPlat}========================================`;
       <div style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
         <span style="opacity:0.85; font-size:0.82rem;">🧠 <em>Geheugen:</em></span>
         ${badgesHtml}
-        <a href="#" onclick="window.RtAssistant && window.RtAssistant.resetGespreksGeheugen(); const r=document.getElementById('rt-ai-response'); if(r)r.innerHTML='Geheugen gewist. Stel een nieuwe vraag.'; return false;" style="color:#F5DF4D; margin-left:6px; font-size:0.78rem; text-decoration:underline; opacity:0.85; cursor:pointer;" title="Wis het volledige geheugen">(wis alles)</a>
+        <button type="button" class="rt-ai-clear-mem-btn" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis alle parameters uit het geheugen (schone lei)" style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,77,77,0.12); border:1px solid rgba(255,107,107,0.5); border-radius:14px; padding:3px 10px; font-size:0.78rem; font-weight:600; color:#ffb4b4; cursor:pointer; margin-left:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,77,77,0.28)'; this.style.color='#ffffff'; this.style.borderColor='#ff4d4d';" onmouseout="this.style.background='rgba(255,77,77,0.12)'; this.style.color='#ffb4b4'; this.style.borderColor='rgba(255,107,107,0.5)';"><i class="fas fa-trash-alt" style="font-size:0.75rem;"></i><span>Wis geheugen</span></button>
       </div>
     </div>`;
   }
@@ -9809,6 +9854,9 @@ ${stralingstijdPlat}========================================`;
             <small class="rt-ai-modal-subtitle">(Radiografie Assistent Deterministische Inferentie)</small>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" class="rt-ai-reset-header-btn" id="rt-ai-reset-header" onclick="window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis gespreksgeheugen (schone lei)" aria-label="Geheugen wissen" style="background:none; border:none; color:#888; font-size:18px; cursor:pointer; padding:6px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='#888'">
+              <i class="fas fa-trash-alt"></i>
+            </button>
             <button type="button" class="rt-ai-examples-btn" id="rt-ai-examples-toggle" title="Bekijk alle mogelijke vragen &amp; voorbeelden (zoeken &amp; filteren)" aria-label="Voorbeeldvragen">
               <i class="fas fa-list-ul"></i><span>Voorbeelden</span>
             </button>
@@ -10580,19 +10628,28 @@ ${stralingstijdPlat}========================================`;
     const respEl = document.getElementById("rt-ai-response");
     if (respEl) respEl.innerHTML = "Bewerken en uitrekenen...";
 
-    const res = await verwerkUniverseleVraag(weergaveTekst, context);
+    try {
+      const res = await verwerkUniverseleVraag(weergaveTekst, context);
 
-    if (respEl) {
-      let outputHtml = res.text;
-      if (res.chips && res.chips.length > 0) {
-        outputHtml += `<div class="rt-ai-chips-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">` +
-          res.chips.map(c => `<button type="button" class="rt-ai-chip-btn" style="background:#222; border:1px solid #f5df4d; color:#f5df4d; padding:4px 10px; border-radius:12px; font-size:0.85rem; cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
-          `</div>`;
+      if (respEl) {
+        let outputHtml = (res && res.text) ? res.text : (typeof res === "string" ? res : "Geen antwoord beschikbaar.");
+        if (res && res.chips && res.chips.length > 0) {
+          outputHtml += `<div class="rt-ai-chips-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">` +
+            res.chips.map(c => `<button type="button" class="rt-ai-chip-btn" style="background:#222; border:1px solid #f5df4d; color:#f5df4d; padding:4px 10px; border-radius:12px; font-size:0.85rem; cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+            `</div>`;
+        }
+        respEl.innerHTML = outputHtml;
+        respEl.scrollTop = 0;
       }
-      respEl.innerHTML = outputHtml;
-      respEl.scrollTop = 0;
+      if (res && res.text) {
+        spreekTekst(res.text);
+      }
+    } catch (err) {
+      console.error("Fout bij verwerken vraag:", err);
+      if (respEl) {
+        respEl.innerHTML = `<span style="color:#ffb4b4;">⚠️ Er trad een fout op bij het uitrekenen (${err && err.message ? err.message : "onbekende fout"}). Stel de vraag a.u.b. opnieuw of controleer de parameters.</span>`;
+      }
     }
-    spreekTekst(res.text);
 
     // Op PC/desktop direct de focus terug op het invoerveld zodat de gebruiker meteen kan doortypen
     const isTouch = (typeof window !== "undefined") && (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
