@@ -229,6 +229,12 @@
   },
   {
     "categorie": "Afzetting & Lood",
+    "type": "Afzetting leiding met loodplaat & schedule",
+    "voorbeeld": "hoe groot moet de afzetting zijn als ik een 6 duimer schedule 40 schiet met een loodplaat en mijn selenium is 30 curie",
+    "toelichting": "Berekent de afzettingsafstand in alle richtingen (open bundel, achter collimator en achter leiding) met en zonder loodplaat."
+  },
+  {
+    "categorie": "Afzetting & Lood",
     "type": "Dosistempo op een bepaalde afstand",
     "voorbeeld": "Wat is het dosistempo op 5 meter afstand bij 30 Ci Ir-192 zonder afscherming?",
     "toelichting": "Berekent het actuele dosistempo (in μSv/u en mSv/u) op een specifieke afstand."
