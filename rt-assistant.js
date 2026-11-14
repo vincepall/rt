@@ -55,6 +55,7 @@ RR3999,Se75,70.54,03-09-2026,3`;
             type: cols[1],
             typeLabel: typeLabel,
             initialActivity: initAct,
+            currentActivity: Math.round(act * 10) / 10,
             date: cols[3],
             size: size,
             label: `${cols[0]} (${typeLabel}, ${size} mm) [${act.toFixed(1)} Ci]`,
@@ -64,6 +65,8 @@ RR3999,Se75,70.54,03-09-2026,3`;
     });
     return result;
   }
+
+  bronnenData = bouwBronnenData(STANDAARD_BRONNEN_CSV);
 
   // Laadt actuele bronnen.csv dynamisch met cache-busting
   async function laadBronnenCsv(force = true) {
@@ -84,11 +87,21 @@ RR3999,Se75,70.54,03-09-2026,3`;
   }
 
   // Dynamische suggesties voor brongroottes rechtstreeks uit bronnen.csv
-  function geefBrongrootteSuggestieChips(bronHint = "") {
+  function geefBrongrootteSuggestieChips(bronHint = "", opstelling = "") {
     const hint = (bronHint || "").toLowerCase();
     const isSe = hint.includes("se") || hint.includes("sel");
     const isIr = hint.includes("ir");
+    const isCentraal =
+      /centraal|panoram|rondstral|opstelling\s*(?:5|a\b)/i.test(opstelling) ||
+      (typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        /centraal|panoram|rondstral|opstelling\s*(?:5|a\b)/i.test(actiefGespreksGeheugen.opstelling || ""));
     const chips = [];
+
+    // Bij een centrale / panoramische opstelling altijd Rondstraler als eerste suggestie
+    if (isCentraal) {
+      chips.push("Balteau Rondstraler (5 mm)");
+    }
 
     if (Array.isArray(bronnenData) && bronnenData.length > 0) {
       let filtered = bronnenData;
@@ -102,7 +115,10 @@ RR3999,Se75,70.54,03-09-2026,3`;
     }
 
     if (!isSe && !isIr) {
-      chips.push("Röntgen Smart (1 mm)", "Balteau (2.5 mm)");
+      chips.push("Smart EVO (1 mm)", "Yxlon 300 (3 mm)", "Balteau (2.5 mm)");
+      if (!isCentraal) {
+        chips.push("Balteau Rondstraler (5 mm)");
+      }
     }
     return chips;
   }
@@ -583,23 +599,26 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     // Films & Beeldkwaliteit
     "filmsoort", "filmtype", "filmklasse", "filmkwaliteit", "D2", "D3", "D4", "D5", "D7", "D8",
-    "C1", "C2", "C3", "C4", "C5", "Agfa", "Structurix", "zwarting", "optische dichtheid",
-    "BKI", "beeldkwaliteit", "beeldkwaliteitsindicator", "penetrameter", "draadje", "draadvereiste", "gevoeligheid",
+    "C1", "C2", "C3", "C4", "C5", "C6", "Agfa", "Structurix", "zwarting", "optische dichtheid",
+    "BKI", "BKI's", "beeldkwaliteit", "beeldkwaliteitsindicator", "penetrameter", "draadje", "draadjes", "draad", "draden", "draadvereiste", "gevoeligheid",
     "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12", "W13", "W14", "W15", "W16", "W17", "W18", "W19",
     "1 FE EN", "6 FE EN", "10 FE EN", "13 FE EN", "Set A", "Set B", "Set C", "Set D", "Set 1A", "Set 2A",
+    "hole-type", "hole type", "shim", "plaatje", "plaatjes", "1T", "2T", "4T", "2T-gat", "2T gat", "loodletter", "loodletter B", "terugverstrooiing", "backscatter",
 
     // Normen & Kwaliteitsklassen
     "ASME", "Section V", "Artikel 2", "EN", "ISO", "EN ISO", "ISO 17636", "ISO 17636-1", "ISO 17636-2",
-    "ISO 19232", "ISO 19232-1", "ASTM", "ASTM E747", "Klasse A", "Klasse B", "EN-A", "EN-B",
+    "ISO 19232", "ISO 19232-1", "ASTM", "ASTM E747", "ASTM E1025", "ASTM E1815", "ISO 11699-1",
+    "Klasse A", "Klasse B", "EN-A", "EN-B", "Klasse TA", "Klasse TB",
 
     // Duimsmaten, Leidingmaten & Schedules
     "duims", "duimer", "halve duimer", "driekwart duims", "1 duimer", "2 duimer", "3 duimer", "4 duimer",
     "5 duimer", "6 duimer", "8 duimer", "10 duimer", "12 duimer", "14 duimer", "16 duimer", "18 duimer", "20 duimer", "24 duimer",
     "DN 15", "DN 20", "DN 25", "DN 50", "DN 80", "DN 90", "DN90", "dia9", "dl90", "DN 100", "DN 150", "DN 200", "DN 250", "DN 300", "DN 400", "DN 500", "DN 600",
-    "schedule", "schedules", "schedule 10", "schedule 20", "schedule 30", "schedule 40", "schedule 60", "schedule 80",
-    "schedule 100", "schedule 120", "schedule 140", "schedule 160", "Sch 40", "Sch 80", "Sch 160", "STD", "standard",
+    "schedule", "schedules", "schedule 5", "schedule 10", "schedule 20", "schedule 30", "schedule 40", "schedule 60", "schedule 80",
+    "schedule 100", "schedule 120", "schedule 140", "schedule 160", "Sch 10", "Sch 40", "Sch 80", "Sch 160", "STD", "standard",
     "XS", "extra strong", "XXS", "ASME B36.10M", "ASME B36.19M", "wanddiktes",
-    "haffmans", "sitech", "sabic", "lood", "staal", "aluminium", "inconel", "monel", "hastelloy"
+    "haffmans", "sitech", "sabic", "lood", "staal", "aluminium", "inconel", "monel", "hastelloy",
+    "dosislimiet", "dosislimieten", "stralingswerker", "gecontroleerde zone", "bewaakte zone", "halveringsdikte", "halfwaardedikte", "loodplaat"
   ];
 
   const NDO_FUZZY_WOORDENBOEK = NDO_SPRAAK_WOORDENBOEK;
@@ -963,6 +982,15 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(hoeveel|aantal)\s+(aannames?|afnames?|innames?|deelnames?|toenames?|overnames?|uitnames?)\b/gi, "$1 opnames"],
       [/\bhoeveel\s+(voorzet|inzet|opzet|afzet|omzet|uitzet|bijzet|ontzet|bezet|gezet)\b/gi, "hoeveel verzet"],
 
+      // BKI / IQI / Draadjes / Schedule / Structurix lookalikes
+      [/\b(beke|beki|beekie|bekkie|bikkie|wiki|mickey|tikkie|b\s*k\s*ie|b\s*k\s*i)\b/gi, "BKI"],
+      [/\b(i\s*q\s*i|iqi)\b/gi, "IQI"],
+      [/\b(draatjes|traatjes)\b/gi, "draadjes"],
+      [/\b(draatje|traatje)\b/gi, "draadje"],
+      [/\b(beeld\s+kwaliteit)\b/gi, "beeldkwaliteit"],
+      [/\b(schedel|schedul|skedule|skedul|shedul|schetsel)\b/gi, "schedule"],
+      [/\b(structuriks|structurex|structuriek)\b/gi, "Structurix"],
+
       // 6. Technieken (DWSI / SWSI / DWDI)
       [/\b(de\s+wc|dw\s*zie|d\s*w\s*s\s*i|dwz\s*i|dw\s*si|dw-si|double\s*wall\s*single\s*image|dubbele\s+wand\s+enkel\s+beeld|dubbelwandig\s+enkel|dubbel\s*wand\s*enkel\s*beeld|dubbelwand\s*enkel\s*beeld|dweb|d\.w\.e\.b\.)\b/gi, "DWSI"],
       [/\b(single\s*wall\s*single\s*image|single\s*wall|souci|sw\s*zie|s\s*w\s*s\s*i|s\s*w\s*c|sw\s*si|sw-si|enkele\s+wand\s+enkel\s+beeld|enkeld?wandig\s+enkel\s+beeld|enkeld?wandig|enkeld?\s*wand\s*enkel\s*beeld|enkeld?wand\s*enkel\s*beeld|enkele?\s*wand|enkeld?wand|eweb|e\.w\.e\.b\.)\b/gi, "SWSI"],
@@ -1162,7 +1190,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(buistabel|buistabellen|buis\s*tabel|buis\s*tabellen)\b/gi, "buistabel"],
       [/\b(materiaal\s*factor|materiaalfactor)\b/gi, "materiaalfactor"],
       // BKI / Draadjes
-      [/\b(b\s*k\s*i|beke|beki|beekie|bekkie|bikkie|wiki|mickey|tikkie|b\s*k\s*ie|beeldkwaliteit|beeld\s+kwaliteit|indicator|draadjes|draadje|draatje|draatjes|i\s*q\s*i|iqi)\b/gi, "draadje BKI"],
+      [/\b(beke|beki|beekie|bekkie|bikkie|wiki|mickey|tikkie|b\s*k\s*ie|b\s*k\s*i)\b/gi, "BKI"],
+      [/\b(i\s*q\s*i|iqi)\b/gi, "IQI"],
+      [/\b(draatjes)\b/gi, "draadjes"],
+      [/\b(draatje)\b/gi, "draadje"],
+      [/\b(beeld\s+kwaliteit)\b/gi, "beeldkwaliteit"],
       // Brongrootte / Bronafmeting / Bronkeuze
       [/\b(bron\s*afmeting|bronafmeting|focus\s*afmeting|focusafmeting|brongrote|bron\s*grootte|brandvlek\s*grootte|brandvlekgrootte|brandvlek)\b/gi, "brongrootte"],
       [/\b(bronkhuyzen|bronkhuizen|bronkhuis|bronhuizen|bronhuis|bronkruis|bronbuis|bron\s*kruis|bron\s*buis|bron\s*keuzes?|bronkeuzes|bronkeuzen|bron\s*cursus|bron\s*keuring)\b/gi, "bronkeuze"],
@@ -1219,8 +1251,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(\d+(?:[.,]\d+)?)\s*(?:juli|julie|jury|joelie)\b(?!\s*20\d\d)/gi, "$1 Curie"],
       [/\b(activiteid|aktieviteit|activitijd|bronsterkte|bron\s*sterkte)\b/gi, "activiteit"],
       // Röntgenbuizen & Merken fonetisch
-      [/\b(yxlon\s+smart|ikslon\s+smart|ypsilon\s+smart|smart\s*evo|evo\s*300)\b/gi, "Yxlon Smart (1 mm)"],
-      [/\b(ikslon|ixlon|x[\s-]*lon|xlon|epsilon|ypsilon|ijssel|ijslon|eikslon|ykslon|iks\s*lon|yks\s*lon|yxlon)\b/gi, "Yxlon (3 mm)"],
+      [/\b(smart\s*evo|evo\s*300|smart\s*1\s*mm)\b/gi, "Smart EVO (1 mm)"],
+      [/\b(yxlon\s*300|ikslon\s*300|ypsilon\s*300|smart\s*3\s*mm)\b/gi, "Yxlon 300 (3 mm)"],
+      [/\b(ikslon|ixlon|x[\s-]*lon|xlon|epsilon|ypsilon|ijssel|ijslon|eikslon|ykslon|iks\s*lon|yks\s*lon|yxlon)\b/gi, "Yxlon 300 (3 mm)"],
       [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:rondstraler|panoramisch)|rondstraler|rondstralen)\b/gi, "Balteau Rondstraler (5 mm)"],
       [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:ceram|directional)|ceram\s*300|seram\s*300|ceran\s*300)\b/gi, "Balteau Ceram (2.5 mm)"],
       [/\b(balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bal\s*touw|baltouw|bauto)\b(?!\s*\(|\s*rondstraler|\s*ceram)/gi, "Balteau (2.5 mm)"],
@@ -1234,6 +1267,23 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(optische\s+dichtheid|opties\s+dichtheid|optische\s+dikheid|optische\s+dikte|filmzwarting)\b/gi, "zwarting"],
       [/\b(bron\s*zijde|bron\s*kant|source\s*side|sourceside)\b/gi, "bronzijde"],
       [/\b(film\s*zijde|film\s*kant|film\s*side|filmside)\b/gi, "filmzijde"],
+      // BKI, IQI en Draadjes fonetisch
+      [/\b(b\s*k\s*i|bee\s*kaa\s*ie|beekaaie|bekaie|b\.k\.i\.|beka\s*ie|bkaie|bekai)\b/gi, "BKI"],
+      [/\b(i\s*q\s*i|ie\s*kju\s*ie|iekjuie|iki|i\.q\.i\.)\b/gi, "IQI"],
+      [/\b(draatjes|draaitjes|draatje|draaitje)\b/gi, "draadjes"],
+      // Agfa Structurix & Filmklassen C1 t/m C6
+      [/\b(akfa|achfa|agfa\s*film|struktuurix|structuriks|struchturix)\b/gi, "Agfa Structurix"],
+      [/\b(c\s*1|cee\s*1|see\s*1|zee\s*1|c\s*een|cee\s*een|c-1)\b/gi, "C1"],
+      [/\b(c\s*2|cee\s*2|see\s*2|zee\s*2|c\s*twee|cee\s*twee|c-2)\b/gi, "C2"],
+      [/\b(c\s*3|cee\s*3|see\s*3|zee\s*3|c\s*drie|cee\s*drie|c-3)\b/gi, "C3"],
+      [/\b(c\s*4|cee\s*4|see\s*4|zee\s*4|c\s*vier|cee\s*vier|c-4)\b/gi, "C4"],
+      [/\b(c\s*5|cee\s*5|see\s*5|zee\s*5|c\s*vijf|cee\s*vijf|c-5)\b/gi, "C5"],
+      [/\b(c\s*6|cee\s*6|see\s*6|zee\s*6|c\s*zes|cee\s*zes|c-6)\b/gi, "C6"],
+      // FFD / SFD
+      [/\b(ef\s*ef\s*dee|f\s*f\s*d|f\.f\.d\.|f-f-d|ff\s*dee|effeffdee)\b/gi, "FFD"],
+      [/\b(es\s*ef\s*dee|s\s*f\s*d|s\.f\.d\.|s-f-d|sf\s*dee|esseffdee)\b/gi, "SFD"],
+      // Schedules
+      [/\b(schetsjoel|schetjoel|skejoel|sketsjoel|sjedjoel|shedoel|skedjoel|skedule|schedul|shedoel|skedoel|skedool|scheduel)\b/gi, "schedule"],
       // Filmtypen & D-nummers
       [/\b(d\s*4|dee\s*vier|dee\s*4|d\s*vier|de\s*vier|de\s*4|d-4|b\s*4|dier)\b/gi, "D4"],
       [/\b(d\s*5|dee\s*vijf|dee\s*5|d\s*vijf|de\s*vijf|de\s*5|d-5|b\s*5)\b/gi, "D5"],
@@ -1510,10 +1560,15 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       (/\b(geometrische\s*onscherpte|wat\s+is\s+ug|formule\s+voor\s+ug|ug\s+eisen|ug\s+norm|ug\s+grenzen)\b/i.test(lower) && !/\b(bereken|wat\s+is\s+de\s+ug\s+bij)\b/i.test(lower)) ||
       /\b(keverregel|waarom\s+(?:laag|lage)\s*kv|waarom\s+buisspanning\s+beperken|wat\s+is\s+(?:de\s+)?(?:keverregel|kv[-\s]?regel))\b/i.test(lower) ||
       (/\b(halfwaardetijd|halveringstijd|halveringtijd|eigenschappen\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|isotopen|isotoop|iridium|selenium|kobalt)|energie\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|iridium|selenium|kobalt))\b/i.test(lower) && !/\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower)) ||
+      (/\b(agfa|structurix)\b/i.test(lower) && /\b(film|klasse|c[1-6]|d[2-8]|type|overeen)\b/i.test(lower)) ||
+      /\b(filmklasse\s*c[1-6]|film\s*c[1-6]|wat\s+is\s+film\s*c[1-6]|wat\s+is\s+c[1-6]|welke\s+film\s+is\s+c[1-6]|welk\s+type\s+agfa\s*(?:film)?\s*(?:komt\s+overeen\s+)?met\s+c[1-6])\b/i.test(lower) ||
       /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5)\b/i.test(lower) ||
+      (/\b(hoeveel|aantal)\s+(?:draadjes?|draden|draadje(?:\s*bki)?)\b/i.test(lower) && /\b(en\s*bki|iso\s*bki|bki|iqi|houder|en\b|iso\b)/i.test(lower)) ||
+      /\b(verschil\s+tussen\s+(?:een\s+)?(?:asme|astm)\s*(?:en\s+|vs\s*)?(?:en|iso)?\s*(?:bki|iqi)|(?:asme|astm)\s*(?:vs|tegenover)\s*(?:en|iso)\s*(?:bki|iqi)|verschil\s+tussen\s+(?:en\s+en\s+asme|asme\s+en\s+en)\s*(?:bki|iqi))\b/i.test(lower) ||
+      (/\b(verschil|vergelijk)\b/i.test(lower) && /\b(asme|astm)\b/i.test(lower) && /\b(en|iso)\b/i.test(lower) && /\b(bki|iqi|draad|indicator)\b/i.test(lower)) ||
       /\b(verschil\s+tussen\s+(?:een\s+)?(?:draadje|draadjes|wire)(?:\s*bki)?\s+en\s+(?:een\s+)?(?:gaatje|gaatjes|gat|gaten|plaatje|plaatjes|hole)|draadje\s+vs\s+(?:gaatje|gat|plaatje)|wat\s+is\s+(?:een\s+)?2t[-\s]*gat|waarom\s+2t|hole\s*type\s*iqi\s*uitleg)\b/i.test(lower) ||
       /\b(waarom\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+van\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower) ||
-      /\b(hoeveel\s+straling\s+mag\s+(?:een\s+)?(?:medewerker|werknemer|persoon|radiograaf)|dosislimiet\s+(?:per\s+jaar|werknemer|medewerker)|maximaal\s+toegestane\s+dosis\s+(?:per\s+jaar|jaarlijks)|hoeveel\s+(?:msv|millisievert)\s+(?:per\s+jaar|mag\s+een\s+medewerker)|dosislimiet\s+straling|wettelijke\s+dosislimiet)\b/i.test(lower) ||
+      /\b(hoeveel\s+straling\s+mag\s+(?:een\s+)?(?:medewerker|werknemer|persoon|radiograaf)|dosislimiet|dosislimieten|maximaal\s+toegestane\s+dosis\s+(?:per\s+jaar|jaarlijks)|hoeveel\s+(?:msv|millisievert)\s+(?:per\s+jaar|mag\s+een\s+medewerker)|dosislimiet\s+straling|wettelijke\s+dosislimiet)\b/i.test(lower) ||
       (/\b(hoe\s+bereken\s+(?:je|men)\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|focus|film\s*focus\s*afstand)|hoe\s+wordt\s+de\s+(?:minimale\s+)?ffd\s+berekend|formule\s+(?:voor\s+)?(?:de\s+)?(?:minimale\s+)?ffd|hoe\s+bepaal\s+(?:je|men)\s+(?:de\s+)?(?:minimale\s+)?ffd)\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|duim|inch|dik)\b/i.test(lower)) ||
       /\b(strooistraling|secundaire\s*straling|waarom\s+(?:een\s+)?collimator|werking\s+collimator|hoe\s+werkt\s+een\s+collimator|wat\s+doet\s+(?:een\s+)?collimator)\b/i.test(lower) ||
       /\b(welke\s+normen\s*(?:zijn\s*er|gelden)|overzicht\s+van\s+normen|rt\s+normen|radiografie\s+normen)\b/i.test(lower) ||
@@ -1562,13 +1617,29 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // Onstream tak (RT21021 / RT21022)
+    const isOnstreamGeheugen =
+      typeof actiefGespreksGeheugen !== "undefined" &&
+      actiefGespreksGeheugen &&
+      (Boolean(actiefGespreksGeheugen.isOnstream) ||
+        actiefGespreksGeheugen.laatsteIntentie === "onstream_ffd" ||
+        actiefGespreksGeheugen.laatsteIntentie === "onstream_bron");
+
     const isOnstream =
       /\b(onstream|on\s*stream|onstreamopname|rt21021|rt21022|tangentiaal|tangenti[eë]le|restwanddikte|wmax|w\s*max|w-max|klasse\s*t[ab])\b/i.test(lower) ||
-      (typeof actiefGespreksGeheugen !== "undefined" &&
-        actiefGespreksGeheugen &&
-        (actiefGespreksGeheugen.laatsteIntentie === "onstream_ffd" || actiefGespreksGeheugen.laatsteIntentie === "onstream_bron") &&
-        /\b(klasse\s*t[ab]|tb|ta|isolatie|tangentiaal|dubbelwand)\b/i.test(lower));
+      (isOnstreamGeheugen &&
+        (/\b(klasse\s*t[ab]|tb|ta|isolatie|tangentiaal|dubbelwand)\b/i.test(lower) ||
+          (/\b(mag|kan|geschikt|toegestaan|mogelijk|welke\s*bron|bronkeuze)\b/i.test(lower) &&
+            /\b(se[-\s]?75|se75|selenium|seleen|ir[-\s]?192|ir192|iridium|co[-\s]?60|co60|kobalt|bron|isotoop)\b/i.test(lower))));
     if (isOnstream) {
+      const isFilmVraagInOnstream =
+        (/\b(d[234578]|filmkwaliteit|filmklasse|filmtype|filmsoort)\b/i.test(lower) &&
+          /\b(mag|toegestaan|gebruiken|kiezen|nemen|toepassen|advies|kan\s*ik|welke)\b/i.test(lower)) ||
+        /\bmag\s+.*(d[234578])\b/i.test(lower);
+      if (isFilmVraagInOnstream) {
+        intenties.push("film_keuze");
+        return intenties;
+      }
+
       const vraagtOnstreamFFD = /\b(ffd|sfd|focus|afstand|focusafstand)\b/i.test(lower) && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang)\b/i.test(lower);
       const vraagtPureOnstreamBron = !vraagtOnstreamFFD && /\b(welke\s+bron|bronkeuze|wat\s+is\s+de\s+wmax|bereken\s+wmax|mag\s+ik.*gebruiken|kan\s+ik.*gebruiken|is\s+.*geschikt)\b/i.test(lower);
       if (
@@ -1580,7 +1651,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang)\b/i.test(lower))
       ) {
         intenties.push("onstream_ffd");
-      } else if (/\b(bron|bronkeuze|geschikt|isotoop|se-75|ir-192|co-60|welke\s+bron|iridium|selenium|kobalt|kan\s+ik|mag\s+ik|gebruiken|wmax|w-max)\b/i.test(lower) && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang|gevuld|water|olie)\b/i.test(lower)) {
+      } else if (/\b(bron|bronkeuze|geschikt|isotoop|se-75|se75|seleen|selenium|ir-192|ir192|iridium|co-60|co60|welke\s+bron|kobalt|kan\s+ik|mag\s+ik|mag\s+dit|gebruiken|wmax|w-max)\b/i.test(lower) && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang|gevuld|water|olie)\b/i.test(lower)) {
         intenties.push("onstream_bron");
       }
       if (intenties.length === 0 && !/\b(stralingstijd|belichtingstijd|schiettijd|hoelang|hoe\s+lang|gevuld|water|olie|kv|verval)\b/i.test(lower)) {
@@ -1861,6 +1932,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       !/\b(wat\s+is\s+de\s+(?:min\w*\s+)?(?:ffd|focus)\s+en\b)/i.test(lower);
     if (
       (/\b(min(?:imale|imum|\.)?\s*ffd|fmin|f-min|f\s+min|minimale\s+(?:focus|bron[-\s]*film|film[-\s]*focus)?\s*afstand|focus\s*afstand|bron\s*film|welke\s*ffd|wat\s+is\s+de\s+(?:min\s*)?ffd|gekozen\s*ffd|minimale\s+focus|hoeveel\s+focus|welke\s+focus|hoeveel\s+ffd|focus\s+aanhouden)\b/i.test(lower) ||
+        /\b(?:heb ik|is er|is dit|is mijn|voldoe ik aan|hebben we)\s+(?:genoeg|voldoende)\s+(?:focus|ffd|sfd)\b/i.test(lower) ||
+        /\b(?:genoeg|voldoende)\s+(?:focus|ffd|sfd)\b/i.test(lower) ||
+        /\b(?:voldoe\s+ik\s+aan\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|sfd|focus))\b/i.test(lower) ||
         /\b(?:hoe\s+ver|op\s+welke\s+afstand|welke\s+afstand|wat\s+is\s+de\s+afstand)\b.*?\b(?:bron|camera|focus|film|schieten|stralen|zetten|staan|aanhouden)\b/i.test(lower) ||
         /\bafstand\s+(?:van\s+de\s+)?(?:bron|focus|film)\b/i.test(lower) ||
         isBronOpDePijpVraag) &&
@@ -2498,7 +2572,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     // FFD / SFD
     const isBundelVraag = lower.includes("bundel") || lower.includes("collimator");
     let matchFfd = tekst.match(/(?:ffd|sfd|focus\s*afstand|film\s*focus\s*afstand|source\s*film\s*distance|bron\s*film)\s*(?:van|is|op|:|\()?\s*(\d+(?:[.,]\d+)?)\s*(mm|cm|meter|m\b)?/i);
-    if (!matchFfd) matchFfd = tekst.match(/(?:op\s+)?(\d+(?:[.,]\d+)?)\s*(mm|cm|meter|m\b)?\s*(?:ffd|sfd|focus\s*afstand|film\s*focus\s*afstand|source\s*film\s*distance)\b/i);
+    if (!matchFfd) matchFfd = tekst.match(/(?:op\s+)?(\d+(?:[.,]\d+)?)\s*(mm|cm|meter|m\b)?\s*(?:ffd|sfd|focus\s*afstand|film\s*focus\s*afstand|source\s*film\s*distance|\(?min\.?\s*ffd\)?|\(?voorgesteld(?:e)?(?:\s*ffd)?\)?)/i);
+    if (!matchFfd) matchFfd = tekst.match(/(\d+(?:[.,]\d+)?)\s*(mm|cm)?\s*(?:\(min\.?\s*ffd\)|\bmin\.?\s*ffd\b|\(voorgesteld\))/i);
     if (!matchFfd && !isAfschermingContext) {
       const mAfst = tekst.match(/(?:op|bij)\s+(\d+(?:[.,]\d+)?)\s*(mm|cm|meter|m\b)?\s*afstand\b/i) ||
                     tekst.match(/\bafstand\s*(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(mm|cm|meter|m\b)?\b/i);
@@ -2875,8 +2950,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         }
       }
 
-      if (/smart/i.test(tekst)) {
-        res.bronTekst = "Yxlon Smart (1 mm)";
+      if (/smart\s*evo|evo|smart.*1\s*mm/i.test(tekst)) {
+        res.bronTekst = "Smart EVO (1 mm)";
+        res.brongrootte = 1;
+        res.bronType = "X-ray";
+      } else if (/yxlon|smart.*3\s*mm/i.test(tekst)) {
+        res.bronTekst = "Yxlon 300 (3 mm)";
+        res.brongrootte = 3;
+        res.bronType = "X-ray";
+      } else if (/smart/i.test(tekst)) {
+        res.bronTekst = "Smart EVO (1 mm)";
         res.brongrootte = 1;
         res.bronType = "X-ray";
       } else if (/\brondstraler\b/i.test(tekst) || /balteau\s*rondstraler/i.test(tekst)) {
@@ -2886,10 +2969,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       } else if (/balteau/i.test(tekst)) {
         res.bronTekst = "Balteau (2.5 mm)";
         res.brongrootte = 2.5;
-        res.bronType = "X-ray";
-      } else if (/yxlon/i.test(tekst)) {
-        res.bronTekst = "Yxlon (3 mm)";
-        res.brongrootte = 3;
         res.bronType = "X-ray";
       } else if (/se[-\s]?75|selenium|seleen/i.test(tekst)) {
         res.bronTekst = res.brongrootte ? `Se-75 (${res.brongrootte} mm)` : "Se-75";
@@ -2913,6 +2992,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     // Veilig getallenvangnet (bronkeuzes isoleren zodat bronmaten nooit als diameter worden gezien)
     if ((res.diameter === null || res.wanddikte === null) && !isBundelVraag && res.sfd === null && res.langsnaadLengte === null && res.oudeFocus === null && res.nieuweFocus === null && res.focusBegintijdSec === null && res.maminVal === null && res.maVal === null) {
       let tZonder = tekst
+        .replace(/\b(?:schedule|sch|sched)[-\s]*([0-9]{1,3}[a-z]?|std|xs|xxs)\b/gi, "")
+        .replace(/\b([0-9]{1,3}[a-z]?)\s*(?:schedule|sch|sched)\b/gi, "")
         .replace(/\b(se-75|se75|ir-192|ir192|co-60|selenium|iridium|balteau|yxlon|smart|rondstraler|rr\d+|\d{5}[a-z]?|d[234578])\b/gi, "")
         .replace(/\bdn\s*[-]?\s*\d+\b/gi, "")
         .replace(/\b\d+(?:[.,]\d+)?\s*(?:mm\s*)?(?:ci|curie|gbq|tbq|usv|µsv|microsievert|pb|fe|lood|staal|isolatie|ma\*min|mamin|ma|milliamp|miliamp)\b/gi, "")
@@ -2975,9 +3056,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       res.diameter = converteerDuimIndienNodig(res.diameter);
     }
 
-    // Schedule koppeling: als schedule & diameter bekend zijn, zoek wanddikte op
-    if (res.schedule && res.diameter) {
-      const schInfo = zoekScheduleInfo(res.diameter, res.schedule);
+    // Schedule koppeling: als schedule & diameter bekend zijn (of in actiefGespreksGeheugen), zoek wanddikte op
+    const effDiameterVoorSchedule = res.diameter || (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen ? actiefGespreksGeheugen.diameter : null);
+    if (res.schedule && effDiameterVoorSchedule) {
+      const schInfo = zoekScheduleInfo(effDiameterVoorSchedule, res.schedule);
       if (schInfo && schInfo.gevonden) {
         res.scheduleInfo = schInfo;
         const schValNum = parseFloat(res.schedule);
@@ -3527,9 +3609,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           ta: { "Se-75": 55, "Ir-192": 80, "Co-60": 120 },
           tb: { "Se-75": 40, "Ir-192": 60, "Co-60": 85 }
         };
-        const isIrGekozen = /\b(iridium|ir-?192)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Ir-192")) || params.bronType === "Ir192";
-        const isSeGekozen = /\b(selenium|se-?75)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Se-75")) || params.bronType === "Se75";
-        const isCoGekozen = /\b(kobalt|co-?60)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Co-60")) || params.bronType === "Co60";
+        const isIrGekozen = /\b(iridium|ir[-\s]?192|ir192)\b/i.test(lower) || (params.bronTekst && /ir[-\s]?192|iridium/i.test(params.bronTekst)) || params.bronType === "Ir192";
+        const isSeGekozen = /\b(selenium|seleen|se[-\s]?75|se75)\b/i.test(lower) || (params.bronTekst && /se[-\s]?75|selenium|seleen/i.test(params.bronTekst)) || params.bronType === "Se75";
+        const isCoGekozen = /\b(kobalt|co[-\s]?60|co60)\b/i.test(lower) || (params.bronTekst && /co[-\s]?60|kobalt/i.test(params.bronTekst)) || params.bronType === "Co60";
 
         let extraWaarschuwing = "";
         if (isIrGekozen && !bronnen.includes("Ir-192")) {
@@ -3571,9 +3653,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const regels = [];
 
     // Specifiek gevraagd of een bepaalde bron toegestaan is (bijv. iridium, selenium, kobalt)
-    const wilIridium = /\b(iridium|ir-?192)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Ir-192"));
-    const wilSelenium = /\b(selenium|se-?75)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Se-75"));
-    const wilKobalt = /\b(kobalt|co-?60)\b/i.test(lower) || (params.bronTekst && params.bronTekst.includes("Co-60"));
+    const wilIridium = /\b(iridium|ir[-\s]?192|ir192)\b/i.test(lower) || (params.bronTekst && /ir[-\s]?192|iridium/i.test(params.bronTekst)) || params.bronType === "Ir192";
+    const wilSelenium = /\b(selenium|seleen|se[-\s]?75|se75)\b/i.test(lower) || (params.bronTekst && /se[-\s]?75|selenium|seleen/i.test(params.bronTekst)) || params.bronType === "Se75";
+    const wilKobalt = /\b(kobalt|co[-\s]?60|co60)\b/i.test(lower) || (params.bronTekst && /co[-\s]?60|kobalt/i.test(params.bronTekst)) || params.bronType === "Co60";
     const isWmaxVraag = /\b(wmax|w-max|wat\s+is\s+de\s+w)\b/i.test(lower);
 
     const maxWmaxTabel = {
@@ -3688,9 +3770,29 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const isD7 = /\bd7\b/i.test(lower);
     const isD5 = /\bd5\b/i.test(lower);
     const isD4 = /\bd4\b/i.test(lower);
-    const isKlasseB = /\b(klasse\s*b|en[-\s]?b|rt21013|sabic|sitech)\b/i.test(lower) || params.procedure === "EN-B";
+    const isOnstream = Boolean(
+      params.isOnstream ||
+      params.onstreamKlasse ||
+      (params.procedure && /onstream|tb|ta/i.test(params.procedure)) ||
+      /\b(onstream|on\s*stream|rt\s*[-]?\s*21021|rt\s*[-]?\s*21022)\b/i.test(lower)
+    );
+    const isKlasseB = !isOnstream && (/\b(klasse\s*b|en[-\s]?b|rt21013|sabic|sitech)\b/i.test(lower) || params.procedure === "EN-B");
     const isKlasseA = /\b(klasse\s*a|en[-\s]?a)\b/i.test(lower) || params.procedure === "EN-A";
     const isAsme = /\basme\b/i.test(lower) || params.procedure === "ASME";
+
+    if (isOnstream) {
+      if (isD7) {
+        return "Ja, volgens de onstream procedures (RT21021 / RT21022) is filmtype D7 <strong>toegestaan</strong> (voor zowel Klasse TA als Klasse TB).";
+      }
+      if (isD5) {
+        return "Ja, filmtype D5 is toegestaan voor onstream opnames (RT21021 / RT21022).";
+      }
+      if (isD4) {
+        return "Ja, filmtype D4 is altijd toegestaan voor onstream opnames en biedt de hoogste scherpte en beeldkwaliteit.";
+      }
+      if (chips) chips.push("D7", "D5", "D4");
+      return "Voor onstream inspecties (RT21021 / RT21022) zijn de filmtypen D4, D5 en D7 toegestaan. Welk filmtype wil je controleren?";
+    }
 
     if (isD7) {
       if (isKlasseB) {
@@ -3719,6 +3821,67 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   function bepaalNumeriekeMinFFD(params, vraagTekst = "") {
     const lower = (vraagTekst || "").toLowerCase();
     const De = params.diameter;
+    if (!De || isNaN(De) || De <= 0) return null;
+
+    const isOnstream = Boolean(
+      params.isOnstream ||
+      params.onstreamKlasse ||
+      (params.procedure && /onstream|tb|ta/i.test(params.procedure)) ||
+      /\b(onstream|on\s*stream|rt\s*[-]?\s*21021|rt\s*[-]?\s*21022|rt\s*[-]?\s*21-?02-?[12])\b/i.test(lower)
+    );
+
+    let b = params.brongrootte;
+    if (!b) {
+      if (params.bronType === "Se75" || (params.bronTekst && /se[-\s]?75|selenium|seleen/i.test(params.bronTekst))) {
+        b = 3.0;
+      } else if (params.bronType === "Ir192" || (params.bronTekst && /ir[-\s]?192|iridium/i.test(params.bronTekst))) {
+        b = 2.8;
+      } else if (params.bronType === "Co60" || (params.bronTekst && /co[-\s]?60|kobalt/i.test(params.bronTekst))) {
+        b = 3.5;
+      } else if (params.bronType === "X-ray" || (params.bronTekst && /x[-\s]?ray|rontgen|röntgen|buis/i.test(params.bronTekst))) {
+        b = 1.0;
+      } else {
+        b = 3.0;
+      }
+    }
+
+    // --- ONSTREAM MINIMALE FFD CONFORM onstreamffd.html (RT21021 / RT21022) ---
+    if (isOnstream) {
+      const klasse = (
+        params.onstreamKlasse ||
+        (params.procedure && /tb/i.test(params.procedure) ? "tb" : (params.procedure && /ta/i.test(params.procedure) ? "ta" : "")) ||
+        (/\btb\b/i.test(lower) ? "tb" : (/\bta\b/i.test(lower) ? "ta" : "tb"))
+      ).toLowerCase();
+
+      const techniek =
+        params.onstreamTechniek ||
+        (/\bdubbelwand|rt\s*[-]?\s*21022\b/i.test(lower) ? "dubbelwand" : "tangentiaal");
+
+      const Iso = (params.isolatieMm !== null && params.isolatieMm !== undefined) ? params.isolatieMm : 0;
+      const t = params.wanddikte;
+
+      let minFFD = 0;
+      if (techniek === "tangentiaal") {
+        const PDD = (De / 2) + Iso;
+        const ffd1 = PDD + 3.5 * De;
+        const ug = klasse === "tb" ? 0.3 : 0.6;
+        const ffd2 = (b * PDD) / ug;
+        minFFD = Math.max(ffd1, ffd2);
+      } else {
+        // dubbelwand RT21022
+        const isDWSI = De >= 150;
+        let OFD = De + Iso;
+        if (isDWSI && t && !isNaN(t) && t > 0) {
+          OFD = t + Iso;
+        }
+        const ug = klasse === "tb" ? 0.3 : 0.6;
+        const ffdOnscherpte = (b * OFD) / ug;
+        const ffdFysiek = De + 2 * Iso;
+        minFFD = isDWSI ? Math.max(ffdOnscherpte, ffdFysiek) : ffdOnscherpte;
+      }
+      return Math.round(minFFD);
+    }
+
     const isCentraal = /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower) || params.optie === "1";
     const isExcentrisch = /\bexcentrisch/i.test(lower) || params.optie === "2";
     const isDWDI =
@@ -3734,9 +3897,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       ofa = params.wanddikte;
     }
 
-    if (!params.brongrootte || !params.procedure) return null;
+    if (!params.procedure) return null;
 
-    const b = params.brongrootte;
     const proc = params.procedure;
     let factor = proc === "EN-A" ? 7.5 : 15;
     let minFfd = 0;
@@ -3757,7 +3919,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     return Math.round(minFfd);
   }
 
-  // 3b-2. Minimale FFD Waarschuwing voor Lasonderzoek (achtergrondcontrole)
+  // 3b-2. Minimale FFD Waarschuwing voor Lasonderzoek & Onstream (achtergrondcontrole)
   function geefMinFFDWaarschuwing(params, vraagTekst = "") {
     if (!params.sfd) return "";
     const minFfd = bepaalNumeriekeMinFFD(params, vraagTekst);
@@ -3765,7 +3927,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     const sfdCm = (params.sfd / 10).toFixed(1);
     const minCm = (minFfd / 10).toFixed(1);
-    const proc = params.procedure || "de norm";
+    const isOnstream = Boolean(
+      params.isOnstream ||
+      params.onstreamKlasse ||
+      (params.procedure && /onstream|tb|ta/i.test(params.procedure))
+    );
+    const proc = isOnstream ? `Onstream Klasse ${(params.onstreamKlasse || "TB").toUpperCase()} (<a href="onstreamffd.html" class="ai-link" target="_blank">onstreamffd.html</a>)` : (params.procedure || "de norm");
     const bgStr = params.brongrootte ? `brongrootte ${params.brongrootte} mm` : "";
     const wtStr = params.wanddikte ? `wanddikte ${params.wanddikte} mm` : "";
     const details = [bgStr, wtStr].filter(Boolean).join(" en ");
@@ -3774,21 +3941,33 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       `<div class="rt-ai-warning-box" style="background: rgba(255, 75, 75, 0.15); border-left: 4px solid #ff4b4b; padding: 10px 14px; margin: 10px 0; border-radius: 6px; color: #ffcccc; font-size: 0.95rem; line-height: 1.5;">` +
       `⚠️ <strong>Waarschuwing: Minimale FFD onderschreden!</strong><br>` +
       `De gekozen focus van <strong>${params.sfd} mm (${sfdCm} cm)</strong> is <u>kleiner</u> dan de normatieve minimale FFD van <strong>${minFfd} mm (${minCm} cm)</strong> volgens <strong>${proc}</strong>${details ? ` (${details})` : ""}.<br>` +
-      `<small style="opacity: 0.9; display: block; margin-top: 4px;">Hierdoor wordt de maximaal toelaatbare geometrische onscherpte (U<sub>g</sub>) overschreden en voldoet de opname <strong>niet</strong> aan de normatieve eisen van EN ISO 17636-1 / ASME.</small>` +
+      `<small style="opacity: 0.9; display: block; margin-top: 4px;">Hierdoor wordt de maximaal toelaatbare geometrische onscherpte (U<sub>g</sub>) overschreden en voldoet de opname <strong>niet</strong> aan de normatieve eisen${isOnstream ? " van RT21021 / RT21022" : " van EN ISO 17636-1 / ASME"}.</small>` +
       `</div>`
     );
   }
 
-  // 3c. Voorgestelde FFD Berekening (Conform getPrefilledFFD() in pruts.html)
+  // 3c. Voorgestelde FFD Berekening (Conform getPrefilledFFD() in pruts.html / onstreamffd.html)
   // Bij DWSI opstelling (bron buiten) stelt pruts.html een praktische FFD voor:
-  // - Gammabron (Se-75 / Ir-192): diameter + 15 mm
-  // - Röntgenbuis (X-ray): diameter + 150 mm
-  // Altijd minimaal gelijk aan de normatieve minFFD
+  // - Gammabron (Se-75 / Ir-192 / Co-60): diameter + 15 mm
+  // - Röntgenbuis (X-ray directioneel): diameter + 150 mm
+  // - Onstream (RT21021 / RT21022): minimale FFD volgens onstreamffd.html
   function bepaalVoorgesteldeFFD(params, vraagTekst = "") {
     const De = params.diameter;
     if (!De || isNaN(De) || De <= 0) return null;
 
     const lower = (vraagTekst || "").toLowerCase();
+    const isOnstream = Boolean(
+      params.isOnstream ||
+      params.onstreamKlasse ||
+      (params.procedure && /onstream|tb|ta/i.test(params.procedure)) ||
+      /\b(onstream|on\s*stream|rt\s*[-]?\s*21021|rt\s*[-]?\s*21022)\b/i.test(lower)
+    );
+
+    if (isOnstream) {
+      // Voor onstream is de voorgestelde FFD gelijk aan de minimale FFD volgens onstreamffd.html
+      return bepaalNumeriekeMinFFD(params, vraagTekst);
+    }
+
     const isCentraal = /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower) || params.optie === "1";
     const isExcentrisch = /\bexcentrisch/i.test(lower) || params.optie === "2";
     if (isCentraal || isExcentrisch) return null;
@@ -3813,10 +3992,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       candidate = Math.round(De + 15);
     }
 
-    const minFfd = bepaalNumeriekeMinFFD(params, vraagTekst);
-    if (minFfd) {
-      return Math.max(minFfd, candidate);
-    }
     return candidate;
   }
 
@@ -3912,10 +4087,39 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
         actiefGespreksGeheugen.verwachtParameter = "wanddikte";
       }
-      if (chips) chips.push("4 mm dik", "6 mm dik", "8 mm dik");
-      return "Wat is de <strong>wanddikte</strong> (of doorstraalde dikte in mm) van het materiaal?";
+      const isPlaatCheck = Boolean(
+        params.isPlaat ||
+        params.optie === "3" ||
+        (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.isPlaat) ||
+        /\b(plaat|vlakke\s+plaat)\b/i.test(vraagTekst)
+      );
+      if (isPlaatCheck) {
+        if (chips) chips.push("6 mm dik", "8 mm dik", "10 mm dik", "12 mm dik", "15 mm dik");
+        return "Wat is de <strong>dikte</strong> van de vlakke plaat (in mm)?";
+      }
+      if (chips) chips.push("6 duimer Sch 40", "4 duimer Sch 40", "Plaat (enkelwandig)", "6 mm dik", "8 mm dik");
+      return "Om de stralingstijd te berekenen heb ik de gegevens van het werkstuk nodig.<br><br>Wat is de <strong>leidingmaat</strong> (diameter en wanddikte/schedule) of de dikte van de <strong>vlakke plaat</strong>?";
     }
     const wt = params.wanddikte || (params.doorstraaldeDikte ? (params.technique === "SWSI" ? params.doorstraaldeDikte : params.doorstraaldeDikte / 2) : 0);
+
+    const isPlaat = Boolean(
+      params.isPlaat ||
+      params.optie === "3" ||
+      (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.isPlaat) ||
+      /\b(plaat|vlakke\s+plaat)\b/i.test(vraagTekst)
+    );
+
+    // Als wel de wanddikte bekend is, maar noch diameter, noch plaat, noch opstelling/techniek/doorstraald:
+    // vraag dan specifiek of het om een buis (welke diameter) of een vlakke plaat (SWSI) gaat!
+    if (!params.diameter && !isPlaat && !params.doorstraaldeDikte && !params.technique) {
+      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+        actiefGespreksGeheugen.verwachtParameter = "diameter";
+      }
+      if (chips) {
+        chips.push("Plaat (enkelwandig)", "2 duimer", "3 duimer", "4 duimer", "6 duimer", "8 duimer");
+      }
+      return `Voor een wanddikte van <strong>${wt} mm</strong>: gaat het om een <strong>vlakke plaat / enkelwandig (SWSI)</strong> of om een <strong>leiding / buis</strong> (welke diameter / duimsmaat)?`;
+    }
 
     const isCentraal = params.optie === "1" || /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(vraagTekst);
     const isExcentrisch = params.optie === "2" || /\b(excentrisch|excentrische)\b/i.test(vraagTekst);
@@ -3960,8 +4164,49 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     let isVoorgesteldeFFDGebruikt = false;
     if (!params.sfd) {
+      const isOnstream = Boolean(
+        params.isOnstream ||
+        params.onstreamKlasse ||
+        (params.procedure && /onstream|tb|ta/i.test(params.procedure)) ||
+        /\b(onstream|on\s*stream|rt\s*[-]?\s*21021|rt\s*[-]?\s*21022)\b/i.test(vraagTekst)
+      );
+
       const berekendeMin = bepaalNumeriekeMinFFD(params, vraagTekst);
-      const voorgesteldeFFD = !params.isOnstream ? bepaalVoorgesteldeFFD(params, vraagTekst) : null;
+      const voorgesteldeFFD = bepaalVoorgesteldeFFD(params, vraagTekst);
+
+      // Bij Onstream: vraag ALTIJD specifiek naar de FFD (met onstream minFFD als voorstel)!
+      if (isOnstream) {
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "sfd";
+        }
+        const diaLabel = formatMmNaarDuimLabel(params.diameter);
+        const klStr = (params.onstreamKlasse || (params.procedure && /tb/i.test(params.procedure) ? "TB" : "TA")).toUpperCase();
+        const techStr = params.onstreamTechniek === "dubbelwand" ? "Dubbelwand (RT21022)" : "Tangentiaal (RT21021)";
+        if (chips) {
+          if (berekendeMin) {
+            chips.push(`${berekendeMin} mm FFD (min. ffd)`);
+            const afgerond50 = Math.ceil(berekendeMin / 50) * 50;
+            if (afgerond50 !== berekendeMin) chips.push(`${afgerond50} mm FFD`);
+            chips.push(`${afgerond50 + 100} mm FFD`);
+          } else {
+            chips.push("600 mm FFD", "700 mm FFD", "800 mm FFD");
+          }
+        }
+        const ffdHint = berekendeMin ? ` (minimale FFD volgens <a href="onstreamffd.html" class="ai-link" target="_blank">onstreamffd.html</a>: <strong>${berekendeMin} mm</strong>)` : "";
+        return `Voor een <strong>onstream ${techStr}</strong> opname op <strong>${diaLabel}</strong> (Klasse ${klStr}) is de FFD afhankelijk van de opstelling en minimale geometrische eisen${ffdHint}.<br><br>Wat is de gekozen <strong>FFD</strong> (in mm of cm) waarmee je de stralingstijd wilt berekenen?`;
+      }
+
+      // Als de normatieve minimale FFD groter is dan de voorgestelde FFD: vraag specifiek met welke waarde gerekend moet worden!
+      if (berekendeMin && voorgesteldeFFD && berekendeMin > voorgesteldeFFD) {
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "sfd";
+        }
+        if (chips) {
+          chips.push(`${voorgesteldeFFD} mm FFD`, `${berekendeMin} mm FFD (min. ffd)`);
+        }
+        const diaLabel = formatMmNaarDuimLabel(params.diameter);
+        return `Voor <strong>${diaLabel}</strong> is de voorgestelde FFD bij contactopname <strong>${voorgesteldeFFD} mm</strong> (diameter + 15 mm), maar de normatieve minimale FFD volgens <strong>${params.procedure || "de norm"}</strong> is <strong>${berekendeMin} mm</strong> (${(berekendeMin / 10).toFixed(1)} cm).<br><br>Met welke FFD wil je de stralingstijd berekenen?`;
+      }
 
       // Als er een gammabron (Ir-192 / Se-75) en een leidingdiameter met voorgestelde FFD (DWSI) zijn opgegeven,
       // bereken dan direct de stralingstijd voor de voorgestelde FFD en vermeld dit duidelijk!
@@ -3976,10 +4221,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           actiefGespreksGeheugen.verwachtParameter = "sfd";
         }
         if (chips) {
-          if (voorgesteldeFFD && (!berekendeMin || voorgesteldeFFD !== berekendeMin)) {
-            chips.push(`Voorgestelde FFD (${voorgesteldeFFD} mm)`);
+          if (voorgesteldeFFD) {
+            chips.push(`${voorgesteldeFFD} mm FFD`);
           }
-          if (berekendeMin) chips.push(`Minimale FFD (${berekendeMin} mm)`);
+          if (berekendeMin) chips.push(`${berekendeMin} mm FFD (min. ffd)`);
           chips.push("400 mm FFD", "500 mm FFD", "650 mm FFD", "700 mm FFD");
         }
         let ffdPrompt = `Wat is de gekozen <strong>FFD</strong> (film-focusafstand in mm of cm)`;
@@ -3994,7 +4239,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
     const sfd = params.sfd;
-    const tech = params.technique || (params.diameter && params.diameter < 100 ? "DWDI" : "DWSI");
+    const tech = isPlaat || params.technique === "SWSI" || isCentraal || isExcentrisch
+      ? "SWSI"
+      : (params.technique || (params.diameter && params.diameter < 100 ? "DWDI" : (params.diameter ? "DWSI" : "SWSI")));
     let doorstr = params.doorstraaldeDikte;
     if (params.isGevuldeLeiding && params.diameter && wt) {
       const binnenDia = params.diameter - 2 * wt;
@@ -4008,10 +4255,20 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         }
       }
     }
+    const isOnstream = Boolean(
+      params.isOnstream ||
+      params.onstreamKlasse ||
+      (params.procedure && /onstream|tb|ta/i.test(params.procedure)) ||
+      /\b(onstream|on\s*stream|rt\s*[-]?\s*21021|rt\s*[-]?\s*21022)\b/i.test(vraagTekst)
+    );
+
     if (!doorstr) {
       doorstr = tech === "SWSI" ? wt : 2 * wt;
     }
     let comp = 5; // Standaard 5 mm lascompensatie (lasoverdikte & inbranding conform formule)
+    if (isOnstream) {
+      comp = 0; // Geen lascompensatie bij onstream (geen lasnaad / profielopname; belichting op nominale wanddikte, niet op Wmax)
+    }
     if (params.lascompensatie !== undefined && params.lascompensatie !== null) {
       comp = params.lascompensatie;
     } else if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.lascompensatie !== undefined && actiefGespreksGeheugen.lascompensatie !== null) {
@@ -4068,14 +4325,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       return `${mStr} en ${s} seconden`;
     }
 
+    // D7 is volgens de onstream procedures (RT21021 / RT21022) wél toegestaan (voor zowel Klasse TA als TB).
+    // isKlasseB geldt uitsluitend voor EN ISO 17636-1 lasonderzoek (waarbij D7 standaard niet is toegestaan).
     const isKlasseB =
-      params.procedure === "EN-B" ||
-      (typeof params.procedure === "string" && /klasse\s*b/i.test(params.procedure)) ||
-      params.onstreamKlasse === "tb" ||
-      /\b(klasse\s*b|en[-\s]?b)\b/i.test(vraagTekst) ||
-      (typeof actiefGespreksGeheugen !== "undefined" &&
-        actiefGespreksGeheugen &&
-        (actiefGespreksGeheugen.procedure === "EN-B" || actiefGespreksGeheugen.onstreamKlasse === "tb"));
+      !isOnstream &&
+      (params.procedure === "EN-B" ||
+        (typeof params.procedure === "string" && /klasse\s*b/i.test(params.procedure)) ||
+        /\b(klasse\s*b|en[-\s]?b)\b/i.test(vraagTekst) ||
+        (typeof actiefGespreksGeheugen !== "undefined" &&
+          actiefGespreksGeheugen &&
+          actiefGespreksGeheugen.procedure === "EN-B"));
 
     const ffdCmStr = (sfd / 10).toFixed(1).replace(/\.0$/, "");
 
@@ -4106,7 +4365,17 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const explicieteFilm = explicieteFilmMatch ? explicieteFilmMatch[1].toUpperCase() : null;
 
     const compLabel = comp > 0 ? ` + ${comp} mm lascompensatie` : " (zonder lascompensatie)";
-    let resp = `Stralingstijd (doorstraalde dikte: ${doorstr.toFixed(1)} mm${compLabel}${gevuldExtra}, ${bronNaam} van ${ci.toFixed(1)} Curie, ${ffdLabel})${matExtra}:<br>`;
+    const opstellingUitleg = isPlaat
+      ? `plaat (enkelwandig SWSI: ${doorstr.toFixed(1)} mm${compLabel})`
+      : isCentraal
+      ? `${formatMmNaarDuimLabel(params.diameter)} panoramisch / centraal (SWSI 1×t: ${doorstr.toFixed(1)} mm${compLabel})`
+      : isExcentrisch
+      ? `${formatMmNaarDuimLabel(params.diameter)} excentrisch (SWSI 1×t: ${doorstr.toFixed(1)} mm${compLabel})`
+      : params.diameter
+      ? `${formatMmNaarDuimLabel(params.diameter)} (${tech === "DWDI" ? "dubbelwand DWDI 2×t" : "dubbelwand DWSI 2×t"}: ${doorstr.toFixed(1)} mm${compLabel})`
+      : `doorstraalde dikte: ${doorstr.toFixed(1)} mm${compLabel}`;
+
+    let resp = `Stralingstijd voor <strong>${opstellingUitleg}</strong> (${bronNaam} van ${ci.toFixed(1)} Curie, ${ffdLabel})${gevuldExtra}${matExtra}:<br>`;
 
     if (explicieteFilm === "D4") {
       resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>`;
@@ -4332,10 +4601,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     // 3. Standaard situatie: combineer eventueel ontbrekende gegevens in 1 gerichte vraag (Q29 & Gesprek 1)
     const voorgesteldeFFD = bepaalVoorgesteldeFFD(params, vraagTekst);
+    const berekendeMin = (params.wanddikte && params.procedure && (params.brongrootte || params.bronTekst))
+      ? bepaalNumeriekeMinFFD(params, vraagTekst)
+      : null;
+
     let isVoorgesteldeFFDGebruikt = false;
     if (!params.sfd && params.technique === "DWSI" && params.wanddikte && params.procedure && voorgesteldeFFD) {
-      params.sfd = voorgesteldeFFD;
-      isVoorgesteldeFFDGebruikt = true;
+      if (berekendeMin && berekendeMin > voorgesteldeFFD) {
+        // Minimale FFD is groter dan voorgestelde FFD: niet automatisch invullen, RADI vraagt specifiek welke FFD gewenst is!
+      } else {
+        params.sfd = voorgesteldeFFD;
+        isVoorgesteldeFFDGebruikt = true;
+      }
     }
 
     const ontbrekend = [];
@@ -4347,21 +4624,25 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
         actiefGespreksGeheugen.verwachtParameter = ontbrekend[0];
       }
-      const berekendeMin = (params.wanddikte && params.procedure && (params.brongrootte || params.bronTekst))
-        ? bepaalNumeriekeMinFFD(params, vraagTekst)
-        : null;
 
       if (ontbrekend.length === 1 && ontbrekend[0] === "sfd") {
-        if (chips) {
-          if (voorgesteldeFFD && (!berekendeMin || voorgesteldeFFD !== berekendeMin)) {
-            chips.push(`Voorgestelde FFD (${voorgesteldeFFD} mm)`);
+        if (berekendeMin && voorgesteldeFFD && berekendeMin > voorgesteldeFFD) {
+          if (chips) {
+            chips.push(`${voorgesteldeFFD} mm FFD`, `${berekendeMin} mm FFD (min. ffd)`);
           }
-          if (berekendeMin) chips.push(`Minimale FFD (${berekendeMin} mm)`);
+          return `Voor <strong>${diaLabel} (${params.wanddikte} mm dik, ${params.procedure})</strong> is de voorgestelde FFD bij contactopname <strong>${voorgesteldeFFD} mm</strong> (diameter + 15 mm), maar de normatieve minimale FFD volgens ${params.procedure} is <strong>${berekendeMin} mm</strong> (${(berekendeMin / 10).toFixed(1)} cm).<br><br>` +
+                 `Met welke FFD wil je dat het aantal opnames wordt berekend?`;
+        }
+        if (chips) {
+          if (voorgesteldeFFD) {
+            chips.push(`${voorgesteldeFFD} mm FFD`);
+          }
+          if (berekendeMin) chips.push(`${berekendeMin} mm FFD (min. ffd)`);
           chips.push("Centraal / panoramisch", "500 mm FFD", "600 mm FFD");
         }
         const hints = [];
         if (voorgesteldeFFD) hints.push(`voorgestelde FFD op basis van opstelling: <strong>${voorgesteldeFFD} mm</strong>`);
-        if (berekendeMin) hints.push(`minimale FFD volgens de norm: <strong>${berekendeMin} mm</strong>`);
+        if (berekendeMin) hints.push(`normatieve minimale FFD: <strong>${berekendeMin} mm</strong>`);
         return `Voor <strong>${diaLabel} (${params.wanddikte} mm dik, ${params.procedure})</strong> is het aantal opnames afhankelijk van de opstelling en gekozen <strong>FFD</strong>:<br>` +
                `• Gaat het om een <strong>DWSI opname van buitenaf (opstelling 13/14)</strong> of <strong>centraal/panoramisch (opstelling 5/A)</strong>?<br>` +
                `• Wat is bij DWSI de gekozen <strong>FFD</strong> (in mm of cm)${hints.length ? ` (${hints.join(", ")})` : ""}?`;
@@ -4376,7 +4657,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       if (chips) {
         if (!params.wanddikte) chips.push("6 mm dik", "8 mm dik", "10 mm dik");
         if (!params.procedure) chips.push("Klasse B", "Klasse A", "ASME");
-        if (!params.sfd && voorgesteldeFFD) chips.push(`Voorgestelde FFD (${voorgesteldeFFD} mm)`);
+        if (!params.sfd && voorgesteldeFFD) {
+          chips.push(`${voorgesteldeFFD} mm FFD`);
+          if (berekendeMin && berekendeMin > voorgesteldeFFD) {
+            chips.push(`${berekendeMin} mm FFD (min. ffd)`);
+          }
+        }
         if (params.technique !== "DWSI") chips.push("Centraal / panoramisch");
       }
       const vragenLijst = [];
@@ -4469,7 +4755,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         }
         if (chips) {
           if (!params.wanddikte) chips.push("6 mm dik", "8 mm dik", "10 mm dik");
-          if (!params.brongrootte) chips.push(...geefBrongrootteSuggestieChips(params.bronTekst));
+          if (!params.brongrootte) chips.push(...geefBrongrootteSuggestieChips(params.bronTekst, params.opstelling || "centraal"));
           if (!params.procedure) chips.push("Klasse B", "Klasse A", "ASME");
         }
         if (ontbrekend.length === 1 && ontbrekend[0] === "wanddikte") {
@@ -4581,7 +4867,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         }
         if (chips) {
           if (!params.wanddikte) chips.push("3.6 mm dik", "4.5 mm dik", "6 mm dik", "8 mm dik");
-          if (!params.brongrootte) chips.push(...geefBrongrootteSuggestieChips(params.bronTekst));
+          if (!params.brongrootte) chips.push(...geefBrongrootteSuggestieChips(params.bronTekst, params.opstelling));
           if (!params.procedure) chips.push("Klasse B", "Klasse A", "ASME");
         }
         if (ontbrekend.length === 1 && ontbrekend[0] === "wanddikte") {
@@ -4718,6 +5004,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
   function berekenMinFFD(params, vraagTekst, chips = []) {
     const lower = vraagTekst.toLowerCase();
+    const isOnstream = Boolean(
+      params.isOnstream ||
+      params.onstreamKlasse ||
+      (params.procedure && /onstream|tb|ta/i.test(params.procedure)) ||
+      /\b(onstream|on\s*stream|rt\s*[-]?\s*21021|rt\s*[-]?\s*21022)\b/i.test(lower)
+    );
+    if (isOnstream) {
+      return berekenOnstream(params, vraagTekst, chips);
+    }
+
     const De = params.diameter;
     const diaLabel = De ? formatMmNaarDuimLabel(De) : "vlakke plaat";
     const isCentraal = /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower) || params.optie === "1";
@@ -4741,14 +5037,23 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       ofa = params.wanddikte;
     }
 
-    if (!params.brongrootte) {
-      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
-        actiefGespreksGeheugen.verwachtParameter = "brongrootte";
+    let b = params.brongrootte;
+    let fallbackFocusLabel = "";
+    if (!b) {
+      if (params.bronType === "Se75" || (params.bronTekst && /se[-\s]?75|selenium|seleen/i.test(params.bronTekst))) {
+        b = 3.0;
+        fallbackFocusLabel = " (standaard 3.0 mm focus voor Se-75)";
+      } else if (params.bronType === "Ir192" || (params.bronTekst && /ir[-\s]?192|iridium/i.test(params.bronTekst))) {
+        b = 2.8;
+        fallbackFocusLabel = " (standaard 2.8 mm focus voor Ir-192)";
+      } else {
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "brongrootte";
+        }
+        if (chips) chips.push(...geefBrongrootteSuggestieChips(params.bronTekst, params.opstelling));
+        return `Welke <strong>brongrootte</strong> (focusafmeting in mm) heeft de bron of buis?`;
       }
-      if (chips) chips.push(...geefBrongrootteSuggestieChips(params.bronTekst));
-      return `Welke <strong>brongrootte</strong> (focusafmeting in mm) heeft de bron of buis?`;
     }
-    const b = params.brongrootte;
 
     if (!params.procedure) {
       if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
@@ -4767,11 +5072,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     } else if (isExcentrisch) {
       opstellingNaam = "opstelling 8/B (excentrisch)";
     }
-    const minFfd = bepaalNumeriekeMinFFD(params, vraagTekst);
-    const voorgesteldeFFD = bepaalVoorgesteldeFFD(params, vraagTekst);
+    const minFfd = bepaalNumeriekeMinFFD({ ...params, brongrootte: b }, vraagTekst);
+    const voorgesteldeFFD = bepaalVoorgesteldeFFD({ ...params, brongrootte: b }, vraagTekst);
     const detailInfo = isDWDI ? `diameter ${De} mm (OFA)` : `wanddikte ${ofa} mm`;
 
     const vraagtBronOpPijp = /\bbron\s+op\s+de\s+(?:pijp|buis|leiding)\b/i.test(lower);
+    const vraagtGenoegFocus =
+      /\b(?:heb ik|is er|is dit|is mijn|voldoe ik aan|hebben we)\s+(?:genoeg|voldoende)\s+(?:focus|ffd|sfd)\b/i.test(lower) ||
+      /\b(?:genoeg|voldoende)\s+(?:focus|ffd|sfd)\b/i.test(lower) ||
+      /\b(?:voldoe\s+ik\s+aan\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|sfd|focus))\b/i.test(lower);
+
     let prefix = "";
     if (vraagtBronOpPijp && De) {
       const ffdOpPijp = voorgesteldeFFD || De;
@@ -4780,13 +5090,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       } else {
         prefix = `❌ <strong>Nee, je kunt NIET met de bron direct op de pijp zitten!</strong> De FFD op de pijp (<strong>${ffdOpPijp} mm</strong>) is kleiner dan de minimaal vereiste FFD (<strong>${minFfd} mm</strong>); je moet dus afstand houden.<br><br>`;
       }
+    } else if (params.sfd) {
+      const gekozen = params.sfd;
+      if (gekozen >= minFfd) {
+        prefix = `✅ <strong>Ja, je hebt voldoende focus!</strong> Je ingestelde FFD (<strong>${gekozen} mm</strong>) is groter dan of gelijk aan de minimaal vereiste FFD (<strong>${minFfd} mm</strong>) volgens ${proc}. (Marge: <strong>+${gekozen - minFfd} mm</strong> reserve).<br><br>`;
+      } else {
+        prefix = `❌ <strong>Nee, je hebt ONVOLDOENDE focus!</strong> Je ingestelde FFD (<strong>${gekozen} mm</strong>) is kleiner dan de minimaal vereiste FFD (<strong>${minFfd} mm</strong>) volgens ${proc}. Je komt <strong>${minFfd - gekozen} mm tekort</strong> om te voldoen aan de onscherpte-eis.<br><br>`;
+      }
+    } else if (vraagtGenoegFocus) {
+      prefix = `Om te controleren of je voldoende focus hebt, moet ik weten welke FFD (film-focusafstand) je wilt aanhouden. De minimaal vereiste FFD volgens ${proc} is <strong>${minFfd} mm</strong>.<br><br>`;
+      if (chips) chips.push(`FFD ${minFfd} mm`, `FFD ${minFfd + 50} mm`, `FFD ${minFfd + 100} mm`);
     }
 
-    let res = `${prefix}Minimale Film-Focus Afstand (FFD) volgens ${proc} (${opstellingNaam}) voor ${detailInfo} en brongrootte ${b} mm:<br>• <strong>min. ${minFfd} mm</strong> (${(minFfd / 10).toFixed(1)} cm).`;
+    let res = `${prefix}Minimale Film-Focus Afstand (FFD) volgens ${proc} (${opstellingNaam}) voor ${detailInfo} en brongrootte ${b} mm${fallbackFocusLabel}:<br>• <strong>min. ${minFfd} mm</strong> (${(minFfd / 10).toFixed(1)} cm).`;
 
-    if (voorgesteldeFFD && voorgesteldeFFD > minFfd) {
-      res += `<br>• Voorgestelde FFD voor opstelling: <strong>${voorgesteldeFFD} mm</strong> (conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).`;
-      if (chips) chips.push(`Voorgestelde FFD (${voorgesteldeFFD} mm)`);
+    if (voorgesteldeFFD) {
+      if (voorgesteldeFFD > minFfd) {
+        res += `<br>• Voorgestelde FFD voor opstelling: <strong>${voorgesteldeFFD} mm</strong> (conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).`;
+        if (chips) chips.push(`${voorgesteldeFFD} mm FFD`);
+      } else if (voorgesteldeFFD < minFfd) {
+        res += `<br>• Voorgestelde contact-FFD: <strong>${voorgesteldeFFD} mm</strong> (diameter + 15 mm, let op: &lt; min. FFD).`;
+        if (chips) chips.push(`${voorgesteldeFFD} mm FFD`, `${minFfd} mm FFD (min. ffd)`);
+      }
     }
 
     if (isCentraal && De) {
@@ -6315,24 +6640,69 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       );
     }
 
-    // 6. Filmkeuze: D4 vs D7 (en D5 / Filmklassen)
-    if (/\b(waarom\s*d4|verschil\s*tussen\s*d4\s*en\s*d7|verschil\s*tussen\s*d7\s*en\s*d4|filmklasse\s*c[1-5]|wanneer\s*d4|wanneer\s*d7|wanneer\s*d5|filmkwaliteit\s*uitleg)\b/i.test(lower)) {
+    // 6. Filmkeuze: Agfa Structurix (C1 t/m C6) & D4 vs D7
+    if (
+      /\b(agfa|structurix)\b/i.test(lower) ||
+      /\b(filmklasse\s*c[1-6]|film\s*c[1-6]|wat\s+is\s+film\s*c[1-6]|wat\s+is\s+c[1-6]|welke\s+film\s+is\s+c[1-6]|welk\s+type\s+agfa\s*(?:film)?\s*(?:komt\s+overeen\s+)?met\s+c[1-6]|overeenkomst\s+c[1-6])\b/i.test(lower) ||
+      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5|filmkwaliteit\s*uitleg)\b/i.test(lower)
+    ) {
       if (chips) chips.push("Film D4 advies", "Film D7 advies", "Klasse B zwarting");
       return (
-        "<strong>Industriële Röntgenfilms &ndash; Keuze en Filmklassen (ISO 11699-1 / ASTM E1815):</strong><br><br>" +
-        "• <strong>Filmklasse C3 (bijv. Agfa Structurix D4):</strong><br>" +
-        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Zeer fijnkorrelig, hoog contrast en minimale filmonscherpte.<br>" +
-        "&nbsp;&nbsp;&bull; <em>Wanneer verplicht / aanbevolen:</em> Verplicht voor <strong>Klasse B</strong> bij gammastraling (Se-75 / Ir-192) en aanbevolen om de strengste BKI-draadeisen te halen. Vereist ca. <strong>2.5 tot 3&times; langere belichtingstijd</strong> dan D7.<br><br>" +
-        "• <strong>Filmklasse C4 (bijv. Agfa Structurix D5):</strong><br>" +
-        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Uitstekend compromis tussen korrelgrootte en belichtingstijd.<br>" +
-        "&nbsp;&nbsp;&bull; <em>Toepassing:</em> Veel gebruikt in het veld bij Se-75 op Klasse B.<br><br>" +
-        "• <strong>Filmklasse C5 (bijv. Agfa Structurix D7):</strong><br>" +
-        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Snelle, hooggevoelige film met een grovere korrel.<br>" +
-        "&nbsp;&nbsp;&bull; <em>Wanneer toegestaan:</em> Toegestaan voor <strong>Klasse A</strong> en dikkere wanden. In <strong>Klasse B is D7 normatief verboden</strong> voor gammastraling om te voorkomen dat fijne indicaties in de filmkorrel verdwijnen."
+        "<strong>Agfa Structurix Filmtypen &amp; Filmklassen (ISO 11699-1 / ASTM E1815):</strong><br><br>" +
+        "De internationale normen delen industriële röntgenfilms in volgens korrelgrootte, contrast en gevoeligheid:<br><br>" +
+        "• <strong>Klasse C1 (ASTM Special):</strong> <strong>Agfa Structurix D2</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Ultrafijne korrel, maximaal contrast en extreem scherp. Vereist lange belichtingstijden (voor kritische luchtvaart- en nucleaire inspecties).<br><br>" +
+        "• <strong>Klasse C2 (ASTM Klasse I):</strong> <strong>Agfa Structurix D3</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Zeer fijnkorrelig met zeer hoog contrast.<br><br>" +
+        "• <strong>Klasse C3 (ASTM Klasse I):</strong> <strong>Agfa Structurix D4</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Fijnkorrelig, uitstekend contrast. <strong>Verplichte standaardkeuze voor EN Klasse B bij gammastraling (Se-75 &amp; Ir-192)</strong>.<br><br>" +
+        "• <strong>Klasse C4 (ASTM Klasse I / II):</strong> <strong>Agfa Structurix D5</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Goed compromis tussen korrelgrootte en belichtingstijd; veel gebruikt in de praktijk bij Se-75.<br><br>" +
+        "• <strong>Klasse C5 (ASTM Klasse II):</strong> <strong>Agfa Structurix D7</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Snelle, hooggevoelige film met een grovere korrel. <strong>Standaard toegestaan voor Klasse A en ASME</strong>, maar <strong>normatief verboden voor Klasse B gammastraling</strong>.<br><br>" +
+        "• <strong>Klasse C6 (ASTM Klasse III):</strong> <strong>Agfa Structurix D8</strong><br>" +
+        "&nbsp;&nbsp;&bull; <em>Eigenschappen:</em> Zeer grofkorrelig, ultrasnel; alleen voor grove overzichtsopnamen bij dikke objecten."
       );
     }
 
-    // 7. Draadjes vs Plaatjes (Hole-type IQI / 2T-gat)
+    // 7a. Aantal draadjes op een EN BKI (ISO 19232-1)
+    if (/\b(hoeveel|aantal)\s+(?:draadjes?|draden|draadje(?:\s*bki)?)\b/i.test(lower) && /\b(en\s*bki|iso\s*bki|bki|iqi|houder|en\b|iso\b)/i.test(lower)) {
+      if (chips) chips.push("Verschil ASME en EN BKI", "Welke BKI voor W10", "Draadjes vs 2T gat");
+      return (
+        "<strong>Aantal draden op een EN BKI (ISO 19232-1):</strong><br><br>" +
+        "Een EN beeldkwaliteitsindicator (BKI conform <strong>EN ISO 19232-1</strong>) bevat altijd <strong>exact 7 parallelle draden</strong> van verschillende diktes in een transparante kunststof houder met loden identificatieletters.<br><br>" +
+        "Er bestaan <strong>4 standaard EN BKI-houders</strong> (met onderlinge overlap):<br>" +
+        "• <strong>1 EN (draden W1 t/m W7):</strong> Draaddiktes van <strong>3.20 mm aflopend naar 0.80 mm</strong> &mdash; voor zeer zware wanddiktes.<br>" +
+        "• <strong>6 EN (draden W6 t/m W12):</strong> Draaddiktes van <strong>1.00 mm aflopend naar 0.25 mm</strong> &mdash; voor middelzware wanden.<br>" +
+        "• <strong>10 EN (draden W10 t/m W16):</strong> Draaddiktes van <strong>0.40 mm aflopend naar 0.10 mm</strong> &mdash; de meest gebruikte BKI in het leidingwerk.<br>" +
+        "• <strong>13 EN (draden W13 t/m W19):</strong> Draaddiktes van <strong>0.20 mm aflopend naar 0.050 mm</strong> &mdash; voor dunwandig werk en hoge beeldscherpte.<br><br>" +
+        "💡 <em>De totale EN-reeks telt 19 draden (W1 t/m W19). Hoe hoger het W-nummer, hoe dunner de draad en hoe scherper de foto moet zijn om hem waar te nemen!</em>"
+      );
+    }
+
+    // 7b. Verschil tussen ASME BKI en EN BKI
+    if (
+      /\b(verschil\s+tussen\s+(?:een\s+)?(?:asme|astm)\s*(?:en\s+|vs\s*)?(?:en|iso)?\s*(?:bki|iqi)|(?:asme|astm)\s*(?:vs|tegenover)\s*(?:en|iso)\s*(?:bki|iqi)|verschil\s+tussen\s+(?:en\s+en\s+asme|asme\s+en\s+en)\s*(?:bki|iqi))\b/i.test(lower) ||
+      (/\b(verschil|vergelijk)\b/i.test(lower) && /\b(asme|astm)\b/i.test(lower) && /\b(en|iso)\b/i.test(lower) && /\b(bki|iqi|draad|indicator)\b/i.test(lower))
+    ) {
+      if (chips) chips.push("Hoeveel draadjes EN BKI", "Welk EN draadje ipv ASME", "2T gat alternatief");
+      return (
+        "<strong>Verschil tussen een ASME BKI (ASTM E747 / E1025) en een EN BKI (ISO 19232-1):</strong><br><br>" +
+        "1. <strong>Aantal draden per indicator:</strong><br>" +
+        "• <strong>EN BKI (ISO 19232-1):</strong> Bevat <strong>7 draden</strong> per houder (1 EN, 6 EN, 10 EN, 13 EN).<br>" +
+        "• <strong>ASME Draad-BKI (ASTM E747):</strong> Bevat <strong>6 draden</strong> per houder (Set A, Set B, Set C, Set D).<br><br>" +
+        "2. <strong>Nummering en draaddikterichting (Cruciaal verschil!):</strong><br>" +
+        "• <strong>EN ISO:</strong> Loopt van <strong>W1 (dikste: 3.20 mm) tot W19 (dunste: 0.050 mm)</strong>. Een <em>hoger getal</em> betekent een <em>dunnere draad</em> (strenger).<br>" +
+        "• <strong>ASME / ASTM:</strong> Loopt van <strong>Draad 1 (dunste: 0.08 mm) tot Draad 21 (dikste: 8.13 mm)</strong>. Een <em>lager getal</em> betekent een <em>dunnere draad</em> (omgekeerde volgorde!).<br><br>" +
+        "3. <strong>Plaatjes-IQI (Hole-Type):</strong><br>" +
+        "• <strong>ASME Section V:</strong> Gebruikt standaard rechthoekige <strong>plaatjes-IQIs (ASTM E1025)</strong> met een 1T, 2T en 4T gat (waarbij het 2T-gat zichtbaar moet zijn), naast draad-IQIs.<br>" +
+        "• <strong>EN ISO 17636-1:</strong> Schrijft standaard draadjes voor (ISO 19232-1) of stap-gat indicators (ISO 19232-2).<br><br>" +
+        "4. <strong>Equivalente vervanging:</strong><br>" +
+        "Volgens ASME Sec. V Art. 2 Tabel T-283 mag een EN-draad worden gebruikt ter vervanging van een ASME-draad mits de draaddikte gelijk is of dunner."
+      );
+    }
+
+    // 7c. Draadjes vs Plaatjes (Hole-type IQI / 2T-gat)
     if (/\b(verschil\s*tussen\s*(?:een\s*)?(?:draadje|draadjes|wire)(?:\s*bki)?\s*en\s*(?:een\s*)?(?:plaatje|plaatjes|hole|gaatje|gaatjes|gat|gaten)|draadje\s+vs\s+(?:gaatje|gat|plaatje)|wat\s*is\s*(?:een\s*)?2t[-\s]*gat|waarom\s*2t|hole\s*type\s*iqi\s*uitleg)\b/i.test(lower)) {
       if (chips) chips.push("2T gat alternatief", "BKI draadjes", "ASME Section V");
       return (
@@ -6367,7 +6737,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // 8b. Jaarlijkse dosislimieten voor medewerkers (Categorie A, B, publiek, zwanger)
-    if (/\b(hoeveel\s+straling\s+mag\s+(?:een\s+)?(?:medewerker|werknemer|persoon|radiograaf)|dosislimiet\s+(?:per\s+jaar|werknemer|medewerker)|maximaal\s+toegestane\s+dosis\s+(?:per\s+jaar|jaarlijks)|hoeveel\s+(?:msv|millisievert)\s+(?:per\s+jaar|mag\s+een\s+medewerker)|dosislimiet\s+straling|wettelijke\s+dosislimiet)\b/i.test(lower)) {
+    if (/\b(dosislimiet|dosislimieten|dosis\s*limiet|hoeveel\s+straling\s+mag\s+(?:een\s+)?(?:medewerker|werknemer|persoon|radiograaf)|maximaal\s+toegestane\s+dosis|hoeveel\s+(?:msv|millisievert)|wettelijke\s+dosislimiet)\b/i.test(lower)) {
       if (chips) chips.push("Grens 10 microSv/uur", "Afzettingsafstand", "ALARA principe");
       return (
         "<strong>Wettelijke Dosislimieten per Jaar (Bbs &amp; Richtlijn 2013/59/Euratom):</strong><br><br>" +
@@ -7632,12 +8002,21 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     // Minimale FFD & Voorgestelde FFD conform pruts.html
     const minFfd = bepaalNumeriekeMinFFD(params, vraagTekst) || 0;
-    const voorgesteldeFfd = bepaalVoorgesteldeFFD(params, vraagTekst) || (minFfd > 0 ? minFfd : 0);
+    const voorgesteldeFfd = bepaalVoorgesteldeFFD(params, vraagTekst) || 0;
 
     // Gekozen FFD
     let gekozenFfd = params.sfd;
     if (!gekozenFfd || isNaN(gekozenFfd)) {
-      gekozenFfd = voorgesteldeFfd;
+      if (minFfd > 0 && voorgesteldeFfd > 0 && minFfd > voorgesteldeFfd) {
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "sfd";
+        }
+        if (chips) {
+          chips.push(`${voorgesteldeFfd} mm FFD`, `${minFfd} mm FFD (min. ffd)`);
+        }
+        return `Voor een complete schietkaart van <strong>${diaLabel} (${t} mm dik, ${proc})</strong> is de voorgestelde contact-FFD <strong>${voorgesteldeFfd} mm</strong> (diameter + 15 mm), maar de normatieve minimale FFD volgens ${proc} is <strong>${minFfd} mm</strong> (${(minFfd / 10).toFixed(1)} cm).<br><br>Met welke FFD wil je de schietkaart samenstellen?`;
+      }
+      gekozenFfd = voorgesteldeFfd > 0 ? voorgesteldeFfd : (minFfd > 0 ? minFfd : 0);
       params.sfd = gekozenFfd;
       if (actiefGespreksGeheugen) actiefGespreksGeheugen.sfd = gekozenFfd;
     }
@@ -7790,7 +8169,16 @@ ${stralingstijdPlat}========================================`;
     vervalDoelDatum: null,
   };
 
+  let actieveVraagId = 0;
+
   function resetGespreksGeheugen() {
+    actieveVraagId++;
+    if (typeof stopSpraakherkenning === "function") {
+      try { stopSpraakherkenning(); } catch (e) {}
+    }
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
     for (const k in actiefGespreksGeheugen) {
       if (typeof actiefGespreksGeheugen[k] === "boolean") actiefGespreksGeheugen[k] = false;
       else actiefGespreksGeheugen[k] = null;
@@ -7800,14 +8188,25 @@ ${stralingstijdPlat}========================================`;
     }
     synchroniseerDOMFormulier(actiefGespreksGeheugen);
     if (typeof document !== "undefined") {
-      const container = document.getElementById("rt-ai-context-container");
-      if (container) {
-        container.outerHTML = `<div id="rt-ai-context-container" style="margin-top: 12px; font-size: 0.82rem; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px; color:#a3e635; display:flex; align-items:center; gap:6px;"><i class="fas fa-check-circle" style="color:#a3e635;"></i> <em>Geheugen gewist &mdash; schone lei voor een nieuwe berekening!</em></div>`;
-      } else {
-        const respEl = document.getElementById("rt-ai-response");
-        if (respEl && (respEl.innerHTML.includes("Stel je vraag") || respEl.innerHTML.includes("Bewerken"))) {
-          respEl.innerHTML = `<span style="color:#a3e635;"><i class="fas fa-check-circle"></i> Geheugen gewist &mdash; schone lei voor een nieuwe berekening!</span>`;
-        }
+      const respEl = document.getElementById("rt-ai-response");
+      if (respEl) {
+        respEl.innerHTML = `Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).` + geefGeheugenBadgesHtml();
+      }
+      const transEl = document.getElementById("rt-ai-transcript");
+      if (transEl) {
+        transEl.textContent = "Houd 🎙️ ingedrukt om in te spreken (PTT), of typ je vraag...";
+      }
+      const inp = document.getElementById("rt-ai-input");
+      if (inp) {
+        inp.value = "";
+      }
+      isExamplesOpen = false;
+      opgeslagenResponseHtmlVoorVoorbeelden = "";
+      opgeslagenTranscriptHtmlVoorVoorbeelden = "";
+      const exBtn = document.getElementById("rt-ai-examples-toggle");
+      if (exBtn) {
+        exBtn.classList.remove("active");
+        exBtn.style.color = "";
       }
     }
   }
@@ -8060,13 +8459,16 @@ ${stralingstijdPlat}========================================`;
       actiefGespreksGeheugen.kv = null;
     } else if (key === "sfd") {
       actiefGespreksGeheugen.sfd = null;
-    } else if (key === "procedure") {
+    } else if (key === "procedure" || key === "norm") {
       actiefGespreksGeheugen.procedure = null;
       actiefGespreksGeheugen.subProcedure = null;
+      actiefGespreksGeheugen.onstreamKlasse = null;
+      actiefGespreksGeheugen.isOnstream = false;
     } else if (key === "bron" || key === "bronTekst") {
       actiefGespreksGeheugen.bronTekst = null;
       actiefGespreksGeheugen.brongrootte = null;
       actiefGespreksGeheugen.bronType = null;
+      actiefGespreksGeheugen.activiteit = null;
     } else if (key === "brongrootte") {
       actiefGespreksGeheugen.brongrootte = null;
     } else if (key === "activiteit") {
@@ -8131,21 +8533,392 @@ ${stralingstijdPlat}========================================`;
     }
   }
 
+  function geefBronDropdownHtml() {
+    const curTekst = (actiefGespreksGeheugen.bronTekst || "").toLowerCase();
+    const curType = (actiefGespreksGeheugen.bronType || "").toLowerCase();
+    const curSize = actiefGespreksGeheugen.brongrootte;
+
+    let bronnenOptions = "";
+    if (Array.isArray(bronnenData) && bronnenData.length > 0) {
+      bronnenOptions = bronnenData
+        .map((b) => {
+          const act = b.currentActivity || b.initialActivity || 0;
+          const isSelected = curTekst === b.name.toLowerCase() || curTekst.startsWith(b.name.toLowerCase() + " ");
+          return `<option value="bron_${b.name}" ${isSelected ? "selected" : ""} style="background:#222; color:#fff;">${b.name} (${b.typeLabel}, ${b.size} mm) [${act.toFixed(1)} Ci]</option>`;
+        })
+        .join("");
+    }
+
+    const isSmart = (curTekst.includes("smart evo") || curTekst === "smart") && curSize === 1;
+    const isYxlon = curTekst.includes("yxlon") || (curTekst.includes("300") && curSize === 3);
+    const isCeram = curTekst.includes("ceram") || (curTekst.includes("balteau") && curSize === 2.5);
+    const isRondstraler = curTekst.includes("rondstraler") || (curTekst.includes("balteau") && curSize === 5);
+    const hasKnownName = (bronnenData || []).some(
+      (b) => curTekst === b.name.toLowerCase() || curTekst.startsWith(b.name.toLowerCase() + " ")
+    );
+    const isGenSe = !isSmart && !isYxlon && !isCeram && !isRondstraler && !hasKnownName && (curType === "se75" || curTekst.includes("se-75") || curTekst.includes("selenium"));
+    const isGenIr = !isSmart && !isYxlon && !isCeram && !isRondstraler && !hasKnownName && (curType === "ir192" || curTekst.includes("ir-192") || curTekst.includes("iridium"));
+    const isGenCo = !isSmart && !isYxlon && !isCeram && !isRondstraler && !hasKnownName && (curType === "co60" || curTekst.includes("co-60") || curTekst.includes("kobalt"));
+
+    const isAnySelected = Boolean(
+      actiefGespreksGeheugen.bronTekst ||
+      (actiefGespreksGeheugen.bronType && actiefGespreksGeheugen.bronType !== "") ||
+      actiefGespreksGeheugen.brongrootte
+    );
+
+    return `<span class="rt-ai-bron-pill ${isAnySelected ? 'active' : ''}" style="display:inline-flex; align-items:center; background:#181818; border:1px solid ${isAnySelected ? '#f5df4d' : 'rgba(245,223,77,0.45)'}; border-radius:14px; padding:2px 8px; font-size:0.8rem; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3); vertical-align:middle; transition:border-color 0.2s;">
+      <i class="fas fa-crosshairs" style="color:#f5df4d; font-size:0.75rem; margin-right:4px;"></i>
+      <select class="rt-ai-bron-select" onchange="window.RtAssistant && window.RtAssistant.selecteerBronUitDropdown(this.value);" title="Snelkeuze bron of focusafmeting" style="background:transparent; border:none; color:${isAnySelected ? '#f5df4d' : '#f0f0f0'}; font-family:'Roboto Condensed', sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; outline:none; padding-right:2px; max-width:240px; text-overflow:ellipsis;">
+        <option value="" ${!isAnySelected ? "selected" : ""} style="background:#222; color:#f5df4d;">🎯 Kies bron / focus ▾</option>
+        <optgroup label="Actuele Gammabronnen (bronnen.csv)" style="background:#222; color:#f5df4d;">
+          ${bronnenOptions}
+        </optgroup>
+        <optgroup label="Röntgenbuizen" style="background:#222; color:#38bdf8;">
+          <option value="smart" ${isSmart ? "selected" : ""} style="background:#222; color:#fff;">Smart EVO (1.0 mm focus)</option>
+          <option value="yxlon_300" ${isYxlon ? "selected" : ""} style="background:#222; color:#fff;">Yxlon 300 (3.0 mm focus)</option>
+          <option value="balteau_ceram" ${isCeram ? "selected" : ""} style="background:#222; color:#fff;">Balteau Ceram (2.5 mm focus)</option>
+          <option value="balteau_rondstraler" ${isRondstraler ? "selected" : ""} style="background:#222; color:#fff;">Balteau Rondstraler (5.0 mm focus)</option>
+        </optgroup>
+        <optgroup label="Generieke Isotopen" style="background:#222; color:#ccc;">
+          <option value="gen_se75" ${isGenSe ? "selected" : ""} style="background:#222; color:#fff;">Standaard Se-75 (3.0 mm)${isGenSe && actiefGespreksGeheugen.activiteit ? ` [${actiefGespreksGeheugen.activiteit} Ci]` : ""}</option>
+          <option value="gen_ir192" ${isGenIr ? "selected" : ""} style="background:#222; color:#fff;">Standaard Ir-192 (2.8 mm)${isGenIr && actiefGespreksGeheugen.activiteit ? ` [${actiefGespreksGeheugen.activiteit} Ci]` : ""}</option>
+          <option value="gen_co60" ${isGenCo ? "selected" : ""} style="background:#222; color:#fff;">Standaard Co-60 (3.5 mm)${isGenCo && actiefGespreksGeheugen.activiteit ? ` [${actiefGespreksGeheugen.activiteit} Ci]` : ""}</option>
+        </optgroup>
+        ${isAnySelected ? '<option value="wis" style="background:#222; color:#ff6b6b;">❌ Wis bronkeuze</option>' : ''}
+      </select>
+      ${isAnySelected ? `<button type="button" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('bron');" title="Wis bronkeuze uit geheugen" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:0 0 0 5px; margin:0; font-size:1.05rem; line-height:1; font-weight:bold; display:inline-flex; align-items:center;" onmouseover="this.style.color='#ff3333'" onmouseout="this.style.color='#ff6b6b'">&times;</button>` : ''}
+    </span>`;
+  }
+
+  function selecteerBronUitDropdown(val) {
+    if (!val || val === "wis") {
+      wisGeheugenParameter("bron");
+      return;
+    }
+    const isGenericGamma = val === "gen_se75" || val === "gen_ir192" || val === "gen_co60";
+
+    if (val.startsWith("bron_")) {
+      const bName = val.replace("bron_", "").trim();
+      const b = (bronnenData || []).find((x) => x.name.toLowerCase() === bName.toLowerCase());
+      if (b) {
+        actiefGespreksGeheugen.bronTekst = b.name;
+        actiefGespreksGeheugen.bronType = b.type;
+        actiefGespreksGeheugen.brongrootte = b.size;
+        actiefGespreksGeheugen.activiteit = b.currentActivity || null;
+      }
+    } else if (val === "smart") {
+      actiefGespreksGeheugen.bronTekst = "Smart EVO (1.0 mm)";
+      actiefGespreksGeheugen.bronType = "Rontgen";
+      actiefGespreksGeheugen.brongrootte = 1.0;
+      actiefGespreksGeheugen.activiteit = null;
+    } else if (val === "yxlon_300" || val === "yxlon_smart") {
+      actiefGespreksGeheugen.bronTekst = "Yxlon 300 (3.0 mm)";
+      actiefGespreksGeheugen.bronType = "Rontgen";
+      actiefGespreksGeheugen.brongrootte = 3.0;
+      actiefGespreksGeheugen.activiteit = null;
+    } else if (val === "balteau_ceram") {
+      actiefGespreksGeheugen.bronTekst = "Balteau Ceram (2.5 mm)";
+      actiefGespreksGeheugen.bronType = "Rontgen";
+      actiefGespreksGeheugen.brongrootte = 2.5;
+      actiefGespreksGeheugen.activiteit = null;
+    } else if (val === "balteau_rondstraler") {
+      actiefGespreksGeheugen.bronTekst = "Balteau Rondstraler (5.0 mm)";
+      actiefGespreksGeheugen.bronType = "Rontgen";
+      actiefGespreksGeheugen.brongrootte = 5.0;
+      actiefGespreksGeheugen.activiteit = null;
+    } else if (val === "gen_se75") {
+      if (actiefGespreksGeheugen.bronType !== "Se75") actiefGespreksGeheugen.activiteit = null;
+      actiefGespreksGeheugen.bronTekst = "Se-75 (3.0 mm)";
+      actiefGespreksGeheugen.bronType = "Se75";
+      actiefGespreksGeheugen.brongrootte = 3.0;
+    } else if (val === "gen_ir192") {
+      if (actiefGespreksGeheugen.bronType !== "Ir192") actiefGespreksGeheugen.activiteit = null;
+      actiefGespreksGeheugen.bronTekst = "Ir-192 (2.8 mm)";
+      actiefGespreksGeheugen.bronType = "Ir192";
+      actiefGespreksGeheugen.brongrootte = 2.8;
+    } else if (val === "gen_co60") {
+      if (actiefGespreksGeheugen.bronType !== "Co60") actiefGespreksGeheugen.activiteit = null;
+      actiefGespreksGeheugen.bronTekst = "Co-60 (3.5 mm)";
+      actiefGespreksGeheugen.bronType = "Co60";
+      actiefGespreksGeheugen.brongrootte = 3.5;
+    }
+
+    // Directe activiteit (Curie) invoer voor generieke isotopen
+    if (isGenericGamma) {
+      const isSe = val === "gen_se75";
+      const isIr = val === "gen_ir192";
+      const bronLabel = isSe ? "Se-75 (3.0 mm)" : (isIr ? "Ir-192 (2.8 mm)" : "Co-60 (3.5 mm)");
+      const targetType = isSe ? "Se75" : (isIr ? "Ir192" : "Co60");
+      const defaultCi = (actiefGespreksGeheugen.bronType === targetType && actiefGespreksGeheugen.activiteit)
+        ? String(actiefGespreksGeheugen.activiteit)
+        : "";
+
+      if (typeof window !== "undefined" && typeof window.prompt === "function") {
+        const invoer = window.prompt(`Voer de activiteit in Curie (Ci) in voor ${bronLabel}:`, defaultCi);
+        if (invoer !== null && invoer.trim() !== "") {
+          const parsed = parseFloat(invoer.replace(",", ".").trim());
+          if (!isNaN(parsed) && parsed > 0) {
+            actiefGespreksGeheugen.activiteit = Math.round(parsed * 10) / 10;
+          }
+        }
+      }
+    }
+
+    synchroniseerDOMFormulier(actiefGespreksGeheugen);
+
+    if (typeof document !== "undefined") {
+      const container = document.getElementById("rt-ai-context-container");
+      if (container) {
+        container.outerHTML = geefGeheugenBadgesHtml();
+      }
+    }
+
+    if (
+      actiefGespreksGeheugen.verwachtParameter === "brongrootte" ||
+      actiefGespreksGeheugen.verwachtParameter === "focus" ||
+      actiefGespreksGeheugen.verwachtParameter === "bron" ||
+      actiefGespreksGeheugen.verwachtParameter === "activiteit"
+    ) {
+      if (isGenericGamma && !actiefGespreksGeheugen.activiteit) {
+        vraagActiviteitInvoer(val);
+        return;
+      }
+      const q = actiefGespreksGeheugen.activiteit
+        ? `${actiefGespreksGeheugen.activiteit} Curie`
+        : (actiefGespreksGeheugen.bronTekst || `${actiefGespreksGeheugen.brongrootte} mm`);
+      actiefGespreksGeheugen.verwachtParameter = null;
+      verwerkVraagDirect(q, { isChip: true });
+      return;
+    }
+
+    if (isGenericGamma) {
+      if (!actiefGespreksGeheugen.activiteit) {
+        vraagActiviteitInvoer(val);
+      } else {
+        toonBronBevestiging(val);
+      }
+    }
+  }
+
+  function vraagActiviteitInvoer(val) {
+    if (typeof actiefGespreksGeheugen === "undefined" || !actiefGespreksGeheugen) return;
+    actiefGespreksGeheugen.verwachtParameter = "activiteit";
+    const isSe = val === "gen_se75" || (actiefGespreksGeheugen.bronType === "Se75");
+    const isIr = val === "gen_ir192" || (actiefGespreksGeheugen.bronType === "Ir192");
+    const bronNaam = isSe ? "Standaard Se-75 (3.0 mm)" : (isIr ? "Standaard Ir-192 (2.8 mm)" : "Standaard Co-60 (3.5 mm)");
+    const chips = (!isSe && !isIr)
+      ? ["15 Curie", "25 Curie", "50 Curie"]
+      : isIr
+      ? ["15 Curie", "25 Curie", "35 Curie", "50 Curie", "60 Curie"]
+      : ["15 Curie", "25 Curie", "35 Curie", "45 Curie", "50 Curie"];
+
+    if (typeof document !== "undefined") {
+      const respEl = document.getElementById("rt-ai-response");
+      if (respEl) {
+        const chipsHtml = `<div class="rt-ai-chips-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">` +
+          chips.map((c) => `<button type="button" class="rt-ai-chip-btn" style="background:#222; border:1px solid #f5df4d; color:#f5df4d; padding:4px 10px; border-radius:12px; font-size:0.85rem; cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+          `</div>`;
+        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> geselecteerd.<br><br>Hoeveel <strong>Curie</strong> (activiteit) heeft deze bron?${chipsHtml}` + geefGeheugenBadgesHtml();
+      }
+      const transEl = document.getElementById("rt-ai-transcript");
+      if (transEl) {
+        transEl.innerHTML = `Bronkeuze: <strong>${bronNaam}</strong> (wacht op activiteit...)`;
+      }
+      const inp = document.getElementById("rt-ai-input");
+      if (inp) {
+        inp.placeholder = "Vul aantal Curie in (bijv. 30 Ci)...";
+        inp.focus();
+      }
+    }
+  }
+
+  function toonBronBevestiging(val) {
+    if (typeof actiefGespreksGeheugen === "undefined" || !actiefGespreksGeheugen) return;
+    const isSe = val === "gen_se75" || (actiefGespreksGeheugen.bronType === "Se75");
+    const isIr = val === "gen_ir192" || (actiefGespreksGeheugen.bronType === "Ir192");
+    const bronNaam = isSe ? "Standaard Se-75 (3.0 mm)" : (isIr ? "Standaard Ir-192 (2.8 mm)" : "Standaard Co-60 (3.5 mm)");
+    const ci = actiefGespreksGeheugen.activiteit;
+
+    if (typeof document !== "undefined") {
+      const respEl = document.getElementById("rt-ai-response");
+      if (respEl) {
+        const suggestieChips = [];
+        suggestieChips.push("Afzetting berekenen");
+        if (actiefGespreksGeheugen.diameter) {
+          const diaLabel = formatMmNaarDuimLabel(actiefGespreksGeheugen.diameter);
+          suggestieChips.push(`Stralingstijd voor ${diaLabel}`);
+        } else if (actiefGespreksGeheugen.isPlaat) {
+          suggestieChips.push("Stralingstijd plaat");
+        } else {
+          suggestieChips.push("Stralingstijd 6 duimer Sch 40", "Stralingstijd 4 duimer Sch 40", "Stralingstijd plaat");
+        }
+        const chipsHtml = `<div class="rt-ai-chips-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">` +
+          suggestieChips.map((c) => `<button type="button" class="rt-ai-chip-btn" style="background:#222; border:1px solid #f5df4d; color:#f5df4d; padding:4px 10px; border-radius:12px; font-size:0.85rem; cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+          `</div>`;
+        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> ingesteld met <strong>${ci} Curie</strong>.<br><br>Waarmee wil je verder rekenen?${chipsHtml}` + geefGeheugenBadgesHtml();
+      }
+      const transEl = document.getElementById("rt-ai-transcript");
+      if (transEl) {
+        transEl.innerHTML = `Bronkeuze: <strong>${bronNaam}</strong> [${ci} Ci]`;
+      }
+    }
+  }
+
+  function wijzigActiviteitViaPrompt() {
+    if (typeof window === "undefined" || typeof window.prompt !== "function") return;
+    const bronNaam = actiefGespreksGeheugen.bronTekst || actiefGespreksGeheugen.bronType || "bron";
+    const defaultVal = actiefGespreksGeheugen.activiteit ? String(actiefGespreksGeheugen.activiteit) : "";
+    const antw = window.prompt(`Voer de activiteit in Curie (Ci) in voor ${bronNaam}:`, defaultVal);
+    if (antw !== null && antw.trim() !== "") {
+      const parsed = parseFloat(antw.replace(",", ".").trim());
+      if (!isNaN(parsed) && parsed > 0) {
+        actiefGespreksGeheugen.activiteit = Math.round(parsed * 10) / 10;
+        synchroniseerDOMFormulier(actiefGespreksGeheugen);
+        if (typeof document !== "undefined") {
+          const container = document.getElementById("rt-ai-context-container");
+          if (container) container.outerHTML = geefGeheugenBadgesHtml();
+        }
+        toonBronBevestiging();
+      }
+    }
+  }
+
+  function geefNormDropdownHtml() {
+    const curProc = (actiefGespreksGeheugen.procedure || "").toLowerCase();
+    const curKl = (actiefGespreksGeheugen.onstreamKlasse || "").toLowerCase();
+    const isOnstream = Boolean(actiefGespreksGeheugen.isOnstream || curKl || curProc.includes("onstream"));
+
+    const isEnB = !isOnstream && (curProc === "en-b" || curProc === "klasse b" || curProc === "b");
+    const isEnA = !isOnstream && (curProc === "en-a" || curProc === "klasse a" || curProc === "a");
+    const isAsme = !isOnstream && (curProc.includes("asme") || curProc.includes("section v") || curProc.includes("artikel 2"));
+
+    const isOnstreamTb = isOnstream && (curKl === "tb" || curProc.includes("tb"));
+    const isOnstreamTa = isOnstream && (curKl === "ta" || curProc.includes("ta"));
+
+    const isAnySelected = isEnB || isEnA || isAsme || isOnstreamTb || isOnstreamTa;
+
+    return `<span class="rt-ai-norm-pill ${isAnySelected ? 'active' : ''}" style="display:inline-flex; align-items:center; background:#181818; border:1px solid ${isAnySelected ? '#f5df4d' : 'rgba(245,223,77,0.45)'}; border-radius:14px; padding:2px 8px; font-size:0.8rem; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3); vertical-align:middle; transition:border-color 0.2s;">
+      <i class="fas fa-file-contract" style="color:#f5df4d; font-size:0.75rem; margin-right:4px;"></i>
+      <select class="rt-ai-norm-select" onchange="window.RtAssistant && window.RtAssistant.selecteerNormUitDropdown(this.value);" title="Snelkeuze kwaliteitsklasse / norm of onstream" style="background:transparent; border:none; color:${isAnySelected ? '#f5df4d' : '#f0f0f0'}; font-family:'Roboto Condensed', sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; outline:none; padding-right:2px; max-width:200px; text-overflow:ellipsis;">
+        <option value="" ${!isAnySelected ? "selected" : ""} style="background:#222; color:#f5df4d;">📜 Kies norm ▾</option>
+        <optgroup label="Lasonderzoek (EN ISO 17636 / ASME)" style="background:#222; color:#f5df4d;">
+          <option value="EN-B" ${isEnB ? "selected" : ""} style="background:#222; color:#fff;">EN Klasse B (streng)</option>
+          <option value="EN-A" ${isEnA ? "selected" : ""} style="background:#222; color:#fff;">EN Klasse A</option>
+          <option value="ASME" ${isAsme ? "selected" : ""} style="background:#222; color:#fff;">ASME Section V</option>
+        </optgroup>
+        <optgroup label="Onstream Inspectie (RT-21021 / RT-21022)" style="background:#222; color:#38bdf8;">
+          <option value="onstream_tb" ${isOnstreamTb ? "selected" : ""} style="background:#222; color:#fff;">Onstream Klasse TB (improved)</option>
+          <option value="onstream_ta" ${isOnstreamTa ? "selected" : ""} style="background:#222; color:#fff;">Onstream Klasse TA (basic)</option>
+        </optgroup>
+        ${isAnySelected ? '<option value="wis" style="background:#222; color:#ff6b6b;">❌ Wis normkeuze</option>' : ''}
+      </select>
+      ${isAnySelected ? `<button type="button" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('procedure');" title="Wis normkeuze uit geheugen" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:0 0 0 5px; margin:0; font-size:1.05rem; line-height:1; font-weight:bold; display:inline-flex; align-items:center;" onmouseover="this.style.color='#ff3333'" onmouseout="this.style.color='#ff6b6b'">&times;</button>` : ''}
+    </span>`;
+  }
+
+  function selecteerNormUitDropdown(val) {
+    if (!val || val === "wis") {
+      wisGeheugenParameter("procedure");
+      synchroniseerDOMFormulier(actiefGespreksGeheugen);
+      if (typeof document !== "undefined") {
+        const container = document.getElementById("rt-ai-context-container");
+        if (container) {
+          container.outerHTML = geefGeheugenBadgesHtml();
+        }
+      }
+      return;
+    }
+
+    if (val === "onstream_tb") {
+      actiefGespreksGeheugen.isOnstream = true;
+      actiefGespreksGeheugen.onstreamKlasse = "tb";
+      actiefGespreksGeheugen.procedure = "Onstream TB";
+    } else if (val === "onstream_ta") {
+      actiefGespreksGeheugen.isOnstream = true;
+      actiefGespreksGeheugen.onstreamKlasse = "ta";
+      actiefGespreksGeheugen.procedure = "Onstream TA";
+    } else {
+      // EN-B, EN-A, ASME
+      actiefGespreksGeheugen.procedure = val;
+      actiefGespreksGeheugen.isOnstream = false;
+      actiefGespreksGeheugen.onstreamKlasse = null;
+    }
+
+    synchroniseerDOMFormulier(actiefGespreksGeheugen);
+
+    if (typeof document !== "undefined") {
+      const container = document.getElementById("rt-ai-context-container");
+      if (container) {
+        container.outerHTML = geefGeheugenBadgesHtml();
+      }
+    }
+
+    // Als RADI wachtte op procedure of onstreamKlasse, direct doorgaan!
+    if (
+      actiefGespreksGeheugen.verwachtParameter === "procedure" ||
+      actiefGespreksGeheugen.verwachtParameter === "norm" ||
+      actiefGespreksGeheugen.verwachtParameter === "onstreamKlasse" ||
+      actiefGespreksGeheugen.verwachtParameter === "klasse"
+    ) {
+      const q = val === "onstream_tb" ? "klasse tb" : (val === "onstream_ta" ? "klasse ta" : val);
+      actiefGespreksGeheugen.verwachtParameter = null;
+      verwerkVraagDirect(q, { isChip: true });
+    }
+  }
+
   function geefGeheugenBadgesHtml() {
     const items = geefGeheugenItems();
-    if (items.length === 0) return "";
-    const badgesHtml = items
+    const hasSourceSelected = Boolean(
+      actiefGespreksGeheugen.bronTekst ||
+      (actiefGespreksGeheugen.bronType && actiefGespreksGeheugen.bronType !== "") ||
+      actiefGespreksGeheugen.brongrootte
+    );
+    const hasNormSelected = Boolean(
+      actiefGespreksGeheugen.procedure ||
+      actiefGespreksGeheugen.onstreamKlasse
+    );
+
+    const curTekst = (actiefGespreksGeheugen.bronTekst || "").toLowerCase();
+    const hasCsvSource = (bronnenData || []).some(
+      (b) => curTekst === b.name.toLowerCase() || curTekst.startsWith(b.name.toLowerCase() + " ")
+    );
+
+    // Filter bron en norm gerelateerde items uit normale badges omdat ze in de bron- en norm-dropdown pills staan
+    const nonDropdownItems = items.filter(
+      (it) =>
+        it.key !== "bron" &&
+        it.key !== "brongrootte" &&
+        it.key !== "procedure" &&
+        it.key !== "onstreamKlasse" &&
+        (it.key !== "activiteit" || !hasCsvSource)
+    );
+
+    const badgesHtml = nonDropdownItems
       .map(
-        (it) =>
-          `<span class="rt-ai-param-badge" title="${it.title || it.label}: klik op &times; om te wissen" style="display:inline-flex; align-items:center; background:#181818; border:1px solid rgba(245,223,77,0.45); border-radius:14px; padding:2px 9px; font-size:0.8rem; color:#f0f0f0; gap:6px; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><span>${it.label}</span><button type="button" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('${it.key}');" title="Wis ${it.label} uit geheugen" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:0; margin:0; font-size:1.05rem; line-height:1; font-weight:bold; display:inline-flex; align-items:center;" onmouseover="this.style.color='#ff3333'" onmouseout="this.style.color='#ff6b6b'">&times;</button></span>`
+        (it) => {
+          if (it.key === "activiteit") {
+            return `<span class="rt-ai-param-badge" onclick="window.RtAssistant && window.RtAssistant.wijzigActiviteitViaPrompt();" title="Activiteit: klik om te wijzigen (${it.label}), of &times; om te wissen" style="display:inline-flex; align-items:center; background:#181818; border:1px solid #f5df4d; border-radius:14px; padding:2px 9px; font-size:0.8rem; color:#f5df4d; gap:6px; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3); cursor:pointer;"><span style="text-decoration:underline dotted; text-underline-offset:2px;">${it.label} ✏️</span><button type="button" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('${it.key}');" title="Wis ${it.label} uit geheugen" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:0; margin:0; font-size:1.05rem; line-height:1; font-weight:bold; display:inline-flex; align-items:center;" onmouseover="this.style.color='#ff3333'" onmouseout="this.style.color='#ff6b6b'">&times;</button></span>`;
+          }
+          return `<span class="rt-ai-param-badge" title="${it.title || it.label}: klik op &times; om te wissen" style="display:inline-flex; align-items:center; background:#181818; border:1px solid rgba(245,223,77,0.45); border-radius:14px; padding:2px 9px; font-size:0.8rem; color:#f0f0f0; gap:6px; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><span>${it.label}</span><button type="button" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('${it.key}');" title="Wis ${it.label} uit geheugen" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:0; margin:0; font-size:1.05rem; line-height:1; font-weight:bold; display:inline-flex; align-items:center;" onmouseover="this.style.color='#ff3333'" onmouseout="this.style.color='#ff6b6b'">&times;</button></span>`;
+        }
       )
       .join(" ");
+
+    const bronPill = geefBronDropdownHtml();
+    const normPill = geefNormDropdownHtml();
+    const hasAny = nonDropdownItems.length > 0 || hasSourceSelected || hasNormSelected;
+
+    const clearBtnHtml = hasAny
+      ? `<button type="button" class="rt-ai-clear-mem-btn" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis alle parameters uit het geheugen (schone lei)" style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,77,77,0.12); border:1px solid rgba(255,107,107,0.5); border-radius:14px; padding:3px 10px; font-size:0.78rem; font-weight:600; color:#ffb4b4; cursor:pointer; margin-left:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,77,77,0.28)'; this.style.color='#ffffff'; this.style.borderColor='#ff4d4d';" onmouseout="this.style.background='rgba(255,77,77,0.12)'; this.style.color='#ffb4b4'; this.style.borderColor='rgba(255,107,107,0.5)';"><i class="fas fa-trash-alt" style="font-size:0.75rem;"></i><span>Wis geheugen</span></button>`
+      : "";
 
     return `<div id="rt-ai-context-container" style="margin-top: 12px; font-size: 0.82rem; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px;">
       <div style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
         <span style="opacity:0.85; font-size:0.82rem;">🧠 <em>Geheugen:</em></span>
         ${badgesHtml}
-        <button type="button" class="rt-ai-clear-mem-btn" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis alle parameters uit het geheugen (schone lei)" style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,77,77,0.12); border:1px solid rgba(255,107,107,0.5); border-radius:14px; padding:3px 10px; font-size:0.78rem; font-weight:600; color:#ffb4b4; cursor:pointer; margin-left:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,77,77,0.28)'; this.style.color='#ffffff'; this.style.borderColor='#ff4d4d';" onmouseout="this.style.background='rgba(255,77,77,0.12)'; this.style.color='#ffb4b4'; this.style.borderColor='rgba(255,107,107,0.5)';"><i class="fas fa-trash-alt" style="font-size:0.75rem;"></i><span>Wis geheugen</span></button>
+        ${bronPill}
+        ${normPill}
+        ${clearBtnHtml}
       </div>
     </div>`;
   }
@@ -8415,6 +9188,21 @@ ${stralingstijdPlat}========================================`;
         } else {
           actiefGespreksGeheugen[k] = nieuwParsed[k];
           if (actiefGespreksGeheugen.verwachtParameter === k) {
+            actiefGespreksGeheugen.verwachtParameter = null;
+          }
+        }
+      }
+    }
+
+    // Schedule koppeling synchroniseren met actiefGespreksGeheugen
+    if (actiefGespreksGeheugen.schedule && actiefGespreksGeheugen.diameter) {
+      const schInfo = zoekScheduleInfo(actiefGespreksGeheugen.diameter, actiefGespreksGeheugen.schedule);
+      if (schInfo && schInfo.gevonden) {
+        actiefGespreksGeheugen.scheduleInfo = schInfo;
+        const schValNum = parseFloat(actiefGespreksGeheugen.schedule);
+        if (actiefGespreksGeheugen.wanddikte === null || actiefGespreksGeheugen.wanddikte === undefined || actiefGespreksGeheugen.wanddikte === schValNum || nieuwParsed.schedule) {
+          actiefGespreksGeheugen.wanddikte = schInfo.wt;
+          if (actiefGespreksGeheugen.verwachtParameter === "wanddikte") {
             actiefGespreksGeheugen.verwachtParameter = null;
           }
         }
@@ -9110,8 +9898,8 @@ ${stralingstijdPlat}========================================`;
       if (waarschuwing) {
         antwoorden.unshift(waarschuwing);
         const minFfdVal = bepaalNumeriekeMinFFD(params, gefilterdeTekst);
-        if (minFfdVal && chips && !chips.includes(`Minimale FFD (${minFfdVal} mm)`)) {
-          chips.unshift(`Minimale FFD (${minFfdVal} mm)`);
+        if (minFfdVal && chips && !chips.includes(`${minFfdVal} mm FFD (min. ffd)`)) {
+          chips.unshift(`${minFfdVal} mm FFD (min. ffd)`);
         }
       }
     }
@@ -9587,6 +10375,11 @@ ${stralingstijdPlat}========================================`;
         background: rgba(245, 223, 77, 0.25);
         border-color: #F5DF4D;
       }
+      .rt-ai-examples-btn.active {
+        background: #F5DF4D;
+        color: #111;
+        border-color: #F5DF4D;
+      }
       .rt-ai-ex-toolbar {
         position: sticky;
         top: -14px;
@@ -9874,6 +10667,7 @@ ${stralingstijdPlat}========================================`;
         </div>
         <div class="rt-ai-response-box" id="rt-ai-response">
           Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).
+          ${geefGeheugenBadgesHtml()}
         </div>
         <form id="rt-ai-form" class="rt-ai-input-bar" onsubmit="event.preventDefault(); window.RtAssistant.verstuurTekst();">
           <input type="text" id="rt-ai-input" class="rt-ai-text-input" placeholder="Typ je vraag..." autocomplete="off">
@@ -9945,7 +10739,7 @@ ${stralingstijdPlat}========================================`;
     if (examplesToggle) {
       examplesToggle.addEventListener("click", () => {
         toggleInfoPanel(false);
-        toonVoorbeeldVragen();
+        toggleVoorbeeldVragen();
       });
     }
 
@@ -10363,6 +11157,9 @@ ${stralingstijdPlat}========================================`;
 
   function sluitAssistant() {
     toggleInfoPanel(false);
+    isExamplesOpen = false;
+    const exBtn = document.getElementById("rt-ai-examples-toggle");
+    if (exBtn) exBtn.classList.remove("active");
     stopSpraakherkenning();
     if (typeof window !== "undefined") {
       if (window.speechSynthesis) {
@@ -10622,6 +11419,8 @@ ${stralingstijdPlat}========================================`;
 
   async function verwerkVraagDirect(vraagTekst, context = {}) {
     stopSpraakherkenning();
+    actieveVraagId++;
+    const mijnVraagId = actieveVraagId;
     const weergaveTekst = corrigeerSpraakTekst(vraagTekst);
     const tr = document.getElementById("rt-ai-transcript");
     if (tr) tr.innerHTML = `Jij: "<strong>${weergaveTekst}</strong>"`;
@@ -10630,6 +11429,7 @@ ${stralingstijdPlat}========================================`;
 
     try {
       const res = await verwerkUniverseleVraag(weergaveTekst, context);
+      if (mijnVraagId !== actieveVraagId) return;
 
       if (respEl) {
         let outputHtml = (res && res.text) ? res.text : (typeof res === "string" ? res : "Geen antwoord beschikbaar.");
@@ -10645,6 +11445,7 @@ ${stralingstijdPlat}========================================`;
         spreekTekst(res.text);
       }
     } catch (err) {
+      if (mijnVraagId !== actieveVraagId) return;
       console.error("Fout bij verwerken vraag:", err);
       if (respEl) {
         respEl.innerHTML = `<span style="color:#ffb4b4;">⚠️ Er trad een fout op bij het uitrekenen (${err && err.message ? err.message : "onbekende fout"}). Stel de vraag a.u.b. opnieuw of controleer de parameters.</span>`;
@@ -10664,6 +11465,9 @@ ${stralingstijdPlat}========================================`;
   }
 
   function verstuurSuggestie(tekst) {
+    isExamplesOpen = false;
+    const exBtn = document.getElementById("rt-ai-examples-toggle");
+    if (exBtn) exBtn.classList.remove("active");
     const inp = document.getElementById("rt-ai-input");
     if (inp) {
       inp.value = "";
@@ -10676,6 +11480,9 @@ ${stralingstijdPlat}========================================`;
   }
 
   function verstuurTekst() {
+    isExamplesOpen = false;
+    const exBtn = document.getElementById("rt-ai-examples-toggle");
+    if (exBtn) exBtn.classList.remove("active");
     const inp = document.getElementById("rt-ai-input");
     if (!inp || !inp.value.trim()) return;
     const q = inp.value.trim();
@@ -10743,12 +11550,22 @@ ${stralingstijdPlat}========================================`;
     { categorie: "Lasfouten & Schietkaart", type: "Overzicht van alle RT-lasfouten", voorbeeld: "Welke lasfouten ken je?", toelichting: "Toont alle 14 gestandaardiseerde RT-lasfouten met ISO 6520-1 codes." },
     { categorie: "Lasfouten & Schietkaart", type: "Lasfout herkennen op de foto + code", voorbeeld: "Wat betekent een wormgat op de foto en welke lasfoutcode hoort daarbij?", toelichting: "Legt uit hoe een lasfout (bijv. wormgat, bindingsfout, worteldoorzakking) op de film zichtbaar is." },
     { categorie: "Lasfouten & Schietkaart", type: "Acceptatiecriteria lasfout berekenen", voorbeeld: "Hoe groot mag een porie zijn bij een wanddikte van 12 mm volgens EN Level 2?", toelichting: "Berekent de exacte toelaatbare afmetingen volgens EN ISO 10675-1 (Level 1, 2, 3) en ASME." },
-    { categorie: "Lasfouten & Schietkaart", type: "Complete schietkaart genereren", voorbeeld: "Maak een schietkaart voor een 6 duimer van 8 mm dik met 25 Ci Se-75 volgens Klasse B", toelichting: "Genereert in één overzicht opstelling, FFD, draadje, opnames, belichtingstijd en afzetting." }
+    { categorie: "Lasfouten & Schietkaart", type: "Complete schietkaart genereren", voorbeeld: "Maak een schietkaart voor een 6 duimer van 8 mm dik met 25 Ci Se-75 volgens Klasse B", toelichting: "Genereert in één overzicht opstelling, FFD, draadje, opnames, belichtingstijd en afzetting." },
+    { categorie: "Theorie & Kennis", type: "Aantal draadjes op een EN BKI", voorbeeld: "Hoeveel draadjes heeft een EN BKI?", toelichting: "Legt uit dat een EN BKI conform ISO 19232-1 altijd 7 draden bevat en welke 4 houders (1, 6, 10 en 13 FE) er zijn." },
+    { categorie: "Theorie & Kennis", type: "Verschil ASME BKI vs EN BKI", voorbeeld: "Wat is het verschil tussen een ASME BKI en een EN BKI?", toelichting: "Vergelijkt 7 vs 6 draden, nummering W1-W19 vs 1-21 en Hole-type plaatjes vs draadjes." },
+    { categorie: "Theorie & Kennis", type: "Agfa filmklasse koppeling (C1 t/m C6)", voorbeeld: "Welk type Agfa film komt overeen met C3, C4 en C5?", toelichting: "Verklaart de indeling van Agfa Structurix films volgens ISO 11699-1 en ASTM E1815 (C1=D2, C2=D3, C3=D4, C4=D5, C5=D7)." },
+    { categorie: "Theorie & Kennis", type: "Kwadratenwet in de radiografie", voorbeeld: "Wat is de kwadratenwet en hoe werkt deze?", toelichting: "Legt de omgekeerde kwadratenwet uit voor belichtingstijd en stralingsafzetting/dosistempo." },
+    { categorie: "Theorie & Kennis", type: "Wettelijke dosislimiet stralingswerker", voorbeeld: "Wat is de wettelijke dosislimiet voor een radiograaf?", toelichting: "Geeft de limieten voor stralingswerkers (20 mSv/jaar) en toezichts-/gecontroleerde zones (10 μSv/u norm)." },
+    { categorie: "Theorie & Kennis", type: "Loodletter B & Terugverstrooiing", voorbeeld: "Waarom leggen we een loodletter B achterop de cassette?", toelichting: "Verklaart de controle op secundaire achterwaartse straling (backscatter) volgens ASME en EN ISO 17636-1." },
+    { categorie: "Theorie & Kennis", type: "kV-regel (Keverregel) & Buisspanning", voorbeeld: "Wat is de keverregel en waarom beperken we de buisspanning?", toelichting: "Verklaart het foto-elektrisch effect vs Compton-effect en de maximale kV formule uit EN ISO 17636-1." }
   ];
 
   let geladenVoorbeeldVragen = null;
   let actieveVoorbeeldCategorie = "Alle";
   let actieveVoorbeeldZoekterm = "";
+  let isExamplesOpen = false;
+  let opgeslagenResponseHtmlVoorVoorbeelden = "";
+  let opgeslagenTranscriptHtmlVoorVoorbeelden = "";
 
   async function laadVoorbeeldVragen() {
     if (Array.isArray(geladenVoorbeeldVragen) && geladenVoorbeeldVragen.length > 0) {
@@ -10773,6 +11590,17 @@ ${stralingstijdPlat}========================================`;
   }
 
   function vulVoorbeeldIn(vraagTekst) {
+    isExamplesOpen = false;
+    const exBtn = document.getElementById("rt-ai-examples-toggle");
+    if (exBtn) exBtn.classList.remove("active");
+    const respEl = document.getElementById("rt-ai-response");
+    const transEl = document.getElementById("rt-ai-transcript");
+    if (respEl && opgeslagenResponseHtmlVoorVoorbeelden) {
+      respEl.innerHTML = opgeslagenResponseHtmlVoorVoorbeelden;
+    }
+    if (transEl && opgeslagenTranscriptHtmlVoorVoorbeelden) {
+      transEl.innerHTML = opgeslagenTranscriptHtmlVoorVoorbeelden;
+    }
     const inp = document.getElementById("rt-ai-input");
     if (inp) {
       inp.value = vraagTekst;
@@ -10781,6 +11609,9 @@ ${stralingstijdPlat}========================================`;
   }
 
   function stelVoorbeeldDirect(vraagTekst) {
+    isExamplesOpen = false;
+    const exBtn = document.getElementById("rt-ai-examples-toggle");
+    if (exBtn) exBtn.classList.remove("active");
     const inp = document.getElementById("rt-ai-input");
     if (inp) {
       inp.value = vraagTekst;
@@ -10788,11 +11619,40 @@ ${stralingstijdPlat}========================================`;
     verstuurTekst();
   }
 
+  async function toggleVoorbeeldVragen() {
+    const respEl = document.getElementById("rt-ai-response");
+    const transEl = document.getElementById("rt-ai-transcript");
+    const exBtn = document.getElementById("rt-ai-examples-toggle");
+    if (!respEl) return;
+
+    if (isExamplesOpen) {
+      isExamplesOpen = false;
+      if (exBtn) exBtn.classList.remove("active");
+      if (opgeslagenResponseHtmlVoorVoorbeelden) {
+        respEl.innerHTML = opgeslagenResponseHtmlVoorVoorbeelden;
+      }
+      if (opgeslagenTranscriptHtmlVoorVoorbeelden && transEl) {
+        transEl.innerHTML = opgeslagenTranscriptHtmlVoorVoorbeelden;
+      }
+      return;
+    }
+
+    opgeslagenResponseHtmlVoorVoorbeelden = respEl.innerHTML;
+    opgeslagenTranscriptHtmlVoorVoorbeelden = transEl ? transEl.innerHTML : "";
+    isExamplesOpen = true;
+    if (exBtn) exBtn.classList.add("active");
+    await toonVoorbeeldVragen();
+  }
+
   async function toonVoorbeeldVragen() {
     const items = await laadVoorbeeldVragen();
     const respEl = document.getElementById("rt-ai-response");
     const transEl = document.getElementById("rt-ai-transcript");
+    const exBtn = document.getElementById("rt-ai-examples-toggle");
     if (!respEl) return;
+
+    isExamplesOpen = true;
+    if (exBtn) exBtn.classList.add("active");
 
     if (transEl) {
       transEl.innerHTML = `<i class="fas fa-list-ul" style="color:#F5DF4D;"></i> Overzicht van alle ondersteunde vraagtypen &amp; voorbeeldvragen (${items.length} voorbeelden):`;
@@ -10989,6 +11849,7 @@ ${stralingstijdPlat}========================================`;
     geefAppInfo,
     toggleInfo: (force) => toggleInfoPanel(force),
     toonVoorbeeldVragen,
+    toggleVoorbeeldVragen,
     laadVoorbeeldVragen,
     STANDAARD_VOORBEELDVRAGEN,
     berekenKVRegel,
@@ -11034,6 +11895,11 @@ ${stralingstijdPlat}========================================`;
     isTtsEnabled,
     spreekTekst,
     corrigeerSpraakTekst,
+    geefBronDropdownHtml,
+    selecteerBronUitDropdown,
+    geefNormDropdownHtml,
+    selecteerNormUitDropdown,
+    wijzigActiviteitViaPrompt,
   };
 
   global.RtAssistant = RtAssistant;
