@@ -595,8 +595,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   const NDO_SPRAAK_WOORDENBOEK = [
     // Geometrie & Lastechniek
     "wanddikte", "diameter", "buitendiameter", "binnendiameter", "lasbreedte", "lasoverdikte",
-    "rondnaad", "langsnaad", "lasnaad", "ovaal", "ovaaltje", "verzet", "voorzet",
-    "kruislas", "omtrek",
+    "rondnaad", "langsnaad", "lasnaad", "ovaal", "ovaaltje", "ovaaltjes", "verzet", "voorzet",
+    "kruislas", "omtrek", "schietkaart", "overzichtskaart", "werkstuk",
 
     // Buisopstellingen & Technieken
     "centraal", "panoramisch", "excentrisch", "dubbelwandig", "enkelwandig",
@@ -610,52 +610,63 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     "Iridium", "Iridium-192", "Ir-192", "Selenium", "Selenium-75", "Se-75", "Kobalt", "Kobalt-60", "Co-60",
     "Balteau", "Balteau Ceram", "Balteau Ceram 300", "Balteau Rondstraler", "directional", "Ceram",
     "Yxlon", "Yxlon 300", "Smart EVO", "Smart EVO 300DS", "Smart 300",
-    "röntgen", "röntgenbuis", "X-ray", "rondstraler", "collimator", "brongrootte", "focus",
-    "focusafstand", "FFD", "SFD", "OFA", "MinFFD", "minimale FFD",
+    "röntgen", "röntgenbuis", "X-ray", "rondstraler", "collimator", "brongrootte", "bronkeuze", "focus",
+    "focusafstand", "focusverandering", "FFD", "SFD", "OFA", "MinFFD", "minimale FFD",
 
     // Eenheden & Radiologie
     "Curie", "Ci", "halfwaardetijd", "halveringstijd", "bronverval", "vervaltijd", "activiteit",
     "stralingstijd", "belichtingstijd", "schiettijd", "milliampère", "milliampère-minuten", "mA", "mA*min",
     "kV", "kilovolt", "buisspanning", "buistabel", "KV-regel", "kwadratenwet", "diktevermeerdering",
-    "materiaalfactor", "staalequivalent", "afzetting", "dosistempo", "microsievert", "millisievert", "uSv", "mSv",
+    "materiaalfactor", "staalequivalent", "afzetting", "afzettingsafstand", "dosistempo", "microsievert", "millisievert", "uSv", "mSv",
 
     // Films & Beeldkwaliteit
     "filmsoort", "filmtype", "filmklasse", "filmkwaliteit", "D2", "D3", "D4", "D5", "D7", "D8",
-    "C1", "C2", "C3", "C4", "C5", "C6", "Agfa", "Structurix", "zwarting", "optische dichtheid",
+    "C1", "C2", "C3", "C4", "C5", "C6", "Agfa", "Structurix", "zwarting", "zwartingseisen", "optische dichtheid",
     "BKI", "BKI's", "beeldkwaliteit", "beeldkwaliteitsindicator", "penetrameter", "draadje", "draadjes", "draad", "draden", "draadvereiste", "gevoeligheid",
     "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12", "W13", "W14", "W15", "W16", "W17", "W18", "W19",
     "1 FE EN", "6 FE EN", "10 FE EN", "13 FE EN", "Set A", "Set B", "Set C", "Set D", "Set 1A", "Set 2A",
     "hole-type", "hole type", "shim", "plaatje", "plaatjes", "1T", "2T", "4T", "2T-gat", "2T gat", "loodletter", "loodletter B", "terugverstrooiing", "backscatter",
+    "bronzijde", "filmzijde",
 
     // Normen & Kwaliteitsklassen
     "ASME", "Section V", "Artikel 2", "EN", "ISO", "EN ISO", "ISO 17636", "ISO 17636-1", "ISO 17636-2",
     "ISO 19232", "ISO 19232-1", "ASTM", "ASTM E747", "ASTM E1025", "ASTM E1815", "ISO 11699-1",
     "Klasse A", "Klasse B", "EN-A", "EN-B", "Klasse TA", "Klasse TB",
 
-    // Duimsmaten, Leidingmaten & Schedules
-    "duims", "duimer", "halve duimer", "driekwart duims", "1 duimer", "2 duimer", "3 duimer", "4 duimer",
+    // Duimsmaten, Leidingmaten, Schedules, Materialen & Media
+    "duims", "duimer", "duimers", "duimen", "opname", "opnames", "gevuld",
+    "halve duimer", "driekwart duims", "1 duimer", "2 duimer", "3 duimer", "4 duimer",
     "5 duimer", "6 duimer", "8 duimer", "10 duimer", "12 duimer", "14 duimer", "16 duimer", "18 duimer", "20 duimer", "24 duimer",
     "DN 15", "DN 20", "DN 25", "DN 50", "DN 80", "DN 90", "DN90", "dia9", "dl90", "DN 100", "DN 150", "DN 200", "DN 250", "DN 300", "DN 400", "DN 500", "DN 600",
     "schedule", "schedules", "schedule 5", "schedule 10", "schedule 20", "schedule 30", "schedule 40", "schedule 60", "schedule 80",
     "schedule 100", "schedule 120", "schedule 140", "schedule 160", "Sch 10", "Sch 40", "Sch 80", "Sch 160", "STD", "standard",
     "XS", "extra strong", "XXS", "ASME B36.10M", "ASME B36.19M", "wanddiktes",
-    "haffmans", "sitech", "sabic", "lood", "staal", "aluminium", "inconel", "monel", "hastelloy",
-    "dosislimiet", "dosislimieten", "stralingswerker", "gecontroleerde zone", "bewaakte zone", "halveringsdikte", "halfwaardedikte", "loodplaat"
+    "haffmans", "sitech", "sabic", "lood", "staal", "koolstofstaal", "roestvast", "roestvrij", "duplex", "superduplex",
+    "aluminium", "titanium", "titaan", "inconel", "monel", "hastelloy", "messing", "tinbrons", "koper", "nikkel",
+    "water", "aardolie", "benzeen", "benzine", "aceton", "ammoniak", "methanol", "alcohol", "ethaan", "propaan",
+    "dosislimiet", "dosislimieten", "stralingswerker", "gecontroleerde zone", "bewaakte zone", "halveringsdikte", "halfwaardedikte", "loodplaat", "loodplaten",
+    "opstelling", "opstellingen", "wolfraam", "doorstraling", "radiografie", "flenslas", "rondnaadje", "rondnaadjes", "verliestijd", "schaduwhoek", "schaduwbreedte", "onscherpte", "loodletter", "loodletters", "filmzijde", "bronzijde", "pijpleiding", "slakinsluitsel", "porositeit", "randinkarteling", "wormgat", "bindingsfout", "wortelfout", "lasfout", "corrosie", "wanddiktemeting", "draadindicator", "stappenwig", "densitometer", "benzeen", "tolueen", "nafta", "kerosine", "diesel", "stookolie", "ethanol", "methanol", "ammoniak", "isolatie", "steenwol", "glaswol", "contrast"
   ];
 
   const NDO_FUZZY_WOORDENBOEK = NDO_SPRAAK_WOORDENBOEK;
 
   const NDO_ENKELWOORD_TRIGGERS = Array.from(
-    new Set([
-      ...NDO_SPRAAK_WOORDENBOEK
-        .flatMap((term) => term.toLowerCase().split(/[\s\/]+/))
-        .map((w) => w.replace(/[^a-z0-9-]/g, ""))
-        .filter((w) => w.length >= 5 && !/^\d+$/.test(w)),
-      "opnames", "opname", "gevuld", "duimer", "duims", "duimen", "ovaaltje", "ovaaltjes",
-      "stralingstijd", "belichtingstijd", "schiettijd", "wanddikte", "diameter", "afzetting",
-      "focusafstand", "brongrootte", "materiaalfactor", "kwadratenwet", "draadje", "draadjes",
-    ])
+    new Set(
+      NDO_SPRAAK_WOORDENBOEK
+        .flatMap((term) => term.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/[\s\/]+/))
+        .map((w) => w.replace(/[^a-z]/g, ""))
+        .filter((w) => w.length >= 5)
+    )
   );
+
+  const NDO_COMPOUND_TRIGGERS = NDO_ENKELWOORD_TRIGGERS.filter((w) => w.length >= 7);
+
+  const NDO_TRIGGERS_SET = new Set([
+    ...NDO_ENKELWOORD_TRIGGERS,
+    "ir-192", "se-75", "co-60", "dwsi", "swsi", "dwdi", "bki", "iqi", "ffd", "sfd", "ofa",
+    "asme", "en-a", "en-b", "dik", "ci", "kv", "ma", "lood", "staal", "buis", "pijp", "plaat",
+    "duim", "duims", "draad", "norm", "bron", "film", "tijd", "klas"
+  ]);
 
   // Normale Nederlandse woorden die nooit door de fuzzy-matcher veranderd mogen worden
   const NORMALE_NL_STOPWOORDEN = new Set([
@@ -671,7 +682,25 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     "totaal", "alleen", "samen", "kleine", "grote", "nieuwe", "andere", "zelfde", "dezelfde",
     "eerder", "later", "boven", "onder", "rechts", "links", "midden", "direct", "meteen", "klopt",
     "staat", "blijft", "lijkt", "gebruik", "gezien", "gedaan", "gehad", "gegeven", "genomen",
+    "dikte", "opstelling", "doorstraalde", "doorstraald", "maximale", "minimale", "maximaal", "minimaal",
+    "veilige", "veilig", "normale", "normaal", "standaard", "kleiner", "groter", "langer", "korter",
+    "dikker", "dunner", "sterker", "zwakker", "zwaarder", "lichter", "dubbel", "enkel",
+    "centimeter", "millimeter", "verplicht", "mogelijk", "waardoor", "waarvoor", "daarmee", "hiermee",
+    "eigen", "welks", "vanaf", "omdat", "indien", "zodra", "nadat", "voordat", "tijdens", "tegen",
+    "zouden", "kunnen", "mogen", "willen", "hoeft", "moest", "komen", "gaat", "staan", "vinden",
+    "lopen", "zetten", "halen", "geven", "nemen", "krijgen", "lezen", "zeggen", "horen", "voelen",
+    "afstand", "ruimte", "plaats", "moment", "meter", "meters", "tweemaal", "driemaal"
   ]);
+
+  function medeklinkerSkelet(woord) {
+    return woord
+      .toLowerCase()
+      .replace(/[^a-z]/g, "")
+      .replace(/d$/g, "t")
+      .replace(/ij/g, "")
+      .replace(/[aeiouy]/g, "")
+      .replace(/(.)\1+/g, "$1");
+  }
 
   function nlFonetischeSleutel(woord) {
     return woord
@@ -697,6 +726,55 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       .replace(/dt$/g, "t")
       .replace(/d$/g, "t")
       .replace(/(.)\1+/g, "$1");
+  }
+
+  function besteTriggerMatch(s, kandidaten, minScore = 45) {
+    if (!s || s.length < 5) return null;
+    if (/^duim[a-z]{1,5}$/.test(s) && s !== "duimer" && s !== "duims" && s !== "duimen") {
+      return { match: "duimer", score: 95 };
+    }
+    const sFon = nlFonetischeSleutel(s);
+    const sSkel = medeklinkerSkelet(s);
+    let bestMatch = null;
+    let bestScore = -1;
+
+    for (const d of kandidaten) {
+      if (Math.abs(s.length - d.length) > 2) continue;
+      const dist = levenshteinAfstand(s, d);
+      const dFon = nlFonetischeSleutel(d);
+      const fonDist = levenshteinAfstand(sFon, dFon);
+      const dSkel = medeklinkerSkelet(d);
+      const skelDist = levenshteinAfstand(sSkel, dSkel);
+
+      const prefix3 = s.length >= 5 && d.length >= 5 && s.slice(0, 3) === d.slice(0, 3);
+      const rhyme3 = s.length >= 5 && d.length >= 5 && s.slice(-3) === d.slice(-3);
+      const fonEdge = sFon.length >= 4 && dFon.length >= 4 && (sFon.slice(0, 2) === dFon.slice(0, 2) || sFon.slice(-2) === dFon.slice(-2));
+
+      const qualifies =
+        dist <= (d.length >= 8 ? 2 : 1) ||
+        (dist <= 2 && (prefix3 || rhyme3)) ||
+        (fonDist === 0 && d.length >= 5) ||
+        (fonDist === 1 && fonEdge && s.length >= 5 && d.length >= 5) ||
+        (sSkel.length >= 4 && dSkel.length >= 4 && skelDist === 0 && (prefix3 || sSkel[0] === dSkel[0])) ||
+        (sSkel.length >= 5 && dSkel.length >= 5 && skelDist <= 1 && sSkel[0] === dSkel[0] && sSkel.slice(-1) === dSkel.slice(-1) && dist <= 3);
+
+      if (!qualifies) continue;
+
+      const prefix4 = s.length >= 6 && d.length >= 6 && s.slice(0, 4) === d.slice(0, 4);
+      const score =
+        (dist === 0 ? 100 : dist === 1 ? 50 : dist === 2 ? 25 : 10) +
+        (fonDist === 0 ? 55 : fonDist === 1 ? 15 : 0) +
+        (skelDist === 0 ? 35 : skelDist === 1 ? 10 : 0) +
+        (prefix4 ? 22 : prefix3 ? 12 : 0) +
+        (rhyme3 ? 12 : 0);
+
+      if (score >= minScore && score > bestScore) {
+        bestScore = score;
+        bestMatch = d;
+      }
+    }
+
+    return bestMatch ? { match: bestMatch, score: bestScore } : null;
   }
 
   // Corrigeert veelvoorkomende Nederlandse spraakherkenningsfouten (STT lookalikes) naar leesbare RT-termen
@@ -831,13 +909,27 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     s = s.replace(/\b(selenieum|celenium|seleniem|silenium)\b/gi, "selenium");
     s = s.replace(/\b(koebalt|kobald|kobaldt|cobalt)\b/gi, "kobalt");
     s = s.replace(/\b(balto|ball\s*toe|bal\s*toe|baltoo|balteauw|baltoh)\b/gi, "Balteau");
-    s = s.replace(/\b(ikslon|ixlon|ykslon|ichslon|exlon)\b/gi, "Yxlon");
-    s = s.replace(/\b(smart\s*info|smart\s*ever|smart\s*ivo|smartieve)\b/gi, "Smart EVO");
+    s = s.replace(/\b(keram|seram|ceran|seeraam)\b/gi, "Ceram");
+    s = s.replace(/\b(ikslon|ixlon|ykslon|ichslon|exlon|yx\s*lon|ijxlon|ypsilon\s*300|epsilon\s*300)\b/gi, "Yxlon");
+    s = s.replace(/\b(smart\s*info|smart\s*ever|smart\s*ivo|smartieve|smart\s*efo|smart\s*ifo|smart\s*iwo)\b/gi, "Smart EVO");
     s = s.replace(/\b(kollimator|kolimator|colimator|collimater|kolimater)\b/gi, "collimator");
     s = s.replace(/\b(doosistempo|doosis\s*tempo|dosis\s*tempo)\b/gi, "dosistempo");
     s = s.replace(/\b(lootplaat|lood\s*plaat)\b/gi, "loodplaat");
     s = s.replace(/\b(lootplaten|lood\s*platen)\b/gi, "loodplaten");
     s = s.replace(/\b(gefuld|gevult)\b/gi, "gevuld");
+    s = s.replace(/\b(er\s*vees|r\s*v\s*s|air\s*vs|rfs)\b/gi, "RVS");
+    s = s.replace(/\b(316\s*el|316\s*ell)\b/gi, "316L");
+    s = s.replace(/\b(304\s*el|304\s*ell)\b/gi, "304L");
+    s = s.replace(/\b(dupleks|dublex)\b/gi, "duplex");
+    s = s.replace(/\b(inkonel|in\s*konel)\b/gi, "Inconel");
+    s = s.replace(/\b(tytanium)\b/gi, "titanium");
+    s = s.replace(/\b(lasdikte|las\s*dikte|pijpdikte|pijp\s*dikte|buisdikte|buis\s*dikte)\b/gi, "wanddikte");
+    s = s.replace(/\b(pijpdiameter|pijp\s*diameter|buisdiameter|buis\s*diameter)\b/gi, "diameter");
+    s = s.replace(/\b(bron\s*zeide|bron\s*zij)\b/gi, "bronzijde");
+    s = s.replace(/\b(film\s*zeide|film\s*zij)\b/gi, "filmzijde");
+    s = s.replace(/\b(vilm|filmje)\b/gi, "film");
+    s = s.replace(/\b(onstream\s*(?:klasse\s*)?(?:thee\s*b|t\s*b|tb)|klasse\s*(?:thee\s*b|t\s*b)|tee\s*bee)\b/gi, "onstream klasse TB");
+    s = s.replace(/\b(onstream\s*(?:klasse\s*)?(?:thee\s*a|t\s*a|ta)|klasse\s*(?:thee\s*a|t\s*a)|tee\s*aa)\b/gi, "onstream klasse TA");
 
     // Zwarting & Verwachting fonetische spraakcorrecties
     s = s.replace(/\b(zwartings?\s*vrijste|zwartingsvrijste|zwartingvrijste|zwartings?\s*vrijsten|zwartings?\s*vereiste|zwartings?\s*vereisten)\b/gi, "zwartingseisen");
@@ -1060,10 +1152,33 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(schedel|schedul|skedule|skedul|shedul|schetsel)\b/gi, "schedule"],
       [/\b(structuriks|structurex|structuriek)\b/gi, "Structurix"],
 
-      // 6. Technieken (DWSI / SWSI / DWDI)
-      [/\b(de\s+wc|dw\s*zie|d\s*w\s*s\s*i|dwz\s*i|dw\s*si|dw-si|double\s*wall\s*single\s*image|dubbele\s+wand\s+enkel\s+beeld|dubbelwandig\s+enkel|dubbel\s*wand\s*enkel\s*beeld|dubbelwand\s*enkel\s*beeld|dweb|d\.w\.e\.b\.)\b/gi, "DWSI"],
-      [/\b(single\s*wall\s*single\s*image|single\s*wall|souci|sw\s*zie|s\s*w\s*s\s*i|s\s*w\s*c|sw\s*si|sw-si|enkele\s+wand\s+enkel\s+beeld|enkeld?wandig\s+enkel\s+beeld|enkeld?wandig|enkeld?\s*wand\s*enkel\s*beeld|enkeld?wand\s*enkel\s*beeld|enkele?\s*wand|enkeld?wand|eweb|e\.w\.e\.b\.)\b/gi, "SWSI"],
-      [/\b(double\s*wall\s*double\s*image|double\s*wall\s*double|dw\s*die|d\s*w\s*d\s*i|dw\s*di|dw-di|dubbele\s+wand\s+dubbel\s+beeld|dubbel\s+wand\s+dubbel|dubbelwandig\s+dubbel\s+beeld|dubbelwand\s+dubbel\s+beeld|dwdb|d\.w\.d\.b\.)\b/gi, "DWDI"],
+      // 6. Technieken (DWSI / SWSI / DWDI) + volledig uitgesproken RT-afkortingen (NL & EN, excl. onbestaand 'enkel wand dubbel beeld')
+      [/\b(de\s+wc|dw\s*zie|d\s*w\s*s\s*i|dwz\s*i|dw\s*si|dw-si|(?:double|dubbel|dobbel|dubble)\s*(?:wall|wol|wal|wand)\s*(?:single|singel)\s*(?:image|imige|iemets|imids)|dubbele\s+wand\s+enkel\s+beeld|dubbelwand(?:ig)?\s*(?:enkel|een)\s*(?:beeld|beelt)?|dubbel\s*(?:wand|want|wandt)\s*(?:enkel|een)\s*(?:beeld|beelt)|twee\s*wanden\s*enkel\s*beeld|d\s*w\s*e\s*b|dweb|d\.w\.e\.b\.)\b/gi, "DWSI"],
+      [/\b((?:single|singel)\s*(?:wall|wol|wal)\s*(?:single|singel)\s*(?:image|imige|iemets|imids)|(?:single|singel)\s*(?:wall|wol|wal)(?!\s*(?:double|dubbel))|souci|sw\s*zie|s\s*w\s*s\s*i|s\s*w\s*c|sw\s*si|sw-si|enkele?\s*(?:wand|want|wandt)\s*(?:enkel|een)\s*(?:beeld|beelt)|enkeld?wand(?:ig)?\s*(?:enkel|een)\s*(?:beeld|beelt)?|enkele?\s*(?:wand|want)(?!\s*(?:dubbel|twee))|e\s*w\s*e\s*b|eweb|e\.w\.e\.b\.)\b/gi, "SWSI"],
+      [/\b((?:double|dubbel|dobbel|dubble)\s*(?:wall|wol|wal|wand)\s*(?:double|dubbel|dobbel)\s*(?:image|imige|iemets|imids)|(?:double|dubbel|dobbel)\s*(?:wall|wol|wal)\s*(?:double|dubbel)|dw\s*die|d\s*w\s*d\s*i|dw\s*di|dw-di|dubbele\s+wand\s+dubbel\s+beeld|dubbel\s*(?:wand|want|wandt)\s*dubbel(?:\s*(?:beeld|beelt))?|dubbelwand(?:ig)?\s*dubbel(?:\s*(?:beeld|beelt))?|twee\s*wanden\s*dubbel\s*beeld|d\s*w\s*d\s*b|dwdb|d\.w\.d\.b\.)\b/gi, "DWDI"],
+      [/\b(focus\s*(?:tot\s*|to\s*)?film\s*(?:afstand|distance)|film\s*(?:tot\s*|to\s*)?focus\s*(?:afstand|distance)|bron\s*(?:tot\s*|to\s*)?film\s*(?:afstand|distance)|source\s*(?:to\s*)?film\s*(?:distance|afstand))\b/gi, "FFD"],
+      [/\b(object\s*(?:tot\s*|to\s*)?film\s*(?:afstand|distance)|voorwerp\s*(?:tot\s*)?film\s*(?:afstand|distance)|onderwerp\s*(?:tot\s*)?film\s*(?:afstand|distance)|las\s*(?:tot\s*)?film\s*(?:afstand|distance))\b/gi, "OFD"],
+      [/\b(source\s*(?:to\s*)?object\s*(?:distance|afstand)|bron\s*(?:tot\s*)?object\s*(?:afstand|distance)|focus\s*(?:tot\s*)?object\s*(?:afstand|distance))\b/gi, "SOD"],
+      [/\b(source\s*(?:to\s*)?detector\s*(?:distance|afstand)|bron\s*(?:tot\s*)?detector\s*(?:afstand|distance))\b/gi, "SDD"],
+      [/\b(source\s*(?:to\s*)?film\s*factor|s\s*f\s*f)\b/gi, "SFF"],
+      [/\b(image\s*quality\s*indicators?|beeld\s*kwaliteits?\s*indicators?)\b/gi, "IQI BKI"],
+      [/\b(half\s*value\s*layer|halve\s*waarde\s*laag|halfwaarde\s*laag|halfwaarde\s*dikte|halverings\s*dikte)\b(?!\s*HVL)/gi, "halveringsdikte HVL"],
+      [/(?<!halveringsdikte\s)\b(h\s*v\s*l|h\.v\.l\.|ha\s*vee\s*el)\b/gi, "halveringsdikte HVL"],
+      [/\b(?:geometrische?\s*(?:on\s*scherpte|onscherpte)|geometric(?:al)?\s*unsharpness)\b(?!\s*Ug\b)/gi, "geometrische onscherpte Ug"],
+      [/\b(niet[-\s]*destructief\s*onderzoek|n\s*d\s*o)\b/gi, "NDO"],
+      [/\b(non[-\s]*destructive\s*testing|nondestructive\s*testing|n\s*d\s*t)\b/gi, "NDT"],
+      [/\b(half\s*life)\b/gi, "halfwaardetijd"],
+      [/\b(exposure\s*time)\b/gi, "stralingstijd"],
+      [/\b(dose\s*rate)\b/gi, "dosistempo"],
+      [/\b(optical\s*density|film\s*density)\b/gi, "zwarting"],
+      [/\b(maximum\s*wall\s*thickness|w\s*max|wee\s*max|w-max)\b/gi, "Wmax"],
+      [/\b(nominal\s*wall\s*thickness|wall\s*thickness)\b/gi, "wanddikte"],
+      [/\b(outer\s*diameter|outside\s*diameter|nominal\s*pipe\s*size|n\s*p\s*s)\b/gi, "diameter"],
+      [/\b((?:effective\s*)?focal\s*spot(?:\s*size)?|source\s*size|source\s*dimension)\b/gi, "brongrootte"],
+      [/\b(stainless\s*steel)\b/gi, "RVS"],
+      [/\b(carbon\s*steel)\b/gi, "staal"],
+      [/\b(tungsten)\b/gi, "wolfraam"],
+      [/\b(concrete)\b/gi, "beton"],
     ];
 
     for (const [pat, rep] of spraakCorrecties) {
@@ -1242,11 +1357,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(want\s*dikte|van\s*dikte|vandikte|wand\s*dikte|wamdikte|waterdikte|wat\s*dikte|wanddikten|handdikte|banddikte|zanddikte|randdikte|wanten\s*dikte|wante\s*dikte|wang\s*dikte|wangdikte|wan\s*dikte|warmte\s*dikte|wandsdikte|wand\s*dicht|want\s*dicht|wandicht|wanticht)\b/gi, "wanddikte"],
       [/\b(dia\s*meter|die\s*ja\s*meter|dieja\s*meter|dia\s*meeter|diameters|diamater)\b/gi, "diameter"],
       [/\b(las\s*breedte|last\s*breedte|los\s*breedte|lasbreete|las\s*breed|las\s*meet|lasbreedten)\b/gi, "lasbreedte"],
-      // FFD / Afstanden
-      [/\b(focus\s*afstand|fokkers\s*afstand|fokker\s*afstand|foto\s*afstand|vogels\s*afstand|vogel\s*afstand|focusafstand|fokus|fokusafstand|film\s*focus\s*afstand|film\s*focusafstand|bron\s*film\s*afstand|source\s*film\s*distance|source\s*film\s*afstand|source\s*to\s*film\s*distance)\b/gi, "FFD"],
+      // FFD / Afstanden (NL & EN volledig uitgesproken)
+      [/\b(focus\s*afstand|fokkers\s*afstand|fokker\s*afstand|foto\s*afstand|vogels\s*afstand|vogel\s*afstand|focusafstand|fokus|fokusafstand|film\s*(?:tot\s*)?focus\s*(?:afstand|distance)|focus\s*(?:tot\s*|to\s*)?film\s*(?:afstand|distance)|film\s*focusafstand|bron\s*(?:tot\s*)?film\s*(?:afstand|distance)|source\s*(?:to\s*)?film\s*(?:distance|afstand))\b/gi, "FFD"],
       [/\b(effe\s+de|effe\s+dee|ef\s*ef\s*de|ef\s*ef\s*dee|ef\s*dee|f\s*f\s*d|effd|ff\s*d|f\s*f\s*t|f\s*v\s*d|fvd)\b/gi, "FFD"],
       [/\b(s\s*f\s*d|sf\s*d|es\s*ef\s*dee|es\s*ef\s*de|s\s*v\s*d|svd)\b/gi, "SFD"],
+      [/\b(object\s*(?:tot\s*|to\s*)?film\s*(?:afstand|distance)|voorwerp\s*(?:tot\s*)?film\s*(?:afstand|distance)|onderwerp\s*(?:tot\s*)?film\s*(?:afstand|distance)|las\s*(?:tot\s*)?film\s*(?:afstand|distance))\b/gi, "OFD"],
       [/\b(o\s*f\s*a|oo\s*ef\s*aa|o\s*v\s*a)\b/gi, "OFA"],
+      [/\b(source\s*(?:to\s*)?object\s*(?:distance|afstand)|bron\s*(?:tot\s*)?object\s*(?:afstand|distance)|focus\s*(?:tot\s*)?object\s*(?:afstand|distance)|s\s*o\s*d|s\.o\.d\.|es\s*oo\s*dee)\b/gi, "SOD"],
+      [/\b(source\s*(?:to\s*)?detector\s*(?:distance|afstand)|bron\s*(?:tot\s*)?detector\s*(?:afstand|distance)|s\s*d\s*d|s\.d\.d\.|es\s*dee\s*dee)\b/gi, "SDD"],
+      [/\b(source\s*(?:to\s*)?film\s*factor|s\s*f\s*f|s\.f\.f\.|es\s*ef\s*ef)\b/gi, "SFF"],
+      [/\b(half\s*value\s*layer|halve\s*waarde\s*laag|halfwaarde\s*laag|halfwaarde\s*dikte|halverings\s*dikte)\b(?!\s*HVL)/gi, "halveringsdikte HVL"],
+      [/(?<!halveringsdikte\s)\b(h\s*v\s*l|h\.v\.l\.|ha\s*vee\s*el)\b/gi, "halveringsdikte HVL"],
+      [/\b(?:geometrische?\s*(?:on\s*scherpte|onscherpte)|geometric(?:al)?\s*unsharpness)\b(?!\s*Ug\b)/gi, "geometrische onscherpte Ug"],
       // Focus & Filmtype Calculator / Kwadratenwet
       [/\b(focus\s*verandering|focusverandering|ffd\s*verandering|focus\s*wissel)\b/gi, "focusverandering"],
       [/\b(kwadraten\s*wet|kwadraat\s*wet|omgekeerde\s*kwadratenwet)\b/gi, "kwadratenwet"],
@@ -1267,10 +1389,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       // Brongrootte / Bronafmeting / Bronkeuze
       [/\b(bron\s*afmeting|bronafmeting|focus\s*afmeting|focusafmeting|brongrote|bron\s*grootte|brandvlek\s*grootte|brandvlekgrootte|brandvlek)\b/gi, "brongrootte"],
       [/\b(bronkhuyzen|bronkhuizen|bronkhuis|bronhuizen|bronhuis|bronkruis|bronbuis|bron\s*kruis|bron\s*buis|bron\s*keuzes?|bronkeuzes|bronkeuzen|bron\s*cursus|bron\s*keuring)\b/gi, "bronkeuze"],
-      // Technieken
-      [/\b(de\s+wc|dw\s*zie|d\s*w\s*s\s*i|dwz\s*i|dw\s*si|dw-si|double\s*wall\s*single\s*image|dubbele\s+wand\s+enkel\s+beeld|dubbelwandig\s+enkel|dubbel\s*wand\s*enkel\s*beeld|dubbelwand\s*enkel\s*beeld|dweb|d\.w\.e\.b\.)\b/gi, "DWSI"],
-      [/\b(single\s*wall\s*single\s*image|single\s*wall|souci|sw\s*zie|s\s*w\s*s\s*i|s\s*w\s*c|sw\s*si|sw-si|enkele\s+wand\s+enkel\s+beeld|enkeld?wandig\s+enkel\s+beeld|enkeld?wandig|enkeld?\s*wand\s*enkel\s*beeld|enkeld?wand\s*enkel\s*beeld|enkele?\s*wand|enkeld?wand|eweb|e\.w\.e\.b\.)\b/gi, "SWSI"],
-      [/\b(double\s*wall\s*double\s*image|double\s*wall\s*double|dw\s*die|d\s*w\s*d\s*i|dw\s*di|dw-di|dubbele\s+wand\s+dubbel\s+beeld|dubbel\s+wand\s+dubbel|dubbelwandig\s+dubbel\s+beeld|dubbelwand\s+dubbel\s+beeld|dwdb|d\.w\.d\.b\.)\b/gi, "DWDI"],
+      // Technieken (DWSI / SWSI / DWDI volledig uitgesproken NL & EN, excl. onbestaand 'enkel wand dubbel beeld')
+      [/\b(de\s+wc|dw\s*zie|d\s*w\s*s\s*i|dwz\s*i|dw\s*si|dw-si|(?:double|dubbel|dobbel|dubble)\s*(?:wall|wol|wal|wand)\s*(?:single|singel)\s*(?:image|imige|iemets|imids)|dubbele\s+wand\s+enkel\s+beeld|dubbelwand(?:ig)?\s*(?:enkel|een)\s*(?:beeld|beelt)?|dubbel\s*(?:wand|want|wandt)\s*(?:enkel|een)\s*(?:beeld|beelt)|twee\s*wanden\s*enkel\s*beeld|d\s*w\s*e\s*b|dweb|d\.w\.e\.b\.)\b/gi, "DWSI"],
+      [/\b((?:single|singel)\s*(?:wall|wol|wal)\s*(?:single|singel)\s*(?:image|imige|iemets|imids)|(?:single|singel)\s*(?:wall|wol|wal)(?!\s*(?:double|dubbel))|souci|sw\s*zie|s\s*w\s*s\s*i|s\s*w\s*c|sw\s*si|sw-si|enkele?\s*(?:wand|want|wandt)\s*(?:enkel|een)\s*(?:beeld|beelt)|enkeld?wand(?:ig)?\s*(?:enkel|een)\s*(?:beeld|beelt)?|enkele?\s*(?:wand|want)(?!\s*(?:dubbel|twee))|e\s*w\s*e\s*b|eweb|e\.w\.e\.b\.)\b/gi, "SWSI"],
+      [/\b((?:double|dubbel|dobbel|dubble)\s*(?:wall|wol|wal|wand)\s*(?:double|dubbel|dobbel)\s*(?:image|imige|iemets|imids)|(?:double|dubbel|dobbel)\s*(?:wall|wol|wal)\s*(?:double|dubbel)|dw\s*die|d\s*w\s*d\s*i|dw\s*di|dw-di|dubbele\s+wand\s+dubbel\s+beeld|dubbel\s*(?:wand|want|wandt)\s*dubbel(?:\s*(?:beeld|beelt))?|dubbelwand(?:ig)?\s*dubbel(?:\s*(?:beeld|beelt))?|twee\s*wanden\s*dubbel\s*beeld|d\s*w\s*d\s*b|dwdb|d\.w\.d\.b\.)\b/gi, "DWDI"],
       [/\b(panoramisch|panoramische|panoraam|panoramis|panorama|in\s+het\s+midden|in\s+het\s+centrum)\b/gi, "centraal"],
       [/\b(ex\s*centrisch|ekscentrisch|accentrisch|excentriek|excentrische)\b/gi, "excentrisch"],
       // Onstream termen & Procedures (RT21021 / RT21022)
@@ -1323,9 +1445,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(smart\s*evo|evo\s*300|smart\s*1\s*mm)\b/gi, "Smart EVO (1 mm)"],
       [/\b(yxlon\s*300|ikslon\s*300|ypsilon\s*300|smart\s*3\s*mm)\b/gi, "Yxlon 300 (3 mm)"],
       [/\b(ikslon|ixlon|x[\s-]*lon|xlon|epsilon|ypsilon|ijssel|ijslon|eikslon|ykslon|iks\s*lon|yks\s*lon|yxlon)\b/gi, "Yxlon 300 (3 mm)"],
-      [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:rondstraler|panoramisch)|rondstraler|rondstralen)\b/gi, "Balteau Rondstraler (5 mm)"],
-      [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:ceram|directional)|ceram\s*300|seram\s*300|ceran\s*300)\b/gi, "Balteau Ceram (2.5 mm)"],
-      [/\b(balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bal\s*touw|baltouw|bauto)\b(?!\s*\(|\s*rondstraler|\s*ceram)/gi, "Balteau (2.5 mm)"],
+      [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:rond\s*straler|panoramisch)|rond\s*straler|rondstralen)\b/gi, "Balteau Rondstraler (5 mm)"],
+      [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:ceram|seram|keram|ceran|directional)|(?:ceram|seram|keram|ceran)\s*300)\b/gi, "Balteau Ceram (2.5 mm)"],
+      [/\b(balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bal\s*touw|baltouw|bauto)\b(?!\s*\(|\s*rond\s*straler|\s*ceram|\s*seram)/gi, "Balteau (2.5 mm)"],
       // Begrippen
       [/\b(straling\s*tijd|stralings\s*tijd|belichting\s*tijd|belichtings\s*tijd|betalingstijd|vertalingstijd|herhalingstijd|belastingstijd|bestralingstijd|belichtingstijd|schiettijd|schiet\s*tijd|schietteid)\b/gi, "stralingstijd"],
       [/\b(bron\s*verval|vervaltijd|verval\s*tijd)\b/gi, "bronverval"],
@@ -1336,9 +1458,17 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(optische\s+dichtheid|opties\s+dichtheid|optische\s+dikheid|optische\s+dikte|filmzwarting)\b/gi, "zwarting"],
       [/\b(bron\s*zijde|bron\s*kant|source\s*side|sourceside)\b/gi, "bronzijde"],
       [/\b(film\s*zijde|film\s*kant|film\s*side|filmside)\b/gi, "filmzijde"],
-      // BKI, IQI en Draadjes fonetisch
+      // BKI, IQI, Opstelling-afkortingen en Draadjes fonetisch
       [/\b(b\s*k\s*i|bee\s*kaa\s*ie|beekaaie|bekaie|b\.k\.i\.|beka\s*ie|bkaie|bekai)\b/gi, "BKI"],
       [/\b(i\s*q\s*i|ie\s*kju\s*ie|iekjuie|iki|i\.q\.i\.)\b/gi, "IQI"],
+      [/\b(d\s*w\s*s\s*i|d\.w\.s\.i\.|dee\s*wee\s*es\s*ie)\b/gi, "DWSI"],
+      [/\b(d\s*w\s*d\s*i|d\.w\.d\.i\.|dee\s*wee\s*dee\s*ie)\b/gi, "DWDI"],
+      [/\b(d\s*w\s*b\s*i|d\.w\.b\.i\.|dee\s*wee\s*bee\s*ie)\b/gi, "DWBI"],
+      [/\b(s\s*w\s*s\s*i|s\.w\.s\.i\.|es\s*wee\s*es\s*ie)\b/gi, "SWSI"],
+      [/\b(e\s*w\s*e\s*b|e\.w\.e\.b\.)\b/gi, "EWEB"],
+      [/\b(d\s*w\s*e\s*b|d\.w\.e\.b\.)\b/gi, "DWEB"],
+      [/\b(d\s*w\s*d\s*b|d\.w\.d\.b\.)\b/gi, "DWDB"],
+      [/\b(u\s*g|u\.g\.)\b/gi, "Ug"],
       [/\b(draatjes|draaitjes|draatje|draaitje)\b/gi, "draadjes"],
       // Agfa Structurix & Filmklassen C1 t/m C6
       [/\b(akfa|achfa|agfa\s*film|struktuurix|structuriks|struchturix)\b/gi, "Agfa Structurix"],
@@ -1348,9 +1478,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(c\s*4|cee\s*4|see\s*4|zee\s*4|c\s*vier|cee\s*vier|c-4)\b/gi, "C4"],
       [/\b(c\s*5|cee\s*5|see\s*5|zee\s*5|c\s*vijf|cee\s*vijf|c-5)\b/gi, "C5"],
       [/\b(c\s*6|cee\s*6|see\s*6|zee\s*6|c\s*zes|cee\s*zes|c-6)\b/gi, "C6"],
-      // FFD / SFD
+      // FFD / SFD / OFA / OFD / SDD / SFF
       [/\b(ef\s*ef\s*dee|f\s*f\s*d|f\.f\.d\.|f-f-d|ff\s*dee|effeffdee)\b/gi, "FFD"],
       [/\b(es\s*ef\s*dee|s\s*f\s*d|s\.f\.d\.|s-f-d|sf\s*dee|esseffdee)\b/gi, "SFD"],
+      [/\b(es\s*ef\s*ef|s\s*f\s*f|s\.f\.f\.|s-f-f)\b/gi, "SFF"],
+      [/\b(es\s*dee\s*dee|s\s*d\s*d|s\.d\.d\.|s-d-d)\b/gi, "SDD"],
+      [/\b(o\s*ef\s*dee|o\s*f\s*d|o\.f\.d\.|o-f-d)\b/gi, "OFD"],
+      [/\b(o\s*ef\s*a|o\s*f\s*a|o\.f\.a\.|o-f-a)\b/gi, "OFA"],
       // Schedules
       [/\b(schetsjoel|schetjoel|skejoel|sketsjoel|sjedjoel|shedoel|skedjoel|skedule|schedul|shedoel|skedoel|skedool|scheduel)\b/gi, "schedule"],
       // Filmtypen & D-nummers
@@ -1509,16 +1643,79 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     t = t.replace(/\b(opnames?\s+met\s+verzet)\b/gi, "opstelling 11/F ovaaltje");
     t = t.replace(/\b(loodrecht\s+door\s+de\s+las)\b/gi, "opstelling 12/G superpositie");
 
-    // D & N spraakcorrecties: "den 50", "d en 50", "d.n. 50", "d n 50", "d&n 50", "dm 50", "dr 50", "dl 50", "dia 50" -> "DN 50"
-    t = t.replace(/\b(?:d\s*(?:en|&|\.n\.|\s+n)|den|dan|dm|dr|dl|dia|thee\s*en|de\s*en|de\s*n)\s*(\d+)\b/gi, "DN $1");
+    // 4A. Bigram-Samenvoeger (gesplitste of licht verbasterde samenstellingen tegen NDO_COMPOUND_TRIGGERS)
+    const gramWoordenStop = new Set([
+      "de", "het", "een", "van", "op", "in", "bij", "met", "voor", "naar", "aan", "om", "uit", "door", "over",
+      "als", "dan", "of", "en", "is", "zijn", "was", "kan", "mag", "moet", "wil", "zal", "zou", "hoe", "wat",
+      "welk", "welke", "waar", "wanneer", "wie", "mijn", "jouw", "onze", "dit", "dat", "deze", "die", "veel",
+      "hoeveel", "kleine", "grote", "nieuwe", "oude", "wordt", "heeft", "heb", "ik", "je", "we", "men"
+    ]);
+    const stopExactPrefix = new Set(["ons", "door", "op", "af", "over"]);
+    const beschermdeEenheden = new Set(["mm", "cm", "dm", "kv", "ma", "ci", "msv", "usv", "ug", "ffd", "sfd", "ofa", "bki", "iqi", "dwsi", "swsi", "dwdi", "dwbi", "eweb", "dweb", "dwdb"]);
+    const tokens = t.split(/\s+/).filter(Boolean);
+    const mergedTokens = [];
+    for (let idx = 0; idx < tokens.length; idx++) {
+      const w1 = tokens[idx];
+      const w2 = tokens[idx + 1];
+      if (w2 && !/[).,!?;:]$/.test(w1) && !/^[(\[]/.test(w2)) {
+        const c1 = w1.replace(/[^a-z]/gi, "").toLowerCase();
+        const c2 = w2.replace(/[^a-z]/gi, "").toLowerCase();
+        const allowBigram =
+          c1.length >= 2 &&
+          c2.length >= 3 &&
+          !/\d/.test(w1) &&
+          !/\d/.test(w2) &&
+          !beschermdeEenheden.has(c1) &&
+          !beschermdeEenheden.has(c2) &&
+          (!gramWoordenStop.has(c1) || stopExactPrefix.has(c1)) &&
+          !gramWoordenStop.has(c2) &&
+          c1.length <= 10 &&
+          c2.length <= 12;
+        if (allowBigram) {
+          const combo = c1 + c2;
+          if (NDO_COMPOUND_TRIGGERS.includes(combo)) {
+            mergedTokens.push(combo);
+            idx++;
+            continue;
+          }
+          if (!gramWoordenStop.has(c1) || c1 === "ons") {
+            const comboRes = besteTriggerMatch(combo, NDO_COMPOUND_TRIGGERS, 54);
+            if (comboRes && (c1 !== "ons" || comboRes.match === "onstream")) {
+              mergedTokens.push(comboRes.match);
+              idx++;
+              continue;
+            }
+          }
+        }
+      }
+      mergedTokens.push(w1);
+    }
+    t = mergedTokens.join(" ");
 
-    // DN maten converteren naar buitendiameter De (in mm)
+    // 4B. Best-Match Enkelwoord Fuzzy / Rijm / Fonetisch / Medeklinkerskelet Engine
+    t = t.split(/\s+/).map((w) => {
+      const s = w.replace(/[^a-z]/gi, "").toLowerCase();
+      if (s.length < 5 || NORMALE_NL_STOPWOORDEN.has(s) || NDO_TRIGGERS_SET.has(s)) return w;
+      const res = besteTriggerMatch(s, NDO_ENKELWOORD_TRIGGERS, 45);
+      if (!res) return w;
+      if (res.match === "iridium") return "Ir-192";
+      if (res.match === "selenium") return "Se-75";
+      if (res.match === "kobalt") return "Co-60";
+      return res.match;
+    }).join(" ");
+
+    // 5. D & N / DN & Duimse maten en eenheden normaliseren (nu inclusief alle herstelde triggerwoorden!)
+    t = t.replace(/\b(?:d\s*(?:en|&|\.n\.|\s+n)|dia|thee\s*en|de\s*en|de\s*n)\s*(\d+)\b/gi, "DN $1");
+    t = t.replace(
+      /(\b(?:groter|kleiner|meer|minder|hoger|lager|dikker|dunner|breder|langer|korter|zwaarder|lichter|eerder|later|liever|beter|en|want|of|dat)\s+)?\b(den|dan)\s*(\d+)\b/gi,
+      (m, prev, _w, num) => (!prev && DN_MATEN[num] !== undefined ? `DN ${num}` : m),
+    );
+
     t = t.replace(/\bdn\s*[-]?\s*(\d+)\b/gi, (m, dnVal) => {
       const od = DN_MATEN[dnVal];
       return od !== undefined ? `diameter ${od}` : m;
     });
 
-    // 4. Duimse maten
     t = t.replace(
       /\b(\d+(?:\.\d+)?)[-\s]*(?:duimertjes?|duimse|duims|duimer|duimers|duimen|duimpje|duim|duin|duins|duinen|timer|timers|tuin|tuinen|dimmer|dimmers|dimme|dimma|duivel|duvel|duvels|duwer|duwers|inch|inches|")\b/gi,
       (m, maatStr) => {
@@ -1535,42 +1732,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const paddedCms = cms.length === 1 ? `0${cms}` : cms;
       return `${meters}.${paddedCms} meter`;
     });
-
-    // 5. Fuzzy matching (Levenshtein + Nederlandse fonetische sleutel + medeklinkerskelet + rijm/prefix-koppeling)
-    const medeklinkerSkelet = (woord) =>
-      woord.toLowerCase().replace(/[^a-z]/g, "").replace(/[aeiouy]/g, "").replace(/(.)\1+/g, "$1");
-
-    t = t.split(/\s+/).map((w) => {
-      const s = w.replace(/[^a-z]/gi, "").toLowerCase();
-      if (s.length < 5 || NORMALE_NL_STOPWOORDEN.has(s) || NDO_ENKELWOORD_TRIGGERS.includes(s)) return w;
-      if (/^duim[a-z]{1,4}$/.test(s) && s !== "duimer" && s !== "duims" && s !== "duimen") {
-        return "duimer";
-      }
-      const sFon = nlFonetischeSleutel(s);
-      const sSkel = medeklinkerSkelet(s);
-      for (const d of NDO_ENKELWOORD_TRIGGERS) {
-        if (Math.abs(s.length - d.length) > 2) continue;
-        const dist = levenshteinAfstand(s, d);
-        const zelfdePrefix = s.length >= 5 && d.length >= 5 && s.slice(0, 3) === d.slice(0, 3);
-        const zelfdeRijm = s.length >= 5 && d.length >= 5 && s.slice(-3) === d.slice(-3);
-        const dFon = nlFonetischeSleutel(d);
-        const fonDist = levenshteinAfstand(sFon, dFon);
-        const fonRijmOfPrefix = sFon.length >= 4 && dFon.length >= 4 && (sFon.slice(0, 2) === dFon.slice(0, 2) || sFon.slice(-2) === dFon.slice(-2));
-        const dSkel = medeklinkerSkelet(d);
-        const skelMatch = sSkel.length >= 4 && dSkel.length >= 4 && levenshteinAfstand(sSkel, dSkel) <= 1 && (sSkel[0] === dSkel[0] || sSkel.slice(-2) === dSkel.slice(-2));
-        if (
-          dist <= (d.length >= 8 ? 2 : 1) ||
-          (dist <= 2 && (zelfdePrefix || zelfdeRijm)) ||
-          (fonDist <= 1 && fonRijmOfPrefix) ||
-          skelMatch
-        ) {
-          if (d === "iridium") return "Ir-192";
-          if (d === "selenium") return "Se-75";
-          return d;
-        }
-      }
-      return w;
-    }).join(" ");
 
     return t.replace(/\s+/g, " ").trim();
   }
@@ -11293,7 +11454,7 @@ ${stralingstijdPlat}========================================`;
     if (resultItem.length === 1) {
       return (resultItem[0] && resultItem[0].transcript) ? resultItem[0].transcript.trim() : "";
     }
-    const rtKernwoorden = /\b(iridium|ir[-\s]?192|selenium|se[-\s]?75|kobalt|co[-\s]?60|sterkste|zwakste|curie|ci|activiteit|wanddikte|diameter|duimer|duims|duim|duin|duins|dik|dek|onstream|afzetting|stralingstijd|belichtingstijd|schiettijd|focus|focusafstand|ffd|sfd|langsnaad|rondnaad|opnames|draadje|bki|buistabel|kilovolt|buisspanning|staalequivalent|bronverval|verval|ovaaltje|verzet|collimator|zwarting|lood|klasse|asme|tangentiaal|dubbelwand|isolatie|isolatiedikte|milliamp[eè]re|mamin|ma|brongrootte|bronkeuze|balteau|balto|ball\s*toe|bal\s*toe|baltoo|yxlon|ikslon|smart|evo|rondstraler|rondstralen|panoramisch|centraal|bundel|bundelbreedte|directional|ceram|d[2-8]|iso|swsi|dwsi|kwadratenwet|one\s*that\s*is|aas\s*mee|esmee|wandelen)\b/gi;
+    const rtExtraUnits = /\b(ir-192|se-75|co-60|mm|cm|ci|kv|ma|mamin|ffd|sfd|ofa|ofd|sod|sdd|sff|hvl|ug|bki|iqi|dwsi|swsi|dwdi|dwbi|eweb|dweb|dwdb|ndo|ndt|wmax|asme|en-[ab]|w\d+|d[2-8]|c[1-6]|dn\s*\d+|sch(?:edule)?\s*(?:\d+|xs|xxs|std)|xxs|xs|std)\b/gi;
 
     let bestText = (resultItem[0] && resultItem[0].transcript) ? resultItem[0].transcript.trim() : "";
     let bestScore = -1;
@@ -11302,12 +11463,28 @@ ${stralingstijdPlat}========================================`;
       const cand = (resultItem[a] && resultItem[a].transcript) ? resultItem[a].transcript.trim() : "";
       if (!cand) continue;
       const gecorrigeerd = corrigeerSpraakTekst(cand);
-      const matches = gecorrigeerd.match(rtKernwoorden);
-      const rawMatches = cand.match(rtKernwoorden);
-      const numMatches = gecorrigeerd.match(/\b\d+(?:[.,]\d+)?\b/g);
-      // Geef elk herkend RT-kernwoord +10 punten, elk getal +3 punten, en het eerste alternatief +2 tie-breaker bonus
-      const totalTermMatches = (matches ? matches.length : 0) + (rawMatches ? rawMatches.length : 0);
-      const score = (totalTermMatches * 10) + (numMatches ? numMatches.length * 3 : 0) + (a === 0 ? 2 : 0);
+      const hersteld = herstelVakjargon(gecorrigeerd);
+
+      const telTriggers = (txt) => {
+        let count = 0;
+        const unitMatches = txt.match(rtExtraUnits);
+        if (unitMatches) count += unitMatches.length;
+        const words = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/\s+/);
+        for (const w of words) {
+          const clean = w.replace(/[^a-z-]/g, "");
+          if (clean && NDO_TRIGGERS_SET.has(clean)) count++;
+        }
+        return count;
+      };
+
+      const rawScore = telTriggers(cand) * 14;
+      const corrScore = telTriggers(gecorrigeerd) * 12;
+      const hersteldScore = telTriggers(hersteld) * 8;
+      const numMatches = hersteld.match(/\b\d+(?:[.,]\d+)?\b/g);
+      const numScore = numMatches ? numMatches.length * 4 : 0;
+      const confScore = typeof resultItem[a].confidence === "number" ? Math.round(resultItem[a].confidence * 5) : 0;
+      const score = rawScore + corrScore + hersteldScore + numScore + confScore + (a === 0 ? 2 : 0);
+
       if (score > bestScore) {
         bestScore = score;
         bestText = cand;
@@ -11671,6 +11848,10 @@ ${stralingstijdPlat}========================================`;
       // Sla de ruwe resultaten op, maar toon nog GEEN tussenwoorden op het scherm
       // De zin wordt pas netjes weergegeven zodra de PTT-knop wordt losgelaten!
       latestRawSpeechResults = evt.results;
+      const tr = document.getElementById("rt-ai-transcript");
+      if (tr && isPushing && evt.results && evt.results.length > 0) {
+        tr.textContent = "🎙️ Spraak ontvangen... (Laat los om te verzenden)";
+      }
     };
 
     rec.onerror = (e) => {
