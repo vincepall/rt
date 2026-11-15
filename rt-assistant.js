@@ -355,6 +355,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
             continue;
           }
         }
+        if (a.name === "RVS 316 / 316L") {
+          // Voorkom dat losse getallen zoals "FFD 316 mm" of "316" onterecht als RVS 316 worden herkend
+          if (!/\b(rvs|roestvast|roestvrij|316\s*l|1\.4404|aisi\s*316|ss\s*316|materiaal\s*316|werkstof\s*316)\b/i.test(lower)) {
+            continue;
+          }
+        }
+        if (a.name === "RVS 304 / 304L") {
+          // Voorkom dat losse getallen zoals "304 mm" onterecht als RVS 304 worden herkend
+          if (!/\b(rvs|roestvast|roestvrij|304\s*l|1\.4301|aisi\s*304|ss\s*304|materiaal\s*304|werkstof\s*304)\b/i.test(lower)) {
+            continue;
+          }
+        }
+        if (a.name === "Super Duplex 2507") {
+          if (!/\b(duplex|super\s*duplex|materiaal\s*2507|werkstof\s*2507)\b/i.test(lower)) {
+            continue;
+          }
+        }
+        if (a.name === "Duplex 2205") {
+          if (!/\b(duplex|materiaal\s*2205|werkstof\s*2205)\b/i.test(lower)) {
+            continue;
+          }
+        }
         const found = materialenDatabase.find((m) => m.name.toLowerCase() === a.name.toLowerCase());
         if (found) return found;
       }
@@ -8190,8 +8212,9 @@ ${stralingstijdPlat}========================================`;
     if (typeof document !== "undefined") {
       const respEl = document.getElementById("rt-ai-response");
       if (respEl) {
-        respEl.innerHTML = `Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).` + geefGeheugenBadgesHtml();
+        respEl.innerHTML = `Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).`;
       }
+      renderGeheugenBalk();
       const transEl = document.getElementById("rt-ai-transcript");
       if (transEl) {
         transEl.textContent = "Houd 🎙️ ingedrukt om in te spreken (PTT), of typ je vraag...";
@@ -8199,6 +8222,7 @@ ${stralingstijdPlat}========================================`;
       const inp = document.getElementById("rt-ai-input");
       if (inp) {
         inp.value = "";
+        inp.style.height = "auto";
       }
       isExamplesOpen = false;
       opgeslagenResponseHtmlVoorVoorbeelden = "";
@@ -8520,15 +8544,24 @@ ${stralingstijdPlat}========================================`;
 
     synchroniseerDOMFormulier(actiefGespreksGeheugen);
 
-    if (typeof document !== "undefined") {
-      const container = document.getElementById("rt-ai-context-container");
-      if (container) {
-        const html = geefGeheugenBadgesHtml();
-        if (html) {
-          container.outerHTML = html;
-        } else {
-          container.outerHTML = `<div id="rt-ai-context-container" style="margin-top: 12px; font-size: 0.82rem; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px; opacity:0.7;">🧠 <em>Geheugen is leeg.</em></div>`;
-        }
+    renderGeheugenBalk();
+  }
+
+  function renderGeheugenBalk() {
+    if (typeof document === "undefined") return;
+    const bar = document.getElementById("rt-ai-memory-bar");
+    if (bar) {
+      const html = geefGeheugenBadgesHtml();
+      bar.innerHTML = html || `<div id="rt-ai-context-container" class="rt-ai-memory-empty">🧠 <em>Geheugen is leeg.</em></div>`;
+      return;
+    }
+    const container = document.getElementById("rt-ai-context-container");
+    if (container) {
+      const html = geefGeheugenBadgesHtml();
+      if (html) {
+        container.outerHTML = html;
+      } else {
+        container.outerHTML = `<div id="rt-ai-context-container" class="rt-ai-memory-empty">🧠 <em>Geheugen is leeg.</em></div>`;
       }
     }
   }
@@ -8569,7 +8602,7 @@ ${stralingstijdPlat}========================================`;
     return `<span class="rt-ai-bron-pill ${isAnySelected ? 'active' : ''}" style="display:inline-flex; align-items:center; background:#181818; border:1px solid ${isAnySelected ? '#f5df4d' : 'rgba(245,223,77,0.45)'}; border-radius:14px; padding:2px 8px; font-size:0.8rem; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3); vertical-align:middle; transition:border-color 0.2s;">
       <i class="fas fa-crosshairs" style="color:#f5df4d; font-size:0.75rem; margin-right:4px;"></i>
       <select class="rt-ai-bron-select" onchange="window.RtAssistant && window.RtAssistant.selecteerBronUitDropdown(this.value);" title="Snelkeuze bron of focusafmeting" style="background:transparent; border:none; color:${isAnySelected ? '#f5df4d' : '#f0f0f0'}; font-family:'Roboto Condensed', sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; outline:none; padding-right:2px; max-width:240px; text-overflow:ellipsis;">
-        <option value="" ${!isAnySelected ? "selected" : ""} style="background:#222; color:#f5df4d;">🎯 Kies bron / focus ▾</option>
+        <option value="" ${!isAnySelected ? "selected" : ""} style="background:#222; color:#f5df4d;">Bron / focus ▾</option>
         <optgroup label="Actuele Gammabronnen (bronnen.csv)" style="background:#222; color:#f5df4d;">
           ${bronnenOptions}
         </optgroup>
@@ -8666,12 +8699,7 @@ ${stralingstijdPlat}========================================`;
 
     synchroniseerDOMFormulier(actiefGespreksGeheugen);
 
-    if (typeof document !== "undefined") {
-      const container = document.getElementById("rt-ai-context-container");
-      if (container) {
-        container.outerHTML = geefGeheugenBadgesHtml();
-      }
-    }
+    renderGeheugenBalk();
 
     if (
       actiefGespreksGeheugen.verwachtParameter === "brongrootte" ||
@@ -8715,11 +8743,12 @@ ${stralingstijdPlat}========================================`;
     if (typeof document !== "undefined") {
       const respEl = document.getElementById("rt-ai-response");
       if (respEl) {
-        const chipsHtml = `<div class="rt-ai-chips-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">` +
-          chips.map((c) => `<button type="button" class="rt-ai-chip-btn" style="background:#222; border:1px solid #f5df4d; color:#f5df4d; padding:4px 10px; border-radius:12px; font-size:0.85rem; cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+        const chipsHtml = `<div class="rt-ai-chips-row">` +
+          chips.map((c) => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
           `</div>`;
-        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> geselecteerd.<br><br>Hoeveel <strong>Curie</strong> (activiteit) heeft deze bron?${chipsHtml}` + geefGeheugenBadgesHtml();
+        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> geselecteerd.<br><br>Hoeveel <strong>Curie</strong> (activiteit) heeft deze bron?${chipsHtml}`;
       }
+      renderGeheugenBalk();
       const transEl = document.getElementById("rt-ai-transcript");
       if (transEl) {
         transEl.innerHTML = `Bronkeuze: <strong>${bronNaam}</strong> (wacht op activiteit...)`;
@@ -8752,11 +8781,12 @@ ${stralingstijdPlat}========================================`;
         } else {
           suggestieChips.push("Stralingstijd 6 duimer Sch 40", "Stralingstijd 4 duimer Sch 40", "Stralingstijd plaat");
         }
-        const chipsHtml = `<div class="rt-ai-chips-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">` +
-          suggestieChips.map((c) => `<button type="button" class="rt-ai-chip-btn" style="background:#222; border:1px solid #f5df4d; color:#f5df4d; padding:4px 10px; border-radius:12px; font-size:0.85rem; cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+        const chipsHtml = `<div class="rt-ai-chips-row">` +
+          suggestieChips.map((c) => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
           `</div>`;
-        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> ingesteld met <strong>${ci} Curie</strong>.<br><br>Waarmee wil je verder rekenen?${chipsHtml}` + geefGeheugenBadgesHtml();
+        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> ingesteld met <strong>${ci} Curie</strong>.<br><br>Waarmee wil je verder rekenen?${chipsHtml}`;
       }
+      renderGeheugenBalk();
       const transEl = document.getElementById("rt-ai-transcript");
       if (transEl) {
         transEl.innerHTML = `Bronkeuze: <strong>${bronNaam}</strong> [${ci} Ci]`;
@@ -8774,10 +8804,7 @@ ${stralingstijdPlat}========================================`;
       if (!isNaN(parsed) && parsed > 0) {
         actiefGespreksGeheugen.activiteit = Math.round(parsed * 10) / 10;
         synchroniseerDOMFormulier(actiefGespreksGeheugen);
-        if (typeof document !== "undefined") {
-          const container = document.getElementById("rt-ai-context-container");
-          if (container) container.outerHTML = geefGeheugenBadgesHtml();
-        }
+        renderGeheugenBalk();
         toonBronBevestiging();
       }
     }
@@ -8800,7 +8827,7 @@ ${stralingstijdPlat}========================================`;
     return `<span class="rt-ai-norm-pill ${isAnySelected ? 'active' : ''}" style="display:inline-flex; align-items:center; background:#181818; border:1px solid ${isAnySelected ? '#f5df4d' : 'rgba(245,223,77,0.45)'}; border-radius:14px; padding:2px 8px; font-size:0.8rem; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3); vertical-align:middle; transition:border-color 0.2s;">
       <i class="fas fa-file-contract" style="color:#f5df4d; font-size:0.75rem; margin-right:4px;"></i>
       <select class="rt-ai-norm-select" onchange="window.RtAssistant && window.RtAssistant.selecteerNormUitDropdown(this.value);" title="Snelkeuze kwaliteitsklasse / norm of onstream" style="background:transparent; border:none; color:${isAnySelected ? '#f5df4d' : '#f0f0f0'}; font-family:'Roboto Condensed', sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; outline:none; padding-right:2px; max-width:200px; text-overflow:ellipsis;">
-        <option value="" ${!isAnySelected ? "selected" : ""} style="background:#222; color:#f5df4d;">📜 Kies norm ▾</option>
+        <option value="" ${!isAnySelected ? "selected" : ""} style="background:#222; color:#f5df4d;">Norm ▾</option>
         <optgroup label="Lasonderzoek (EN ISO 17636 / ASME)" style="background:#222; color:#f5df4d;">
           <option value="EN-B" ${isEnB ? "selected" : ""} style="background:#222; color:#fff;">EN Klasse B (streng)</option>
           <option value="EN-A" ${isEnA ? "selected" : ""} style="background:#222; color:#fff;">EN Klasse A</option>
@@ -8820,12 +8847,7 @@ ${stralingstijdPlat}========================================`;
     if (!val || val === "wis") {
       wisGeheugenParameter("procedure");
       synchroniseerDOMFormulier(actiefGespreksGeheugen);
-      if (typeof document !== "undefined") {
-        const container = document.getElementById("rt-ai-context-container");
-        if (container) {
-          container.outerHTML = geefGeheugenBadgesHtml();
-        }
-      }
+      renderGeheugenBalk();
       return;
     }
 
@@ -8846,12 +8868,7 @@ ${stralingstijdPlat}========================================`;
 
     synchroniseerDOMFormulier(actiefGespreksGeheugen);
 
-    if (typeof document !== "undefined") {
-      const container = document.getElementById("rt-ai-context-container");
-      if (container) {
-        container.outerHTML = geefGeheugenBadgesHtml();
-      }
-    }
+    renderGeheugenBalk();
 
     // Als RADI wachtte op procedure of onstreamKlasse, direct doorgaan!
     if (
@@ -8893,29 +8910,75 @@ ${stralingstijdPlat}========================================`;
         (it.key !== "activiteit" || !hasCsvSource)
     );
 
-    const badgesHtml = nonDropdownItems
-      .map(
-        (it) => {
-          if (it.key === "activiteit") {
-            return `<span class="rt-ai-param-badge" onclick="window.RtAssistant && window.RtAssistant.wijzigActiviteitViaPrompt();" title="Activiteit: klik om te wijzigen (${it.label}), of &times; om te wissen" style="display:inline-flex; align-items:center; background:#181818; border:1px solid #f5df4d; border-radius:14px; padding:2px 9px; font-size:0.8rem; color:#f5df4d; gap:6px; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3); cursor:pointer;"><span style="text-decoration:underline dotted; text-underline-offset:2px;">${it.label} ✏️</span><button type="button" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('${it.key}');" title="Wis ${it.label} uit geheugen" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:0; margin:0; font-size:1.05rem; line-height:1; font-weight:bold; display:inline-flex; align-items:center;" onmouseover="this.style.color='#ff3333'" onmouseout="this.style.color='#ff6b6b'">&times;</button></span>`;
-          }
-          return `<span class="rt-ai-param-badge" title="${it.title || it.label}: klik op &times; om te wissen" style="display:inline-flex; align-items:center; background:#181818; border:1px solid rgba(245,223,77,0.45); border-radius:14px; padding:2px 9px; font-size:0.8rem; color:#f0f0f0; gap:6px; margin:2px 0; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><span>${it.label}</span><button type="button" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('${it.key}');" title="Wis ${it.label} uit geheugen" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:0; margin:0; font-size:1.05rem; line-height:1; font-weight:bold; display:inline-flex; align-items:center;" onmouseover="this.style.color='#ff3333'" onmouseout="this.style.color='#ff6b6b'">&times;</button></span>`;
+    function geefKortBadgeLabel(it) {
+      if (it.key === "diameter" && actiefGespreksGeheugen.diameter) {
+        return `Dia ${actiefGespreksGeheugen.diameter}`;
+      }
+      if (it.key === "wanddikte" && actiefGespreksGeheugen.wanddikte) {
+        return actiefGespreksGeheugen.schedule
+          ? `WD ${actiefGespreksGeheugen.wanddikte} (${actiefGespreksGeheugen.schedule})`
+          : `WD ${actiefGespreksGeheugen.wanddikte}`;
+      }
+      if (it.key === "sfd" && actiefGespreksGeheugen.sfd) {
+        return `FFD ${actiefGespreksGeheugen.sfd}`;
+      }
+      if (it.key === "filmType" && actiefGespreksGeheugen.filmType) {
+        return `Film ${actiefGespreksGeheugen.filmType}`;
+      }
+      if (it.key === "activiteit" && actiefGespreksGeheugen.activiteit) {
+        return `${actiefGespreksGeheugen.activiteit} Ci`;
+      }
+      if (it.key === "materiaalFactor") {
+        if (actiefGespreksGeheugen.materiaalNaam) {
+          return actiefGespreksGeheugen.materiaalNaam
+            .replace(/\s*\(.*?\)\s*/g, "")
+            .replace(/\s*\/\s*316L/i, "")
+            .replace(/\s*\/\s*304L/i, "")
+            .trim();
         }
-      )
-      .join(" ");
+        if (actiefGespreksGeheugen.materiaalFactor) {
+          return `Factor ${actiefGespreksGeheugen.materiaalFactor}x`;
+        }
+      }
+      if (it.key === "pbMm" && actiefGespreksGeheugen.pbMm) {
+        return `Pb ${actiefGespreksGeheugen.pbMm} mm`;
+      }
+      if (it.key === "feMm" && actiefGespreksGeheugen.feMm) {
+        return `Fe ${actiefGespreksGeheugen.feMm} mm`;
+      }
+      if (it.key === "lascompensatie") {
+        return `Las ${actiefGespreksGeheugen.lascompensatie} mm`;
+      }
+      if (it.key === "isolatieMm") {
+        return actiefGespreksGeheugen.isolatieMm === 0 ? "Geen iso" : `Iso ${actiefGespreksGeheugen.isolatieMm} mm`;
+      }
+      if (it.key === "focusBegintijdSec" && actiefGespreksGeheugen.focusBegintijdSec) {
+        return `Tijd ${formatSecondenKort(actiefGespreksGeheugen.focusBegintijdSec)}`;
+      }
+      return it.label;
+    }
+
+    const badgesHtml = nonDropdownItems
+      .map((it) => {
+        const kortLabel = geefKortBadgeLabel(it);
+        if (it.key === "activiteit") {
+          return `<span class="rt-ai-param-badge rt-ai-param-badge-edit" onclick="window.RtAssistant && window.RtAssistant.wijzigActiviteitViaPrompt();" title="Activiteit: ${it.label} — klik om te wijzigen, of × om te wissen"><span class="rt-ai-badge-text">${kortLabel} ✏️</span><button type="button" class="rt-ai-badge-del" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('${it.key}');" title="Wis ${it.label} uit geheugen">&times;</button></span>`;
+        }
+        return `<span class="rt-ai-param-badge" title="${it.title || it.label}: ${it.label} — klik op × om te wissen"><span class="rt-ai-badge-text">${kortLabel}</span><button type="button" class="rt-ai-badge-del" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.wisGeheugenParameter('${it.key}');" title="Wis ${it.label} uit geheugen">&times;</button></span>`;
+      })
+      .join("");
 
     const bronPill = geefBronDropdownHtml();
     const normPill = geefNormDropdownHtml();
     const hasAny = nonDropdownItems.length > 0 || hasSourceSelected || hasNormSelected;
 
     const clearBtnHtml = hasAny
-      ? `<button type="button" class="rt-ai-clear-mem-btn" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis alle parameters uit het geheugen (schone lei)" style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,77,77,0.12); border:1px solid rgba(255,107,107,0.5); border-radius:14px; padding:3px 10px; font-size:0.78rem; font-weight:600; color:#ffb4b4; cursor:pointer; margin-left:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,77,77,0.28)'; this.style.color='#ffffff'; this.style.borderColor='#ff4d4d';" onmouseout="this.style.background='rgba(255,77,77,0.12)'; this.style.color='#ffb4b4'; this.style.borderColor='rgba(255,107,107,0.5)';"><i class="fas fa-trash-alt" style="font-size:0.75rem;"></i><span>Wis geheugen</span></button>`
+      ? `<button type="button" class="rt-ai-clear-mem-btn" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis alle parameters uit het geheugen (schone lei)"><i class="fas fa-trash-alt"></i><span class="rt-ai-clear-text">Wis</span></button>`
       : "";
 
-    return `<div id="rt-ai-context-container" style="margin-top: 12px; font-size: 0.82rem; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px;">
-      <div style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
-        <span style="opacity:0.85; font-size:0.82rem;">🧠 <em>Geheugen:</em></span>
-        ${badgesHtml}
+    return `<div id="rt-ai-context-container" class="rt-ai-context-container">
+      ${nonDropdownItems.length > 0 ? `<div class="rt-ai-memory-items">${badgesHtml}</div>` : ""}
+      <div class="rt-ai-memory-controls">
         ${bronPill}
         ${normPill}
         ${clearBtnHtml}
@@ -9153,9 +9216,9 @@ ${stralingstijdPlat}========================================`;
         wisGeheugenParameter("materiaalFactor");
         gewistNaam = "Materiaalfactor";
       }
-      const badges = geefGeheugenBadgesHtml();
+      renderGeheugenBalk();
       return {
-        text: `<strong>${gewistNaam}</strong> is gewist uit het geheugen.${badges ? "<br>" + badges : "<br><small style='opacity:0.7;'>Geheugen is nu leeg.</small>"}`,
+        text: `<strong>${gewistNaam}</strong> is gewist uit het geheugen.`,
         chips: [],
       };
     }
@@ -9384,9 +9447,9 @@ ${stralingstijdPlat}========================================`;
         } else if ((typeof nieuwParsed.pbMm === "number" && nieuwParsed.pbMm > 0) || (typeof nieuwParsed.feMm === "number" && nieuwParsed.feMm > 0) || /\b(afscherming|loodafscherming|lood\s*afscherming)\b/i.test(gefilterdeTekst)) {
           intenties = ["afzetting"];
         } else if (!heeftNieuweParameter && !isVraagZin && !context.isChip) {
-          const badges = geefGeheugenBadgesHtml();
+          renderGeheugenBalk();
           return {
-            text: `Ik beantwoord graag je RT-vraag. Stel gerust een specifieke vraag over stralingstijd, opnames, FFD, afzetting of onstream.${badges ? "<br>" + badges : ""}`,
+            text: `Ik beantwoord graag je RT-vraag. Stel gerust een specifieke vraag over stralingstijd, opnames, FFD, afzetting of onstream.`,
             chips: [
               "Stralingstijd berekenen",
               "Aantal opnames",
@@ -9904,10 +9967,7 @@ ${stralingstijdPlat}========================================`;
       }
     }
 
-    const contextHtml = geefGeheugenBadgesHtml();
-    if (contextHtml) {
-      antwoorden.push(contextHtml);
-    }
+    renderGeheugenBalk();
 
     return {
       text: antwoorden.filter(Boolean).join("<br><br>"),
@@ -10254,10 +10314,162 @@ ${stralingstijdPlat}========================================`;
         font-weight: 800 !important;
         letter-spacing: 0.2px !important;
       }
+      .rt-ai-chips-row {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)) !important;
+        gap: 8px !important;
+        margin-top: 12px !important;
+        width: 100% !important;
+      }
+      .rt-ai-chip-btn {
+        background: #222 !important;
+        border: 1px solid #f5df4d !important;
+        color: #f5df4d !important;
+        padding: 7px 10px !important;
+        border-radius: 10px !important;
+        font-size: 0.85rem !important;
+        font-family: 'Roboto Condensed', sans-serif !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        width: 100% !important;
+        min-height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        line-height: 1.25 !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        box-sizing: border-box !important;
+        transition: background 0.15s ease, transform 0.1s ease !important;
+      }
+      .rt-ai-chip-btn:hover {
+        background: rgba(245, 223, 77, 0.15) !important;
+      }
+      .rt-ai-memory-bar {
+        background: #161616 !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        border-radius: 8px !important;
+        padding: 6px 10px !important;
+        margin-bottom: 10px !important;
+        flex-shrink: 0 !important;
+        max-height: 170px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        touch-action: pan-y !important;
+        box-sizing: border-box !important;
+      }
+      .rt-ai-context-container {
+        font-size: 0.82rem;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .rt-ai-memory-empty {
+        font-size: 0.8rem;
+        opacity: 0.7;
+      }
+      .rt-ai-memory-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 5px;
+        width: 100%;
+      }
+      .rt-ai-param-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #181818;
+        border: 1px solid rgba(245, 223, 77, 0.45);
+        border-radius: 10px;
+        padding: 3px 8px;
+        font-size: 0.78rem;
+        color: #f0f0f0;
+        gap: 4px;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+      .rt-ai-param-badge-edit {
+        border-color: #f5df4d;
+        color: #f5df4d;
+        cursor: pointer;
+      }
+      .rt-ai-param-badge-edit .rt-ai-badge-text {
+        text-decoration: underline dotted;
+        text-underline-offset: 2px;
+      }
+      .rt-ai-badge-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+      }
+      .rt-ai-badge-del {
+        background: none;
+        border: none;
+        color: #ff6b6b;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .rt-ai-badge-del:hover {
+        color: #ff3333;
+      }
+      .rt-ai-memory-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+      }
+      .rt-ai-memory-controls .rt-ai-bron-pill,
+      .rt-ai-memory-controls .rt-ai-norm-pill {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        justify-content: space-between !important;
+        box-sizing: border-box !important;
+      }
+      .rt-ai-memory-controls .rt-ai-bron-select,
+      .rt-ai-memory-controls .rt-ai-norm-select {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+      }
+      .rt-ai-clear-mem-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        background: rgba(255, 77, 77, 0.12);
+        border: 1px solid rgba(255, 107, 107, 0.5);
+        border-radius: 10px;
+        padding: 3px 9px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #ffb4b4;
+        cursor: pointer;
+        flex-shrink: 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        transition: all 0.15s ease;
+      }
+      .rt-ai-clear-mem-btn:hover {
+        background: rgba(255, 77, 77, 0.28);
+        color: #ffffff;
+        border-color: #ff4d4d;
+      }
       .rt-ai-input-bar {
         display: flex !important;
         gap: 8px !important;
-        align-items: center !important;
+        align-items: flex-end !important;
         width: 100% !important;
         box-sizing: border-box !important;
         flex-shrink: 0 !important;
@@ -10269,17 +10481,23 @@ ${stralingstijdPlat}========================================`;
         flex: 1 1 0 !important;
         width: 0 !important;
         min-width: 0 !important;
-        padding: 10px 14px !important;
+        min-height: 42px !important;
+        max-height: 112px !important;
+        padding: 9px 14px !important;
         border-radius: 1.05em !important;
         border: 3px solid #F5DF4D !important;
         background-color: #ffffff !important;
         color: #000000 !important;
         font-size: 1.05rem !important;
+        line-height: 1.35 !important;
         font-family: 'Roboto Condensed', sans-serif !important;
         text-align: left !important;
         max-width: none !important;
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
         box-sizing: border-box !important;
+        resize: none !important;
+        overflow-y: auto !important;
+        touch-action: pan-y !important;
       }
       .rt-ai-text-input:focus {
         outline: none !important;
@@ -10547,25 +10765,49 @@ ${stralingstijdPlat}========================================`;
           margin-bottom: 6px !important;
           padding: 8px 10px !important;
         }
+        .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-memory-bar {
+          max-height: 64px !important;
+          margin-bottom: 5px !important;
+          padding: 4px 6px !important;
+        }
         .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-mic-btn {
           width: 44px !important;
           height: 44px !important;
           font-size: 20px !important;
         }
         .rt-ai-modal-header {
-          margin-bottom: 6px !important;
+          margin-bottom: 4px !important;
           padding-bottom: 4px !important;
+          min-height: 0 !important;
           flex-shrink: 0 !important;
           touch-action: none !important;
         }
         .rt-ai-modal-header h3 {
-          font-size: 1.15rem !important;
+          font-size: 1.05rem !important;
+          margin: 0 !important;
+          line-height: 1.1 !important;
         }
         .rt-ai-modal-subtitle {
-          font-size: 0.65rem !important;
+          display: none !important;
+        }
+        .rt-ai-reset-header-btn,
+        .rt-ai-info-btn,
+        .rt-ai-tts-btn {
+          padding: 4px !important;
+          font-size: 16px !important;
+        }
+        .rt-ai-close-btn {
+          padding: 0 4px !important;
+          font-size: 22px !important;
+          line-height: 1 !important;
+        }
+        .rt-ai-examples-btn {
+          padding: 3px 8px !important;
+          font-size: 0.76rem !important;
         }
         .rt-ai-transcript {
-          font-size: 0.85rem !important;
+          font-size: 0.8rem !important;
+          min-height: 0 !important;
           margin-bottom: 4px !important;
           flex-shrink: 0 !important;
           touch-action: none !important;
@@ -10590,6 +10832,76 @@ ${stralingstijdPlat}========================================`;
           font-size: 1.15em !important;
           font-weight: 800 !important;
         }
+        .rt-ai-chips-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 6px !important;
+          margin-top: 10px !important;
+        }
+        .rt-ai-chip-btn {
+          padding: 6px 8px !important;
+          font-size: 0.78rem !important;
+          min-height: 34px !important;
+          border-radius: 9px !important;
+        }
+        .rt-ai-memory-bar {
+          padding: 5px 6px !important;
+          margin-bottom: 6px !important;
+          max-height: 145px !important;
+          border-radius: 8px !important;
+        }
+        .rt-ai-context-container {
+          gap: 4px !important;
+        }
+        .rt-ai-memory-items {
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          gap: 4px !important;
+        }
+        .rt-ai-param-badge {
+          padding: 2px 6px !important;
+          font-size: 0.72rem !important;
+          border-radius: 8px !important;
+          min-height: 24px !important;
+          gap: 3px !important;
+        }
+        .rt-ai-memory-controls {
+          gap: 4px !important;
+        }
+        .rt-ai-clear-mem-btn {
+          padding: 2px 8px !important;
+          font-size: 0.72rem !important;
+          border-radius: 8px !important;
+          min-height: 24px !important;
+          height: 24px !important;
+        }
+        .rt-ai-clear-text {
+          display: none !important;
+        }
+        .rt-ai-bron-pill,
+        .rt-ai-norm-pill {
+          padding: 1px 6px !important;
+          font-size: 0.72rem !important;
+          border-radius: 8px !important;
+          min-height: 24px !important;
+          height: 24px !important;
+          margin: 0 !important;
+          max-width: none !important;
+        }
+        .rt-ai-bron-pill i,
+        .rt-ai-norm-pill i {
+          font-size: 0.68rem !important;
+          margin-right: 3px !important;
+          flex-shrink: 0 !important;
+        }
+        .rt-ai-bron-select,
+        .rt-ai-norm-select {
+          font-size: 0.72rem !important;
+          max-width: none !important;
+          padding: 0 2px 0 0 !important;
+          margin: 0 !important;
+          height: 20px !important;
+          min-height: 0 !important;
+          line-height: 1.1 !important;
+        }
         .rt-ai-input-bar {
           gap: 6px !important;
           width: 100% !important;
@@ -10603,8 +10915,11 @@ ${stralingstijdPlat}========================================`;
           flex-shrink: 0 !important;
         }
         .rt-ai-text-input {
-          padding: 9px 12px !important;
+          padding: 8px 12px !important;
           font-size: 0.98rem !important;
+          line-height: 1.3 !important;
+          min-height: 40px !important;
+          max-height: 96px !important;
           flex: 1 1 0 !important;
           width: 0 !important;
           min-width: 0 !important;
@@ -10667,10 +10982,12 @@ ${stralingstijdPlat}========================================`;
         </div>
         <div class="rt-ai-response-box" id="rt-ai-response">
           Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).
+        </div>
+        <div id="rt-ai-memory-bar" class="rt-ai-memory-bar">
           ${geefGeheugenBadgesHtml()}
         </div>
         <form id="rt-ai-form" class="rt-ai-input-bar" onsubmit="event.preventDefault(); window.RtAssistant.verstuurTekst();">
-          <input type="text" id="rt-ai-input" class="rt-ai-text-input" placeholder="Typ je vraag..." autocomplete="off">
+          <textarea id="rt-ai-input" class="rt-ai-text-input" rows="1" placeholder="Typ je vraag..." autocomplete="off"></textarea>
           <button type="submit" class="rt-ai-send-btn" title="Vraag versturen"><i class="fas fa-paper-plane"></i></button>
           <button type="button" class="rt-ai-mic-btn" id="rt-ai-mic-toggle" title="Houd ingedrukt om in te spreken (Push-to-Talk)">
             <i class="fas fa-microphone"></i>
@@ -10816,17 +11133,32 @@ ${stralingstijdPlat}========================================`;
       if (e.target === overlay) sluitAssistant();
     });
 
-    // Voorkom achtergrond scrollen op mobiel bij vegen buiten de response box
+    // Voorkom achtergrond scrollen op mobiel bij vegen buiten de response/memory/input box
     overlay.addEventListener("touchmove", (e) => {
       const target = e.target;
-      const isInsideResponse = target && target.closest && target.closest(".rt-ai-response-box");
-      if (!isInsideResponse) {
+      const isInsideScrollable = target && target.closest && (target.closest(".rt-ai-response-box") || target.closest(".rt-ai-memory-bar") || target.closest(".rt-ai-text-input"));
+      if (!isInsideScrollable) {
         if (e.cancelable) e.preventDefault();
       }
     }, { passive: false });
 
+    const txtInp = document.getElementById("rt-ai-input");
+    if (txtInp) {
+      const autoResizeInput = () => {
+        txtInp.style.height = "auto";
+        txtInp.style.height = `${Math.min(txtInp.scrollHeight, 112)}px`;
+      };
+      txtInp.addEventListener("input", autoResizeInput);
+      txtInp.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          verstuurTekst();
+        }
+      });
+    }
+
     overlay.addEventListener("focusin", (e) => {
-      if (e.target && e.target.tagName === "INPUT" && typeof window !== "undefined" && window.innerWidth <= 768) {
+      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") && typeof window !== "undefined" && window.innerWidth <= 768) {
         window.scrollTo(0, 0);
         updateMobileViewport();
         setTimeout(updateMobileViewport, 60);
@@ -10836,7 +11168,7 @@ ${stralingstijdPlat}========================================`;
       }
     });
     overlay.addEventListener("focusout", (e) => {
-      if (e.target && e.target.tagName === "INPUT" && typeof window !== "undefined" && window.innerWidth <= 768) {
+      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") && typeof window !== "undefined" && window.innerWidth <= 768) {
         setTimeout(updateMobileViewport, 60);
         setTimeout(updateMobileViewport, 250);
         setTimeout(updateMobileViewport, 450);
@@ -11106,7 +11438,7 @@ ${stralingstijdPlat}========================================`;
     }
 
     const activeEl = typeof document !== "undefined" ? document.activeElement : null;
-    const isInputFocused = Boolean(activeEl && activeEl.tagName === "INPUT" && assistantModal.contains && assistantModal.contains(activeEl));
+    const isInputFocused = Boolean(activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA") && assistantModal.contains && assistantModal.contains(activeEl));
     const isKeyboardOpen = (window.screen && window.screen.height && height < window.screen.height * 0.72) || (isInputFocused && height < 580);
     if (assistantModal.classList) {
       assistantModal.classList.toggle("rt-ai-kb-open", Boolean(isKeyboardOpen));
@@ -11434,8 +11766,8 @@ ${stralingstijdPlat}========================================`;
       if (respEl) {
         let outputHtml = (res && res.text) ? res.text : (typeof res === "string" ? res : "Geen antwoord beschikbaar.");
         if (res && res.chips && res.chips.length > 0) {
-          outputHtml += `<div class="rt-ai-chips-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">` +
-            res.chips.map(c => `<button type="button" class="rt-ai-chip-btn" style="background:#222; border:1px solid #f5df4d; color:#f5df4d; padding:4px 10px; border-radius:12px; font-size:0.85rem; cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+          outputHtml += `<div class="rt-ai-chips-row">` +
+            res.chips.map(c => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
             `</div>`;
         }
         respEl.innerHTML = outputHtml;
@@ -11471,6 +11803,7 @@ ${stralingstijdPlat}========================================`;
     const inp = document.getElementById("rt-ai-input");
     if (inp) {
       inp.value = "";
+      inp.style.height = "auto";
       const isTouch = (typeof window !== "undefined") && (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
       if (isTouch) {
         inp.blur(); // Zorgt dat het mobiele toetsenbord NOOIT ongewenst openklapt bij klikken op een chip
@@ -11487,6 +11820,7 @@ ${stralingstijdPlat}========================================`;
     if (!inp || !inp.value.trim()) return;
     const q = inp.value.trim();
     inp.value = "";
+    inp.style.height = "auto";
     const isTouch = (typeof window !== "undefined") && (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
     if (isTouch) {
       inp.blur(); // Sluit mobiel toetsenbord na verzenden zodat antwoord direct goed leesbaar is
