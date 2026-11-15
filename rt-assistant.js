@@ -1442,9 +1442,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(\d+(?:[.,]\d+)?)\s*(?:juli|julie|jury|joelie)\b(?!\s*20\d\d)/gi, "$1 Curie"],
       [/\b(activiteid|aktieviteit|activitijd|bronsterkte|bron\s*sterkte)\b/gi, "activiteit"],
       // Röntgenbuizen & Merken fonetisch
-      [/\b(smart\s*evo|evo\s*300|smart\s*1\s*mm)\b/gi, "Smart EVO (1 mm)"],
-      [/\b(yxlon\s*300|ikslon\s*300|ypsilon\s*300|smart\s*3\s*mm)\b/gi, "Yxlon 300 (3 mm)"],
-      [/\b(ikslon|ixlon|x[\s-]*lon|xlon|epsilon|ypsilon|ijssel|ijslon|eikslon|ykslon|iks\s*lon|yks\s*lon|yxlon)\b/gi, "Yxlon 300 (3 mm)"],
+      [/\b(smart\s*evo|evo\s*300|smart\s*1\s*mm)\b(?!\s*\()/gi, "Smart EVO (1 mm)"],
+      [/\b(yxlon\s*300|ikslon\s*300|ypsilon\s*300|smart\s*3\s*mm)\b(?!\s*\()/gi, "Yxlon 300 (3 mm)"],
+      [/\b(ikslon|ixlon|x[\s-]*lon|xlon|epsilon|ypsilon|ijssel|ijslon|eikslon|ykslon|iks\s*lon|yks\s*lon|yxlon)\b(?!\s*300\b|\s*\()/gi, "Yxlon 300 (3 mm)"],
       [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:rond\s*straler|panoramisch)|rond\s*straler|rondstralen)\b/gi, "Balteau Rondstraler (5 mm)"],
       [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:ceram|seram|keram|ceran|directional)|(?:ceram|seram|keram|ceran)\s*300)\b/gi, "Balteau Ceram (2.5 mm)"],
       [/\b(balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bal\s*touw|baltouw|bauto)\b(?!\s*\(|\s*rond\s*straler|\s*ceram|\s*seram)/gi, "Balteau (2.5 mm)"],
@@ -1651,7 +1651,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       "hoeveel", "kleine", "grote", "nieuwe", "oude", "wordt", "heeft", "heb", "ik", "je", "we", "men"
     ]);
     const stopExactPrefix = new Set(["ons", "door", "op", "af", "over"]);
-    const beschermdeEenheden = new Set(["mm", "cm", "dm", "kv", "ma", "ci", "msv", "usv", "ug", "ffd", "sfd", "ofa", "bki", "iqi", "dwsi", "swsi", "dwdi", "dwbi", "eweb", "dweb", "dwdb"]);
+    const beschermdeEenheden = new Set([
+      "mm", "cm", "dm", "kv", "ma", "ci", "msv", "usv", "ug",
+      "ffd", "sfd", "ofa", "ofd", "sod", "sdd", "sff", "hvl",
+      "bki", "iqi", "dwsi", "swsi", "dwdi", "dwbi", "eweb", "dweb", "dwdb",
+      "ndo", "ndt", "wmax", "sch", "schedule", "std", "xs", "xxs"
+    ]);
     const tokens = t.split(/\s+/).filter(Boolean);
     const mergedTokens = [];
     for (let idx = 0; idx < tokens.length; idx++) {
@@ -4814,6 +4819,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       return `Voor ${diaLabel} bij een <strong>centrale (panoramische) opstelling</strong>:<br>` +
              `• Omtrek: <strong>${omtrekCm} cm</strong>.<br>` +
              `• <strong>1 opname (360° panoramisch)</strong> met <strong>${f48} film(s) van 10x48 cm</strong>${film10x40Tekst}.`;
+    }
+
+    // Als de opgegeven focus/FFD groter is dan de buitendiameter (en er geen SWSI/centraal is gevraagd),
+    // staat de bron fysiek buiten de leiding en kan het bij De >= 100 mm alleen DWSI van buitenaf zijn.
+    if (!params.technique && !isCentraal && params.sfd && params.sfd > De) {
+      params.technique = "DWSI";
+      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+        actiefGespreksGeheugen.technique = "DWSI";
+        if (!actiefGespreksGeheugen.opstelling) {
+          actiefGespreksGeheugen.opstelling = "Opstelling 13/14 E (DWSI)";
+        }
+      }
     }
 
     const isSWSI = params.technique === "SWSI" || /\bswsi\b/i.test(lower);
@@ -10616,7 +10633,7 @@ ${stralingstijdPlat}========================================`;
         padding: 6px 10px !important;
         margin-bottom: 10px !important;
         flex-shrink: 0 !important;
-        max-height: 170px !important;
+        max-height: 182px !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
         overscroll-behavior: contain !important;
@@ -10675,13 +10692,16 @@ ${stralingstijdPlat}========================================`;
         border: none;
         color: #ff6b6b;
         cursor: pointer;
-        padding: 0;
+        padding: 2px 3px;
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.1rem;
         line-height: 1;
         font-weight: bold;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        min-height: 22px;
         flex-shrink: 0;
       }
       .rt-ai-badge-del:hover {
@@ -11107,63 +11127,70 @@ ${stralingstijdPlat}========================================`;
           border-radius: 9px !important;
         }
         .rt-ai-memory-bar {
-          padding: 5px 6px !important;
+          padding: 6px !important;
           margin-bottom: 6px !important;
-          max-height: 145px !important;
+          max-height: 172px !important;
           border-radius: 8px !important;
         }
         .rt-ai-context-container {
-          gap: 4px !important;
+          gap: 5px !important;
         }
         .rt-ai-memory-items {
           grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-          gap: 4px !important;
+          gap: 5px !important;
         }
         .rt-ai-param-badge {
-          padding: 2px 6px !important;
-          font-size: 0.72rem !important;
-          border-radius: 8px !important;
-          min-height: 24px !important;
-          gap: 3px !important;
-        }
-        .rt-ai-memory-controls {
+          padding: 4px 7px !important;
+          font-size: 0.78rem !important;
+          border-radius: 9px !important;
+          min-height: 32px !important;
           gap: 4px !important;
         }
+        .rt-ai-badge-del {
+          font-size: 1.15rem !important;
+          min-width: 20px !important;
+          min-height: 26px !important;
+          padding: 2px 3px !important;
+        }
+        .rt-ai-memory-controls {
+          gap: 5px !important;
+        }
         .rt-ai-clear-mem-btn {
-          padding: 2px 8px !important;
-          font-size: 0.72rem !important;
-          border-radius: 8px !important;
-          min-height: 24px !important;
-          height: 24px !important;
+          padding: 4px 9px !important;
+          font-size: 0.78rem !important;
+          border-radius: 9px !important;
+          min-width: 34px !important;
+          min-height: 32px !important;
+          height: 32px !important;
         }
         .rt-ai-clear-text {
           display: none !important;
         }
         .rt-ai-bron-pill,
         .rt-ai-norm-pill {
-          padding: 1px 6px !important;
-          font-size: 0.72rem !important;
-          border-radius: 8px !important;
-          min-height: 24px !important;
-          height: 24px !important;
+          padding: 2px 8px !important;
+          font-size: 0.78rem !important;
+          border-radius: 9px !important;
+          min-height: 32px !important;
+          height: 32px !important;
           margin: 0 !important;
           max-width: none !important;
         }
         .rt-ai-bron-pill i,
         .rt-ai-norm-pill i {
-          font-size: 0.68rem !important;
-          margin-right: 3px !important;
+          font-size: 0.74rem !important;
+          margin-right: 4px !important;
           flex-shrink: 0 !important;
         }
         .rt-ai-bron-select,
         .rt-ai-norm-select {
-          font-size: 0.72rem !important;
+          font-size: 0.78rem !important;
           max-width: none !important;
           padding: 0 2px 0 0 !important;
           margin: 0 !important;
-          height: 20px !important;
+          height: 28px !important;
           min-height: 0 !important;
-          line-height: 1.1 !important;
+          line-height: 1.2 !important;
         }
         .rt-ai-input-bar {
           gap: 6px !important;
@@ -12446,6 +12473,7 @@ ${stralingstijdPlat}========================================`;
 
   // Expose API
   const RtAssistant = {
+    NDO_SPRAAK_WOORDENBOEK,
     corrigeerSpraakTekst,
     herstelVakjargon,
     bepaalVraagIntenties,
