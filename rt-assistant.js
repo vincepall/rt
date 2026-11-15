@@ -8429,9 +8429,76 @@ ${stralingstijdPlat}========================================`;
   };
 
   let actieveVraagId = 0;
+  let gespreksGeschiedenis = [];
+
+  function escapeHtmlTekst(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function voegOfUpdateGeschiedenis(entryId, vraagHtml, antwoordHtml) {
+    const idx = entryId !== null ? gespreksGeschiedenis.findIndex((x) => x.id === entryId) : -1;
+    if (idx !== -1) {
+      if (vraagHtml !== undefined) gespreksGeschiedenis[idx].vraagHtml = vraagHtml;
+      gespreksGeschiedenis[idx].antwoordHtml = antwoordHtml;
+    } else {
+      gespreksGeschiedenis.push({ id: entryId, vraagHtml: vraagHtml || "", antwoordHtml });
+      if (gespreksGeschiedenis.length > 40) {
+        gespreksGeschiedenis = gespreksGeschiedenis.slice(-40);
+      }
+    }
+    renderGespreksGeschiedenis(true);
+  }
+
+  function renderGespreksGeschiedenis(scrollNaarLaatste = true) {
+    if (typeof document === "undefined") return;
+    const respEl = document.getElementById("rt-ai-response");
+    if (!respEl) return;
+
+    if (!gespreksGeschiedenis.length) {
+      respEl.innerHTML = `Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).`;
+      respEl.scrollTop = 0;
+      return;
+    }
+
+    respEl.innerHTML = gespreksGeschiedenis
+      .map((item, idx) => {
+        const isLast = idx === gespreksGeschiedenis.length - 1;
+        return (
+          `<div class="rt-ai-history-entry${isLast ? " is-latest" : ""}">` +
+          (item.vraagHtml ? `<div class="rt-ai-history-q">${item.vraagHtml}</div>` : "") +
+          `<div class="rt-ai-history-a">${item.antwoordHtml}</div>` +
+          `</div>`
+        );
+      })
+      .join("");
+
+    if (scrollNaarLaatste) {
+      const scrollFn = () => {
+        const entries = respEl.querySelectorAll(".rt-ai-history-entry");
+        const lastEl = entries.length ? entries[entries.length - 1] : null;
+        if (!lastEl) {
+          respEl.scrollTop = respEl.scrollHeight;
+          return;
+        }
+        if (lastEl.offsetHeight > respEl.clientHeight - 16) {
+          respEl.scrollTop = Math.max(0, lastEl.offsetTop - 8);
+        } else {
+          respEl.scrollTop = respEl.scrollHeight;
+        }
+      };
+      scrollFn();
+      if (typeof requestAnimationFrame === "function") requestAnimationFrame(scrollFn);
+      setTimeout(scrollFn, 40);
+    }
+  }
 
   function resetGespreksGeheugen() {
     actieveVraagId++;
+    gespreksGeschiedenis = [];
     if (typeof stopSpraakherkenning === "function") {
       try { stopSpraakherkenning(); } catch (e) {}
     }
@@ -8447,10 +8514,7 @@ ${stralingstijdPlat}========================================`;
     }
     synchroniseerDOMFormulier(actiefGespreksGeheugen);
     if (typeof document !== "undefined") {
-      const respEl = document.getElementById("rt-ai-response");
-      if (respEl) {
-        respEl.innerHTML = `Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).`;
-      }
+      renderGespreksGeschiedenis(false);
       renderGeheugenBalk();
       const transEl = document.getElementById("rt-ai-transcript");
       if (transEl) {
@@ -9014,13 +9078,14 @@ ${stralingstijdPlat}========================================`;
       : ["15 Curie", "25 Curie", "35 Curie", "45 Curie", "50 Curie"];
 
     if (typeof document !== "undefined") {
-      const respEl = document.getElementById("rt-ai-response");
-      if (respEl) {
-        const chipsHtml = `<div class="rt-ai-chips-row">` +
-          chips.map((c) => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
-          `</div>`;
-        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> geselecteerd.<br><br>Hoeveel <strong>Curie</strong> (activiteit) heeft deze bron?${chipsHtml}`;
-      }
+      const chipsHtml = `<div class="rt-ai-chips-row">` +
+        chips.map((c) => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+        `</div>`;
+      voegOfUpdateGeschiedenis(
+        null,
+        `Bronkeuze: <strong>${bronNaam}</strong>`,
+        `🎯 <strong>${bronNaam}</strong> geselecteerd.<br><br>Hoeveel <strong>Curie</strong> (activiteit) heeft deze bron?${chipsHtml}`
+      );
       renderGeheugenBalk();
       const transEl = document.getElementById("rt-ai-transcript");
       if (transEl) {
@@ -9042,23 +9107,24 @@ ${stralingstijdPlat}========================================`;
     const ci = actiefGespreksGeheugen.activiteit;
 
     if (typeof document !== "undefined") {
-      const respEl = document.getElementById("rt-ai-response");
-      if (respEl) {
-        const suggestieChips = [];
-        suggestieChips.push("Afzetting berekenen");
-        if (actiefGespreksGeheugen.diameter) {
-          const diaLabel = formatMmNaarDuimLabel(actiefGespreksGeheugen.diameter);
-          suggestieChips.push(`Stralingstijd voor ${diaLabel}`);
-        } else if (actiefGespreksGeheugen.isPlaat) {
-          suggestieChips.push("Stralingstijd plaat");
-        } else {
-          suggestieChips.push("Stralingstijd 6 duimer Sch 40", "Stralingstijd 4 duimer Sch 40", "Stralingstijd plaat");
-        }
-        const chipsHtml = `<div class="rt-ai-chips-row">` +
-          suggestieChips.map((c) => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
-          `</div>`;
-        respEl.innerHTML = `🎯 <strong>${bronNaam}</strong> ingesteld met <strong>${ci} Curie</strong>.<br><br>Waarmee wil je verder rekenen?${chipsHtml}`;
+      const suggestieChips = [];
+      suggestieChips.push("Afzetting berekenen");
+      if (actiefGespreksGeheugen.diameter) {
+        const diaLabel = formatMmNaarDuimLabel(actiefGespreksGeheugen.diameter);
+        suggestieChips.push(`Stralingstijd voor ${diaLabel}`);
+      } else if (actiefGespreksGeheugen.isPlaat) {
+        suggestieChips.push("Stralingstijd plaat");
+      } else {
+        suggestieChips.push("Stralingstijd 6 duimer Sch 40", "Stralingstijd 4 duimer Sch 40", "Stralingstijd plaat");
       }
+      const chipsHtml = `<div class="rt-ai-chips-row">` +
+        suggestieChips.map((c) => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+        `</div>`;
+      voegOfUpdateGeschiedenis(
+        null,
+        `Bronkeuze: <strong>${bronNaam}</strong> [${ci} Ci]`,
+        `🎯 <strong>${bronNaam}</strong> ingesteld met <strong>${ci} Curie</strong>.<br><br>Waarmee wil je verder rekenen?${chipsHtml}`
+      );
       renderGeheugenBalk();
       const transEl = document.getElementById("rt-ai-transcript");
       if (transEl) {
@@ -10594,6 +10660,31 @@ ${stralingstijdPlat}========================================`;
         font-weight: 800 !important;
         letter-spacing: 0.2px !important;
       }
+      .rt-ai-history-entry {
+        padding-bottom: 8px;
+      }
+      .rt-ai-history-entry + .rt-ai-history-entry {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.16);
+      }
+      .rt-ai-history-entry:not(.is-latest) {
+        opacity: 0.78;
+      }
+      .rt-ai-history-entry:last-child {
+        padding-bottom: 2px;
+      }
+      .rt-ai-history-q {
+        font-size: 0.85rem;
+        color: #9fb3c8;
+        margin-bottom: 5px;
+        word-break: break-word;
+      }
+      .rt-ai-history-q strong {
+        color: #e2e8f0 !important;
+        font-size: 1em !important;
+        font-weight: 700 !important;
+      }
       .rt-ai-chips-row {
         display: grid !important;
         grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)) !important;
@@ -12064,34 +12155,33 @@ ${stralingstijdPlat}========================================`;
     actieveVraagId++;
     const mijnVraagId = actieveVraagId;
     const weergaveTekst = corrigeerSpraakTekst(vraagTekst);
+    const vraagHeaderHtml = `Jij: "<strong>${escapeHtmlTekst(weergaveTekst)}</strong>"`;
     const tr = document.getElementById("rt-ai-transcript");
-    if (tr) tr.innerHTML = `Jij: "<strong>${weergaveTekst}</strong>"`;
-    const respEl = document.getElementById("rt-ai-response");
-    if (respEl) respEl.innerHTML = "Bewerken en uitrekenen...";
+    if (tr) tr.innerHTML = vraagHeaderHtml;
+    voegOfUpdateGeschiedenis(mijnVraagId, vraagHeaderHtml, "<em>Bewerken en uitrekenen...</em>");
 
     try {
       const res = await verwerkUniverseleVraag(weergaveTekst, context);
       if (mijnVraagId !== actieveVraagId) return;
 
-      if (respEl) {
-        let outputHtml = (res && res.text) ? res.text : (typeof res === "string" ? res : "Geen antwoord beschikbaar.");
-        if (res && res.chips && res.chips.length > 0) {
-          outputHtml += `<div class="rt-ai-chips-row">` +
-            res.chips.map(c => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
-            `</div>`;
-        }
-        respEl.innerHTML = outputHtml;
-        respEl.scrollTop = 0;
+      let outputHtml = (res && res.text) ? res.text : (typeof res === "string" ? res : "Geen antwoord beschikbaar.");
+      if (res && res.chips && res.chips.length > 0) {
+        outputHtml += `<div class="rt-ai-chips-row">` +
+          res.chips.map(c => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+          `</div>`;
       }
+      voegOfUpdateGeschiedenis(mijnVraagId, vraagHeaderHtml, outputHtml);
       if (res && res.text) {
         spreekTekst(res.text);
       }
     } catch (err) {
       if (mijnVraagId !== actieveVraagId) return;
       console.error("Fout bij verwerken vraag:", err);
-      if (respEl) {
-        respEl.innerHTML = `<span style="color:#ffb4b4;">⚠️ Er trad een fout op bij het uitrekenen (${err && err.message ? err.message : "onbekende fout"}). Stel de vraag a.u.b. opnieuw of controleer de parameters.</span>`;
-      }
+      voegOfUpdateGeschiedenis(
+        mijnVraagId,
+        vraagHeaderHtml,
+        `<span style="color:#ffb4b4;">⚠️ Er trad een fout op bij het uitrekenen (${err && err.message ? err.message : "onbekende fout"}). Stel de vraag a.u.b. opnieuw of controleer de parameters.</span>`
+      );
     }
 
     // Op PC/desktop direct de focus terug op het invoerveld zodat de gebruiker meteen kan doortypen
