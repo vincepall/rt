@@ -171,6 +171,8 @@ function laadRtAssistant() {
     ["maximum wall thickness 12 mm", /Wmax 12 mm/i],
     ["DN150 van schedule XXS", /diameter 168\.3 van schedule xxs/i],
     ["Yxlon 300 en Smart EVO", /Yxlon 300 \(3 mm\) en Smart EVO \(1 mm\)/i],
+    ["staarste selenium", /\bsterkste selenium\b/i],
+    ["de stagische selenium", /\bsterkste selenium\b/i],
   ];
   for (const [inp, rx] of spraakCases) {
     const out = norm(inp);

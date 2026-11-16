@@ -429,7 +429,7 @@
 
     // Iridium lookalikes (bijv. "die ridem", "ingrediën", "ingrediënt", "ingrediënten", "ridia", "ridium", "de stage iridium")
     s = s.replace(/\b(?:en\s+die\s+|die\s+|de\s+)?(?:ridem|ridium|ridia|ingredi[eë]n|ingredi[eë]nt|ingredi[eë]nten)\b/gi, "iridium");
-    s = s.replace(/\b(?:de|die)?\s*(?:sterkste|stage|stagste|strakste|steekste)\s+(iridium|selenium|kobalt|bron|cilinder)\b/gi, "de sterkste $1");
+    s = s.replace(/\b(?:de|die)?\s*(?:sterkste|stage|stagste|stagische|statische|strategische|staarste|strakste|steekste)\s+(iridium|selenium|kobalt|bron|cilinder)\b/gi, "de sterkste $1");
 
     // Curie & Selenium lookalikes (bijv. "30 Carry", "30 gereed", "chryslering" -> "Curie selenium", "cilinder in bron" -> "selenium bron")
     s = s.replace(/\b(\d+)\s*(?:carry|gereed|jullie)\b/gi, "$1 Curie");
@@ -520,7 +520,7 @@
       [/\b(kobal|koba|kobold|kobald|cobald)\b/gi, "kobalt"],
       [/\b(ko|kool|koolstof|koopman|c\s*o|c\.o\.)\s*60\b/gi, "Co-60"],
       // Sterkste / Zwakste
-      [/\b(staarste|stearste|starste|sterste|stèrste|sterksten|strakste|strikste|stekste|streekste|stiekste|steekste|sterfte|stelligste|stoutste)\b/gi, "sterkste"],
+      [/\b(staarste|stearste|starste|sterste|stèrste|sterksten|strakste|strikste|stekste|streekste|stiekste|steekste|sterfte|stelligste|stoutste|stagische|stugste)\b/gi, "sterkste"],
       [/\b(zwaarste|heetste|felste|grootste|hoogste)\s+(?=(?:(?:iridium|ir[-\s]?192|selenium|se[-\s]?75|kobalt|co[-\s]?60|gamma)\s+)?(?:bron|bronnen|isotoop|radium|brom|kroon))\b/gi, "sterkste "],
       [/\bhoe\s+(?:staar|star|strak|ster|stèr|zwaar|heet|fel)\s+(?=is|zijn|waren)\b/gi, "hoe sterk "],
       [/\b(zachtste|slapste|lichtste|kleinste|laagste|oudste)\s+(?=(?:(?:iridium|ir[-\s]?192|selenium|se[-\s]?75|kobalt|co[-\s]?60|gamma)\s+)?(?:bron|bronnen|isotoop|radium|brom|kroon))\b/gi, "zwakste "],
