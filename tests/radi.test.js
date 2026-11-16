@@ -173,6 +173,13 @@ function laadRtAssistant() {
     ["Yxlon 300 en Smart EVO", /Yxlon 300 \(3 mm\) en Smart EVO \(1 mm\)/i],
     ["staarste selenium", /\bsterkste selenium\b/i],
     ["de stagische selenium", /\bsterkste selenium\b/i],
+    ["achterma", /\bdiameter 219\.1\b/i],
+    ["een achterma van 6 dik", /diameter 219\.1.*6 dik/i],
+    ["achterman schedule 40", /diameter 219\.1.*schedule 40/i],
+    ["zestuimer van 8 dik", /diameter 168\.3.*8 dik/i],
+    ["vijftuimer schedule 40", /diameter 141\.3.*schedule 40/i],
+    ["vierduino van 6 dik", /diameter 114\.3.*6 dik/i],
+    ["dertigcurie selenium", /30 curie selenium/i],
   ];
   for (const [inp, rx] of spraakCases) {
     const out = norm(inp);
@@ -187,6 +194,8 @@ function laadRtAssistant() {
     ["mijn voorkeur gaat uit naar selenium", (o) => o === "mijn voorkeur gaat uit naar selenium"],
     ["enkel wand dubbel beeld", (o) => !/\bSWSI\b/i.test(o)],
     ["97969M (25.2 Ci)", (o) => o.toLowerCase() === "97969m (25.2 ci)"],
+    ["achter de collimator", (o) => o === "achter de collimator"],
+    ["achteraan de leiding", (o) => o === "achteraan de leiding"],
   ];
   for (const [inp, fn] of safeCases) {
     const out = norm(inp);

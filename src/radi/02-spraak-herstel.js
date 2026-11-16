@@ -93,10 +93,40 @@
     "duim", "duims", "draad", "norm", "bron", "film", "tijd", "klas"
   ]);
 
+  // Synthetische aaneengeschreven vakterm-samenstellingen (getalwoord/modifier + eenheid/bron) -> canonieke vorm met spatie
+  const SYNTHETISCHE_SAMENSTELLINGEN_MAP = {
+    halveduimer: "0.5 duimer",
+    anderhalfduimer: "1.5 duimer",
+    anderhalveduimer: "1.5 duimer",
+    driekwartduimer: "0.75 duimer",
+    sterksteselenium: "sterkste selenium",
+    sterksteiridium: "sterkste iridium",
+    sterkstekobalt: "sterkste kobalt",
+    zwaksteselenium: "zwakste selenium",
+    zwaksteiridium: "zwakste iridium",
+  };
+  for (const [woord, cijfer] of [
+    ["een", "1"], ["twee", "2"], ["drie", "3"], ["vier", "4"], ["vijf", "5"], ["zes", "6"],
+    ["zeven", "7"], ["acht", "8"], ["negen", "9"], ["tien", "10"], ["elf", "11"], ["twaalf", "12"],
+    ["veertien", "14"], ["zestien", "16"], ["achttien", "18"], ["twintig", "20"], ["vierentwintig", "24"],
+  ]) {
+    SYNTHETISCHE_SAMENSTELLINGEN_MAP[`${woord}duimer`] = `${cijfer} duimer`;
+    SYNTHETISCHE_SAMENSTELLINGEN_MAP[`${woord}duims`] = `${cijfer} duims`;
+    SYNTHETISCHE_SAMENSTELLINGEN_MAP[`${woord}duimse`] = `${cijfer} duimse`;
+    SYNTHETISCHE_SAMENSTELLINGEN_MAP[`${woord}dik`] = `${cijfer} dik`;
+    SYNTHETISCHE_SAMENSTELLINGEN_MAP[`${woord}curie`] = `${cijfer} Curie`;
+  }
+  for (const synthKey of Object.keys(SYNTHETISCHE_SAMENSTELLINGEN_MAP)) {
+    if (!NDO_ENKELWOORD_TRIGGERS.includes(synthKey)) NDO_ENKELWOORD_TRIGGERS.push(synthKey);
+    if (synthKey.length >= 7 && !NDO_COMPOUND_TRIGGERS.includes(synthKey)) NDO_COMPOUND_TRIGGERS.push(synthKey);
+  }
+
   // Normale Nederlandse woorden die nooit door de fuzzy-matcher veranderd mogen worden
   const NORMALE_NL_STOPWOORDEN = new Set([
     "straal", "straalt", "stralen", "stalen", "minuten", "seconden", "bereken", "berekenen", "hoeveel", "wanneer",
-    "waarom", "binnen", "buiten", "tussen", "zonder", "achter", "volgens", "eerste", "laatste",
+    "waarom", "binnen", "buiten", "tussen", "zonder", "achter", "achteraan", "achteraf", "achtergrond", "achterkant",
+    "achterzijde", "achterin", "achterop", "achteruit", "doordat", "voornaam", "voorkeur", "voorkomen", "afgelopen",
+    "volgens", "eerste", "laatste",
     "grootste", "kleinste", "hoogste", "laagste", "kortste", "langste", "dikste", "dunste",
     "oudste", "nieuwste", "meeste", "minste", "zwaarste", "lichtste", "tweede", "derde", "vierde",
     "vijfde", "zesde", "achtste", "tiende", "twaalfde", "veertiende", "zestiende", "achttiende",
@@ -116,6 +146,108 @@
     "lopen", "zetten", "halen", "geven", "nemen", "krijgen", "lezen", "zeggen", "horen", "voelen",
     "afstand", "ruimte", "plaats", "moment", "meter", "meters", "tweemaal", "driemaal"
   ]);
+
+  const SAMENGESTELDE_GETAL_PREFIXEN = [
+    ["vierentwintig", "24"],
+    ["anderhalve", "1.5"],
+    ["anderhalf", "1.5"],
+    ["driekwart", "0.75"],
+    ["veertien", "14"],
+    ["vijftien", "15"],
+    ["zestien", "16"],
+    ["achttien", "18"],
+    ["twintig", "20"],
+    ["dertien", "13"],
+    ["dertig", "30"],
+    ["veertig", "40"],
+    ["vijftig", "50"],
+    ["zestig", "60"],
+    ["tachtig", "80"],
+    ["twaalf", "12"],
+    ["halve", "0.5"],
+    ["zeven", "7"],
+    ["negen", "9"],
+    ["twee", "2"],
+    ["drie", "3"],
+    ["vier", "4"],
+    ["vijf", "5"],
+    ["acht", "8"],
+    ["tien", "10"],
+    ["half", "0.5"],
+    ["zaas", "6"],
+    ["een", "1"],
+    ["zes", "6"],
+    ["elf", "11"],
+    ["ach", "8"],
+  ];
+
+  /** Ontleedt aaneengeschreven of geassimileerde <telwoord>+<vakterm> spraakvormen (bijv. "achterma" -> "8 duimer"). */
+  function herstelSamengesteldGetalEnEenheid(tekst) {
+    if (!tekst || typeof tekst !== "string") return tekst;
+    return tekst.split(/(\s+)/).map((tok) => {
+      if (!tok || /^\s+$/.test(tok)) return tok;
+      const m = tok.match(/^([("'«]*)(.*?)([)"'».,!?;:]*)$/);
+      if (!m) return tok;
+      const [, lead, core, trail] = m;
+      if (!core) return tok;
+      const clean = core.toLowerCase();
+      const alphaOnly = clean.replace(/[^a-z]/g, "");
+      if (NORMALE_NL_STOPWOORDEN.has(alphaOnly) || NDO_TRIGGERS_SET.has(clean)) return tok;
+
+      let cijfer = null;
+      let tail = "";
+      let prefixStr = "";
+
+      const numMatch = clean.match(/^(\d+(?:[.,]\d+)?)-?([a-z]{2,})$/);
+      if (numMatch) {
+        cijfer = numMatch[1].replace(",", ".");
+        tail = numMatch[2];
+      } else {
+        for (const [pref, val] of SAMENGESTELDE_GETAL_PREFIXEN) {
+          if (clean.startsWith(pref) && clean.length > pref.length) {
+            let rest = clean.slice(pref.length);
+            if (rest.startsWith("-")) rest = rest.slice(1);
+            if (rest.length >= 3 && /^[a-z]+$/.test(rest)) {
+              cijfer = val;
+              tail = rest;
+              prefixStr = pref;
+            }
+            break;
+          }
+        }
+      }
+
+      if (!cijfer || !tail) return tok;
+
+      const tailKandidaten = [tail];
+      if (prefixStr && tail.length >= 3) {
+        const lastChar = prefixStr[prefixStr.length - 1];
+        if (lastChar === "t" || lastChar === "d") {
+          tailKandidaten.push(lastChar + tail);
+        }
+      }
+
+      for (const cand of tailKandidaten) {
+        if (/^(?:[dt]?u+[ijy]?mse(?:leiding)?|[dt]?[eao]+mse(?:leiding)?)$/i.test(cand)) {
+          const heeftLeiding = cand.endsWith("leiding");
+          return `${lead}${cijfer} ${heeftLeiding ? "duimse leiding" : "duimse"}${trail}`;
+        }
+        if (/^(?:[dt]?u+[ijy]?m+(?:er|ar|a|el|en|pje|s)?|[dt]?[eao]+m+(?:er|ar|a|el|en|an|ig)?|[dt]?i+m+(?:er|ar|a|el)?|erma(?:n|ar|r|s)?|erme(?:r|n)?|umar|umer|omer|[dt]?uino|dino|[dt]?uik(?:er|ers)?|duif|duiven|luier|nummer|remmer|remma|dimmer)$/i.test(cand)) {
+          return `${lead}${cijfer} duimer${trail}`;
+        }
+        if (/^(?:[dt]ik(?:ke|te)?|[dt]ijk|stik|deuk)$/i.test(cand)) {
+          return `${lead}${cijfer} dik${trail}`;
+        }
+        if (/^(?:[ckg][uoei]+r(?:ie|y|i)|cie)$/i.test(cand)) {
+          return `${lead}${cijfer} Curie${trail}`;
+        }
+        if (/^(?:k[aou]v[eé]\w*|c[aou]f[eé]\w*|kv)$/i.test(cand)) {
+          return `${lead}${cijfer} kV${trail}`;
+        }
+      }
+      return tok;
+    }).join("");
+  }
 
   function medeklinkerSkelet(woord) {
     return woord
@@ -164,7 +296,7 @@
     let bestScore = -1;
 
     for (const d of kandidaten) {
-      if (Math.abs(s.length - d.length) > 2) continue;
+      if (Math.abs(s.length - d.length) > (d.length >= 7 ? 3 : 2)) continue;
       const dist = levenshteinAfstand(s, d);
       const dFon = nlFonetischeSleutel(d);
       const fonDist = levenshteinAfstand(sFon, dFon);
@@ -314,8 +446,14 @@
     s = s.replace(/\b(orguinse|ochtendse|arduimse|arduimseleiding|achttuimse|achttruimse|achttuimseleiding|achttruimseleiding|ach\s*duimse|arduinse)(?:\s*leiding)?\b/gi, "8 duimse leiding");
     s = s.replace(/\b(zaalstein\s*maar|zaalstein|zesdemer|zesdem\s*maar|zesdem|zesdedag)\b/gi, "6 duimer");
     s = s.replace(/\b(tweede\s*helemaal|tweede\s*remmer|tweede\s*nummer|tweede\s*dimmer|tweede\s*luier)\b/gi, "2 duimer");
-    s = s.replace(/\b(\d+|een|twee|drie|vier|vijf|zes|acht|tien|twaalf|veertien|zestien)[-\s]*(?:duimel|duimar|duima|demer|demmer|remmer|nummer|helemaal|duif|duiven)\b/gi, "$1 duimer");
+    s = s.replace(/\b(\d+|een|twee|drie|vier|vijf|zes|acht|tien|twaalf|veertien|zestien)[-\s]*(?:duimel|duimar|duima|demer|demmer|remmer|remma|nummer|helemaal|duif|duiven)\b/gi, "$1 duimer");
     s = s.replace(/\b(\d+|een|twee|drie|vier|vijf|zes|acht|tien|twaalf)[-\s]*(?:damer|damers|dik\s*maar|dik\s*mag|dikmer|dikmag)\b/gi, "$1 duimer");
+    s = s.replace(/\b(?:achterma|achterman|achtermaar|achtuimer)\b/gi, "8 duimer");
+    s = s.replace(/\bachter\s+ma\b/gi, "8 duimer");
+    s = s.replace(/\b((?:een|op|voor|van|met|naar|bij)\s+)?achter\s+maar(?=\s*(?:van|met|schedule|sch\b|sched|leiding|buis|pijp|rondnaad|langsnaad|wand|dik|\d|$))/gi, (m, prep) => `${prep || ""}8 duimer`);
+    s = s.replace(/\b(zestuimer|zestumer|zestimer)\b/gi, "6 duimer");
+    s = s.replace(/\b(vijftuimer|vijftumer|vijftimer)\b/gi, "5 duimer");
+    s = herstelSamengesteldGetalEnEenheid(s);
     s = s.replace(/\b(?:om|op)\s+een\s+duimer\b/gi, "op 1 duimer");
 
     // Wanddikte patronen: "10D" -> "10 dik", "4D" -> "4 dik", "vierdijk" -> "4 dik", "drie trek" -> "3 dik", "43 die gevuld" -> "4 dik die gevuld"
@@ -957,6 +1095,8 @@
     t = t.replace(/\b(opnames?\s+met\s+verzet)\b/gi, "opstelling 11/F ovaaltje");
     t = t.replace(/\b(loodrecht\s+door\s+de\s+las)\b/gi, "opstelling 12/G superpositie");
 
+    t = herstelSamengesteldGetalEnEenheid(t);
+
     // 4A. Bigram-Samenvoeger (gesplitste of licht verbasterde samenstellingen tegen NDO_COMPOUND_TRIGGERS)
     const gramWoordenStop = new Set([
       "de", "het", "een", "van", "op", "in", "bij", "met", "voor", "naar", "aan", "om", "uit", "door", "over",
@@ -993,14 +1133,14 @@
         if (allowBigram) {
           const combo = c1 + c2;
           if (NDO_COMPOUND_TRIGGERS.includes(combo)) {
-            mergedTokens.push(combo);
+            mergedTokens.push(SYNTHETISCHE_SAMENSTELLINGEN_MAP[combo] || combo);
             idx++;
             continue;
           }
           if (!gramWoordenStop.has(c1) || c1 === "ons") {
             const comboRes = besteTriggerMatch(combo, NDO_COMPOUND_TRIGGERS, 54);
             if (comboRes && (c1 !== "ons" || comboRes.match === "onstream")) {
-              mergedTokens.push(comboRes.match);
+              mergedTokens.push(SYNTHETISCHE_SAMENSTELLINGEN_MAP[comboRes.match] || comboRes.match);
               idx++;
               continue;
             }
@@ -1014,9 +1154,11 @@
     // 4B. Best-Match Enkelwoord Fuzzy / Rijm / Fonetisch / Medeklinkerskelet Engine
     t = t.split(/\s+/).map((w) => {
       const s = w.replace(/[^a-z]/gi, "").toLowerCase();
+      if (SYNTHETISCHE_SAMENSTELLINGEN_MAP[s]) return SYNTHETISCHE_SAMENSTELLINGEN_MAP[s];
       if (s.length < 5 || NORMALE_NL_STOPWOORDEN.has(s) || NDO_TRIGGERS_SET.has(s)) return w;
       const res = besteTriggerMatch(s, NDO_ENKELWOORD_TRIGGERS, 45);
       if (!res) return w;
+      if (SYNTHETISCHE_SAMENSTELLINGEN_MAP[res.match]) return SYNTHETISCHE_SAMENSTELLINGEN_MAP[res.match];
       if (res.match === "iridium") return "Ir-192";
       if (res.match === "selenium") return "Se-75";
       if (res.match === "kobalt") return "Co-60";
