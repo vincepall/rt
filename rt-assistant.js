@@ -3835,7 +3835,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
 
       let resp = `Voor ${diaLabel} bij een onstream opname conform ${techniek === "tangentiaal" ? "Tangentiaal (RT21021)" : `Dubbelwand (${isDWSI ? "DWSI" : "DWDI"} RT21022)`}, Klasse ${effKlasse.toUpperCase()} met focus ${b} mm${effIso > 0 ? ` en ${effIso} mm isolatie` : " (ongeïsoleerd)"}:<br>` +
-                 `• <strong>Minimale FFD: ${ffdAfgerond} mm</strong> (${(ffdAfgerond / 10).toFixed(1)} cm).<br>` +
+                 `• <strong>Minimale FFD: ${(ffdAfgerond / 10).toFixed(1)} cm</strong> (${ffdAfgerond} mm).<br>` +
+                 `<span class="rt-tts-summary" style="display:none">Minimaal ${(ffdAfgerond / 10).toFixed(1)} cm</span>` +
                  `• ${techniek === "tangentiaal" ? `PDD: ${PDD.toFixed(1)} mm (geometrische bundeleis ffd₁ = ${Math.round(ffd1)} mm, toelaatbare onscherpte ffd₂ = ${Math.round(ffd2)} mm bij Ug ${effKlasse === "tb" ? "0.3" : "0.6"} mm).` : `OFD: ${ofdInfo}${isDWSI ? ` (Ug ${effKlasse === "tb" ? "0.3" : "0.6"} mm vereist min. ${Math.round(ffdOnscherpte)} mm FFD, fysieke contact-FFD buitenkant buis is ${Math.round(ffdFysiek)} mm)` : ` (toelaatbare onscherpte bij Ug ${effKlasse === "tb" ? "0.3" : "0.6"} mm)`}.`}<br>` +
                  `<small style="opacity: 0.85;">(Ter vergelijking bij Klasse ${altKlasse.toUpperCase()}: minimale FFD ${altFFD} mm; zie <a href="onstreamffd.html" class="ai-link" target="_blank">onstreamffd.html</a>).</small>`;
 
@@ -3984,19 +3985,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         const ffd2 = (b * PDD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         minFFD = Math.max(ffd1, ffd2);
         regels.push(
-          `• Minimale FFD tangentiaal (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${Math.round(minFFD)} mm</strong> (PDD: ${PDD.toFixed(1)} mm).`
+          `• Minimale FFD tangentiaal (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, PDD: ${PDD.toFixed(1)} mm).`
         );
       } else if (isDWSI) {
         ffdOnscherpte = (b * OFD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         ffdFysiek = De + 2 * Iso;
         minFFD = Math.max(ffdOnscherpte, ffdFysiek);
         regels.push(
-          `• Minimale FFD dubbelwand DWSI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm en wand ${t} mm): <strong>${Math.round(minFFD)} mm</strong> (OFD: ${OFD.toFixed(1)} mm vanaf binnenwand filmzijde).`
+          `• Minimale FFD dubbelwand DWSI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm en wand ${t} mm): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm vanaf binnenwand filmzijde).`
         );
       } else {
         minFFD = (b * OFD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         regels.push(
-          `• Minimale FFD dubbelwand DWDI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${Math.round(minFFD)} mm</strong> (OFD: ${OFD.toFixed(1)} mm).`
+          `• Minimale FFD dubbelwand DWDI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm).`
         );
       }
       params.sfd = Math.round(minFFD);
@@ -4624,24 +4625,31 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     let resp = `Stralingstijd voor <strong>${opstellingUitleg}</strong> (${bronNaam} van ${ci.toFixed(1)} Curie, ${ffdLabel})${gevuldExtra}${matExtra}:<br>`;
 
+    let ttsTijden = [];
     if (explicieteFilm === "D4") {
       resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>`;
+      ttsTijden.push(`D4: ${formatTijd(time_d4)}`);
     } else if (explicieteFilm === "D5") {
       resp += `• D5: <strong>${formatTijd(time_d5)}</strong><br>`;
+      ttsTijden.push(`D5: ${formatTijd(time_d5)}`);
     } else if (explicieteFilm === "D7") {
       resp += `• D7: <strong>${formatTijd(time_d7)}</strong><br>`;
+      ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
       if (isKlasseB) {
         resp += `<small style="color:#ffb4b4;">⚠️ Let op: D7 is niet toegestaan volgens EN ISO 17636-1 Klasse B (D4: ${formatTijd(time_d4)}, D5: ${formatTijd(time_d5)}).</small><br>`;
       }
     } else {
       resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>` +
               `• D5: <strong>${formatTijd(time_d5)}</strong><br>`;
+      ttsTijden.push(`D4: ${formatTijd(time_d4)}`, `D5: ${formatTijd(time_d5)}`);
       if (!isKlasseB) {
         resp += `• D7: <strong>${formatTijd(time_d7)}</strong><br>`;
+        ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
       } else {
         resp += `<small style="opacity: 0.85;">(D7 is weggelaten: niet toegestaan volgens EN ISO 17636-1 Klasse B).</small><br>`;
       }
     }
+    resp += `<span class="rt-tts-summary" style="display:none">${ttsTijden.join(". ")}</span>`;
     if (isVoorgesteldeFFDGebruikt) {
       resp += `<small style="color:#F5DF4D;">ℹ️ <em>Let op: berekend op basis van de <strong>voorgestelde FFD (${sfd} mm)</strong> voor een gammabron op de buis. Geef gerust een andere FFD op indien gewenst.</em></small><br>`;
     }
@@ -4966,6 +4974,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       resp += `<br><small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD/10).toFixed(1)} cm):</em> minimaal <strong>${expMin} opnames</strong> (om de ${gradenMin}°).</small>`;
     }
 
+    let ttsOpnames = `Minimaal ${gekozenExp} ${gekozenExp === 1 ? "opname" : "opnames"}, om de ${graden} graden`;
+    if (berekendeMinFFD && sfd < berekendeMinFFD) {
+      ttsOpnames = `Let op, minimale FFD onderschreden. ${ttsOpnames}`;
+    }
+    resp += `<span class="rt-tts-summary" style="display:none">${ttsOpnames}</span>`;
     resp += `<br><small style="opacity: 0.85;">(Berekend volgens <a href="opnamesklasseb.html" class="ai-link" target="_blank">opnamesklasseb.html</a> conform EN ISO 17636-1 / ASME). Opmerking: 1 opname rondom is alleen mogelijk bij een <em>centrale/panoramische</em> opstelling van binnenuit.</small>`;
 
     return resp;
@@ -5361,16 +5374,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       if (chips) chips.push(`FFD ${minFfd} mm`, `FFD ${minFfd + 50} mm`, `FFD ${minFfd + 100} mm`);
     }
 
-    let res = `${prefix}Minimale Film-Focus Afstand (FFD) volgens ${proc} (${opstellingNaam}) voor ${detailInfo} en brongrootte ${b} mm${fallbackFocusLabel}:<br>• <strong>min. ${minFfd} mm</strong> (${(minFfd / 10).toFixed(1)} cm).`;
+    const minFfdCm = (minFfd / 10).toFixed(1);
+    let res = `${prefix}Minimale Film-Focus Afstand (FFD) volgens ${proc} (${opstellingNaam}) voor ${detailInfo} en brongrootte ${b} mm${fallbackFocusLabel}:<br>• <strong>Minimaal ${minFfdCm} cm</strong> (${minFfd} mm).`;
 
     if (voorgesteldeFFD) {
       if (voorgesteldeFFD > minFfd) {
-        res += `<br>• Voorgestelde FFD voor opstelling: <strong>${voorgesteldeFFD} mm</strong> (conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).`;
+        res += `<br>• Voorgestelde FFD voor opstelling: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).`;
         if (chips) chips.push(`${voorgesteldeFFD} mm FFD`);
       } else if (voorgesteldeFFD < minFfd) {
-        res += `<br>• Voorgestelde contact-FFD: <strong>${voorgesteldeFFD} mm</strong> (diameter + 15 mm, let op: &lt; min. FFD).`;
+        res += `<br>• Voorgestelde contact-FFD: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, diameter + 15 mm, let op: &lt; min. FFD).`;
         if (chips) chips.push(`${voorgesteldeFFD} mm FFD`, `${minFfd} mm FFD (min. ffd)`);
       }
+    }
+
+    let ttsKern = `Minimaal ${minFfdCm} cm`;
+    if (vraagtBronOpPijp && De) {
+      const ffdOpPijp = voorgesteldeFFD || De;
+      ttsKern = ffdOpPijp >= minFfd ? `Ja, toegestaan. Minimaal ${minFfdCm} cm` : `Nee, niet toegestaan. Minimaal ${minFfdCm} cm`;
+    } else if (params.sfd) {
+      ttsKern = params.sfd >= minFfd ? `Ja, voldoende focus. Minimaal ${minFfdCm} cm` : `Nee, onvoldoende focus. Minimaal ${minFfdCm} cm`;
+    } else if (isCentraal && De) {
+      const werkelijk = Number((De / 2).toFixed(1));
+      ttsKern = werkelijk >= minFfd ? `Centraal is toegestaan. Minimaal ${minFfdCm} cm` : `Centraal is niet toegestaan. Minimaal ${minFfdCm} cm`;
     }
 
     if (isCentraal && De) {
@@ -5382,6 +5407,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
+    res += `<span class="rt-tts-summary" style="display:none">${ttsKern}</span>`;
     res += `<br><small style="opacity: 0.85;">(Berekend volgens <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small>`;
     return res;
   }
@@ -7809,7 +7835,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     const bronMelding = bron !== "X-ray" ? ` met ${bronLabel}` : "";
-    return `Vereist draadje: <strong>${wire}</strong> (${bkiPos}, doorstraalde dikte: ${doorstraaldeDikte.toFixed(1)} mm bij ${tech} volgens ${proc}${bronMelding}).${verminderingTekst}${altGammaInfo}${bkiExtra}<br><small style="opacity:0.85;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small>`;
+    const ttsDraad = params.materiaalNaam && bkiInfo ? `Vereist draadje: ${wire}, op houder ${geefBkiSetsVoorDraad(wireNum, bkiInfo.isoGroup)}` : `Vereist draadje: ${wire}`;
+    return `Vereist draadje: <strong>${wire}</strong> (${bkiPos}, doorstraalde dikte: ${doorstraaldeDikte.toFixed(1)} mm bij ${tech} volgens ${proc}${bronMelding}).${verminderingTekst}${altGammaInfo}${bkiExtra}<span class="rt-tts-summary" style="display:none">${ttsDraad}</span><br><small style="opacity:0.85;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small>`;
   }
 
   // 15. Pipe Schedule Wanddiktes (ASME B36.10M / ASME B36.19M)
@@ -12102,6 +12129,132 @@ ${stralingstijdPlat}========================================`;
     }
   }
 
+  function maakKorteSpraakTekst(htmlOrText) {
+    const raw = String(htmlOrText || "");
+    if (!raw.trim()) return "";
+
+    const opschoonStuk = (frag) => {
+      let t = String(frag || "");
+      t = t.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+           .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+           .replace(/<br\s*[\/]?>/gi, ". ")
+           .replace(/<\/(?:p|div|li)>/gi, ". ")
+           .replace(/<\/?[^>]+(>|$)/g, " ");
+      t = t.replace(/&nbsp;/g, " ")
+           .replace(/&amp;/g, " en ")
+           .replace(/&lt;/g, "kleiner dan ")
+           .replace(/&gt;/g, "groter dan ")
+           .replace(/&ge;/g, "minimaal ")
+           .replace(/&le;/g, "maximaal ")
+           .replace(/&times;/g, " bij ")
+           .replace(/&bull;/g, "")
+           .replace(/&rarr;/g, " naar ")
+           .replace(/&ndash;|&mdash;/g, " ");
+      t = t.replace(/✅\s*(?:Ja[,:]?\s*)?/gi, "Ja, ")
+           .replace(/❌\s*(?:Nee[,:]?\s*)?/gi, "Nee, ")
+           .replace(/⚠️\s*(?:Let op[,:]?\s*)?/gi, "Let op, ")
+           .replace(/ℹ️/g, "")
+           .replace(/📋/g, "")
+           .replace(/🎯/g, "")
+           .replace(/💡/g, "")
+           .replace(/☢️?/g, "")
+           .replace(/⚡/g, "");
+      return t.replace(/\s+/g, " ").trim();
+    };
+
+    const spreekNatuurlijk = (str) => {
+      let s = String(str || "");
+      // Verwijder restjes zoals (conform ...html) of (Berekend volgens ...)
+      s = s.replace(/\([^)]*(?:\.html|conform|berekend volgens|zie\s)[^)]*\)/gi, "");
+      // W14 -> W 14 voor natuurlijke Nederlandse uitspraak
+      s = s.replace(/\bW(\d+)\b/g, "W $1");
+      // Isotopen & afkortingen uitspreken
+      s = s.replace(/\bIr[-\s]?192\b/gi, "Iridium 192")
+           .replace(/\bSe[-\s]?75\b/gi, "Seleen 75")
+           .replace(/\bCo[-\s]?60\b/gi, "Kobalt 60");
+      // Compacte tijden als "3m 55s (3 minuten en 55 seconden)" -> "3 minuten en 55 seconden"
+      s = s.replace(/\b(\d+)m\s*(\d+)s\s*\(([^)]+)\)/gi, "$3");
+      s = s.replace(/\b(\d+)m\s*(\d+)s\b/gi, "$1 minuten en $2 seconden");
+      // min. voor getal = minimaal; min na getal = minuten
+      s = s.replace(/\bmin\.?\s*(?=\d)/gi, "minimaal ");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*min\b\.?/gi, "$1 minuten");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*sec\b\.?/gi, "$1 seconden");
+      // Eenheden
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*°/g, "$1 graden");
+      s = s.replace(/[μu]Sv\/(?:uur|h)\b/gi, "microsievert per uur");
+      s = s.replace(/\bmSv\/(?:uur|h)\b/gi, "millisievert per uur");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*mSv\b/g, "$1 millisievert");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*cm\b/gi, "$1 centimeter");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*mm\b/gi, "$1 millimeter");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*m\b(?![a-zA-Z*\/])/g, "$1 meter");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*kV\b/gi, "$1 kilovolt");
+      s = s.replace(/\bmA\*min\b/gi, "milliampère minuut");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*mA\b/g, "$1 milliampère");
+      s = s.replace(/(\d+(?:[.,]\d+)?)\s*Ci\b/gi, "$1 Curie");
+      // Decimale punt tussen cijfers naar komma (75.2 -> 75,2)
+      s = s.replace(/(\d)\.(\d)/g, "$1,$2");
+      return s.replace(/\s+([.,!?])/g, "$1").replace(/([?!])\./g, "$1").replace(/\.{2,}/g, ".").replace(/\s+/g, " ").trim();
+    };
+
+    // 1. Expliciete korte TTS-kern uit rekenmodule (bijv. MinFFD, Opnames, Stralingstijd, Draadje)
+    const summaryMatch = raw.match(/<span[^>]*class=["'][^"']*rt-tts-summary[^"']*["'][^>]*>([\s\S]*?)<\/span>/i);
+    if (summaryMatch && summaryMatch[1].trim()) {
+      return spreekNatuurlijk(opschoonStuk(summaryMatch[1]));
+    }
+
+    // 2. Focusverandering eindresultaat (.rt-ai-final-time)
+    const finalTimeMatch = raw.match(/<div[^>]*class=["'][^"']*rt-ai-final-time[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+    if (finalTimeMatch && finalTimeMatch[1].trim()) {
+      return spreekNatuurlijk(opschoonStuk(finalTimeMatch[1]));
+    }
+
+    // 3. Verwijder <small> voetnoten en splits in regels/bullets
+    const zonderSmall = raw.replace(/<small[^>]*>[\s\S]*?<\/small>/gi, "");
+    const regels = zonderSmall
+      .split(/<br\s*[\/]?>|<\/p>|<\/div>/i)
+      .map((r) => r.trim())
+      .filter(Boolean);
+
+    const statusRegels = [];
+    const bulletResultaten = [];
+    for (const r of regels) {
+      const hasStrong = /<(?:strong|b)\b[^>]*>/i.test(r);
+      const isStatus = /^(?:✅|❌|⚠️)/.test(r.replace(/<[^>]+>/g, "").trim());
+      const isBullet = /^[•–-]\s*/.test(r.replace(/<[^>]+>/g, "").trim());
+      if (isStatus) {
+        const eersteZin = opschoonStuk(r).split(/\.\s+/)[0];
+        if (eersteZin) statusRegels.push(eersteZin);
+      } else if (isBullet && hasStrong && !r.includes("?")) {
+        // Strip technische haakjes in resultaat-bullets zodat alleen het directe antwoord + label wordt voorgelezen
+        const schoongemaakt = opschoonStuk(r)
+          .replace(/^[•–-]\s*/, "")
+          .replace(/\s*\([^)]*\)/g, "")
+          .replace(/\s+:/g, ":")
+          .trim();
+        if (schoongemaakt) bulletResultaten.push(schoongemaakt);
+      }
+    }
+
+    if (bulletResultaten.length > 0) {
+      const delen = [...statusRegels.slice(0, 1), ...bulletResultaten.slice(0, 3)];
+      return spreekNatuurlijk(delen.join(". "));
+    }
+
+    // 4. Korte wedervraag of compact antwoord
+    const schoonGeheel = opschoonStuk(zonderSmall);
+    if (schoonGeheel.includes("?")) {
+      const zinnen = schoonGeheel.split(/(?<=[.!?])\s+/).filter(Boolean);
+      const vraagZin = zinnen.find((z) => z.includes("?"));
+      if (vraagZin) return spreekNatuurlijk(vraagZin.replace(/^[•–-]\s*/, ""));
+    }
+
+    if (statusRegels.length > 0) {
+      return spreekNatuurlijk(statusRegels[0]);
+    }
+
+    return spreekNatuurlijk(schoonGeheel);
+  }
+
   function spreekTekst(htmlOrText) {
     if (!ttsEnabled) return;
     if (typeof window === "undefined" || !window.speechSynthesis) return;
@@ -12109,30 +12262,7 @@ ${stralingstijdPlat}========================================`;
     try {
       window.speechSynthesis.cancel();
 
-      // Converteer HTML naar een natuurlijke, schone spreekbare tekst
-      let text = String(htmlOrText || "");
-      text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
-      text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
-      text = text.replace(/<br\s*[\/]?>/gi, ". ");
-      text = text.replace(/<\/p>/gi, ". ");
-      text = text.replace(/<\/?[^>]+(>|$)/g, " ");
-      text = text.replace(/&nbsp;/g, " ")
-                 .replace(/&amp;/g, " en ")
-                 .replace(/&lt;/g, "kleiner dan ")
-                 .replace(/&gt;/g, "groter dan ")
-                 .replace(/&ge;/g, "minimaal ")
-                 .replace(/&le;/g, "maximaal ")
-                 .replace(/&times;/g, " bij ")
-                 .replace(/&bull;/g, "")
-                 .replace(/&rarr;/g, " naar ");
-      text = text.replace(/✅/g, "Toegestaan. ")
-                 .replace(/❌/g, "Niet toegestaan. ")
-                 .replace(/⚠️/g, "Let op. ")
-                 .replace(/ℹ️/g, "Informatie. ")
-                 .replace(/📋/g, "Overzicht. ")
-                 .replace(/☢️?/g, "")
-                 .replace(/⚡/g, "");
-      text = text.replace(/\s+/g, " ").trim();
+      const text = maakKorteSpraakTekst(htmlOrText);
       if (!text) return;
 
       const utterance = new SpeechSynthesisUtterance(text);
@@ -12629,6 +12759,7 @@ ${stralingstijdPlat}========================================`;
     toggleTts,
     isTtsEnabled,
     spreekTekst,
+    maakKorteSpraakTekst,
     corrigeerSpraakTekst,
     geefBronDropdownHtml,
     selecteerBronUitDropdown,
