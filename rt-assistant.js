@@ -900,7 +900,24 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     s = s.replace(/\bvan\s*43\s*(?=die\s*gevuld|gevuld|gevuldest)/gi, "van 4 dik ");
     s = s.replace(/\bgevuldest\b/gi, "gevuld is");
     s = s.replace(/(\d+(?:[.,]\d+)?)[-\s]*(?:mm\s*)?\b(dek|deck|decks|dec|decs|deken|dekens|dijk|dijken|deuk|deuken|deutjes|deukjes)\b/gi, "$1 dik");
-    s = s.replace(/\b(woonde\s*ik\s*(?:de|te|er)?|wandde\s*ik\s*(?:de|te|er)|wonde\s*ik\s*(?:de|te|er)|woonde\s*ik)\b/gi, "wanddikte");
+    s = s.replace(/\b(woonde\s*ik\s*(?:de|te|er)?|wandde\s*ik\s*(?:de|te|er)|wonde\s*ik\s*(?:de|te|er)|woonde\s*ik|wandelijke|wandlijke|wanddijke|wandelijk|wandelik)\b/gi, "wanddikte");
+    s = s.replace(/\bachtung\b/gi, "8 duimer");
+    s = s.replace(/\b(een|twee|drie|vier|vijf|zes|zeven|acht|tien|twaalf|\d+)\s*(?:duino|duimo|dino|duimno|ar?duino|duiker|duikers)\b/gi, "$1 duimer");
+    s = s.replace(
+      new RegExp(`\\b(${getalWoorden}|\\d+(?:[.,]\\d+)?)\\s+(?:duino|duimo|dino|duimno|duiker|duikers)\\b`, "gi"),
+      "$1 duimer",
+    );
+    s = s.replace(
+      /\b(1\/2|0\.5|1\/4|3\/4|1|2|3|4|5|6|8|10|12|14|16|18|20|24)(?:e|ste|de)\b(?=\s*(?:schedule|sch\b|sched\b|scheelt|pijp|buis|leiding|rondnaad|langsnaad|van\s+\d+\s*(?:mm|dik)|van\s+(?:sch|schedule)))/gi,
+      "$1 duimer",
+    );
+    s = s.replace(
+      /\b(tweede|derde|vierde|vijfde|zesde|achtste|tiende|twaalfde)\b(?=\s*(?:schedule|sch\b|sched\b|scheelt|pijp|buis|leiding|rondnaad|langsnaad|van\s+\d+\s*(?:mm|dik)|van\s+(?:sch|schedule)))/gi,
+      (w) => {
+        const m = { tweede: "2", derde: "3", vierde: "4", vijfde: "5", zesde: "6", achtste: "8", tiende: "10", twaalfde: "12" };
+        return `${m[w.toLowerCase()] || w} duimer`;
+      },
+    );
 
     // Algemene RT-triggerwoord lookalikes & rijmwoorden (Curie, Schedule, Opnames, Tijd, Afzetting, Bronnen, Normen, Draadjes, etc.)
     s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:c|k|g)(?:u|e|ee|ie|ë)?r+[a-zäëïöü]*ridi[a-z]+\b/gi, "$1 Curie iridium");
@@ -915,7 +932,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       new RegExp(`\\b(${getalWoorden}|\\d+(?:[.,]\\d+)?)\\s+(si|cie)\\b`, "gi"),
       "$1 Curie",
     );
-    s = s.replace(/\b(skedule|skedjul|skedjoel|schedul|scedule|schede|schedel|ketel)\s+(\d+|xxs|xs|std)\b/gi, "schedule $2");
+    s = s.replace(/\b(skedule|skedjul|skedjoel|schedul|scedule|schede|schedel|ketel|scheelt|scheel|schel|sheelt|sjeelt)\s+(5s?|10s?|20|30|40s?|60|80s?|100|120|140|160|xxs|xs|std|\d+[a-z]?)\b/gi, "schedule $2");
     s = s.replace(/\b(hoeveel|aantal)\s+(afnames|afname|toename|opnamen|opnaam|opnaams)\b/gi, "$1 opnames");
     s = s.replace(/\b(straling\s*tijd|stralings\s*tijd|straal\s*tijd|straaltijd|stralingstijden|verlichtingstijd|berichtingtijd|plichtingstijd|belichting\s*tijd|belichtings\s*tijd|schiet\s*tijd)\b/gi, "stralingstijd");
     s = s.replace(/\b(on\s*stream|ons\s*stream|onstroom|ontstroom|ons\s*droom|onstrie|onstriem|ons\s*riem|ontstem)\b/gi, "onstream");
@@ -9124,6 +9141,7 @@ ${stralingstijdPlat}========================================`;
       materiaalfactor: "Wat is de materiaalfactor?",
       langsnaad: "Langsnaad verdelen",
       bron_verval: "Bronverval berekenen",
+      schedule: "Wat is de wanddikte van het schedule?",
       mag_ik: "Mag ik deze opstelling gebruiken?",
       lasoverdikte: "Wat is de lasoverdikte?",
     };
@@ -9810,16 +9828,18 @@ ${stralingstijdPlat}========================================`;
 
     const isVraagZin = /\b(wat|hoe|hoelang|hoe\s+lang|hoeveel|kan|mag|moet|is\s+het|waarom|welk|welke|bereken|zoek|lijst|toon|overzicht)\b/i.test(gefilterdeTekst) || gefilterdeTekst.includes("?");
 
+    const isParameterZonderNieuweIntentie =
+      intenties.length === 0 ||
+      (intenties.length === 1 && (
+        intenties[0] === "overzicht" ||
+        (!isVraagZin && intenties[0] === "min_ffd" && nieuwParsed.sfd !== null && !/\b(wat|welk|welke|bereken|hoeveel)\b/i.test(gefilterdeTekst)) ||
+        (!isVraagZin && intenties[0] === "activiteit" && (nieuwParsed.activiteit !== null || nieuwParsed.bronTekst !== null))
+      ));
+
     const isAanvullendeData =
-      Boolean(context.isChip) ||
-      (heeftNieuweParameter &&
-        Boolean(actiefGespreksGeheugen.laatsteIntentie) &&
-        (intenties.length === 0 ||
-          (intenties.length === 1 && (
-            intenties[0] === "overzicht" ||
-            (!isVraagZin && intenties[0] === "min_ffd" && nieuwParsed.sfd !== null && !/\b(wat|welk|welke|bereken|hoeveel)\b/i.test(gefilterdeTekst)) ||
-            (!isVraagZin && intenties[0] === "activiteit" && (nieuwParsed.activiteit !== null || nieuwParsed.bronTekst !== null))
-          ))));
+      Boolean(actiefGespreksGeheugen.laatsteIntentie) &&
+      (heeftNieuweParameter || Boolean(context.isChip)) &&
+      isParameterZonderNieuweIntentie;
 
     if (isAanvullendeData && actiefGespreksGeheugen.laatsteIntentie) {
       if (intenties.includes("gevulde_leiding") || intenties.includes("bron_verval") || intenties.includes("kv_regel") || intenties.includes("buistabel")) {
@@ -12675,7 +12695,7 @@ ${stralingstijdPlat}========================================`;
     injectStyles();
     const micBtn = document.getElementById("btn-index-ai-trigger");
     if (micBtn) {
-      if (!micBtn.dataset.bound) {
+      if (!micBtn.dataset.bound && !micBtn.getAttribute("onclick")) {
         micBtn.dataset.bound = "true";
         micBtn.addEventListener("click", () => {
           openAssistant(false);
