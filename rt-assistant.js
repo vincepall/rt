@@ -1,4 +1,5 @@
 /**
+ * AUTO-GENERATED door build-radi.js uit src/radi/*.js — bewerk de losse modules in src/radi/!
  * RT Assistant - Universele NDO & RT Assistent voor rt-tools
  * Draait 100% lokaal in de browser (0 MB download, geen API-sleutels, 0 latency).
  * Ondersteunt:
@@ -12,6 +13,9 @@
 (function (global) {
   "use strict";
 
+  // ==========================================================================
+  // MODULE: 01-data-tabellen.js (667 regels)
+  // ==========================================================================
   // --- Standaard Bronnen Data ---
   const STANDAARD_BRONNEN_CSV = `Bron,type,Activiteit,datum,brongrootte
 35598P,Ir192,67.9,25-09-2026,2.879
@@ -573,6 +577,116 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     };
   }
 
+
+  // --- NDO Opstellingen & Groeperingen Kennisbank (EN ISO 17636-1 / ASME) ---
+  const OPSTELLINGEN_NDO = {
+    "1": {
+      code: "1",
+      groep: "SWSI",
+      technique: "SWSI",
+      optie: "3",
+      isPlaat: true,
+      synoniemen: ["opstelling 1", "swsi plaat", "vlakke plaat"],
+      titel: "Opstelling 1 (SWSI vlakke plaat)",
+      beschrijving: "Enkelwandige opstelling voor lassen in vlakke platen (Single Wall Single Image / EWEB). Bron aan voorzijde, film aan achterzijde.",
+    },
+    "2": {
+      code: "2/C",
+      groep: "SWSI",
+      technique: "SWSI",
+      optie: "",
+      isPlaat: false,
+      synoniemen: ["opstelling 2", "opstelling c", "opstelling 2/c", "opstelling 2 / c"],
+      titel: "Opstelling 2 / C (SWSI buis)",
+      beschrijving: "Enkelwandige doorstraling van buizen (Single Wall Single Image / EWEB). Bron aan buitenzijde, film aan binnenzijde (contact SWSI).",
+    },
+    "5": {
+      code: "5/A",
+      groep: "SWSI",
+      technique: "SWSI",
+      optie: "1",
+      isPlaat: false,
+      synoniemen: ["opstelling 5", "opstelling a", "opstelling 5/a", "opstelling 5 / a", "centraal", "centrale opstelling", "panoramisch"],
+      titel: "Opstelling 5 / A (SWSI Centraal / Panoramisch)",
+      beschrijving: "Centrale panoramische doorstraling (Single Wall Single Image / EWEB). Bron in de as van de pijp, film aan de buitenzijde rondom. 1 panoramische opname (360°).",
+    },
+    "8": {
+      code: "8/B",
+      groep: "SWSI",
+      technique: "SWSI",
+      optie: "2",
+      isPlaat: false,
+      synoniemen: ["opstelling 8", "opstelling b", "opstelling 8/b", "opstelling 8 / b", "excentrisch", "excentrische opstelling"],
+      titel: "Opstelling 8 / B (SWSI Excentrisch)",
+      beschrijving: "Excentrische enkelwandige doorstraling (Single Wall Single Image / EWEB). Bron binnenin excentrisch tegen de tegenoverliggende wand geplaatst, film aan buitenzijde van het te onderzoeken lassegment.",
+    },
+    "11": {
+      code: "11/F",
+      groep: "DWDI",
+      technique: "DWDI",
+      ovaaltje: "Ja",
+      isPlaat: false,
+      synoniemen: ["opstelling 11", "opstelling f", "opstelling 11/f", "opstelling 11 / f", "ovaal", "ovaaltje", "opnames met verzet", "elliptisch"],
+      titel: "Opstelling 11 / F (DWDI Ovaaltje / met verzet)",
+      beschrijving: "Dubbelwand dubbelbeeld met verzet / ovaalbeeld (Double Wall Double Image / DWDB). Bron en film buiten, bundel onder een hoek verzet. 2 opnames onder 90°.",
+    },
+    "12": {
+      code: "12/G",
+      groep: "DWDI",
+      technique: "DWDI",
+      ovaaltje: "Nee",
+      isPlaat: false,
+      synoniemen: ["opstelling 12", "opstelling g", "opstelling 12/g", "opstelling 12 / g", "superpositie", "loodrecht door de las"],
+      titel: "Opstelling 12 / G (DWDI Superpositie)",
+      beschrijving: "Dubbelwand dubbelbeeld superpositie (Double Wall Double Image / DWDB). Bron en film buiten, centrale straling loodrecht door het lasvlak. 3 opnames onder 60° of 120°.",
+    },
+    "13": {
+      code: "13/E",
+      groep: "DWSI",
+      technique: "DWSI",
+      optie: "",
+      bronTekst: "X-ray",
+      isPlaat: false,
+      synoniemen: ["opstelling 13", "opstelling 13 (x-ray)", "opstelling 13/e", "opstelling 13 / e"],
+      titel: "Opstelling 13 / E (DWSI Röntgenbuis)",
+      beschrijving: "Dubbelwand enkelbeeld met röntgenbuis (Double Wall Single Image / DWEB). Bron buiten, film aan de overzijde buiten.",
+    },
+    "14": {
+      code: "14/E",
+      groep: "DWSI",
+      technique: "DWSI",
+      optie: "",
+      bronTekst: "Gamma bron",
+      isPlaat: false,
+      synoniemen: ["opstelling 14", "opstelling 14 (gamma)", "opstelling 14/e", "opstelling 14 / e"],
+      titel: "Opstelling 14 / E (DWSI Gammabron)",
+      beschrijving: "Dubbelwand enkelbeeld met gammabron (Se-75 / Ir-192) (Double Wall Single Image / DWEB). Bron buiten, film aan de overzijde buiten.",
+    },
+    "E": {
+      code: "E",
+      groep: "DWSI",
+      technique: "DWSI",
+      optie: "",
+      isPlaat: false,
+      synoniemen: ["opstelling e", "opstelling 13/14"],
+      titel: "Opstelling E (DWSI Algemeen)",
+      beschrijving: "Dubbelwand enkelbeeld (Double Wall Single Image / DWEB). Bron buiten, film aan de overzijde buiten (overeenkomend met opstelling 13 voor X-ray en 14 voor gamma).",
+    },
+    "15": {
+      code: "15",
+      groep: "DWSI",
+      technique: "DWSI",
+      optie: "",
+      isPlaat: false,
+      synoniemen: ["opstelling 15"],
+      titel: "Opstelling 15 (DWSI Meervoudige wanden)",
+      beschrijving: "Dubbelwand enkelbeeld techniek (Double Wall Single Image / DWEB) voor dikwandige pijpen, buis-plaat lassen of tangentiële opstellingen.",
+    },
+  };
+
+  // ==========================================================================
+  // MODULE: 02-spraak-herstel.js (1062 regels)
+  // ==========================================================================
   // --- Levenshtein & Fuzzy Woordenboek ---
   function levenshteinAfstand(a, b) {
     const matrix = [];
@@ -1228,111 +1342,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     return s.replace(/\s+/g, " ").trim();
   }
 
-  // --- NDO Opstellingen & Groeperingen Kennisbank (EN ISO 17636-1 / ASME) ---
-  const OPSTELLINGEN_NDO = {
-    "1": {
-      code: "1",
-      groep: "SWSI",
-      technique: "SWSI",
-      optie: "3",
-      isPlaat: true,
-      synoniemen: ["opstelling 1", "swsi plaat", "vlakke plaat"],
-      titel: "Opstelling 1 (SWSI vlakke plaat)",
-      beschrijving: "Enkelwandige opstelling voor lassen in vlakke platen (Single Wall Single Image / EWEB). Bron aan voorzijde, film aan achterzijde.",
-    },
-    "2": {
-      code: "2/C",
-      groep: "SWSI",
-      technique: "SWSI",
-      optie: "",
-      isPlaat: false,
-      synoniemen: ["opstelling 2", "opstelling c", "opstelling 2/c", "opstelling 2 / c"],
-      titel: "Opstelling 2 / C (SWSI buis)",
-      beschrijving: "Enkelwandige doorstraling van buizen (Single Wall Single Image / EWEB). Bron aan buitenzijde, film aan binnenzijde (contact SWSI).",
-    },
-    "5": {
-      code: "5/A",
-      groep: "SWSI",
-      technique: "SWSI",
-      optie: "1",
-      isPlaat: false,
-      synoniemen: ["opstelling 5", "opstelling a", "opstelling 5/a", "opstelling 5 / a", "centraal", "centrale opstelling", "panoramisch"],
-      titel: "Opstelling 5 / A (SWSI Centraal / Panoramisch)",
-      beschrijving: "Centrale panoramische doorstraling (Single Wall Single Image / EWEB). Bron in de as van de pijp, film aan de buitenzijde rondom. 1 panoramische opname (360°).",
-    },
-    "8": {
-      code: "8/B",
-      groep: "SWSI",
-      technique: "SWSI",
-      optie: "2",
-      isPlaat: false,
-      synoniemen: ["opstelling 8", "opstelling b", "opstelling 8/b", "opstelling 8 / b", "excentrisch", "excentrische opstelling"],
-      titel: "Opstelling 8 / B (SWSI Excentrisch)",
-      beschrijving: "Excentrische enkelwandige doorstraling (Single Wall Single Image / EWEB). Bron binnenin excentrisch tegen de tegenoverliggende wand geplaatst, film aan buitenzijde van het te onderzoeken lassegment.",
-    },
-    "11": {
-      code: "11/F",
-      groep: "DWDI",
-      technique: "DWDI",
-      ovaaltje: "Ja",
-      isPlaat: false,
-      synoniemen: ["opstelling 11", "opstelling f", "opstelling 11/f", "opstelling 11 / f", "ovaal", "ovaaltje", "opnames met verzet", "elliptisch"],
-      titel: "Opstelling 11 / F (DWDI Ovaaltje / met verzet)",
-      beschrijving: "Dubbelwand dubbelbeeld met verzet / ovaalbeeld (Double Wall Double Image / DWDB). Bron en film buiten, bundel onder een hoek verzet. 2 opnames onder 90°.",
-    },
-    "12": {
-      code: "12/G",
-      groep: "DWDI",
-      technique: "DWDI",
-      ovaaltje: "Nee",
-      isPlaat: false,
-      synoniemen: ["opstelling 12", "opstelling g", "opstelling 12/g", "opstelling 12 / g", "superpositie", "loodrecht door de las"],
-      titel: "Opstelling 12 / G (DWDI Superpositie)",
-      beschrijving: "Dubbelwand dubbelbeeld superpositie (Double Wall Double Image / DWDB). Bron en film buiten, centrale straling loodrecht door het lasvlak. 3 opnames onder 60° of 120°.",
-    },
-    "13": {
-      code: "13/E",
-      groep: "DWSI",
-      technique: "DWSI",
-      optie: "",
-      bronTekst: "X-ray",
-      isPlaat: false,
-      synoniemen: ["opstelling 13", "opstelling 13 (x-ray)", "opstelling 13/e", "opstelling 13 / e"],
-      titel: "Opstelling 13 / E (DWSI Röntgenbuis)",
-      beschrijving: "Dubbelwand enkelbeeld met röntgenbuis (Double Wall Single Image / DWEB). Bron buiten, film aan de overzijde buiten.",
-    },
-    "14": {
-      code: "14/E",
-      groep: "DWSI",
-      technique: "DWSI",
-      optie: "",
-      bronTekst: "Gamma bron",
-      isPlaat: false,
-      synoniemen: ["opstelling 14", "opstelling 14 (gamma)", "opstelling 14/e", "opstelling 14 / e"],
-      titel: "Opstelling 14 / E (DWSI Gammabron)",
-      beschrijving: "Dubbelwand enkelbeeld met gammabron (Se-75 / Ir-192) (Double Wall Single Image / DWEB). Bron buiten, film aan de overzijde buiten.",
-    },
-    "E": {
-      code: "E",
-      groep: "DWSI",
-      technique: "DWSI",
-      optie: "",
-      isPlaat: false,
-      synoniemen: ["opstelling e", "opstelling 13/14"],
-      titel: "Opstelling E (DWSI Algemeen)",
-      beschrijving: "Dubbelwand enkelbeeld (Double Wall Single Image / DWEB). Bron buiten, film aan de overzijde buiten (overeenkomend met opstelling 13 voor X-ray en 14 voor gamma).",
-    },
-    "15": {
-      code: "15",
-      groep: "DWSI",
-      technique: "DWSI",
-      optie: "",
-      isPlaat: false,
-      synoniemen: ["opstelling 15"],
-      titel: "Opstelling 15 (DWSI Meervoudige wanden)",
-      beschrijving: "Dubbelwand enkelbeeld techniek (Double Wall Single Image / DWEB) voor dikwandige pijpen, buis-plaat lassen of tangentiële opstellingen.",
-    },
-  };
 
   // --- Fonetische Vaktaal-Hersteller ---
   function herstelVakjargon(ruweTekst) {
@@ -1401,14 +1410,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(focus\s*afstand|fokkers\s*afstand|fokker\s*afstand|foto\s*afstand|vogels\s*afstand|vogel\s*afstand|focusafstand|fokus|fokusafstand|film\s*(?:tot\s*)?focus\s*(?:afstand|distance)|focus\s*(?:tot\s*|to\s*)?film\s*(?:afstand|distance)|film\s*focusafstand|bron\s*(?:tot\s*)?film\s*(?:afstand|distance)|source\s*(?:to\s*)?film\s*(?:distance|afstand))\b/gi, "FFD"],
       [/\b(effe\s+de|effe\s+dee|ef\s*ef\s*de|ef\s*ef\s*dee|ef\s*dee|f\s*f\s*d|effd|ff\s*d|f\s*f\s*t|f\s*v\s*d|fvd)\b/gi, "FFD"],
       [/\b(s\s*f\s*d|sf\s*d|es\s*ef\s*dee|es\s*ef\s*de|s\s*v\s*d|svd)\b/gi, "SFD"],
-      [/\b(object\s*(?:tot\s*|to\s*)?film\s*(?:afstand|distance)|voorwerp\s*(?:tot\s*)?film\s*(?:afstand|distance)|onderwerp\s*(?:tot\s*)?film\s*(?:afstand|distance)|las\s*(?:tot\s*)?film\s*(?:afstand|distance))\b/gi, "OFD"],
       [/\b(o\s*f\s*a|oo\s*ef\s*aa|o\s*v\s*a)\b/gi, "OFA"],
-      [/\b(source\s*(?:to\s*)?object\s*(?:distance|afstand)|bron\s*(?:tot\s*)?object\s*(?:afstand|distance)|focus\s*(?:tot\s*)?object\s*(?:afstand|distance)|s\s*o\s*d|s\.o\.d\.|es\s*oo\s*dee)\b/gi, "SOD"],
-      [/\b(source\s*(?:to\s*)?detector\s*(?:distance|afstand)|bron\s*(?:tot\s*)?detector\s*(?:afstand|distance)|s\s*d\s*d|s\.d\.d\.|es\s*dee\s*dee)\b/gi, "SDD"],
-      [/\b(source\s*(?:to\s*)?film\s*factor|s\s*f\s*f|s\.f\.f\.|es\s*ef\s*ef)\b/gi, "SFF"],
-      [/\b(half\s*value\s*layer|halve\s*waarde\s*laag|halfwaarde\s*laag|halfwaarde\s*dikte|halverings\s*dikte)\b(?!\s*HVL)/gi, "halveringsdikte HVL"],
-      [/(?<!halveringsdikte\s)\b(h\s*v\s*l|h\.v\.l\.|ha\s*vee\s*el)\b/gi, "halveringsdikte HVL"],
-      [/\b(?:geometrische?\s*(?:on\s*scherpte|onscherpte)|geometric(?:al)?\s*unsharpness)\b(?!\s*Ug\b)/gi, "geometrische onscherpte Ug"],
       // Focus & Filmtype Calculator / Kwadratenwet
       [/\b(focus\s*verandering|focusverandering|ffd\s*verandering|focus\s*wissel)\b/gi, "focusverandering"],
       [/\b(kwadraten\s*wet|kwadraat\s*wet|omgekeerde\s*kwadratenwet)\b/gi, "kwadratenwet"],
@@ -1429,10 +1431,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       // Brongrootte / Bronafmeting / Bronkeuze
       [/\b(bron\s*afmeting|bronafmeting|focus\s*afmeting|focusafmeting|brongrote|bron\s*grootte|brandvlek\s*grootte|brandvlekgrootte|brandvlek)\b/gi, "brongrootte"],
       [/\b(bronkhuyzen|bronkhuizen|bronkhuis|bronhuizen|bronhuis|bronkruis|bronbuis|bron\s*kruis|bron\s*buis|bron\s*keuzes?|bronkeuzes|bronkeuzen|bron\s*cursus|bron\s*keuring)\b/gi, "bronkeuze"],
-      // Technieken (DWSI / SWSI / DWDI volledig uitgesproken NL & EN, excl. onbestaand 'enkel wand dubbel beeld')
-      [/\b(de\s+wc|dw\s*zie|d\s*w\s*s\s*i|dwz\s*i|dw\s*si|dw-si|(?:double|dubbel|dobbel|dubble)\s*(?:wall|wol|wal|wand)\s*(?:single|singel)\s*(?:image|imige|iemets|imids)|dubbele\s+wand\s+enkel\s+beeld|dubbelwand(?:ig)?\s*(?:enkel|een)\s*(?:beeld|beelt)?|dubbel\s*(?:wand|want|wandt)\s*(?:enkel|een)\s*(?:beeld|beelt)|twee\s*wanden\s*enkel\s*beeld|d\s*w\s*e\s*b|dweb|d\.w\.e\.b\.)\b/gi, "DWSI"],
-      [/\b((?:single|singel)\s*(?:wall|wol|wal)\s*(?:single|singel)\s*(?:image|imige|iemets|imids)|(?:single|singel)\s*(?:wall|wol|wal)(?!\s*(?:double|dubbel))|souci|sw\s*zie|s\s*w\s*s\s*i|s\s*w\s*c|sw\s*si|sw-si|enkele?\s*(?:wand|want|wandt)\s*(?:enkel|een)\s*(?:beeld|beelt)|enkeld?wand(?:ig)?\s*(?:enkel|een)\s*(?:beeld|beelt)?|enkele?\s*(?:wand|want)(?!\s*(?:dubbel|twee))|e\s*w\s*e\s*b|eweb|e\.w\.e\.b\.)\b/gi, "SWSI"],
-      [/\b((?:double|dubbel|dobbel|dubble)\s*(?:wall|wol|wal|wand)\s*(?:double|dubbel|dobbel)\s*(?:image|imige|iemets|imids)|(?:double|dubbel|dobbel)\s*(?:wall|wol|wal)\s*(?:double|dubbel)|dw\s*die|d\s*w\s*d\s*i|dw\s*di|dw-di|dubbele\s+wand\s+dubbel\s+beeld|dubbel\s*(?:wand|want|wandt)\s*dubbel(?:\s*(?:beeld|beelt))?|dubbelwand(?:ig)?\s*dubbel(?:\s*(?:beeld|beelt))?|twee\s*wanden\s*dubbel\s*beeld|d\s*w\s*d\s*b|dwdb|d\.w\.d\.b\.)\b/gi, "DWDI"],
+      // (DWSI / SWSI / DWDI volledig uitgesproken varianten zijn al in corrigeerSpraakTekst genormaliseerd)
       [/\b(panoramisch|panoramische|panoraam|panoramis|panorama|in\s+het\s+midden|in\s+het\s+centrum)\b/gi, "centraal"],
       [/\b(ex\s*centrisch|ekscentrisch|accentrisch|excentriek|excentrische)\b/gi, "excentrisch"],
       // Onstream termen & Procedures (RT21021 / RT21022)
@@ -1608,43 +1607,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     t = t.replace(/\b(\d+(?:[.,]\d+)?)\s*mcentraal\b/gi, "$1 meter centraal");
     t = t.replace(/\b(\d+)[.,](\d{1,2})\s*(?:centraal\s*te|centraal)\b/gi, "$1.$2 meter centraal");
 
-    // Wanddikte lookalikes (bijv. "the wonderte", "wanddeegte", "wandelen", "the 100", "de 100", "de wandel ik de", "wandel ik de", "de wandeling te", "woonde ik de")
-    t = t.replace(
-      /\b(?:the|de)?\s*(?:wonderte|wonder\s*te|wonder\s*de|wandert|wondert|wonderten|wondertek|wondertec|wandd?eeg(?:te)?|wandd?eg(?:te)?|wandd?ek(?:te)?|wandtegte|wandtekte|wanddigte|wandel(?:en|ing|ingen|er|ers|aars?|de|t)?(?:\s*ik)?(?:\s*(?:de|te|er))?|wondikte|wanddecte|one\s*dikte|onedikte|woonde\s*ik\s*(?:de|te|er)?|wandde\s*ik\s*(?:de|te|er)?|wonde\s*ik\s*(?:de|te|er)?)\s*(?:is|van|=|:)?\s*(\d+(?:[.,]\d+)?)\b/gi,
-      "de wanddikte is $1",
-    );
-    t = t.replace(
-      /\b(?:the|de)\s*(?:100|hundred|one\s*hundred|honderd)\s*(?:is|van|=|:)?\s*(\d+(?:[.,]\d+)?)\b/gi,
-      "de wanddikte is $1",
-    );
-    t = t.replace(
-      /\b(?:the|de)\s*(?:wonderte|wonder\s*te|wonder\s*de|wandert|wondert|wonderten|wondertek|wondertec|wandd?eeg(?:te)?|wandd?eg(?:te)?|wandd?ek(?:te)?|wandtegte|wandtekte|wanddigte|wandel(?:en|ing|ingen|er|ers|aars?|de|t)?(?:\s*ik)?(?:\s*(?:de|te|er))?|wondikte|wanddecte|one\s*dikte|onedikte|woonde\s*ik\s*(?:de|te|er)?|wandde\s*ik\s*(?:de|te|er)?|wonde\s*ik\s*(?:de|te|er)?)\b/gi,
-      "de wanddikte",
-    );
-    t = t.replace(
-      /\b(?:wonderte|wonder\s*te|wonder\s*de|wandert|wondert|wonderten|wondertek|wondertec|wandd?eeg(?:te)?|wandd?eg(?:te)?|wandd?ek(?:te)?|wandtegte|wandtekte|wanddigte|wandel(?:en|ing|ingen|er|ers|aars?|de|t)?(?:\s*ik)?(?:\s*(?:de|te|er))?|wondikte|wanddecte|one\s*dikte|onedikte|woonde\s*ik\s*(?:de|te|er)?|wandde\s*ik\s*(?:de|te|er)?|wonde\s*ik\s*(?:de|te|er)?)\b/gi,
-      "wanddikte",
-    );
-    t = t.replace(
-      /\b(?:the|de)\s*(?:100|hundred|one\s*hundred|honderd)\b(?=\s+(?:is|van|=|\d+\s*dik|\d+\s*mm|welk|volgens|\d+\b))/gi,
-      "de wanddikte",
-    );
-    t = t.replace(
-      /\b(?:the|de)?\s*(?:one|1)\s*that(?:['’]?s|\s*is|\s*van|\s*was)?\s*(?:is|van|=|:)?\s*(\d+(?:[.,]\d+)?)\b/gi,
-      "de wanddikte is $1",
-    );
-    t = t.replace(
-      /\b(?:the|de)?\s*(?:one|1)\s*that\s*(\d+(?:[.,]\d+)?)\s*(?:is|dik)?\b/gi,
-      "de wanddikte is $1",
-    );
-    t = t.replace(
-      /\b(?:the|de)\s*(?:one|1)\s*that\s*(?:is|was)\b/gi,
-      "de wanddikte is",
-    );
-    t = t.replace(
-      /\b(?:the|de)\s*(?:one|1)\s*that\b(?=\s+(?:is|van|=|\d+\s*dik|\d+\s*mm|welk|volgens|\d+\b))/gi,
-      "de wanddikte",
-    );
+    // (Wanddikte 'wonderte / one that'-patronen worden al afgehandeld in corrigeerSpraakTekst)
 
     // Selenium & Curie spraakcorrecties ("sileniumbron", "selenium in bron", "25-3")
     t = t.replace(/\b(?:selenium\s*in\s*bron|selenium\s*inbron|sileniumbron|silenium\s*bron)\b/gi, "selenium bron");
@@ -1778,9 +1741,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       return `${meters}.${paddedCms} meter`;
     });
 
+    // 6. Herstel hoofdletters voor bekende RT-afkortingen (één centrale stap na .toLowerCase())
+    t = t
+      .replace(/\b(swsi|dwsi|dwdi|dwbi|eweb|dweb|dwdb|ffd|sfd|ofa|ofd|sod|sdd|sff|hvl|bki|iqi|rvs|asme)\b/gi, (m) => m.toUpperCase())
+      .replace(/\bug\b/gi, "Ug")
+      .replace(/\bwmax\b/gi, "Wmax");
+
     return t.replace(/\s+/g, " ").trim();
   }
 
+  // ==========================================================================
+  // MODULE: 03-intentie-parser.js (1595 regels)
+  // ==========================================================================
   // --- Intentie Bepaling ---
   function bepaalVraagIntenties(tekst) {
     const lower = tekst.toLowerCase();
@@ -3377,6 +3349,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     return res;
   }
 
+  // ==========================================================================
+  // MODULE: 04-calc-opnames-tijd-afzetting.js (2706 regels)
+  // ==========================================================================
   // --- Rekenmodules ---
 
   // 1. Afzetting Gamma (afzettinggamma.html)
@@ -6084,6 +6059,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     return antwoord;
   }
 
+  // ==========================================================================
+  // MODULE: 05-calc-normen-iqi-kaart.js (2371 regels)
+  // ==========================================================================
   // 9. Focus & Filmtype Calculator / Kwadratenwet (focusverandering.html)
   function convertFilmTime(seconds, fromFilm, toFilm) {
     const fFrom = (fromFilm || "D7").toUpperCase();
@@ -8456,6 +8434,9 @@ ${stralingstijdPlat}========================================`;
 </div>`;
   }
 
+  // ==========================================================================
+  // MODULE: 06-geheugen-en-vraagrouter.js (1969 regels)
+  // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
     laatsteIntentie: null,
@@ -10426,6 +10407,9 @@ ${stralingstijdPlat}========================================`;
            `<small style="opacity:0.9;">Tip: Klik op de <strong><i class="fas fa-info-circle"></i> info-knop</strong> in de titelbalk van R.A.D.I. om dit overzicht altijd direct te openen.</small>`;
   }
 
+  // ==========================================================================
+  // MODULE: 07-ui-modal-styles.js (1219 regels)
+  // ==========================================================================
   // --- UI Controller (Universeel op elke pagina) ---
   let assistantModal = null;
   let recognition = null;
@@ -11646,6 +11630,9 @@ ${stralingstijdPlat}========================================`;
     });
   }
 
+  // ==========================================================================
+  // MODULE: 08-ui-speech-tts-init.js (1187 regels)
+  // ==========================================================================
   let isPushing = false;
   let isFinishingPTT = false;
   let committedPhrases = [];
@@ -12822,7 +12809,6 @@ ${stralingstijdPlat}========================================`;
     isTtsEnabled,
     spreekTekst,
     maakKorteSpraakTekst,
-    corrigeerSpraakTekst,
     geefBronDropdownHtml,
     selecteerBronUitDropdown,
     geefNormDropdownHtml,
@@ -12834,4 +12820,5 @@ ${stralingstijdPlat}========================================`;
   if (typeof module !== "undefined" && module.exports) {
     module.exports = RtAssistant;
   }
+
 })(typeof window !== "undefined" ? window : global);
