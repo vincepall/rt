@@ -792,17 +792,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     s = s.replace(/\b(?:dia\s*90?|dl\s*90?|dm\s*90?|dn\s*9\b|dn9\b)\b/gi, "DN 90");
 
     // 0. Losmaken van aan elkaar geplakte samengestelde spraakwoorden en koppeltekens
-    // Voorbeeld: "zesdek" -> "zes dek", "4-duin" -> "4 duin", "driedek" -> "drie dek", "6-dik" -> "6 dik"
+    // Voorbeeld: "zesdek" -> "zes dek", "4-duin" -> "4 duin", "driedijk" -> "drie dijk", "6-dik" -> "6 dik"
     s = s.replace(
       new RegExp(
-        `\\b(${getalWoorden})[-\\s]*(dek|deck|dicht|dak|dok|dik|duin|duins|duinen|duim|duims|duimen|duimer|duimers|duif|duiven|duyven|tuin|tuinen|dimmer|dimmers|mm|cm|meter)\\b`,
+        `\\b(${getalWoorden})[-\\s]*(dek|deck|dicht|dak|dok|dijk|dijken|diks|dikke|dik|duin|duins|duinen|duim|duims|duimen|duimer|duimers|duif|duiven|duyven|tuin|tuinen|dimmer|dimmers|mm|cm|meter)\\b`,
         "gi",
       ),
       "$1 $2",
     );
     s = s.replace(
-      /(\d+(?:[.,]\d+)?)[-\s]*(dek|deck|dicht|dak|dok|dik|duin|duins|duinen|duim|duims|duimen|duimer|duimers|duif|duiven|duyven|tuin|tuinen|dimmer|dimmers|inch|inches|mm|cm|meter|m\b|ci|curie|ma|kv|mill?i|mamin)/gi,
-      "$1 $2",
+      /(\d+(?:[.,]\d+)?)[-\s]*(dek|deck|dicht|dak|dok|dijk|dijken|diks|dikke|dik|duin|duins|duinen|duim|duims|duimen|duimer|duimers|duif|duiven|duyven|tuin|tuinen|dimmer|dimmers|inch|inches|mm|cm|meter|m\b|ci|curie|ma|kv|mill?i|mamin)/gi,
+      (match, num, unit) => {
+        // Bescherm bronnamen uit bronnen.csv / brongrootte-codes zoals "97969M" tegen splitsen naar "97969 M" (= meter)
+        if (/^m$/i.test(unit)) {
+          const rawCombined = (num + unit).toLowerCase();
+          const isBronNaam =
+            /^(97969m|35598p|35041p)$/i.test(rawCombined) ||
+            (Array.isArray(bronnenData) && bronnenData.some((b) => b.name && b.name.toLowerCase() === rawCombined)) ||
+            (!num.includes(".") && !num.includes(",") && num.length >= 4 && !/[-\s]/.test(match.slice(num.length, match.length - unit.length)));
+          if (isBronNaam) return match;
+        }
+        return `${num} ${unit}`;
+      },
     );
 
     // 1. mA*min varianten (minuten deel is VERPLICHT zodat pure milliampere stroom niet verward wordt!)
@@ -892,16 +903,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     s = s.replace(/\b(woonde\s*ik\s*(?:de|te|er)?|wandde\s*ik\s*(?:de|te|er)|wonde\s*ik\s*(?:de|te|er)|woonde\s*ik)\b/gi, "wanddikte");
 
     // Algemene RT-triggerwoord lookalikes & rijmwoorden (Curie, Schedule, Opnames, Tijd, Afzetting, Bronnen, Normen, Draadjes, etc.)
+    s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:c|k|g)(?:u|e|ee|ie|ë)?r+[a-zäëïöü]*ridi[a-z]+\b/gi, "$1 Curie iridium");
+    s = s.replace(/\b(?:c|k|g)(?:u|e|ee|ie|ë)?r+[a-zäëïöü]*ridi[a-z]+\b/gi, "Curie iridium");
+    s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:c|k|g)(?:u|e|ee|ie|ë)?r+[a-zäëïöü]*seleni[a-z]+\b/gi, "$1 Curie selenium");
+    s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:c|k|g)(?:u|e|ee|ie|ë)?r+[a-zäëïöü]*[ck]obal[td]\b/gi, "$1 Curie kobalt");
     s = s.replace(
-      new RegExp(`\\b(${getalWoorden}|\\d+(?:[.,]\\d+)?)\\s+(curry|jury|furie|kierie|kurie|kyrie|kerie|ceurie|curies|si|cie)\\b`, "gi"),
+      new RegExp(`\\b(${getalWoorden}|\\d+(?:[.,]\\d+)?)[-\\s]+(gerie|gerrie|gerry|geerie|gery|geurie|geury|kerrie|keurie|kirie|kiri|kiere|curry|jury|furie|kierie|kurie|kyrie|kerie|ceurie|curies|gereed|carry)\\b`, "gi"),
+      "$1 Curie",
+    );
+    s = s.replace(
+      new RegExp(`\\b(${getalWoorden}|\\d+(?:[.,]\\d+)?)\\s+(si|cie)\\b`, "gi"),
       "$1 Curie",
     );
     s = s.replace(/\b(skedule|skedjul|skedjoel|schedul|scedule|schede|schedel|ketel)\s+(\d+|xxs|xs|std)\b/gi, "schedule $2");
     s = s.replace(/\b(hoeveel|aantal)\s+(afnames|afname|toename|opnamen|opnaam|opnaams)\b/gi, "$1 opnames");
     s = s.replace(/\b(straling\s*tijd|stralings\s*tijd|straal\s*tijd|straaltijd|stralingstijden|verlichtingstijd|berichtingtijd|plichtingstijd|belichting\s*tijd|belichtings\s*tijd|schiet\s*tijd)\b/gi, "stralingstijd");
     s = s.replace(/\b(on\s*stream|ons\s*stream|onstroom|ontstroom|ons\s*droom|onstrie|onstriem|ons\s*riem|ontstem)\b/gi, "onstream");
-    s = s.replace(/\b(af\s*zetting|afzeting|afzettings|opzetting|uitzetting)\b/gi, "afzetting");
+    s = s.replace(/\b(af\s*stapping|afstappen|af\s*zetting|afzeting|afzettings|opzetting|uitzetting)\b/gi, "afzetting");
+    s = s.replace(/\bhoe\s+groot\s+moet(?:en)?\s+(?:de\s+|het\s+|een\s+)?afzetting\b/gi, "hoe groot moet de afzetting");
     s = s.replace(/\b(veilige?|grote?)\s+afzetten\b/gi, "$1 afzetting");
+    s = s.replace(/\b(las\s*prieten?|las\s*sprieten?|laspriet(?:en)?)\b/gi, "lasbreedte");
+    s = s.replace(/\bvoorkeurs(\s*afstand)?\b/gi, (_, afst) => (afst ? "focusafstand" : "focus"));
+    s = s.replace(/\bvoorkeur\b(?=\s+(?:van\s+\d|is\s+\d|\d|afstand|verandering|wissel))/gi, "focus");
     s = s.replace(/\b(fokkes|fokkus|vokus)\b/gi, "focus");
     s = s.replace(/\b(draatje|draadjes|raadje|raadjes|braadje)\b(?=\s|$|\?)/gi, (m) => (m.toLowerCase().endsWith("s") ? "draadjes" : "draadje"));
     s = s.replace(/\b(aas\s*mee|esmee|as\s*mee|azme)\b/gi, "ASME");
@@ -2304,6 +2327,22 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // --- Parameter Extractie ---
+  function stripBronnamenUitTekst(txt) {
+    let s = String(txt || "").replace(/\b(?:97969\s*m|35598\s*p|35041\s*p|rr\s*\d{3,5})\b/gi, " ");
+    if (Array.isArray(bronnenData)) {
+      for (const b of bronnenData) {
+        if (!b || !b.name) continue;
+        const esc = b.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        s = s.replace(new RegExp(`\\b${esc}\\b`, "gi"), " ");
+        const mBron = b.name.match(/^(\d+)([a-z]+)$/i);
+        if (mBron) {
+          s = s.replace(new RegExp(`\\b${mBron[1]}\\s*${mBron[2]}\\b`, "gi"), " ");
+        }
+      }
+    }
+    return s;
+  }
+
   function extractParametersDeterministisch(tekst) {
     const res = {
       diameter: null,
@@ -2512,11 +2551,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         res.afzettingSubModus = "afzettingsafstand";
       }
 
-      // Doel-afstand in meter (bijv. "op 15 meter", "afzetting van 15 meter", "maximaal 15 meter afzetten", of los "10 meter" bij vervolgvraag)
+      // Doel-afstand in meter (bronnaam zoals "97969M" of "97969 M" nooit als meter interpreteren!)
+      const tekstVoorMeter = stripBronnamenUitTekst(lower);
+
       const mDoelM =
-        lower.match(/(?:op|bij|binnen|naar|voor|van|maximaal|max\.?|tot)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i) ||
-        lower.match(/(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\s*(?:afzetten|afzetting|afstand)/i) ||
-        lower.match(/\b(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\b/i);
+        tekstVoorMeter.match(/(?:op|bij|binnen|naar|voor|van|maximaal|max\.?|tot)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i) ||
+        tekstVoorMeter.match(/(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\s*(?:afzetten|afzetting|afstand)/i) ||
+        tekstVoorMeter.match(/\b(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\b/i);
       if (mDoelM) {
         res.afzettingDoelMeter = parseFloat(mDoelM[1].replace(",", "."));
       } else if (
@@ -2524,7 +2565,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         actiefGespreksGeheugen &&
         actiefGespreksGeheugen.verwachtParameter === "afzettingDoelMeter"
       ) {
-        const mBareM = lower.match(/^\s*(?:op\s+|bij\s+)?(\d+(?:[.,]\d+)?)\s*(?:meter|m)?\s*$/i);
+        const mBareM = tekstVoorMeter.match(/^\s*(?:op\s+|bij\s+)?(\d+(?:[.,]\d+)?)\s*(?:meter|m)?\s*$/i);
         if (mBareM) {
           res.afzettingDoelMeter = parseFloat(mBareM[1].replace(",", "."));
         }
@@ -3419,10 +3460,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       actiefGespreksGeheugen.afzettingSubModus = subModus;
     }
 
+    const lowerVoorMeter = stripBronnamenUitTekst(lower);
     const mAfstInline =
-      lower.match(/(?:op|bij|binnen|naar|voor|van|maximaal|max\.?|tot)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i) ||
-      lower.match(/(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\s*(?:afzetten|afzetting|afstand)/i) ||
-      lower.match(/\b(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\b/i);
+      lowerVoorMeter.match(/(?:op|bij|binnen|naar|voor|van|maximaal|max\.?|tot)\s*(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)/i) ||
+      lowerVoorMeter.match(/(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\s*(?:afzetten|afzetting|afstand)/i) ||
+      lowerVoorMeter.match(/\b(\d+(?:[.,]\d+)?)\s*(?:meter|m\b)\b/i);
     const doelM = mAfstInline
       ? parseFloat(mAfstInline[1].replace(",", "."))
       : (params.afzettingDoelMeter || (params.sfd && params.sfd >= 1000 ? params.sfd / 1000 : null));
