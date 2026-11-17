@@ -35,52 +35,59 @@
     "Iridium", "Iridium-192", "Ir-192", "Selenium", "Selenium-75", "Se-75", "Kobalt", "Kobalt-60", "Co-60",
     "Balteau", "Balteau Ceram", "Balteau Ceram 300", "Balteau Rondstraler", "directional", "Ceram",
     "Yxlon", "Yxlon 300", "Smart EVO", "Smart EVO 300DS", "Smart 300",
-    "röntgen", "röntgenbuis", "X-ray", "rondstraler", "collimator", "brongrootte", "bronkeuze", "focus",
-    "focusafstand", "focusverandering", "FFD", "SFD", "OFA", "MinFFD", "minimale FFD",
+    "röntgen", "röntgenbuis", "X-ray", "rondstraler", "collimator", "brongrootte", "focusgrootte", "bronkeuze", "focus",
+    "focusafstand", "film focus afstand", "bron film afstand", "object film afstand", "focusverandering", "focuswissel",
+    "FFD", "SFD", "OFA", "OFD", "SOD", "SDD", "MinFFD", "minimale FFD", "minimale focus", "voorgestelde FFD",
 
     // Eenheden & Radiologie
     "Curie", "Ci", "halfwaardetijd", "halveringstijd", "bronverval", "vervaltijd", "activiteit",
-    "stralingstijd", "belichtingstijd", "schiettijd", "milliampère", "milliampère-minuten", "mA", "mA*min",
-    "kV", "kilovolt", "buisspanning", "buistabel", "KV-regel", "kwadratenwet", "diktevermeerdering",
-    "materiaalfactor", "staalequivalent", "afzetting", "afzettingsafstand", "dosistempo", "microsievert", "millisievert", "uSv", "mSv",
+    "straling", "stralingstijd", "belichtingstijd", "schiettijd", "lascompensatie", "compensatie",
+    "milliampère", "milliampère-minuten", "mA", "mA*min",
+    "kV", "kilovolt", "buisspanning", "buistabel", "KV-regel", "keverregel", "kwadratenwet", "diktevermeerdering",
+    "materiaalfactor", "stralingsfactor", "staalequivalent", "afzetting", "afzettingsafstand", "dosistempo", "microsievert", "millisievert", "uSv", "mSv",
 
     // Films & Beeldkwaliteit
     "filmsoort", "filmtype", "filmklasse", "filmkwaliteit", "D2", "D3", "D4", "D5", "D7", "D8",
-    "C1", "C2", "C3", "C4", "C5", "C6", "Agfa", "Structurix", "zwarting", "zwartingseisen", "optische dichtheid",
+    "10x24", "10x40", "10x48", "6x24", "6x48",
+    "C1", "C2", "C3", "C4", "C5", "C6", "Agfa", "Structurix", "zwarting", "zwartingseisen", "sluierzwarting", "optische dichtheid",
     "BKI", "BKI's", "beeldkwaliteit", "beeldkwaliteitsindicator", "penetrameter", "draadje", "draadjes", "draad", "draden", "draadvereiste", "gevoeligheid",
     "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12", "W13", "W14", "W15", "W16", "W17", "W18", "W19",
     "1 FE EN", "6 FE EN", "10 FE EN", "13 FE EN", "Set A", "Set B", "Set C", "Set D", "Set 1A", "Set 2A",
     "hole-type", "hole type", "shim", "plaatje", "plaatjes", "1T", "2T", "4T", "2T-gat", "2T gat", "loodletter", "loodletter B", "terugverstrooiing", "backscatter",
-    "bronzijde", "filmzijde",
+    "bronzijde", "filmzijde", "geometrische onscherpte", "Ug",
 
     // Normen & Kwaliteitsklassen
     "ASME", "Section V", "Artikel 2", "EN", "ISO", "EN ISO", "ISO 17636", "ISO 17636-1", "ISO 17636-2",
-    "ISO 19232", "ISO 19232-1", "ASTM", "ASTM E747", "ASTM E1025", "ASTM E1815", "ISO 11699-1",
-    "Klasse A", "Klasse B", "EN-A", "EN-B", "Klasse TA", "Klasse TB",
+    "ISO 19232", "ISO 19232-1", "ISO 5817", "ISO 10675", "ASTM", "ASTM E747", "ASTM E1025", "ASTM E1815", "ISO 11699-1",
+    "Klasse A", "Klasse B", "EN-A", "EN-B", "Klasse TA", "Klasse TB", "Level 1", "Level 2", "Level 3",
 
     // Duimsmaten, Leidingmaten, Schedules, Materialen & Media
-    "duims", "duimer", "duimers", "duimen", "opname", "opnames", "gevuld",
-    "halve duimer", "driekwart duims", "1 duimer", "2 duimer", "3 duimer", "4 duimer",
+    "duims", "duimer", "duimers", "duimen", "opname", "opnames", "gevuld", "gevulde leiding", "doorstraalde dikte",
+    "halve duimer", "driekwart duims", "1 duimer", "anderhalf duimer", "2 duimer", "3 duimer", "4 duimer",
     "5 duimer", "6 duimer", "8 duimer", "10 duimer", "12 duimer", "14 duimer", "16 duimer", "18 duimer", "20 duimer", "24 duimer",
     "DN 15", "DN 20", "DN 25", "DN 50", "DN 80", "DN 90", "DN90", "dia9", "dl90", "DN 100", "DN 150", "DN 200", "DN 250", "DN 300", "DN 400", "DN 500", "DN 600",
     "schedule", "schedules", "schedule 5", "schedule 10", "schedule 20", "schedule 30", "schedule 40", "schedule 60", "schedule 80",
     "schedule 100", "schedule 120", "schedule 140", "schedule 160", "Sch 10", "Sch 40", "Sch 80", "Sch 160", "STD", "standard",
     "XS", "extra strong", "XXS", "ASME B36.10M", "ASME B36.19M", "wanddiktes",
-    "haffmans", "sitech", "sabic", "lood", "staal", "koolstofstaal", "roestvast", "roestvrij", "duplex", "superduplex",
-    "aluminium", "titanium", "titaan", "inconel", "monel", "hastelloy", "messing", "tinbrons", "koper", "nikkel",
-    "water", "aardolie", "benzeen", "benzine", "aceton", "ammoniak", "methanol", "alcohol", "ethaan", "propaan",
+    "haffmans", "sitech", "sabic", "lood", "staal", "koolstofstaal", "roestvast", "roestvrij", "RVS", "duplex", "superduplex",
+    "aluminium", "titanium", "titaan", "inconel", "incoloy", "monel", "hastelloy", "stellite", "messing", "tinbrons", "roodbrons", "aluminiumbrons", "cupronikkel", "koper", "nikkel", "zirkonium", "tantaal", "molybdeen",
+    "water", "aardolie", "benzeen", "benzine", "aceton", "chloorbenzeen", "ammoniak", "methanol", "alcohol", "ethaan", "propaan",
     "dosislimiet", "dosislimieten", "stralingswerker", "gecontroleerde zone", "bewaakte zone", "halveringsdikte", "halfwaardedikte", "loodplaat", "loodplaten",
-    "opstelling", "opstellingen", "wolfraam", "doorstraling", "radiografie", "flenslas", "rondnaadje", "rondnaadjes", "verliestijd", "schaduwhoek", "schaduwbreedte", "onscherpte", "loodletter", "loodletters", "filmzijde", "bronzijde", "pijpleiding", "slakinsluitsel", "porositeit", "randinkarteling", "wormgat", "bindingsfout", "wortelfout", "lasfout", "corrosie", "wanddiktemeting", "draadindicator", "stappenwig", "densitometer", "benzeen", "tolueen", "nafta", "kerosine", "diesel", "stookolie", "ethanol", "methanol", "ammoniak", "isolatie", "steenwol", "glaswol", "contrast"
+    "opstelling", "opstellingen", "wolfraam", "doorstraling", "radiografie", "flenslas", "rondnaadje", "rondnaadjes", "verliestijd", "schaduwhoek", "schaduwbreedte", "onscherpte", "loodletter", "loodletters", "filmzijde", "bronzijde", "pijpleiding", "slakinsluitsel", "slaklijn", "wolfraaminsluitsel", "porositeit", "nestporositeit", "gaspit", "randinkarteling", "wormgat", "bindingsfout", "onvolkomen doorlassing", "worteldoorzakking", "kraterscheur", "wortelfout", "lasfout", "lasfouten", "corrosie", "wanddiktemeting", "draadindicator", "stappenwig", "densitometer", "benzeen", "tolueen", "nafta", "kerosine", "diesel", "stookolie", "ethanol", "methanol", "ammoniak", "isolatie", "steenwol", "glaswol", "contrast"
   ];
 
   const NDO_FUZZY_WOORDENBOEK = NDO_SPRAAK_WOORDENBOEK;
+
+  const UITGESLOTEN_ENKELWOORD_TRIGGERS = new Set([
+    "minffd", "single", "double", "image", "extra", "strong", "section", "artikel", "standard", "b3610m", "b3619m"
+  ]);
 
   const NDO_ENKELWOORD_TRIGGERS = Array.from(
     new Set(
       NDO_SPRAAK_WOORDENBOEK
         .flatMap((term) => term.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/[\s\/]+/))
         .map((w) => w.replace(/[^a-z]/g, ""))
-        .filter((w) => w.length >= 5)
+        .filter((w) => w.length >= 5 && !UITGESLOTEN_ENKELWOORD_TRIGGERS.has(w))
     )
   );
 
@@ -90,7 +97,7 @@
     ...NDO_ENKELWOORD_TRIGGERS,
     "ir-192", "se-75", "co-60", "dwsi", "swsi", "dwdi", "bki", "iqi", "ffd", "sfd", "ofa",
     "asme", "en-a", "en-b", "dik", "ci", "kv", "ma", "lood", "staal", "buis", "pijp", "plaat",
-    "duim", "duims", "draad", "norm", "bron", "film", "tijd", "klas"
+    "duim", "duims", "draad", "norm", "bron", "film", "tijd", "klas", "evo", "agfa", "shim", "astm"
   ]);
 
   // Synthetische aaneengeschreven vakterm-samenstellingen (getalwoord/modifier + eenheid/bron) -> canonieke vorm met spatie
@@ -123,28 +130,33 @@
 
   // Normale Nederlandse woorden die nooit door de fuzzy-matcher veranderd mogen worden
   const NORMALE_NL_STOPWOORDEN = new Set([
-    "straal", "straalt", "stralen", "stalen", "minuten", "seconden", "bereken", "berekenen", "hoeveel", "wanneer",
-    "waarom", "binnen", "buiten", "tussen", "zonder", "achter", "achteraan", "achteraf", "achtergrond", "achterkant",
-    "achterzijde", "achterin", "achterop", "achteruit", "doordat", "voornaam", "voorkeur", "voorkomen", "afgelopen",
-    "volgens", "eerste", "laatste",
+    "straal", "straalt", "stralen", "stalen", "minuut", "minuten", "seconde", "seconden", "bereken", "berekent", "berekenen", "hoeveel", "wanneer",
+    "waarom", "waarmee", "waarbij", "waarop", "waarin", "waarvan", "hoelang", "hoever", "hoezo",
+    "binnen", "buiten", "tussen", "zonder", "achter", "achteraan", "achteraf", "achtergrond", "achterkant",
+    "achterzijde", "achterin", "achterop", "achteruit", "doordat", "zodat", "zolang", "voornaam", "voorkeur", "voorkomen", "afgelopen",
+    "volgens", "eerste", "laatste", "steeds", "extra", "echter", "verder", "anders", "daarom", "daarna",
     "grootste", "kleinste", "hoogste", "laagste", "kortste", "langste", "dikste", "dunste",
     "oudste", "nieuwste", "meeste", "minste", "zwaarste", "lichtste", "tweede", "derde", "vierde",
-    "vijfde", "zesde", "achtste", "tiende", "twaalfde", "veertiende", "zestiende", "achttiende",
-    "twintigste", "medium", "aluminium", "benzeen", "benzine", "aardolie", "aceton", "water",
-    "leiding", "gebruiken", "aanhouden", "toegestaan", "geschikt", "nodig", "maken", "weten", "zien",
-    "welke", "kunnen", "worden", "hebben", "moeten", "zullen", "waren", "zouden", "vraag", "vragen",
+    "vijfde", "zesde", "zevende", "achtste", "negende", "tiende", "twaalfde", "veertiende", "zestiende", "achttiende",
+    "twintigste", "zeven", "negen", "twaalf", "dertien", "veertien", "vijftien", "zestien", "zeventien", "achttien", "negentien",
+    "twintig", "dertig", "veertig", "vijftig", "zestig", "zeventig", "tachtig", "negentig", "honderd", "duizend",
+    "halve", "anderhalf", "anderhalve", "driekwart",
+    "medium", "aluminium", "benzeen", "benzine", "aardolie", "aceton", "water",
+    "leiding", "gebruiken", "gebruikt", "aanhouden", "houden", "houdt", "toegestaan", "geschikt", "nodig", "maken", "maakt", "weten", "zien",
+    "welke", "kunnen", "worden", "wordt", "hebben", "heeft", "hadden", "moeten", "zullen", "waren", "zouden", "vraag", "vragen",
     "antwoord", "graag", "alstublieft", "alsjeblieft", "misschien", "eigenlijk", "ongeveer", "precies",
-    "totaal", "alleen", "samen", "kleine", "grote", "nieuwe", "andere", "zelfde", "dezelfde",
+    "totaal", "alleen", "samen", "kleine", "kleiner", "kleinere", "grote", "groter", "grotere", "nieuwe", "andere", "zelfde", "dezelfde",
     "eerder", "later", "boven", "onder", "rechts", "links", "midden", "direct", "meteen", "klopt",
     "staat", "blijft", "lijkt", "gebruik", "gezien", "gedaan", "gehad", "gegeven", "genomen",
     "dikte", "opstelling", "doorstraalde", "doorstraald", "maximale", "minimale", "maximaal", "minimaal",
-    "veilige", "veilig", "normale", "normaal", "standaard", "kleiner", "groter", "langer", "korter",
-    "dikker", "dunner", "sterker", "zwakker", "zwaarder", "lichter", "dubbel", "enkel",
+    "veilige", "veilig", "normale", "normaal", "standaard", "langer", "korter",
+    "dikker", "dunner", "sterker", "zwakker", "zwaarder", "lichter", "dubbel", "dubbele", "enkel", "enkele", "beeld", "beelden",
     "centimeter", "millimeter", "verplicht", "mogelijk", "waardoor", "waarvoor", "daarmee", "hiermee",
     "eigen", "welks", "vanaf", "omdat", "indien", "zodra", "nadat", "voordat", "tijdens", "tegen",
-    "zouden", "kunnen", "mogen", "willen", "hoeft", "moest", "komen", "gaat", "staan", "vinden",
-    "lopen", "zetten", "halen", "geven", "nemen", "krijgen", "lezen", "zeggen", "horen", "voelen",
-    "afstand", "ruimte", "plaats", "moment", "meter", "meters", "tweemaal", "driemaal"
+    "mogen", "willen", "hoeft", "moest", "komen", "gaat", "staan", "vinden",
+    "lopen", "zetten", "halen", "haalt", "geven", "geeft", "nemen", "neemt", "krijg", "krijgt", "krijgen", "lezen", "zeggen", "horen", "voelen",
+    "schiet", "schieten", "belicht", "belichten", "kiezen", "kiest", "pakken", "draaien", "draait", "wissel", "wisselt", "wisselen", "verander", "veranderen", "bepalen", "zoeken",
+    "afstand", "ruimte", "plaats", "moment", "meter", "meters", "tweemaal", "driemaal", "geleden", "vandaag", "morgen", "dagen", "weken", "maanden"
   ]);
 
   const SAMENGESTELDE_GETAL_PREFIXEN = [
@@ -152,10 +164,14 @@
     ["anderhalve", "1.5"],
     ["anderhalf", "1.5"],
     ["driekwart", "0.75"],
+    ["zeventien", "17"],
+    ["negentien", "19"],
     ["veertien", "14"],
     ["vijftien", "15"],
     ["zestien", "16"],
     ["achttien", "18"],
+    ["zeventig", "70"],
+    ["negentig", "90"],
     ["twintig", "20"],
     ["dertien", "13"],
     ["dertig", "30"],
@@ -181,7 +197,7 @@
     ["ach", "8"],
   ];
 
-  /** Ontleedt aaneengeschreven of geassimileerde <telwoord>+<vakterm> spraakvormen (bijv. "achterma" -> "8 duimer"). */
+  /** Ontleedt aaneengeschreven of geassimileerde <telwoord>+<vakterm> spraakvormen (bijv. "achterma" -> "8 duimer", "drietig" -> "3 dik"). */
   function herstelSamengesteldGetalEnEenheid(tekst) {
     if (!tekst || typeof tekst !== "string") return tekst;
     return tekst.split(/(\s+)/).map((tok) => {
@@ -232,10 +248,10 @@
           const heeftLeiding = cand.endsWith("leiding");
           return `${lead}${cijfer} ${heeftLeiding ? "duimse leiding" : "duimse"}${trail}`;
         }
-        if (/^(?:[dt]?u+[ijy]?m+(?:er|ar|a|el|en|pje|s)?|[dt]?[eao]+m+(?:er|ar|a|el|en|an|ig)?|[dt]?i+m+(?:er|ar|a|el)?|erma(?:n|ar|r|s)?|erme(?:r|n)?|umar|umer|omer|[dt]?uino|dino|[dt]?uik(?:er|ers)?|duif|duiven|luier|nummer|remmer|remma|dimmer)$/i.test(cand)) {
+        if (/^(?:[dt]?u+[ijy]?m+(?:er|ar|a|el|en|pje|s)?|[dt]?[eao]+m+(?:er|ar|a|el|en|an|ig|or)?|[dt]?i+m+(?:er|ar|a|el)?|(?:de|ste)?(?:man|mannen|maar|mar|mer|men|mag|dag|kamer|hamer|zomer|jammer|emmer|immer|umer|umar|omer|nummer|remmer|remma|dimmer|demer|damer|domer|timer|timmer|tuimer|luier|humor|humer|hummer)|erma(?:n|ar|r|s)?|erme(?:r|n)?|[dt]?uino|dino|[dt]?uik(?:er|ers)?|duif|duiven)$/i.test(cand)) {
           return `${lead}${cijfer} duimer${trail}`;
         }
-        if (/^(?:[dt]ik(?:ke|te)?|[dt]ijk|stik|deuk)$/i.test(cand)) {
+        if (/^(?:[dt]ik(?:ke|te)?|[dt]ig|[dt]ijk|stik|deuk)$/i.test(cand)) {
           return `${lead}${cijfer} dik${trail}`;
         }
         if (/^(?:[ckg][uoei]+r(?:ie|y|i)|cie)$/i.test(cand)) {
@@ -253,7 +269,17 @@
     return woord
       .toLowerCase()
       .replace(/[^a-z]/g, "")
-      .replace(/d$/g, "t")
+      .replace(/sch/g, "sg")
+      .replace(/ch/g, "g")
+      .replace(/ph/g, "f")
+      .replace(/th/g, "t")
+      .replace(/qu/g, "kw")
+      .replace(/c(?=[eiy])/g, "s")
+      .replace(/c/g, "k")
+      .replace(/z/g, "s")
+      .replace(/v/g, "f")
+      .replace(/(?<=.)d/g, "t")
+      .replace(/b$/g, "p")
       .replace(/ij/g, "")
       .replace(/[aeiouy]/g, "")
       .replace(/(.)\1+/g, "$1");
@@ -272,6 +298,7 @@
       .replace(/eu/g, "U")
       .replace(/oe/g, "W")
       .replace(/ie|y/g, "i")
+      .replace(/sch/g, "sg")
       .replace(/ch/g, "g")
       .replace(/ph/g, "f")
       .replace(/th/g, "t")
@@ -280,8 +307,8 @@
       .replace(/c/g, "k")
       .replace(/z/g, "s")
       .replace(/v/g, "f")
-      .replace(/dt$/g, "t")
-      .replace(/d$/g, "t")
+      .replace(/dt/g, "t")
+      .replace(/(?<=.)d/g, "t")
       .replace(/(.)\1+/g, "$1");
   }
 
@@ -442,12 +469,47 @@
     s = s.replace(/\bvoor\s+ons\s+klasse\b/gi, "volgens klasse");
     s = s.replace(/\bexcentrisch\s+(?:gieter|gieten)\b/gi, "excentrisch schieten");
 
-    // Specifieke spraakvormen voor duimermaten uit praktijk (bijv. "zaalstein maar", "zesdemer", "zesdedag", "tweede helemaal", "tweede remmer", "tweede nummer")
+    // Specifieke spraakvormen voor duimermaten uit praktijk (bijv. "tweede man", "vierde man", "zesde maar", "4d humor", "4 dik humor", "zaalstein maar", "zesdedag")
+    const RANG_EN_TELWOORD_NAAR_DUIM = {
+      half: "0.5", halve: "0.5", "0.5": "0.5", "1/2": "0.5",
+      driekwart: "0.75", "0.75": "0.75", "3/4": "0.75",
+      anderhalf: "1.5", anderhalve: "1.5", "1.5": "1.5",
+      een: "1", eerste: "1", "1": "1", "1e": "1", "1ste": "1",
+      twee: "2", tweede: "2", "2": "2", "2e": "2", "2de": "2",
+      drie: "3", derde: "3", "3": "3", "3e": "3", "3de": "3",
+      vier: "4", vierde: "4", "4": "4", "4e": "4", "4de": "4",
+      vijf: "5", vijfde: "5", "5": "5", "5e": "5", "5de": "5",
+      zes: "6", zesde: "6", zaas: "6", "6": "6", "6e": "6", "6de": "6",
+      zeven: "7", zevende: "7", "7": "7", "7e": "7", "7de": "7",
+      acht: "8", achtste: "8", achter: "8", ach: "8", "8": "8", "8e": "8", "8ste": "8",
+      negen: "9", negende: "9", "9": "9", "9e": "9", "9de": "9",
+      tien: "10", tiende: "10", team: "10", "10": "10", "10e": "10", "10de": "10",
+      elf: "11", elfde: "11", "11": "11", "11e": "11", "11de": "11",
+      twaalf: "12", twaalfde: "12", "12": "12", "12e": "12", "12de": "12",
+      veertien: "14", veertiende: "14", "14": "14", "14e": "14", "14de": "14",
+      zestien: "16", zestiende: "16", "16": "16", "16e": "16", "16de": "16",
+      achttien: "18", achttiende: "18", "18": "18", "18e": "18", "18de": "18",
+      twintig: "20", twintigste: "20", "20": "20", "20e": "20", "20ste": "20",
+      vierentwintig: "24", vierentwintigste: "24", "24": "24", "24e": "24", "24ste": "24",
+    };
     s = s.replace(/\b(orguinse|ochtendse|arduimse|arduimseleiding|achttuimse|achttruimse|achttuimseleiding|achttruimseleiding|ach\s*duimse|arduinse)(?:\s*leiding)?\b/gi, "8 duimse leiding");
     s = s.replace(/\b(zaalstein\s*maar|zaalstein|zesdemer|zesdem\s*maar|zesdem|zesdedag)\b/gi, "6 duimer");
-    s = s.replace(/\b(tweede\s*helemaal|tweede\s*remmer|tweede\s*nummer|tweede\s*dimmer|tweede\s*luier)\b/gi, "2 duimer");
-    s = s.replace(/\b(\d+|een|twee|drie|vier|vijf|zes|acht|tien|twaalf|veertien|zestien)[-\s]*(?:duimel|duimar|duima|demer|demmer|remmer|remma|nummer|helemaal|duif|duiven)\b/gi, "$1 duimer");
-    s = s.replace(/\b(\d+|een|twee|drie|vier|vijf|zes|acht|tien|twaalf)[-\s]*(?:damer|damers|dik\s*maar|dik\s*mag|dikmer|dikmag)\b/gi, "$1 duimer");
+    // Rangtelwoord ("tweede", "vierde", "zesde", "achtste", "tiende", etc.) + ingeslikte "-uimer" ("man", "maar", "ma", "mag", "meer", "men", "dag", "kamer", "hamer", "emmer", "humor", "nummer", "remmer", "dimmer", "luier", "helemaal")
+    s = s.replace(
+      /\b(eerste|tweede|derde|vierde|vijfde|zesde|zevende|achtste|negende|tiende|elfde|twaalfde|veertiende|zestiende|achttiende|twintigste|vierentwintigste|1e|1ste|2e|2de|3e|3de|4e|4de|5e|5de|6e|6de|8e|8ste|10e|10de|12e|12de|14e|14de|16e|16de|18e|18de|20e|20ste|24e|24ste)[-\s]+(?:man|mannen|maar|ma|mar|mer|men|meer|mag|mat|mand|munt|dag|helemaal|emmer|immer|ommer|ammer|umer|umar|omer|kamer|hamer|zomer|jammer|humor|humer|hummer|nummer|remmer|remma|dimmer|dimme|dimma|demer|demmer|damer|damers|domer|timer|timers|timmer|tuimer|tuimel|luier|luiers|duimel|duimar|duima|duiker|duikers|duitser|duitsers|duivel|duvel|duwer|stuiver|ruimer|schuimer|pluimer|sluimer|duino|duimo|dino|duimno|ar?duino|duif|duiven|tuin|tuinen)\b/gi,
+      (m, ord) => `${RANG_EN_TELWOORD_NAAR_DUIM[ord.toLowerCase()] || ord} duimer`,
+    );
+    // Gewoon telwoord / getal + (optioneel d / de / dik) + duimer-lookalike (inclusief "man", "humor", "kamer", "hamer", "emmer", "nummer", "remmer", etc.)
+    s = s.replace(
+      /\b(\d+(?:[.,]\d+)?|half|halve|driekwart|anderhalf|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf|veertien|zestien|achttien|twintig|vierentwintig)[-\s]*(?:[dD]\b\s*|de\s+|dik\s+)?(?:man|mannen|duimel|duimar|duima|demer|demmer|damer|damers|domer|remmer|remma|nummer|helemaal|duif|duiven|humor|humer|hummer|hamer|kamer|zomer|jammer|emmer|immer|ommer|ammer|umer|umar|omer|timer|timers|timmer|tuimer|tuimel|dimmer|dimmers|dimme|dimma|duiker|duikers|duitser|duitsers|duivel|duvel|duvels|duwer|duwers|luier|luiers|stuiver|stuivers|ruimer|schuimer|pluimer|sluimer|duino|duimo|dino|duimno|ar?duino)\b/gi,
+      (m, num) => `${RANG_EN_TELWOORD_NAAR_DUIM[num.toLowerCase()] || num} duimer`,
+    );
+    s = s.replace(/\b(?:[dD]\s+|de\s+|dik\s+)?(humor|humer|hummer|duimel|duimar|duima|tuimer)\b/gi, "duimer");
+    s = s.replace(
+      /\b(\d+|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf|veertien|zestien|achttien|twintig|vierentwintig)[-\s]*(?:damer|damers|dik\s*maar|dik\s*mag|dikmer|dikmag|dij\s*mag|dij\s*maar|dijmag|dijmaar|dei\s*mag|dei\s*maar|tij\s*mag|tij\s*maar|duim\s*mag|duim\s*maar|dijk\s*mag|dijk\s*maar|dag\s*mag|dag\s*maar)\b/gi,
+      (m, num) => `${RANG_EN_TELWOORD_NAAR_DUIM[num.toLowerCase()] || num} duimer`,
+    );
+    s = s.replace(/\b(?:teamd|tiend|team\s+d|tien\s+d|team\s*duim(?:er|s|se)?)\b/gi, "10 duimer");
     s = s.replace(/\b(?:achterma|achterman|achtermaar|achtuimer)\b/gi, "8 duimer");
     s = s.replace(/\bachter\s+ma\b/gi, "8 duimer");
     s = s.replace(/\b((?:een|op|voor|van|met|naar|bij)\s+)?achter\s+maar(?=\s*(?:van|met|schedule|sch\b|sched|leiding|buis|pijp|rondnaad|langsnaad|wand|dik|\d|$))/gi, (m, prep) => `${prep || ""}8 duimer`);
@@ -456,10 +518,13 @@
     s = herstelSamengesteldGetalEnEenheid(s);
     s = s.replace(/\b(?:om|op)\s+een\s+duimer\b/gi, "op 1 duimer");
 
-    // Wanddikte patronen: "10D" -> "10 dik", "4D" -> "4 dik", "vierdijk" -> "4 dik", "drie trek" -> "3 dik", "43 die gevuld" -> "4 dik die gevuld"
-    s = s.replace(/\b(\d+)\s*[dD]\b/gi, "$1 dik");
-    s = s.replace(/\b(vierdijk|vier\s*dijk)\b/gi, "4 dik");
-    s = s.replace(/\b(drie\s*trek|drietrek)\b/gi, "3 dik");
+    // Wanddikte patronen: "10D" -> "10 dik", "4D" -> "4 dik", "vierdijk" -> "4 dik", "drie trek" -> "3 dik", "drietig" -> "3 dik", "43 die gevuld" -> "4 dik die gevuld"
+    s = s.replace(/\b(\d+)\s*[dD]\b(?!\s*(?:duimer|duims|duim\b|humor|humer|hummer|uimer|umer))/gi, "$1 dik");
+    s = s.replace(/\b(vierdijk|vier\s*dijk|viertig|vier\s*tig)\b/gi, "4 dik");
+    s = s.replace(/\b(drie\s*trek|drietrek|drietig|drie\s*tig)\b/gi, "3 dik");
+    s = s.replace(/\b(tweetig|twee\s*tig)\b/gi, "2 dik");
+    s = s.replace(/\b(achttig|acht\s*tig)\b/gi, "8 dik");
+    s = s.replace(/\b(\d+|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|twaalf)[-\s]*(?:tig|dig)\b/gi, "$1 dik");
     s = s.replace(/\bvan\s*43\s*(?=die\s*gevuld|gevuld|gevuldest)/gi, "van 4 dik ");
     s = s.replace(/\bgevuldest\b/gi, "gevuld is");
     s = s.replace(/(\d+(?:[.,]\d+)?)[-\s]*(?:mm\s*)?\b(dek|deck|decks|dec|decs|deken|dekens|dijk|dijken|deuk|deuken|deutjes|deukjes)\b/gi, "$1 dik");
@@ -471,15 +536,12 @@
       "$1 duimer",
     );
     s = s.replace(
-      /\b(1\/2|0\.5|1\/4|3\/4|1|2|3|4|5|6|8|10|12|14|16|18|20|24)(?:e|ste|de)\b(?=\s*(?:schedule|sch\b|sched\b|scheelt|pijp|buis|leiding|rondnaad|langsnaad|van\s+\d+\s*(?:mm|dik)|van\s+(?:sch|schedule)))/gi,
+      /\b(1\/2|0\.5|1\/4|3\/4|1|2|3|4|5|6|8|10|12|14|16|18|20|24)(?:e|ste|de)\b(?=\s*(?:schedule|sch\b|sched\b|scheelt|pijp|buis|leiding|rondnaad|langsnaad|wand|volgens\s+klasse|van\s+(?:\d+|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|twaalf|veertien|zestien)\s*(?:mm|dik)|van\s+(?:sch|schedule)))/gi,
       "$1 duimer",
     );
     s = s.replace(
-      /\b(tweede|derde|vierde|vijfde|zesde|achtste|tiende|twaalfde)\b(?=\s*(?:schedule|sch\b|sched\b|scheelt|pijp|buis|leiding|rondnaad|langsnaad|van\s+\d+\s*(?:mm|dik)|van\s+(?:sch|schedule)))/gi,
-      (w) => {
-        const m = { tweede: "2", derde: "3", vierde: "4", vijfde: "5", zesde: "6", achtste: "8", tiende: "10", twaalfde: "12" };
-        return `${m[w.toLowerCase()] || w} duimer`;
-      },
+      /\b(tweede|derde|vierde|vijfde|zesde|achtste|tiende|twaalfde|veertiende|zestiende|achttiende|twintigste|vierentwintigste)\b(?=\s*(?:schedule|sch\b|sched\b|scheelt|pijp|buis|leiding|rondnaad|langsnaad|wand|volgens\s+klasse|van\s+(?:\d+|een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|twaalf|veertien|zestien)\s*(?:mm|dik)|van\s+(?:sch|schedule)))/gi,
+      (w) => `${RANG_EN_TELWOORD_NAAR_DUIM[w.toLowerCase()] || w} duimer`,
     );
 
     // Algemene RT-triggerwoord lookalikes & rijmwoorden (Curie, Schedule, Opnames, Tijd, Afzetting, Bronnen, Normen, Draadjes, etc.)
@@ -495,9 +557,16 @@
       new RegExp(`\\b(${getalWoorden}|\\d+(?:[.,]\\d+)?)\\s+(si|cie)\\b`, "gi"),
       "$1 Curie",
     );
-    s = s.replace(/\b(skedule|skedjul|skedjoel|schedul|scedule|schede|schedel|ketel|scheelt|scheel|schel|sheelt|sjeelt)\s+(5s?|10s?|20|30|40s?|60|80s?|100|120|140|160|xxs|xs|std|\d+[a-z]?)\b/gi, "schedule $2");
+    s = s.replace(/\b(?:want|van)\s+(?:ik\s+)?(?:ga\s+zo|ga\s+ze|krijg\s+zo|schat\s+zo|schiet\s+zo|kijk\s+zo|geef\s+zo|doe\s+zo|is\s+zo|gazo)\s+(5s?|10s?|20|30|40s?|60|80s?|100|120|140|160|xxs|xs|std)\b/gi, "van schedule $1");
+    s = s.replace(/\b(?:ik\s+)?(?:ga\s+zo|ga\s+ze|krijg\s+zo|schat\s+zo|schiet\s+zo|kijk\s+zo|gazo)\s+(5s?|10s?|20|30|40s?|60|80s?|100|120|140|160|xxs|xs|std)\b/gi, "schedule $1");
+    s = s.replace(/\b(skedule|skedjul|skedjoel|schedul|scedule|schede|schedel|schouder|schouders|schotel|schotels|schaduw|schade|schaal|school|schoen|schakel|schild|schil|ketel|scheelt|scheel|schel|sheelt|sjeelt)\s+(5s?|10s?|20|30|40s?|60|80s?|100|120|140|160|xxs|xs|std|\d+[a-z]?)\b/gi, "schedule $2");
+    s = s.replace(/\b(?:voor\s+een\s+|volgens\s+een\s+|een\s+)?(?:cm|centimeter)\s+klasse\s*([ab])\b/gi, (_, kl) => `volgens EN-${kl.toUpperCase()}`);
     s = s.replace(/\b(hoeveel|aantal)\s+(afnames|afname|toename|opnamen|opnaam|opnaams)\b/gi, "$1 opnames");
-    s = s.replace(/\b(straling\s*tijd|stralings\s*tijd|straal\s*tijd|straaltijd|stralingstijden|verlichtingstijd|berichtingtijd|plichtingstijd|belichting\s*tijd|belichtings\s*tijd|schiet\s*tijd)\b/gi, "stralingstijd");
+    s = s.replace(/\b(straling\s*tijd|stralings\s*tijd|straal\s*tijd|straaltijd|stralingstijden|staling\s*steeds|straling\s*steeds|stalings\s*steeds|staling\s*tijd|stalings\s*tijd|stalingstijd|straling\s*staat|staling\s*staat|stralings\s*staat|straling\s*stad|staling\s*stad|straling\s*strijd|staling\s*strijd|straling\s*stijgt|staling\s*stijgt|verlichtingstijd|berichtingtijd|plichtingstijd|belichting\s*tijd|belichtings\s*tijd|schiet\s*tijd)\b/gi, "stralingstijd");
+    s = s.replace(/\bstaling\b/gi, "straling");
+    s = s.replace(/\b(?:extra(?:\s+al)?|ik\s+sta(?:\s+al)?|ik\s+stalen|ik\s+straalt|ik\s+stralen|ik\s+schaal|ik\s+zaal)\s+(?=\d+(?:[.,]\d+)?\s*(?:minuut|minuten|min\b|sec\b|seconden)\b)/gi, "ik straal ");
+    s = s.replace(/\bhoe\s+ga\s+krijg\s+ik\b/gi, "hoe krijg ik");
+    s = s.replace(/\bhoe\s+krijg\s+ga\s+ik\b/gi, "hoe ga ik");
     s = s.replace(/\b(on\s*stream|ons\s*stream|onstroom|ontstroom|ons\s*droom|onstrie|onstriem|ons\s*riem|ontstem)\b/gi, "onstream");
     s = s.replace(/\b(af\s*stapping|afstappen|af\s*zetting|afzeting|afzettings|opzetting|uitzetting)\b/gi, "afzetting");
     s = s.replace(/\bhoe\s+groot\s+moet(?:en)?\s+(?:de\s+|het\s+|een\s+)?afzetting\b/gi, "hoe groot moet de afzetting");
@@ -534,8 +603,10 @@
     s = s.replace(/\b(onstream\s*(?:klasse\s*)?(?:thee\s*b|t\s*b|tb)|klasse\s*(?:thee\s*b|t\s*b)|tee\s*bee)\b/gi, "onstream klasse TB");
     s = s.replace(/\b(onstream\s*(?:klasse\s*)?(?:thee\s*a|t\s*a|ta)|klasse\s*(?:thee\s*a|t\s*a)|tee\s*aa)\b/gi, "onstream klasse TA");
 
-    // Zwarting & Verwachting fonetische spraakcorrecties
+    // Zwarting & Verwachting fonetische spraakcorrecties (incl. "Sword 1.5", "swording 1.5", "zwart in 2.5")
     s = s.replace(/\b(zwartings?\s*vrijste|zwartingsvrijste|zwartingvrijste|zwartings?\s*vrijsten|zwartings?\s*vereiste|zwartings?\s*vereisten)\b/gi, "zwartingseisen");
+    s = s.replace(/\b(swording|swarting|sworting|swords|sword|zwart\s+in|zwart\s+ik|zwart\s+ding|zwarte\s+in|zwarting\s+in)\b/gi, "zwarting");
+    s = s.replace(/\b(?:zwart|zwarte)\s+(?=(?:van\s+|is\s+)?\d+(?:[.,]\d+)?\b)/gi, "zwarting ");
     s = s.replace(/\b(maximale|minimale|vereiste|toelaatbare|film)\s+verwachting\b/gi, "$1 zwarting");
     s = s.replace(/\bverwachting\s+(?=voor\s+en[-\s]?[ab]|voor\s+asme|volgens\s+en[-\s]?[ab]|volgens\s+asme|van\s+en[-\s]?[ab]|bij\s+en[-\s]?[ab]|van\s+de\s+film|op\s+de\s+film)/gi, "zwarting ");
     s = s.replace(/\b(verwachtingseisen|verwachtingseis)\b/gi, "zwartingseisen");
@@ -567,7 +638,7 @@
 
     // Iridium lookalikes (bijv. "die ridem", "ingrediën", "ingrediënt", "ingrediënten", "ridia", "ridium", "de stage iridium")
     s = s.replace(/\b(?:en\s+die\s+|die\s+|de\s+)?(?:ridem|ridium|ridia|ingredi[eë]n|ingredi[eë]nt|ingredi[eë]nten)\b/gi, "iridium");
-    s = s.replace(/\b(?:de|die)?\s*(?:sterkste|stage|stagste|stagische|statische|strategische|staarste|strakste|steekste)\s+(iridium|selenium|kobalt|bron|cilinder)\b/gi, "de sterkste $1");
+    s = s.replace(/\b(?:de|die)?\s*(?:sterkste|stangste|stangse|stankste|stamste|stage|stagste|stagische|statische|strategische|staarste|strakste|steekste|st[a-z]{2,8}(?:ste|ische))\s+(iridium|selenium|seleen|kobalt|bron|bronnen|cilinder)\b/gi, "de sterkste $1");
 
     // Curie & Selenium lookalikes (bijv. "30 Carry", "30 gereed", "chryslering" -> "Curie selenium", "cilinder in bron" -> "selenium bron")
     s = s.replace(/\b(\d+)\s*(?:carry|gereed|jullie)\b/gi, "$1 Curie");
@@ -658,7 +729,7 @@
       [/\b(kobal|koba|kobold|kobald|cobald)\b/gi, "kobalt"],
       [/\b(ko|kool|koolstof|koopman|c\s*o|c\.o\.)\s*60\b/gi, "Co-60"],
       // Sterkste / Zwakste
-      [/\b(staarste|stearste|starste|sterste|stèrste|sterksten|strakste|strikste|stekste|streekste|stiekste|steekste|sterfte|stelligste|stoutste|stagische|stugste)\b/gi, "sterkste"],
+      [/\b(stangste|stangse|stankste|stamste|staarste|stearste|starste|sterste|stèrste|sterksten|strakste|strikste|stekste|streekste|stiekste|steekste|sterfte|stelligste|stoutste|stagische|stagste|stugste|stomste|stijfste)\b/gi, "sterkste"],
       [/\b(zwaarste|heetste|felste|grootste|hoogste)\s+(?=(?:(?:iridium|ir[-\s]?192|selenium|se[-\s]?75|kobalt|co[-\s]?60|gamma)\s+)?(?:bron|bronnen|isotoop|radium|brom|kroon))\b/gi, "sterkste "],
       [/\bhoe\s+(?:staar|star|strak|ster|stèr|zwaar|heet|fel)\s+(?=is|zijn|waren)\b/gi, "hoe sterk "],
       [/\b(zachtste|slapste|lichtste|kleinste|laagste|oudste)\s+(?=(?:(?:iridium|ir[-\s]?192|selenium|se[-\s]?75|kobalt|co[-\s]?60|gamma)\s+)?(?:bron|bronnen|isotoop|radium|brom|kroon))\b/gi, "zwakste "],
@@ -675,12 +746,19 @@
       [/\b(activiteid|aktieviteit|activitijd|bronsterkte|bron\s*sterkte)\b/gi, "activiteit"],
       [/\b(effectiviteit|productiviteit|creativiteit|festiviteit|intensiteit|capaciteit|elektriciteit|actualiteit|autoriteit|mobiliteit|stabiliteit)\s+(?=van\s+(?:de\s+)?(?:bron|iridium|selenium|se-75|ir-192))\b/gi, "activiteit "],
 
-      // 2. Focus / FFD / Onstream / Isolatie
-      [/\b(fokkers\s*afstand|fokker\s*afstand|foto\s*afstand|vogels\s*afstand|vogel\s*afstand|fokus\s*afstand|fokusafstand)\b/gi, "focusafstand"],
+      // 2. Focus / FFD / Onstream / Isolatie / Bundel
+      [/\b(film\s*(?:voorkeur|voorkeurs|fokkers|fokker|vogels|vogel|fokus)\s*afstand|(?:veel|velum)\s*focus\s*afstand|film\s*focus\s*afstand|filmfocusafstand)\b/gi, "film focus afstand"],
+      [/\b(bron\s*(?:veel|velum|voorkeur|voorkeurs|fokkers|vogels)\s*afstand|bron\s*film\s*afstand|bronfilmafstand)\b/gi, "bron film afstand"],
+      [/\b((?:object|opject|op\s*je)\s*(?:veel|velum|film)\s*afstand|objectfilmafstand)\b/gi, "object film afstand"],
+      [/\b(fokkers\s*afstand|fokker\s*afstand|foto\s*afstand|vogels\s*afstand|vogel\s*afstand|fokus\s*afstand|fokusafstand|focus\s*afstand)\b/gi, "focusafstand"],
+      [/\b(focus\s*verandering|focusverandering|ffd\s*verandering|focus\s*wissel|focuswissel|(?:voorkeur|voorkeurs|fokkers|vogels|fokus)\s*(?:verandering|wissel))\b/gi, "focusverandering"],
       [/\b(effe\s+de|effe\s+dee|ef\s*ef\s*de|ef\s*ef\s*dee|ef\s*dee|f\s*f\s*d|effd|ff\s*d|f\s*f\s*t|f\s*v\s*d|fvd)\b/gi, "FFD"],
       [/\b(fokkers|fokker|fokus|vokkes|fokkes|fokke|vokke|vogels|vogel|locus|crocus|krokus|hocus|pocus|pokus|circus|ficus|lotus|foetus|cactus|fakkel|fakkels)\b(?=\s+(?:afstand|op|voor|bij|van|moet|aanhouden|nodig|berekenen|wissel|verandering|is|\d+)|\s*$)/gi, "focus"],
       [/\b(hoeveel|welke|minimale|wat\s+is\s+de|kleinste|kortste|nieuwe|oude)\s+(fokkers|fokker|fokus|vokkes|fokkes|fokke|vokke|vogels|vogel|locus|crocus|krokus|hocus|pocus|pokus|circus|ficus|lotus|foetus|cactus|fakkel|fakkels)\b/gi, "$1 focus"],
-      [/\b(optimale|normale|finale|ideale|militair|militaire|minima)\s+(?=ffd|sfd|focus|focusafstand)\b/gi, "minimale "],
+      [/\b(optimale|normale|finale|ideale|militair|militaire|minima|minimaal|mini)\s+(?=ffd|sfd|focus|focusafstand)\b/gi, "minimale "],
+      [/\bminimale\s+(?:voorkeur|voorkeurs)\b/gi, "minimale focus"],
+      [/\b(bundel\s*breedte|bundel\s*weten|bundel\s*vreten|buitenbreedte)\b/gi, "bundelbreedte"],
+      [/\b(openings\s*hoek|opening\s*hoek|open\s*hoek)\b/gi, "openingshoek"],
       [/\b(on\s*stream|onstreamer|on\s*streamer|ontstroom|omstroom|instroom|uitstroom|onderstroom|bovenstroom|rondstroom|aanstroom|doorstroom|opstroom|(?:een|1|in|om|aan)\s*stream(?:er)?|instream|omstream|onscreen|on\s*screen|onze\s*team|ons\s*team|onze\s*riem|oom\s*stoom|onze\s*droom)\b/gi, "onstream"],
       [/\b(amsterdam|monster|monsterm|ontstaan|online)\s+(?=opname|opnames|ffd|focus|pijp|buis|leiding|duimer|duim|rt21021|rt21022|tangentiaal)\b/gi, "onstream "],
       [/\b(tangensiaal|tangensieël|tangentieel|tagentiaal|tangesiaal|tangeciaan)\b/gi, "tangentiaal"],
@@ -722,29 +800,45 @@
       [/\b(twintig|20)\s+(?=duimer|duims|duim\b)/gi, "20 "],
       [/\b(vierentwintig|24)\s+(?=duimer|duims|duim\b)/gi, "24 "],
 
-      // 4. Stralingstijd / Belichtingstijd / Buistabel / KV-regel
+      // 4. Stralingstijd / Belichtingstijd / Buistabel / KV-regel / Kwadratenwet / Lascompensatie
       [/\b(betalingstijd|vertalingstijd|herhalingstijd|belastingstijd|bestralingstijd|verlichtingstijd|verrichtingstijd|inrichtingstijd|oprichtingstijd|toelichtingstijd|verplichtingstijd|stichtingstijd|richtingstijd|dalingstijd|bepalingstijd|schietteid|schijt\s*tijd)\b/gi, "stralingstijd"],
       [/\b(hoe\s*lang|hoelang)\s+(?:moet|mag|kan|wil|zal|ga)\s+(?:ik|je|men|we)\s+(?:betalen|vertalen|herhalen|balen|halen|dwalen|malen|palen|gieten|genieten|verlichten|stichten|inrichten|oprichten|verrichten|verplichten)\b/gi, "hoe lang moet ik stralen"],
       [/\b(moet|wil|kan|ga)\s+ik\s+(?:betalen|vertalen|herhalen|balen|malen)\s+(?=met|bij|op|voor)\b/gi, "$1 ik stralen "],
+      [/\b(kwadraten\s*wet|kwadraat\s*wet|omgekeerde\s*kwadratenwet|kadratenwet|kwadraat\s*met|kwadraten\s*met)\b/gi, "kwadratenwet"],
+      [/\b(las\s*compensatie|los\s*compensatie|lascombinatie|las\s*combinatie)\b/gi, "lascompensatie"],
+      [/\b(materiaal\s*factor|materiaal\s*vakter|materiaal\s*vak|stralings\s*factor)\b/gi, "materiaalfactor"],
       [/\b(buitenspel|kruistabel|thuistabel|huistabel|muistabel|ruistabel|luistabel|kluistabel|pijptabel|stroomtabel)\b/gi, "buistabel"],
       [/\b(miljardair|miljonair|militair|militaire|militairen|ministerie|materie|bacterie|calorie|galerie|batterij|familie|milli|mili)\s*(?:amp[eè]re|amber|amper|empire|vampier|papier|manier)?\s*(?:minut(?:en|ie)?|minuut)\b/gi, "milliampère-minuten"],
       [/\b(\d+(?:[.,]\d+)?)\s*(?:miljardair|miljonair|militair|militaire|milli|mili)\s*(?:amp[eè]re|amber|amper|empire|vampier|papier|manier)\b(?!\s*[-]?\s*min)/gi, "$1 mA"],
       [/\b(kever\s*regels?|kabel\s*regels?|kavel\s*regels?|koffie\s*regels?|keverregel|kabelregel|kavelregel|koffieregel)\b/gi, "KV-regel"],
       [/\b(bijspanning|huisspanning|kruisspanning|uitspanning|inspanning|ontspanning|verspanning|overspanning|buispanning|buis\s*paning|buis\s*spring|buis\s*panging)\b/gi, "buisspanning"],
 
-      // 5. Afzetting / Collimator / Langsnaad / Rondnaad / Draadje / Ovaaltje / Opnames
+      // 5. Afzetting / Collimator / Langsnaad / Rondnaad / Draadje / Ovaaltje / Opnames / Films / Lasfouten
       [/\b(bezetting|omzetting|inzetting|uitzetting|voortzetting|overzetting|bijzetting|ontzetting|verzetting)\b/gi, "afzetting"],
+      [/\b(doosje\s*stempel|dosis\s*stempel|dosis\s*tempel)\b/gi, "dosistempo"],
+      [/\b(micro\s*sievert|micro\s*cijfers?|micro\s*zever|micro\s*sever)\b/gi, "microsievert"],
+      [/\b(loopplaat|bootplaat|noodplaat|roodplaat|grootplaat)\b/gi, "loodplaat"],
       [/\b(colimator|kollimator|kolimator|combinator|coördinator|coordinator|alligator|navigator|ventilator|generator|simulator|isolator|transformator|incubator)\b/gi, "collimator"],
       [/\bachter\s+(?:de|een)\s+(radiator|calculator|indicator)\b/gi, "achter de collimator"],
       [/\b(langsnaat|langstraat|landstraat|zandstraat|kantstraat|handstraat|brandstraat|strandstraat)\b/gi, "langsnaad"],
       [/\b(langzaam|langzaamaan|langsgaan|langslaan)\s+(?=van\s+\d+|verdelen|verdeel|verdeling|lengte|opnames)\b/gi, "langsnaad "],
       [/\b(verdeel|verdelen|verdeling)\s+(?:van\s+)?(?:een\s+|de\s+)?(langzaam|langzaamaan|langstraat)\b/gi, "$1 langsnaad"],
       [/\b(rondnaat|rondmaat|rondlaat|rondgaat|rondstaat|rondpraat|rondvaart|rondaan|hondnaad|hondnaat|mondnaad|bondnaad|grondnaad|bontnaad|zondnaad|frontnaad|kontnaad|rodenaad|rondenaad)\b/gi, "rondnaad"],
-      [/\b(welk|welke)\s+(praatje|straatje|gaatje|maatje|blaadje|zaadje|naadje|raadje|vaatje|kraantje|baantje|haantje|maantje|traantje|zwaantje|graantje)\b/gi, "$1 draadje"],
-      [/\b(praatje|straatje|gaatje|maatje|blaadje|zaadje|naadje|raadje|vaatje|kraantje|baantje)\s+(?=bki|nodig|moet|gebruiken|zien|op\s+de\s+film|voor\s+\d+|bij\s+\d+)/gi, "draadje "],
+      [/\b(welk|welke)\s+(praatje|straatje|maatje|blaadje|zaadje|naadje|raadje|vaatje|kraantje|baantje|haantje|maantje|traantje|zwaantje|graantje)\b/gi, "$1 draadje"],
+      [/\b(praatje|straatje|maatje|blaadje|zaadje|naadje|raadje|vaatje|kraantje|baantje)\s+(?=bki|nodig|moet|gebruiken|zien|op\s+de\s+film|voor\s+\d+|bij\s+\d+)/gi, "draadje "],
+      [/\b(?:wee|dubbel\s*v|w)\s*[-]?\s*(1[0-9]|[1-9])\b/gi, "W$1"],
       [/\b(ophaaltje|of\s*haaltje|verhaaltje|taaltje|paaltje|zaaltje|baaltje|schaaltje|kwaaltje|straaltje|kanaaltje|signaaltje|metaaltje|garnaaltje|journaaltje)\b/gi, "ovaaltje"],
       [/\b(hoeveel|aantal)\s+(aannames?|afnames?|innames?|deelnames?|toenames?|overnames?|uitnames?)\b/gi, "$1 opnames"],
       [/\bhoeveel\s+(voorzet|inzet|opzet|afzet|omzet|uitzet|bijzet|ontzet|bezet|gezet)\b/gi, "hoeveel verzet"],
+      [/\b(10|6)\s*(?:bij|maal|keer|x)\s*(24|40|48)\b/gi, "$1x$2"],
+      [/\b((?:veel|velum|filmen)\s*type|film\s*tiepe|film\s*type)\b/gi, "filmtype"],
+      [/\b(film\s*soort|veel\s*soort)\b/gi, "filmsoort"],
+      [/\b(film\s*kwaliteit|veel\s*kwaliteit)\b/gi, "filmkwaliteit"],
+      [/\b(las\s*fout|los\s*fout|last\s*fout)\b/gi, "lasfout"],
+      [/\b(slak\s*insluitsel|slakken\s*insluitsel|slak\s*sluitsel)\b/gi, "slakinsluitsel"],
+      [/\b(binding\s*fout|bindings\s*fout|binnenfout)\b/gi, "bindingsfout"],
+      [/\b(rand\s*inkarteling|randen\s*karteling)\b/gi, "randinkarteling"],
+      [/\b(wortel\s*doorzakking|wortel\s*zakking)\b/gi, "worteldoorzakking"],
 
       // BKI / IQI / Draadjes / Schedule / Structurix lookalikes
       [/\b(beke|beki|beekie|bekkie|bikkie|wiki|mickey|tikkie|b\s*k\s*ie|b\s*k\s*i)\b/gi, "BKI"],
@@ -767,7 +861,7 @@
       [/\b(image\s*quality\s*indicators?|beeld\s*kwaliteits?\s*indicators?)\b/gi, "IQI BKI"],
       [/\b(half\s*value\s*layer|halve\s*waarde\s*laag|halfwaarde\s*laag|halfwaarde\s*dikte|halverings\s*dikte)\b(?!\s*HVL)/gi, "halveringsdikte HVL"],
       [/(?<!halveringsdikte\s)\b(h\s*v\s*l|h\.v\.l\.|ha\s*vee\s*el)\b/gi, "halveringsdikte HVL"],
-      [/\b(?:geometrische?\s*(?:on\s*scherpte|onscherpte)|geometric(?:al)?\s*unsharpness)\b(?!\s*Ug\b)/gi, "geometrische onscherpte Ug"],
+      [/\b(?:geometrische?\s*(?:on\s*scherpte|onscherpte)|chemische\s*onscherpte|geometric(?:al)?\s*unsharpness)\b(?!\s*Ug\b)/gi, "geometrische onscherpte Ug"],
       [/\b(niet[-\s]*destructief\s*onderzoek|n\s*d\s*o)\b/gi, "NDO"],
       [/\b(non[-\s]*destructive\s*testing|nondestructive\s*testing|n\s*d\s*t)\b/gi, "NDT"],
       [/\b(half\s*life)\b/gi, "halfwaardetijd"],
@@ -788,7 +882,95 @@
       s = s.replace(pat, rep);
     }
 
+    s = herstelTriggerWoordenInTekst(s, false);
+
     return s.replace(/\s+/g, " ").trim();
+  }
+
+  function herstelTriggerWoordenInTekst(tekst, vervangIsotopenNaarCode = false) {
+    if (!tekst || typeof tekst !== "string") return "";
+    let t = herstelSamengesteldGetalEnEenheid(tekst);
+
+    // 4A. Bigram-Samenvoeger (gesplitste of licht verbasterde samenstellingen tegen NDO_COMPOUND_TRIGGERS)
+    const gramWoordenStop = new Set([
+      "de", "het", "een", "van", "op", "in", "bij", "met", "voor", "naar", "aan", "om", "uit", "door", "over",
+      "als", "dan", "of", "en", "is", "zijn", "was", "kan", "mag", "moet", "wil", "zal", "zou", "hoe", "wat",
+      "welk", "welke", "waar", "wanneer", "wie", "mijn", "jouw", "onze", "dit", "dat", "deze", "die", "veel",
+      "hoeveel", "kleine", "grote", "nieuwe", "oude", "wordt", "heeft", "heb", "ik", "je", "we", "men"
+    ]);
+    const stopExactPrefix = new Set(["ons", "door", "op", "af", "over"]);
+    const beschermdeEenheden = new Set([
+      "mm", "cm", "dm", "kv", "ma", "ci", "msv", "usv", "ug",
+      "ffd", "sfd", "ofa", "ofd", "sod", "sdd", "sff", "hvl",
+      "bki", "iqi", "dwsi", "swsi", "dwdi", "dwbi", "eweb", "dweb", "dwdb",
+      "ndo", "ndt", "wmax", "sch", "schedule", "std", "xs", "xxs",
+      "smart", "balteau", "yxlon", "ceram", "agfa", "klasse", "opstelling", "set"
+    ]);
+    const tokens = t.split(/\s+/).filter(Boolean);
+    const mergedTokens = [];
+    for (let idx = 0; idx < tokens.length; idx++) {
+      const w1 = tokens[idx];
+      const w2 = tokens[idx + 1];
+      if (w2 && !/[).,!?;:]$/.test(w1) && !/^[(\[]/.test(w2)) {
+        const c1 = w1.replace(/[^a-z]/gi, "").toLowerCase();
+        const c2 = w2.replace(/[^a-z]/gi, "").toLowerCase();
+        const allowBigram =
+          c1.length >= 2 &&
+          c2.length >= 3 &&
+          !/\d/.test(w1) &&
+          !/\d/.test(w2) &&
+          !beschermdeEenheden.has(c1) &&
+          !beschermdeEenheden.has(c2) &&
+          (!gramWoordenStop.has(c1) || stopExactPrefix.has(c1)) &&
+          !gramWoordenStop.has(c2) &&
+          c1.length <= 10 &&
+          c2.length <= 12;
+        if (allowBigram) {
+          const combo = c1 + c2;
+          if (NDO_COMPOUND_TRIGGERS.includes(combo)) {
+            mergedTokens.push(SYNTHETISCHE_SAMENSTELLINGEN_MAP[combo] || combo);
+            idx++;
+            continue;
+          }
+          if (!gramWoordenStop.has(c1) || c1 === "ons") {
+            const comboRes = besteTriggerMatch(combo, NDO_COMPOUND_TRIGGERS, 54);
+            if (comboRes && (c1 !== "ons" || comboRes.match === "onstream")) {
+              mergedTokens.push(SYNTHETISCHE_SAMENSTELLINGEN_MAP[comboRes.match] || comboRes.match);
+              idx++;
+              continue;
+            }
+          }
+        }
+      }
+      mergedTokens.push(w1);
+    }
+    t = mergedTokens.join(" ");
+
+    // 4B. Best-Match Enkelwoord Fuzzy / Rijm / Fonetisch / Medeklinkerskelet Engine
+    t = t.split(/\s+/).map((w) => {
+      const m = w.match(/^([("'«]*)(.*?)([)"'».,!?;:]*)$/);
+      const lead = m ? m[1] : "";
+      const core = m ? m[2] : w;
+      const trail = m ? m[3] : "";
+      const s = core.replace(/[^a-z]/gi, "").toLowerCase();
+      if (SYNTHETISCHE_SAMENSTELLINGEN_MAP[s] && !/\d/.test(core)) {
+        return `${lead}${SYNTHETISCHE_SAMENSTELLINGEN_MAP[s]}${trail}`;
+      }
+      if (/\d/.test(core) || s.length < 5 || NORMALE_NL_STOPWOORDEN.has(s) || NDO_TRIGGERS_SET.has(s)) return w;
+      const res = besteTriggerMatch(s, NDO_ENKELWOORD_TRIGGERS, 45);
+      if (!res) return w;
+      if (SYNTHETISCHE_SAMENSTELLINGEN_MAP[res.match]) {
+        return `${lead}${SYNTHETISCHE_SAMENSTELLINGEN_MAP[res.match]}${trail}`;
+      }
+      if (vervangIsotopenNaarCode) {
+        if (res.match === "iridium") return `${lead}Ir-192${trail}`;
+        if (res.match === "selenium") return `${lead}Se-75${trail}`;
+        if (res.match === "kobalt") return `${lead}Co-60${trail}`;
+      }
+      return `${lead}${res.match}${trail}`;
+    }).join(" ");
+
+    return t;
   }
 
 
@@ -1095,75 +1277,7 @@
     t = t.replace(/\b(opnames?\s+met\s+verzet)\b/gi, "opstelling 11/F ovaaltje");
     t = t.replace(/\b(loodrecht\s+door\s+de\s+las)\b/gi, "opstelling 12/G superpositie");
 
-    t = herstelSamengesteldGetalEnEenheid(t);
-
-    // 4A. Bigram-Samenvoeger (gesplitste of licht verbasterde samenstellingen tegen NDO_COMPOUND_TRIGGERS)
-    const gramWoordenStop = new Set([
-      "de", "het", "een", "van", "op", "in", "bij", "met", "voor", "naar", "aan", "om", "uit", "door", "over",
-      "als", "dan", "of", "en", "is", "zijn", "was", "kan", "mag", "moet", "wil", "zal", "zou", "hoe", "wat",
-      "welk", "welke", "waar", "wanneer", "wie", "mijn", "jouw", "onze", "dit", "dat", "deze", "die", "veel",
-      "hoeveel", "kleine", "grote", "nieuwe", "oude", "wordt", "heeft", "heb", "ik", "je", "we", "men"
-    ]);
-    const stopExactPrefix = new Set(["ons", "door", "op", "af", "over"]);
-    const beschermdeEenheden = new Set([
-      "mm", "cm", "dm", "kv", "ma", "ci", "msv", "usv", "ug",
-      "ffd", "sfd", "ofa", "ofd", "sod", "sdd", "sff", "hvl",
-      "bki", "iqi", "dwsi", "swsi", "dwdi", "dwbi", "eweb", "dweb", "dwdb",
-      "ndo", "ndt", "wmax", "sch", "schedule", "std", "xs", "xxs"
-    ]);
-    const tokens = t.split(/\s+/).filter(Boolean);
-    const mergedTokens = [];
-    for (let idx = 0; idx < tokens.length; idx++) {
-      const w1 = tokens[idx];
-      const w2 = tokens[idx + 1];
-      if (w2 && !/[).,!?;:]$/.test(w1) && !/^[(\[]/.test(w2)) {
-        const c1 = w1.replace(/[^a-z]/gi, "").toLowerCase();
-        const c2 = w2.replace(/[^a-z]/gi, "").toLowerCase();
-        const allowBigram =
-          c1.length >= 2 &&
-          c2.length >= 3 &&
-          !/\d/.test(w1) &&
-          !/\d/.test(w2) &&
-          !beschermdeEenheden.has(c1) &&
-          !beschermdeEenheden.has(c2) &&
-          (!gramWoordenStop.has(c1) || stopExactPrefix.has(c1)) &&
-          !gramWoordenStop.has(c2) &&
-          c1.length <= 10 &&
-          c2.length <= 12;
-        if (allowBigram) {
-          const combo = c1 + c2;
-          if (NDO_COMPOUND_TRIGGERS.includes(combo)) {
-            mergedTokens.push(SYNTHETISCHE_SAMENSTELLINGEN_MAP[combo] || combo);
-            idx++;
-            continue;
-          }
-          if (!gramWoordenStop.has(c1) || c1 === "ons") {
-            const comboRes = besteTriggerMatch(combo, NDO_COMPOUND_TRIGGERS, 54);
-            if (comboRes && (c1 !== "ons" || comboRes.match === "onstream")) {
-              mergedTokens.push(SYNTHETISCHE_SAMENSTELLINGEN_MAP[comboRes.match] || comboRes.match);
-              idx++;
-              continue;
-            }
-          }
-        }
-      }
-      mergedTokens.push(w1);
-    }
-    t = mergedTokens.join(" ");
-
-    // 4B. Best-Match Enkelwoord Fuzzy / Rijm / Fonetisch / Medeklinkerskelet Engine
-    t = t.split(/\s+/).map((w) => {
-      const s = w.replace(/[^a-z]/gi, "").toLowerCase();
-      if (SYNTHETISCHE_SAMENSTELLINGEN_MAP[s]) return SYNTHETISCHE_SAMENSTELLINGEN_MAP[s];
-      if (s.length < 5 || NORMALE_NL_STOPWOORDEN.has(s) || NDO_TRIGGERS_SET.has(s)) return w;
-      const res = besteTriggerMatch(s, NDO_ENKELWOORD_TRIGGERS, 45);
-      if (!res) return w;
-      if (SYNTHETISCHE_SAMENSTELLINGEN_MAP[res.match]) return SYNTHETISCHE_SAMENSTELLINGEN_MAP[res.match];
-      if (res.match === "iridium") return "Ir-192";
-      if (res.match === "selenium") return "Se-75";
-      if (res.match === "kobalt") return "Co-60";
-      return res.match;
-    }).join(" ");
+    t = herstelTriggerWoordenInTekst(t, true);
 
     // 5. D & N / DN & Duimse maten en eenheden normaliseren (nu inclusief alle herstelde triggerwoorden!)
     t = t.replace(/\b(?:d\s*(?:en|&|\.n\.|\s+n)|dia|thee\s*en|de\s*en|de\s*n)\s*(\d+)\b/gi, "DN $1");

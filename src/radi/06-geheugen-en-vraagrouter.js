@@ -1366,7 +1366,9 @@
       nieuwParsed.vervalDagen !== null ||
       nieuwParsed.vervalDoelDatum !== null ||
       nieuwParsed.schedule !== null ||
-      nieuwParsed.lasbreedte !== null;
+      nieuwParsed.lasbreedte !== null ||
+      nieuwParsed.zwartingOud !== null ||
+      nieuwParsed.zwartingNieuw !== null;
 
     const isVraagZin = /\b(wat|hoe|hoelang|hoe\s+lang|hoeveel|kan|mag|moet|is\s+het|waarom|welk|welke|bereken|zoek|lijst|toon|overzicht)\b/i.test(gefilterdeTekst) || gefilterdeTekst.includes("?");
 
@@ -1663,9 +1665,10 @@
           let dNieuw = params.zwartingNieuw || null;
 
           if (!dOud || !dNieuw) {
-            const matchZw = gefilterdeTekst.match(/(?:van\s+)?(?:een\s+)?zwarting\s*(?:van|is|=)?\s*(\d+(?:[.,]\d+)?)\b[\s\S]*?\b(?:om|naar|tot|op|voor)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=)?\s*)?(\d+(?:[.,]\d+)?)\s*(?:te\s*(?:krijgen|halen|bereiken|zien))?/i) ||
-                            gefilterdeTekst.match(/\bvan\s+(?:een\s+)?(?:zwarting\s+(?:van\s+)?)?(\d+(?:[.,]\d+)?)\s+(?:naar|tot)\s+(?:een\s+)?(?:zwarting\s+(?:van\s+)?)?(\d+(?:[.,]\d+)?)\b(?!\s*(?:mm|cm|meter|m\b|ci|curie|kv|ma\b|duim|inch))/i) ||
-                            gefilterdeTekst.match(/(\d+(?:[.,]\d+)?)\s*zwarting\b[\s\S]*?\b(?:om|naar|tot|op|voor)\s*(\d+(?:[.,]\d+)?)\b/i);
+            const matchZw =
+              gefilterdeTekst.match(/(?:van\s+)?(?:een\s+)?zwarting\s*(?:van|is|=|:)?\s*(\d+(?:[.,]\d+)?)\b[\s\S]*?(?:\b(?:om|naar|tot|op|voor)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=|:)?\s*)?|\b(?:hoe\s+)?(?:ga\s+ik\s+naar|krijg\s+ik|haal\s+ik|bereik\s+ik|kom\s+ik\s+op|wil\s+ik)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=|:)?\s*)?|\bzwarting\s*(?:van|is|=|:)?\s*)(\d+(?:[.,]\d+)?)(?![.,\d])(?!\s*(?:minuut|minuten|min\b|sec\b|seconden|s\b|mm|cm|meter|m\b|ci|curie|kv|ma\b))/i) ||
+              gefilterdeTekst.match(/\bvan\s+(?:een\s+)?(?:zwarting\s+(?:van\s+)?)?(\d+(?:[.,]\d+)?)\s+(?:naar|tot)\s+(?:een\s+)?(?:zwarting\s+(?:van\s+)?)?(\d+(?:[.,]\d+)?)(?![.,\d])(?!\s*(?:mm|cm|meter|m\b|ci|curie|kv|ma\b|duim|inch))/i) ||
+              gefilterdeTekst.match(/(\d+(?:[.,]\d+)?)\s*zwarting\b[\s\S]*?(?:\b(?:om|naar|tot|op|voor|krijg\s+ik|haal\s+ik|ga\s+ik\s+naar|zwarting)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=|:)?\s*)?)(\d+(?:[.,]\d+)?)(?![.,\d])(?!\s*(?:minuut|minuten|min\b|sec\b|seconden|s\b|mm|cm|meter|m\b|ci|curie|kv|ma\b))/i);
             if (matchZw) {
               const v1 = parseFloat(matchZw[1].replace(",", "."));
               const v2 = parseFloat(matchZw[2].replace(",", "."));

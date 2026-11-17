@@ -1025,6 +1025,11 @@
         if (chips) chips.push("6 mm dik", "8 mm dik", "10 mm dik", "12 mm dik", "15 mm dik");
         return "Wat is de <strong>dikte</strong> van de vlakke plaat (in mm)?";
       }
+      if (params.diameter) {
+        const diaLabel = formatMmNaarDuimLabel(params.diameter);
+        if (chips) chips.push("Schedule 40", "Schedule 80", "4 mm dik", "6 mm dik", "8 mm dik");
+        return `Om de stralingstijd voor <strong>${diaLabel}</strong> te berekenen heb ik nog de <strong>wanddikte</strong> of het <strong>schedule</strong> nodig.<br><br>Wat is de <strong>wanddikte</strong> (in mm) of het <strong>schedule</strong>?`;
+      }
       if (chips) chips.push("6 duimer Sch 40", "4 duimer Sch 40", "Plaat (enkelwandig)", "6 mm dik", "8 mm dik");
       return "Om de stralingstijd te berekenen heb ik de gegevens van het werkstuk nodig.<br><br>Wat is de <strong>leidingmaat</strong> (diameter en wanddikte/schedule) of de dikte van de <strong>vlakke plaat</strong>?";
     }

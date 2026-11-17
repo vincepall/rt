@@ -180,6 +180,34 @@ function laadRtAssistant() {
     ["vijftuimer schedule 40", /diameter 141\.3.*schedule 40/i],
     ["vierduino van 6 dik", /diameter 114\.3.*6 dik/i],
     ["dertigcurie selenium", /30 curie selenium/i],
+    [
+      "Ik heb een staling steeds van 1 minuut en Sword 1.5 hoe ga krijg ik zwart in 2.5",
+      /stralingstijd van 1 minuut en zwarting 1\.5 hoe krijg ik zwarting 2\.5/i,
+    ],
+    [
+      "extra 1 minuut en heb swording 1.5 Hoe krijg ik zwart in 2.5",
+      /ik straal 1 minuut en heb zwarting 1\.5 hoe krijg ik zwarting 2\.5/i,
+    ],
+    ["van drietig", /^van 3 dik$/i],
+    ["Hoe dik is een teamd want ik ga zo 40", /hoe dik is een diameter 273 van schedule 40/i],
+    ["Hoe dik is een 10-dij mag van schedule 40", /hoe dik is een diameter 273 van schedule 40/i],
+    ["een 4d humor", /^een diameter 114\.3$/i],
+    ["een 4 dik humor", /^een diameter 114\.3$/i],
+    ["vier humor van 6 dik", /diameter 114\.3 van 6 dik/i],
+    ["minimale voorkeur op een 6 duimer", /minimale focus op een diameter 168\.3/i],
+    ["film voorkeur afstand en veel type", /FFD en film(?:type|kwaliteit)/i],
+    ["welke BKI houder voor wee 13", /welke BKI houder voor W13/i],
+    ["verdeel een langstraat met 10 bij 48", /verdeel een langsnaad met 10x48/i],
+    ["chemische onscherpte en los compensatie", /geometrische onscherpte Ug en lascompensatie/i],
+    ["tweede man", /^diameter 60\.3$/i],
+    ["op een vierde man van 6 dik", /op een diameter 114\.3 van 6 dik/i],
+    ["zesde maar schedule 80", /diameter 168\.3 schedule 80/i],
+    ["tiende mag van 8 dik", /diameter 273 van 8 dik/i],
+    ["een vierde van zes dik", /een diameter 114\.3 van 6 dik/i],
+    [
+      "Hoe lang moet ik stralen om een 2 duimer van schedule 80 met de stangste selenium en een Focus van 500",
+      /de sterkste selenium/i,
+    ],
   ];
   for (const [inp, rx] of spraakCases) {
     const out = norm(inp);
@@ -196,6 +224,7 @@ function laadRtAssistant() {
     ["97969M (25.2 Ci)", (o) => o.toLowerCase() === "97969m (25.2 ci)"],
     ["achter de collimator", (o) => o === "achter de collimator"],
     ["achteraan de leiding", (o) => o === "achteraan de leiding"],
+    ["Ik straal 1 minuut en heb zwarting 1.5 hoe krijg ik 2.5", (o) => !/\bminffd\b/i.test(o) && /\b1 minuut\b/i.test(o)],
   ];
   for (const [inp, fn] of safeCases) {
     const out = norm(inp);
@@ -243,6 +272,54 @@ function laadRtAssistant() {
     const res = await RT.verwerkUniverseleVraag("gevuld met benzeen 6 duimer wand 6");
     const txt = stripTags(res && res.text);
     assert("E2E Gevulde leiding", /Benzeen/i.test(txt) && /879 kg\/m/i.test(txt), txt);
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const res = await RT.verwerkUniverseleVraag("Ik straal 1 minuut en heb zwarting 1.5 hoe krijg ik 2.5");
+    const txt = stripTags(res && res.text);
+    assert(
+      "E2E Zwarting tijd 1.5 -> 2.5 zonder MinFFD fout",
+      /1 minuut en 40 seconden/i.test(txt) && !/minimale film-focusafstand/i.test(txt) && !/Volgens welke norm/i.test(txt),
+      txt
+    );
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const res = await RT.verwerkUniverseleVraag(RT.corrigeerSpraakTekst("Ik heb een staling steeds van 1 minuut en Sword 1.5 hoe ga krijg ik zwart in 2.5"));
+    const txt = stripTags(res && res.text);
+    assert("E2E Spraak Zwarting staling steeds + Sword", /1 minuut en 40 seconden/i.test(txt), txt);
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const res = await RT.verwerkUniverseleVraag(RT.corrigeerSpraakTekst("Hoe dik is een teamd want ik ga zo 40"));
+    const txt = stripTags(res && res.text);
+    assert("E2E Spraak 10 duimer Sch 40 (teamd want ik ga zo 40)", /9\.27 mm/.test(txt), txt);
+  }
+  {
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag(
+      RT.corrigeerSpraakTekst("Hoe lang moet ik stralen op een 2 duimer van schouder 80 voor een cm klasse B met een Focus van 1 meter")
+    );
+    RT.selecteerBronUitDropdown("bron_97969M");
+    const res = await RT.verwerkUniverseleVraag("25.1 Curie");
+    const txt = stripTags(res && res.text);
+    assert(
+      "E2E Stralingstijd schouder 80 + cm klasse B direct berekend",
+      /Stralingstijd voor/i.test(txt) && /2 duimer/i.test(txt) && !/Wat is de leidingmaat/i.test(txt),
+      txt
+    );
+  }
+  {
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("Hoe lang moet ik stralen op een 2 duimer met een focus van 1 meter");
+    RT.selecteerBronUitDropdown("bron_97969M");
+    const res = await RT.verwerkUniverseleVraag("25.1 Curie");
+    const txt = stripTags(res && res.text);
+    assert(
+      "E2E Stralingstijd bekende diameter vraagt alleen wanddikte/schedule",
+      /2 duimer/i.test(txt) && /wanddikte/i.test(txt) && !/Wat is de leidingmaat/i.test(txt),
+      txt
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

@@ -11,7 +11,7 @@
     const isZwartingTijdSchatting =
       (/\b(zwarting\w*|optische\s+dichtheid|density)\b/i.test(lower) || /\bvan\s+\d+(?:[.,]\d+)?\s+naar\s+\d+(?:[.,]\d+)?\b/i.test(lower)) &&
       (heeftTijdSeenheid ||
-        /\b(?:hoelang|hoe\s*lang|tijd|stralen|belichten|krijgen|halen|schieten)\b/i.test(lower) ||
+        /\b(?:hoelang|hoe\s*lang|tijd|stralingstijd|belichtingstijd|straal|straalt|stralen|belicht|belichten|krijg|krijgt|krijgen|haal|haalt|halen|schiet|schieten)\b/i.test(lower) ||
         Boolean(typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && (actiefGespreksGeheugen.focusBegintijdSec || actiefGespreksGeheugen.laatsteStralingstijdSec || actiefGespreksGeheugen.maminVal)));
     const isStralingstijdVraag =
       !isZwartingTijdSchatting &&
@@ -1297,8 +1297,9 @@
 
     // Zwarting (optische dichtheid) wissel extractie
     if (!res.zwartingOud || !res.zwartingNieuw) {
-      const matchZwPattern = lower.match(/(?:van\s+)?(?:een\s+)?zwarting\s*(?:van|is|=)?\s*(\d+(?:[.,]\d+)?)\b[\s\S]*?\b(?:om|naar|tot|op|voor)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=)?\s*)?(\d+(?:[.,]\d+)?)\s*(?:te\s*(?:krijgen|halen|bereiken|zien))?/i) ||
-                             lower.match(/(\d+(?:[.,]\d+)?)\s*zwarting\b[\s\S]*?\b(?:om|naar|tot|op|voor)\s*(\d+(?:[.,]\d+)?)\b/i);
+      const matchZwPattern =
+        lower.match(/(?:van\s+)?(?:een\s+)?zwarting\s*(?:van|is|=|:)?\s*(\d+(?:[.,]\d+)?)\b[\s\S]*?(?:\b(?:om|naar|tot|op|voor)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=|:)?\s*)?|\b(?:hoe\s+)?(?:ga\s+ik\s+naar|krijg\s+ik|haal\s+ik|bereik\s+ik|kom\s+ik\s+op|wil\s+ik)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=|:)?\s*)?|\bzwarting\s*(?:van|is|=|:)?\s*)(\d+(?:[.,]\d+)?)(?![.,\d])(?!\s*(?:minuut|minuten|min\b|sec\b|seconden|s\b|mm|cm|meter|m\b|ci|curie|kv|ma\b))/i) ||
+        lower.match(/(\d+(?:[.,]\d+)?)\s*zwarting\b[\s\S]*?(?:\b(?:om|naar|tot|op|voor|krijg\s+ik|haal\s+ik|ga\s+ik\s+naar|zwarting)\s*(?:een\s*)?(?:zwarting\s*(?:van|is|=|:)?\s*)?)(\d+(?:[.,]\d+)?)(?![.,\d])(?!\s*(?:minuut|minuten|min\b|sec\b|seconden|s\b|mm|cm|meter|m\b|ci|curie|kv|ma\b))/i);
       if (matchZwPattern) {
         const z1 = parseFloat(matchZwPattern[1].replace(",", "."));
         const z2 = parseFloat(matchZwPattern[2].replace(",", "."));
