@@ -7,6 +7,7 @@
     wanddikte: null,
     schedule: null,
     sfd: null,
+    ofa: null,
     procedure: null,
     subProcedure: null,
     bronTekst: null,
@@ -215,6 +216,13 @@
         title: "Film-focusafstand",
       });
     }
+    if (actiefGespreksGeheugen.ofa) {
+      items.push({
+        key: "ofa",
+        label: `OFA ${actiefGespreksGeheugen.ofa} mm`,
+        title: "Object-tot-filmafstand",
+      });
+    }
     if (actiefGespreksGeheugen.filmType) {
       items.push({
         key: "filmType",
@@ -412,6 +420,8 @@
       actiefGespreksGeheugen.kv = null;
     } else if (key === "sfd") {
       actiefGespreksGeheugen.sfd = null;
+    } else if (key === "ofa") {
+      actiefGespreksGeheugen.ofa = null;
     } else if (key === "procedure" || key === "norm") {
       actiefGespreksGeheugen.procedure = null;
       actiefGespreksGeheugen.subProcedure = null;
@@ -557,6 +567,15 @@
       wisGeheugenParameter("bron");
       return;
     }
+    const wasRondstraler = Boolean(actiefGespreksGeheugen.bronTekst && /rondstraler/i.test(actiefGespreksGeheugen.bronTekst));
+    if (wasRondstraler && val !== "balteau_rondstraler") {
+      if (actiefGespreksGeheugen.optie === "1") actiefGespreksGeheugen.optie = null;
+      if (actiefGespreksGeheugen.opstelling === "Opstelling 5/A (centraal)") actiefGespreksGeheugen.opstelling = null;
+      if (actiefGespreksGeheugen.technique === "SWSI") actiefGespreksGeheugen.technique = null;
+      if (actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.sfd === Math.round(actiefGespreksGeheugen.diameter / 2)) {
+        actiefGespreksGeheugen.sfd = null;
+      }
+    }
     const isGenericGamma = val === "gen_se75" || val === "gen_ir192" || val === "gen_co60";
 
     if (val.startsWith("bron_")) {
@@ -588,6 +607,12 @@
       actiefGespreksGeheugen.bronType = "Rontgen";
       actiefGespreksGeheugen.brongrootte = 5.0;
       actiefGespreksGeheugen.activiteit = null;
+      actiefGespreksGeheugen.optie = "1";
+      actiefGespreksGeheugen.technique = "SWSI";
+      actiefGespreksGeheugen.opstelling = "Opstelling 5/A (centraal)";
+      if (actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.diameter > 0) {
+        actiefGespreksGeheugen.sfd = Math.round(actiefGespreksGeheugen.diameter / 2);
+      }
     } else if (val === "gen_se75") {
       if (actiefGespreksGeheugen.bronType !== "Se75") actiefGespreksGeheugen.activiteit = null;
       actiefGespreksGeheugen.bronTekst = "Se-75 (3.0 mm)";
@@ -896,6 +921,9 @@
       }
       if (it.key === "sfd" && actiefGespreksGeheugen.sfd) {
         return `FFD ${actiefGespreksGeheugen.sfd}`;
+      }
+      if (it.key === "ofa" && actiefGespreksGeheugen.ofa) {
+        return `OFA ${actiefGespreksGeheugen.ofa}`;
       }
       if (it.key === "filmType" && actiefGespreksGeheugen.filmType) {
         return `Film ${actiefGespreksGeheugen.filmType}`;
@@ -1341,6 +1369,7 @@
       nieuwParsed.bronTekst !== null ||
       nieuwParsed.activiteit !== null ||
       nieuwParsed.sfd !== null ||
+      nieuwParsed.ofa !== null ||
       nieuwParsed.diameter !== null ||
       nieuwParsed.filmType !== null ||
       nieuwParsed.langsnaadLengte !== null ||

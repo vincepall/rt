@@ -2234,7 +2234,8 @@
     // Techniek
     let tech = params.technique;
     let opstellingNaam = "";
-    if (params.optie === "1") {
+    const isRondstralerKaart = Boolean(params.bronTekst && /rondstraler/i.test(params.bronTekst)) || /\b(rondstraler|rondstralen)\b/i.test(vraagTekst || "");
+    if (params.optie === "1" || isRondstralerKaart) {
       tech = "SWSI";
       opstellingNaam = "Opstelling 5 / A (SWSI Centraal / Panoramisch)";
     } else if (params.optie === "2") {
@@ -2273,7 +2274,9 @@
         if (chips) {
           chips.push(`${voorgesteldeFfd} mm FFD`, `${minFfd} mm FFD (min. ffd)`);
         }
-        return `Voor een complete schietkaart van <strong>${diaLabel} (${t} mm dik, ${proc})</strong> is de voorgestelde contact-FFD <strong>${voorgesteldeFfd} mm</strong> (diameter + 15 mm), maar de normatieve minimale FFD volgens ${proc} is <strong>${minFfd} mm</strong> (${(minFfd / 10).toFixed(1)} cm).<br><br>Met welke FFD wil je de schietkaart samenstellen?`;
+        const isXrayKaart = params.bronType === "X-ray" || params.bronType === "Rontgen" || (params.bronTekst && /x[-\s]?ray|rontgen|röntgen|buis|balteau|ceram|yxlon|smart|evo/i.test(params.bronTekst));
+        const ffdBasisKaart = (params.optie === "1" || isRondstralerKaart) ? "halve diameter, centraal" : (isXrayKaart ? "diameter + 150 mm, X-ray" : "diameter + 15 mm");
+        return `Voor een complete schietkaart van <strong>${diaLabel} (${t} mm dik, ${proc})</strong> is de voorgestelde ${(params.optie === "1" || isRondstralerKaart) ? "centrale FFD" : "contact-FFD"} <strong>${voorgesteldeFfd} mm</strong> (${ffdBasisKaart}), maar de normatieve minimale FFD volgens ${proc} is <strong>${minFfd} mm</strong> (${(minFfd / 10).toFixed(1)} cm).<br><br>Met welke FFD wil je de schietkaart samenstellen?`;
       }
       gekozenFfd = voorgesteldeFfd > 0 ? voorgesteldeFfd : (minFfd > 0 ? minFfd : 0);
       params.sfd = gekozenFfd;

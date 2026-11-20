@@ -1091,6 +1091,20 @@
     }
     if (matchLasbreedte) res.lasbreedte = parseFloat(matchLasbreedte[1].replace(",", "."));
 
+    // Object-Film Afstand (OFA / OFD) expliciete extractie (bijv. "mijn ofa is 50", "ofa van 50 mm", "50 mm ofa")
+    let matchOfa = tekst.match(/(?:ofa|ofd|object[-\s]*(?:tot[-\s]*)?film[-\s]*afstand)\s*(?:(?:heb|hebt|heeft|is|was|wordt)\s+)?(?:van|is|op|:|=)?\s*(\d+(?:[.,]\d+)?)\s*(cm|centimeter|mm)?/i);
+    if (!matchOfa) {
+      matchOfa = tekst.match(/(\d+(?:[.,]\d+)?)\s*(cm|centimeter|mm)?\s*(?:ofa|ofd|object[-\s]*(?:tot[-\s]*)?film[-\s]*afstand)\b/i);
+    }
+    if (matchOfa) {
+      let ofaVal = parseFloat(matchOfa[1].replace(",", "."));
+      const ofaUnit = (matchOfa[2] || "").toLowerCase();
+      if (ofaUnit.startsWith("c")) ofaVal *= 10;
+      if (ofaVal > 0 && ofaVal <= 2000) {
+        res.ofa = ofaVal;
+      }
+    }
+
     // FFD / SFD
     const isBundelVraag = lower.includes("bundel") || lower.includes("collimator");
     let matchFfd = tekst.match(/(?:ffd|sfd|focus\s*afstand|film\s*focus\s*afstand|source\s*film\s*distance|bron\s*film)\s*(?:van|is|op|:|\()?\s*(\d+(?:[.,]\d+)?)\s*(mm|cm|meter|m\b)?/i);
@@ -1435,7 +1449,7 @@
       }
     }
     if (!res.bronTekst) {
-      let matchBg = tekst.match(/(?:brongrootte|bron\s*grootte|bron\s*groot|bronafmeting|bron\s*afmeting|focusgrootte|focus\s*grootte|focus\s*groot|focusafmeting|focus\s*afmeting)\s*(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
+      let matchBg = tekst.match(/(?:brongrootte|bron\s*grootte|bron\s*groot|bronafmeting|bron\s*afmeting|focusgrootte|focus\s*grootte|focus\s*groot|focusafmeting|focus\s*afmeting)\s*(?:(?:heb|hebt|heeft|is|was|wordt)\s+)?(?:van|is|op|:|=)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
       if (!matchBg) {
         matchBg = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:mm\s*)?(?:focusgrootte|focus\s*grootte|focus\s*groot|focusafmeting|focus\s*afmeting|bronafmeting|bron\s*afmeting|brongrootte|bron\s*grootte|bron\s*groot)\b/i);
       }
@@ -1512,8 +1526,8 @@
       }
     }
 
-    // Veilig getallenvangnet (bronkeuzes isoleren zodat bronmaten nooit als diameter worden gezien)
-    if ((res.diameter === null || res.wanddikte === null) && !isBundelVraag && res.sfd === null && res.langsnaadLengte === null && res.oudeFocus === null && res.nieuweFocus === null && res.focusBegintijdSec === null && res.maminVal === null && res.maVal === null) {
+    // Veilig getallenvangnet (bronkeuzes en OFA isoleren zodat bronmaten/OFA nooit als diameter worden gezien)
+    if ((res.diameter === null || res.wanddikte === null) && !isBundelVraag && res.sfd === null && res.ofa === null && res.langsnaadLengte === null && res.oudeFocus === null && res.nieuweFocus === null && res.focusBegintijdSec === null && res.maminVal === null && res.maVal === null) {
       let tZonder = tekst
         .replace(/\b(?:schedule|sch|sched)[-\s]*([0-9]{1,3}[a-z]?|std|xs|xxs)\b/gi, "")
         .replace(/\b([0-9]{1,3}[a-z]?)\s*(?:schedule|sch|sched)\b/gi, "")

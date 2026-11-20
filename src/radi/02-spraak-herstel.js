@@ -625,12 +625,19 @@
     s = s.replace(/\b(?:air\s*klasse|airklasse|air\s*classe|airclasse|jan\s*klasse|1\s*klasse|een\s*klasse)\s*b\b/gi, "EN-B");
     s = s.replace(/\b(?:air\s*klasse|airklasse|air\s*classe|airclasse|jan\s*klasse|1\s*klasse|een\s*klasse)\s*a\b/gi, "EN-A");
 
-    // ASME fonetische lookalikes (bijv. "voor ons Esmee", "voor onze Esmee", "aas mee", "aasmee", "volgens Esmee", "volgens a s mee", "voor ons aalsmee")
+    // ASME fonetische lookalikes (bijv. "voor ons Esmee", "volgens SV", "aas mee", "aasmee", "volgens Esmee", "volgens a s mee", "voor ons aalsmee")
     s = s.replace(
-      /\b(?:voor\s+(?:ons|onze)\s+(?:esmee|aalsmee|alsmee|aas\s*mee|aasmee|aas\s*me)|volgens\s+(?:esmee|a\s*s\s*mee|aalsmee|alsmee|aas\s*mee|aasmee|aas\s*me)|a\s*s\s*mee|voorons\s+(?:aalsmee|alsmee))\b/gi,
+      /\b(?:voor\s+(?:ons|onze)\s+(?:esmee|aalsmee|alsmee|aas\s*mee|aasmee|aas\s*me|sv|s\s*v|es\s*v|es\s*vee)|volgens\s+(?:esmee|a\s*s\s*mee|aalsmee|alsmee|aas\s*mee|aasmee|aas\s*me|sv|s\s*v|es\s*v|es\s*vee|as\s*v)|a\s*s\s*mee|voorons\s+(?:aalsmee|alsmee))\b/gi,
       "volgens ASME",
     );
     s = s.replace(/\b(aalsmee|alsmee|aas\s*mee|aasmee|aas\s*me|aasme)\b/gi, "ASME");
+
+    // Praktijk spraakvormen voor draadjes/plaat/dikte (bijv. "kan ik draadje maar ik zie dat mijn plaats van ardijk volgens SV")
+    s = s.replace(/\b(?:kan|ken)\s+ik\s+(draadje|draadjes)\s+(?:maar|moet|mag)\s+ik\s+zie(?:n)?\b/gi, "welk $1 moet ik zien");
+    s = s.replace(/\b(?:kan|ken)\s+ik\s+(draadje|draadjes)\b/gi, "welk $1");
+    s = s.replace(/\b(draadje|draadjes|bki|iqi)\s+(?:maar|mag)\s+ik\s+zie(?:n)?\b/gi, "$1 moet ik zien");
+    s = s.replace(/\b(?:dat\s+mijn|op\s+mijn|mijn)\s+(plaats|praat|blad|plaad)\s+van\b/gi, "op een plaat van");
+    s = s.replace(/\b(ardijk|aardijk|achtdijk|achdijk|ardek)\b/gi, "8 dik");
 
     // Brongrootte lookalikes (bijv. "de bron groot is 3", "de volgende groot is 3", "de bruynegoot is 3", "bronnen grote virus")
     s = s.replace(/\b(?:de\s+)?(?:bron\s*groot|volgende\s*groot|bruyne\s*goot|bruynegoot|bruine\s*goot|bruinegoot)\s*(?:is|van|=|:)?\s*(\d+(?:[.,]\d+)?)\b/gi, "brongrootte $1");

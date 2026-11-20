@@ -208,6 +208,10 @@ function laadRtAssistant() {
       "Hoe lang moet ik stralen om een 2 duimer van schedule 80 met de stangste selenium en een Focus van 500",
       /de sterkste selenium/i,
     ],
+    [
+      "kan ik draadje maar ik zie dat mijn plaats van ardijk volgens SV",
+      /welk draadje moet ik zien op een plaat van 8 dik volgens ASME/i,
+    ],
   ];
   for (const [inp, rx] of spraakCases) {
     const out = norm(inp);
@@ -320,6 +324,53 @@ function laadRtAssistant() {
       /2 duimer/i.test(txt) && /wanddikte/i.test(txt) && !/Wat is de leidingmaat/i.test(txt),
       txt
     );
+  }
+  {
+    RT.resetGespreksGeheugen();
+    RT.selecteerBronUitDropdown("balteau_ceram");
+    const res = await RT.verwerkUniverseleVraag("Asme, balteau, hoeveel opnames moet ik maken op een 8 duim van 7.8 dik");
+    const txt = stripTags(res && res.text);
+    assert(
+      "E2E X-ray Balteau voorgestelde FFD is De+150 (369 mm) en niet De+15 (234 mm)",
+      /369 mm/.test(txt) && !/234 mm/.test(txt),
+      txt
+    );
+  }
+  {
+    RT.resetGespreksGeheugen();
+    RT.selecteerBronUitDropdown("balteau_rondstraler");
+    const res = await RT.verwerkUniverseleVraag("Asme, hoeveel opnames moet ik maken op een 8 duim van 7.8 dik");
+    const txt = stripTags(res && res.text);
+    assert(
+      "E2E Balteau Rondstraler gebruikt opstelling centraal en FFD = De/2 (110 mm)",
+      /centrale \(panoramische\) opstelling/i.test(txt) && /1 opname/i.test(txt) && /110 mm/.test(txt) && RT.actiefGespreksGeheugen.sfd === 110,
+      `${txt} | sfd=${RT.actiefGespreksGeheugen.sfd}`
+    );
+    const voorgesteld = RT.bepaalVoorgesteldeFFD({ diameter: 219.1, bronTekst: "Balteau Rondstraler (5.0 mm)", bronType: "Rontgen" }, "");
+    assert("bepaalVoorgesteldeFFD voor Rondstraler is halve diameter (110 mm)", voorgesteld === 110, `got=${voorgesteld}`);
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const res1 = await RT.verwerkUniverseleVraag("Wat is de minimale FFD volgens asme als ik een brongrootte heb van 3 en mijn ofa is 50");
+    const txt1 = stripTags(res1 && res1.text);
+    assert(
+      "E2E MinFFD ASME met brongrootte 3 en OFA 50 vraagt om wanddikte (wt voor Ug)",
+      /wanddikte/i.test(txt1) && RT.actiefGespreksGeheugen.diameter === null && RT.actiefGespreksGeheugen.wanddikte === null && RT.actiefGespreksGeheugen.ofa === 50 && RT.actiefGespreksGeheugen.brongrootte === 3,
+      `${txt1} | mem=${JSON.stringify({ d: RT.actiefGespreksGeheugen.diameter, wt: RT.actiefGespreksGeheugen.wanddikte, ofa: RT.actiefGespreksGeheugen.ofa, bg: RT.actiefGespreksGeheugen.brongrootte })}`
+    );
+    const res2 = await RT.verwerkUniverseleVraag("10 mm dik");
+    const txt2 = stripTags(res2 && res2.text);
+    assert(
+      "E2E MinFFD ASME met brongrootte 3, OFA 50 en wt 10 mm -> 344 mm (Ug 0.51, conform MinFFD.html)",
+      /344 mm/.test(txt2) && /OFA 50 mm/i.test(txt2),
+      txt2
+    );
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const res = await RT.verwerkUniverseleVraag(RT.corrigeerSpraakTekst("kan ik draadje maar ik zie dat mijn plaats van ardijk volgens SV"));
+    const txt = stripTags(res && res.text);
+    assert("E2E Spraak draadje plaat 8 dik ASME", /ASME/i.test(txt) && /8(?:\.0)? mm/i.test(txt), txt);
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows
