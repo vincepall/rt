@@ -1003,8 +1003,14 @@
             <h3><i class="fas fa-robot"></i> R.A.D.I</h3>
             <small class="rt-ai-modal-subtitle">(Radiografie Assistent Deterministische Inferentie)</small>
           </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <button type="button" class="rt-ai-reset-header-btn" id="rt-ai-reset-header" onclick="window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis gespreksgeheugen (schone lei)" aria-label="Geheugen wissen" style="background:none; border:none; color:#888; font-size:18px; cursor:pointer; padding:6px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='#888'">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" class="rt-ai-copy-header-btn" id="rt-ai-copy-chat" onclick="window.RtAssistant && window.RtAssistant.kopieerGesprek();" title="Kopieer het gehele gesprek" aria-label="Gesprek kopiëren" style="background:none; border:none; color:#888; font-size:17px; cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#F5DF4D'" onmouseout="this.style.color='#888'">
+              <i class="fas fa-copy"></i>
+            </button>
+            <button type="button" class="rt-ai-bug-header-btn" id="rt-ai-report-bug" onclick="window.RtAssistant && window.RtAssistant.meldFoutViaMail();" title="Meld fout via e-mail (vult gesprek automatisch in)" aria-label="Meld fout" style="background:none; border:none; color:#888; font-size:17px; cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#ffb74d'" onmouseout="this.style.color='#888'">
+              <i class="fas fa-bug"></i>
+            </button>
+            <button type="button" class="rt-ai-reset-header-btn" id="rt-ai-reset-header" onclick="window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis gespreksgeheugen (schone lei)" aria-label="Geheugen wissen" style="background:none; border:none; color:#888; font-size:17px; cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='#888'">
               <i class="fas fa-trash-alt"></i>
             </button>
             <button type="button" class="rt-ai-examples-btn" id="rt-ai-examples-toggle" title="Bekijk alle mogelijke vragen &amp; voorbeelden (zoeken &amp; filteren)" aria-label="Voorbeeldvragen">

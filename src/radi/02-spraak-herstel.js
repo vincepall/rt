@@ -36,7 +36,7 @@
     "Balteau", "Balteau Ceram", "Balteau Ceram 300", "Balteau Rondstraler", "directional", "Ceram",
     "Yxlon", "Yxlon 300", "Smart EVO", "Smart EVO 300DS", "Smart 300",
     "röntgen", "röntgenbuis", "X-ray", "rondstraler", "collimator", "brongrootte", "focusgrootte", "bronkeuze", "focus",
-    "focusafstand", "film focus afstand", "bron film afstand", "object film afstand", "focusverandering", "focuswissel",
+    "focusafstand", "film focus afstand", "bron film afstand", "object film afstand", "focusverandering", "focuswissel", "openingshoek", "bundelhoek", "graden",
     "FFD", "SFD", "OFA", "OFD", "SOD", "SDD", "MinFFD", "minimale FFD", "minimale focus", "voorgestelde FFD",
 
     // Eenheden & Radiologie
@@ -45,11 +45,13 @@
     "milliampère", "milliampère-minuten", "mA", "mA*min",
     "kV", "kilovolt", "buisspanning", "buistabel", "KV-regel", "keverregel", "kwadratenwet", "diktevermeerdering",
     "materiaalfactor", "stralingsfactor", "staalequivalent", "afzetting", "afzettingsafstand", "dosistempo", "microsievert", "millisievert", "uSv", "mSv",
+    "beton", "betonnen", "betonmuur", "baksteen", "bakstenen", "baksteenmuur", "metselwerk",
 
     // Films & Beeldkwaliteit
     "filmsoort", "filmtype", "filmklasse", "filmkwaliteit", "D2", "D3", "D4", "D5", "D7", "D8",
     "10x24", "10x40", "10x48", "6x24", "6x48",
     "C1", "C2", "C3", "C4", "C5", "C6", "Agfa", "Structurix", "zwarting", "zwartingseisen", "sluierzwarting", "optische dichtheid",
+    "loodfolie", "loodfolies", "loodscherm", "loodschermen", "versterkingsscherm", "versterkingsschermen", "loodletter B", "ALARA", "halveringsdikte", "tiendewaardelaag",
     "BKI", "BKI's", "beeldkwaliteit", "beeldkwaliteitsindicator", "penetrameter", "draadje", "draadjes", "draad", "draden", "draadvereiste", "gevoeligheid",
     "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12", "W13", "W14", "W15", "W16", "W17", "W18", "W19",
     "1 FE EN", "6 FE EN", "10 FE EN", "13 FE EN", "Set A", "Set B", "Set C", "Set D", "Set 1A", "Set 2A",

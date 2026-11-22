@@ -114,11 +114,11 @@ function laadRtAssistant() {
   context.window = context;
   context.globalThis = context;
   vm.runInNewContext(src, context, { filename: "rt-assistant.js" });
-  return { RT: context.RtAssistant, elMap };
+  return { RT: context.RtAssistant, elMap, context };
 }
 
 (async () => {
-  const { RT, elMap } = laadRtAssistant();
+  const { RT, elMap, context } = laadRtAssistant();
   await RT.laadBronnenCsv(true);
 
   let passed = 0;
@@ -371,6 +371,201 @@ function laadRtAssistant() {
     const res = await RT.verwerkUniverseleVraag(RT.corrigeerSpraakTekst("kan ik draadje maar ik zie dat mijn plaats van ardijk volgens SV"));
     const txt = stripTags(res && res.text);
     assert("E2E Spraak draadje plaat 8 dik ASME", /ASME/i.test(txt) && /8(?:\.0)? mm/i.test(txt), txt);
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const res = await RT.verwerkUniverseleVraag("Hoe bereken ik de onscherpte bij asme?");
+    const txt = stripTags(res && res.text);
+    assert(
+      "E2E Kennisvraag: Hoe bereken ik de onscherpte bij ASME (Ug formule + grenzen)",
+      /F (?:&times;|×) d/i.test(txt) && /FFD (?:&minus;|−) d/i.test(txt) && /0\.51 mm/i.test(txt) && /0\.76 mm/i.test(txt) && /1\.02 mm/i.test(txt),
+      txt
+    );
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const rAlara = await RT.verwerkUniverseleVraag("Wat is het ALARA principe?");
+    assert("E2E Kennisvraag: ALARA principe", /As Low As Reasonably Achievable/i.test(stripTags(rAlara && rAlara.text)), stripTags(rAlara && rAlara.text));
+
+    const rHvl = await RT.verwerkUniverseleVraag("Wat is de halveringsdikte HVL?");
+    assert("E2E Kennisvraag: Halveringsdikte HVL", /Half Value Layer/i.test(stripTags(rHvl && rHvl.text)) && /3\.0 mm/i.test(stripTags(rHvl && rHvl.text)), stripTags(rHvl && rHvl.text));
+
+    const rZwart = await RT.verwerkUniverseleVraag("Wat is de formule van zwarting?");
+    assert("E2E Kennisvraag: Zwarting formule", /log\s*10/i.test(stripTags(rZwart && rZwart.text)), stripTags(rZwart && rZwart.text));
+
+    const rLood = await RT.verwerkUniverseleVraag("Waarom gebruiken we loodfolie in de cassette?");
+    assert("E2E Kennisvraag: Loodfolie / Versterkingsschermen", /foto-elektronen/i.test(stripTags(rLood && rLood.text)) && /Loodfolie/i.test(stripTags(rLood && rLood.text)), stripTags(rLood && rLood.text));
+
+    const rVerval = await RT.verwerkUniverseleVraag("Hoe bereken ik het radioactief verval?");
+    assert("E2E Kennisvraag: Radioactief verval formule", /73\.83 dagen/i.test(stripTags(rVerval && rVerval.text)), stripTags(rVerval && rVerval.text));
+  }
+  {
+    RT.resetGespreksGeheugen();
+    let openedUrl = null;
+    context.open = (url) => { openedUrl = url; return {}; };
+    RT.verstuurSuggestie("lasfout.html");
+    assert("Chip lasfout.html opent directe URL in plaats van chatvraag", openedUrl === "lasfout.html", `openedUrl=${openedUrl}`);
+
+    elMap["rt-ai-input"].value = "welke lasfouten ken je?";
+    RT.verstuurTekst();
+    await new Promise((r) => setImmediate(r));
+    const html = elMap["rt-ai-response"].innerHTML;
+    assert("UI rendert lasfout.html chip als echte <a>-link", /<a href="lasfout\.html"[^>]*class="rt-ai-chip-btn"/i.test(html), html.slice(-260));
+  }
+  {
+    RT.resetGespreksGeheugen();
+    const res = await RT.verwerkUniverseleVraag("Ik heb met de sterkste selenium een afzetting van 5 meter en er zit een betonnen muur tussen van 10cm, hoeveel lood heb ik nodig om de afzetting goed te krijgen?");
+    const txt = stripTags(res && res.text);
+    assert(
+      "E2E Afzetting lood nodig met 10cm betonnen muur (sterkste Se-75, 5 meter)",
+      /10 cm \(100 mm\) beton/i.test(txt) && /HVL beton = 30 mm/i.test(txt) && /mm lood/i.test(txt) && RT.actiefGespreksGeheugen.betonMm === 100 && RT.actiefGespreksGeheugen.sfd === null && RT.actiefGespreksGeheugen.diameter === null,
+      `${txt} | mem=${JSON.stringify({ beton: RT.actiefGespreksGeheugen.betonMm, sfd: RT.actiefGespreksGeheugen.sfd, d: RT.actiefGespreksGeheugen.diameter })}`
+    );
+
+    const resDt = await RT.verwerkUniverseleVraag("Wat is het dosistempo op 5 meter achter een bakstenen muur van 20 cm met 30 Ci Ir-192?");
+    const txtDt = stripTags(resDt && resDt.text);
+    assert(
+      "E2E Dosistempo achter 20 cm bakstenen muur (30 Ci Ir-192, 5 meter)",
+      /20 cm \(200 mm\) baksteen/i.test(txtDt) && /HVL baksteen = 60 mm/i.test(txtDt) && /μSv\/uur/i.test(txtDt),
+      txtDt
+    );
+
+    RT.resetGespreksGeheugen();
+    const resAfst = await RT.verwerkUniverseleVraag("Wat is de afzettingsafstand voor 30 Ci Ir-192 met een betonnen muur van 15 cm?");
+    const txtAfst = stripTags(resAfst && resAfst.text);
+    assert(
+      "E2E Afzettingsafstand met 15 cm betonnen muur (30 Ci Ir-192)",
+      /15 cm \(150 mm\) beton/i.test(txtAfst) && /Incl\. 15 cm beton/i.test(txtAfst),
+      txtAfst
+    );
+
+    RT.resetGespreksGeheugen();
+    const resMuur1 = await RT.verwerkUniverseleVraag("Ik heb met de sterkste selenium een afzetting van 5 meter en er zit een muur van 10cm tussen, hoeveel lood heb ik nodig?");
+    const txtMuur1 = stripTags(resMuur1 && resMuur1.text);
+    assert(
+      "E2E Onbekende muur 10cm vraagt om beton of baksteen",
+      /beton/i.test(txtMuur1) && /baksteen/i.test(txtMuur1) && Array.isArray(resMuur1.chips) && resMuur1.chips.includes("Beton") && resMuur1.chips.includes("Baksteen"),
+      txtMuur1
+    );
+    const resMuur2 = await RT.verwerkUniverseleVraag("Beton", { isChip: true });
+    const txtMuur2 = stripTags(resMuur2 && resMuur2.text);
+    assert(
+      "E2E Vervolgkeuze Beton rekent direct door met 10 cm beton",
+      /10 cm \(100 mm\) beton/i.test(txtMuur2) && /mm lood/i.test(txtMuur2) && RT.actiefGespreksGeheugen.betonMm === 100 && !RT.actiefGespreksGeheugen.muurOnbekendMm,
+      txtMuur2
+    );
+
+    RT.resetGespreksGeheugen();
+    const resMuurAfst1 = await RT.verwerkUniverseleVraag("Wat is het dosistempo achter een muur op 5 meter met de sterkste iridium");
+    const txtMuurAfst1 = stripTags(resMuurAfst1 && resMuurAfst1.text);
+    assert(
+      "E2E 'achter een muur op 5 meter' ziet 5 meter als afstand (niet als 500 cm muur!) en vraagt dikte+materiaal",
+      !/500 cm|5000 mm/i.test(txtMuurAfst1) && /dikte/i.test(txtMuurAfst1) && RT.actiefGespreksGeheugen.afzettingDoelMeter === 5 && !RT.actiefGespreksGeheugen.muurOnbekendMm,
+      `${txtMuurAfst1} | doelM=${RT.actiefGespreksGeheugen.afzettingDoelMeter} | muur=${RT.actiefGespreksGeheugen.muurOnbekendMm}`
+    );
+    const resMuurAfst2 = await RT.verwerkUniverseleVraag("10 cm beton", { isChip: true });
+    const txtMuurAfst2 = stripTags(resMuurAfst2 && resMuurAfst2.text);
+    assert(
+      "E2E Vervolg '10 cm beton' rekent dosistempo op 5 meter met 10 cm beton",
+      /5 meter/i.test(txtMuurAfst2) && /10 cm \(100 mm\) beton/i.test(txtMuurAfst2) && /μSv\/uur/i.test(txtMuurAfst2),
+      txtMuurAfst2
+    );
+    const resMuurAfst3 = await RT.verwerkUniverseleVraag("en met een loodplaat ertussen");
+    const txtMuurAfst3 = stripTags(resMuurAfst3 && resMuurAfst3.text);
+    assert(
+      "E2E Vervolg 'en met een loodplaat ertussen' blijft in dosistempo-modus (μSv/uur, niet meters)",
+      /Dosistempo op 5 meter/i.test(txtMuurAfst3) && /6 mm lood/i.test(txtMuurAfst3) && /10 cm \(100 mm\) beton/i.test(txtMuurAfst3) && /μSv\/uur/i.test(txtMuurAfst3),
+      txtMuurAfst3
+    );
+  }
+  {
+    RT.resetGespreksGeheugen();
+    elMap["rt-ai-input"].value = "halveringstijd van selenium";
+    RT.verstuurTekst();
+    await new Promise((r) => setImmediate(r));
+    const kopieTekst = RT.kopieerGesprek();
+    assert(
+      "QOL kopieerGesprek geeft leesbare platte tekst zonder HTML-tags",
+      /R\.A\.D\.I\. Gesprek/i.test(kopieTekst) && /119\.78 dagen/.test(kopieTekst) && !/<div|<strong/i.test(kopieTekst),
+      kopieTekst.slice(0, 200)
+    );
+    const mailUrl = RT.meldFoutViaMail();
+    assert(
+      "QOL meldFoutViaMail bouwt direct vooraf ingevulde mailto-link naar vincepall@gmail.com",
+      /^mailto:vincepall@gmail\.com\?subject=/.test(mailUrl) && decodeURIComponent(mailUrl).includes("119.78 dagen"),
+      mailUrl.slice(0, 180)
+    );
+  }
+  {
+    // Audit-fixes regressietests
+    RT.resetGespreksGeheugen();
+    const rAsmeCentraal = await RT.verwerkUniverseleVraag("Mag ik een pijp met diameter 700 mm van 60 mm dik centraal schieten met focus 3 mm volgens ASME?");
+    const tAsmeCentraal = stripTags(rAsmeCentraal && rAsmeCentraal.text);
+    assert(
+      "Audit fix 1: berekenMagIk ASME centraal wt=60 mm gebruikt Ug=0.76 (min FFD 297 mm, niet 413 mm)",
+      /297 mm/.test(tAsmeCentraal) && !/413 mm/.test(tAsmeCentraal) && /Ja, dat is toegestaan/i.test(tAsmeCentraal),
+      tAsmeCentraal
+    );
+
+    const bkiRvs = RT.geefBkiMateriaalgroepInfo("RVS 316Ti");
+    const bkiTin = RT.geefBkiMateriaalgroepInfo("Tinbrons");
+    const bkiTi = RT.geefBkiMateriaalgroepInfo("Titanium Grade 2");
+    assert(
+      "Audit fix 3: RVS 316Ti (FE) en Tinbrons (CU) niet als TI EN; Titanium wel TI EN",
+      bkiRvs && bkiRvs.isoGroup === "FE" && bkiTin && bkiTin.isoGroup === "CU" && bkiTi && bkiTi.isoGroup === "TI",
+      JSON.stringify({ bkiRvs, bkiTin, bkiTi })
+    );
+
+    RT.resetGespreksGeheugen();
+    const rAsmeEq = await RT.verwerkUniverseleVraag("Welk draadje in plaats van ASME draadje 6?");
+    const tAsmeEq = stripTags(rAsmeEq && rAsmeEq.text);
+    assert(
+      "Audit fix 2: ASME 6 (W12) staat op 6 FE EN of 10 FE EN (niet 13 FE EN)",
+      /6 FE EN of 10 FE EN/.test(tAsmeEq) && !/13 FE EN/.test(tAsmeEq),
+      tAsmeEq
+    );
+
+    RT.resetGespreksGeheugen();
+    const rBuis60 = await RT.verwerkUniverseleVraag("5.99 mA*min bij 3 mA");
+    const tBuis60 = stripTags(rBuis60 && rBuis60.text);
+    assert(
+      "Audit fix 4: geen '1 minuut en 60 seconden' afrondingsbug bij buistabel",
+      !/60 seconden/.test(tBuis60) && /2 minuten/.test(tBuis60),
+      tBuis60
+    );
+
+    RT.resetGespreksGeheugen();
+    const rBundel = await RT.verwerkUniverseleVraag("Welke focus heb ik nodig voor een 48 cm film bij een openingshoek van 35 graden?");
+    const tBundel = stripTags(rBundel && rBundel.text);
+    assert(
+      "Audit fix 5: bundelbreedte gebruikt customAngle 35° bij minimale focusvraag (762 mm)",
+      /35°/.test(tBundel) && /762 mm/.test(tBundel),
+      tBundel
+    );
+
+    RT.resetGespreksGeheugen();
+    const rVervalTerug = await RT.verwerkUniverseleVraag("Wat was een 50 Ci Ir-192 bron 30 dagen geleden?");
+    const tVervalTerug = stripTags(rVervalTerug && rVervalTerug.text);
+    assert(
+      "Audit fix 6: bronverval 'wat was ... 30 dagen geleden' rekent terug (66.22 Ci, niet 37.75 Ci)",
+      /66\.22 Ci/.test(tVervalTerug) && !/37\.75 Ci/.test(tVervalTerug),
+      tVervalTerug
+    );
+
+    RT.resetGespreksGeheugen();
+    const rAsmeDraad1 = await RT.verwerkUniverseleVraag("Welk draadje moet ik zien op een plaat van 6 mm volgens ASME?");
+    assert(
+      "Audit fix 7a: ASME draadje toont direct resultaat + vraagt lasoverdikte met Lascategorie.png en chips A/B/C/D",
+      /ASME #5/.test(rAsmeDraad1.text) && /Lascategorie\.png/.test(rAsmeDraad1.text) && rAsmeDraad1.chips.includes("Lastype A"),
+      rAsmeDraad1.text.slice(0, 260)
+    );
+    const rAsmeDraad2 = await RT.verwerkUniverseleVraag("Lastype A", { isChip: true });
+    const tAsmeDraad2 = stripTags(rAsmeDraad2 && rAsmeDraad2.text);
+    assert(
+      "Audit fix 7b: Lastype A telt 2.5 mm overdikte op bij 6 mm (8.5 mm -> ASME #6 / W12)",
+      /ASME #6/.test(tAsmeDraad2) && /W12/.test(tAsmeDraad2) && /8\.5 mm/.test(tAsmeDraad2),
+      tAsmeDraad2
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

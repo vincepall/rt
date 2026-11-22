@@ -9,6 +9,7 @@
     sfd: null,
     ofa: null,
     procedure: null,
+    asmeLastype: null,
     subProcedure: null,
     bronTekst: null,
     bronType: null,
@@ -29,6 +30,9 @@
     pbMm: null,
     aantalLoodplaten: null,
     feMm: null,
+    betonMm: null,
+    baksteenMm: null,
+    muurOnbekendMm: null,
     dosisGrens: null,
     langsnaadLengte: null,
     langsnaadMaxDeel: 400,
@@ -66,6 +70,145 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  function htmlNaarPlatteTekst(html) {
+    return String(html || "")
+      .replace(/<div class="rt-ai-chips-row">[\s\S]*?<\/div>/gi, "")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&times;/gi, "×")
+      .replace(/&minus;/gi, "−")
+      .replace(/&le;/gi, "≤")
+      .replace(/&ge;/gi, "≥")
+      .replace(/&lt;/gi, "<")
+      .replace(/&gt;/gi, ">")
+      .replace(/&amp;/gi, "&")
+      .replace(/&quot;/gi, '"')
+      .replace(/&ndash;/gi, "–")
+      .replace(/&mdash;/gi, "—")
+      .replace(/&bull;/gi, "•")
+      .replace(/&rarr;/gi, "→")
+      .replace(/&mu;/gi, "μ")
+      .replace(/&approx;/gi, "≈")
+      .replace(/&frac12;/gi, "½")
+      .replace(/&#40;/g, "(")
+      .replace(/&#41;/g, ")")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function formatteerGesprekAlsTekst(maxChars = 0) {
+    const memItems = geefGeheugenItems();
+    const memSamenvatting = memItems.length ? memItems.map((it) => it.label).join(" | ") : "Geen";
+
+    const blokken = gespreksGeschiedenis.map((item) => {
+      const q = htmlNaarPlatteTekst(item.vraagHtml);
+      const a = htmlNaarPlatteTekst(item.antwoordHtml);
+      return (q ? `${q}\n` : "") + `R.A.D.I.: ${a}`;
+    });
+
+    let gesprekTekst = blokken.length ? blokken.join("\n\n---\n\n") : "(Nog geen berichten in dit gesprek)";
+    if (maxChars > 0 && gesprekTekst.length > maxChars) {
+      // Houd altijd de meest recente berichten volledig leesbaar zodat mailto nooit over de limiet gaat
+      let geselecteerd = [];
+      let lengte = 0;
+      for (let i = blokken.length - 1; i >= 0; i--) {
+        const b = blokken[i];
+        if (geselecteerd.length > 0 && lengte + b.length + 7 > maxChars) break;
+        geselecteerd.unshift(b);
+        lengte += b.length + 7;
+      }
+      gesprekTekst = (geselecteerd.length < blokken.length ? "(... eerdere berichten ingekort ...)\n\n" : "") + geselecteerd.join("\n\n---\n\n");
+      if (gesprekTekst.length > maxChars) {
+        gesprekTekst = gesprekTekst.slice(-maxChars);
+      }
+    }
+
+    return `R.A.D.I. Gesprek\nActief geheugen: ${memSamenvatting}\n\n${gesprekTekst}`;
+  }
+
+  function kopieerTekstNaarKlembord(tekst) {
+    if (typeof navigator !== "undefined" && navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      return navigator.clipboard.writeText(tekst).then(() => true).catch(() => false);
+    }
+    if (typeof document !== "undefined" && document.body) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = tekst;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = typeof document.execCommand === "function" ? document.execCommand("copy") : false;
+        if (typeof document.body.removeChild === "function") document.body.removeChild(ta);
+        return Promise.resolve(Boolean(ok));
+      } catch (e) {
+        return Promise.resolve(false);
+      }
+    }
+    return Promise.resolve(false);
+  }
+
+  function kopieerGesprek() {
+    const transEl = typeof document !== "undefined" ? document.getElementById("rt-ai-transcript") : null;
+    if (!gespreksGeschiedenis.length) {
+      if (transEl) transEl.innerHTML = "ℹ️ Nog geen gesprek om te kopiëren.";
+      return "";
+    }
+    const tekst = formatteerGesprekAlsTekst(0);
+    kopieerTekstNaarKlembord(tekst).then((ok) => {
+      const btn = typeof document !== "undefined" ? document.getElementById("rt-ai-copy-chat") : null;
+      if (btn) {
+        const origHtml = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-check" style="color:#5cb85c;"></i>`;
+        setTimeout(() => { btn.innerHTML = origHtml; }, 1800);
+      }
+      if (transEl) {
+        transEl.innerHTML = ok
+          ? "✅ Gehele gesprek gekopieerd naar het klembord!"
+          : "ℹ️ Kopiëren gelukt of selecteer tekst handmatig.";
+      }
+    });
+    return tekst;
+  }
+
+  function meldFoutViaMail() {
+    const pagina = (typeof window !== "undefined" && window.location && window.location.pathname)
+      ? window.location.pathname
+      : "rt-tools";
+    const gesprekVolledig = formatteerGesprekAlsTekst(0);
+    const gesprekVoorMail = formatteerGesprekAlsTekst(1400);
+
+    // Kopieer stilzwijgend ook het volledige gesprek als backup (gebruiker hoeft niet te plakken)
+    kopieerTekstNaarKlembord(gesprekVolledig);
+
+    const body =
+      `Wat ging er mis / wat verwachtte je?\n` +
+      `(Typ hier kort je toelichting of druk direct op Verzenden)\n\n` +
+      `==============================\n` +
+      `Pagina: ${pagina}\n` +
+      `${gesprekVoorMail}`;
+
+    const mailtoUrl = `mailto:vincepall@gmail.com?subject=${encodeURIComponent("R.A.D.I. Foutmelding")}&body=${encodeURIComponent(body)}`;
+
+    if (typeof document !== "undefined" && document.body) {
+      const a = document.createElement("a");
+      a.href = mailtoUrl;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      if (typeof a.click === "function") a.click();
+      if (typeof document.body.removeChild === "function") document.body.removeChild(a);
+      const transEl = document.getElementById("rt-ai-transcript");
+      if (transEl) {
+        transEl.innerHTML = "🐞 Mail met foutmelding en gesprek wordt geopend (vincepall@gmail.com)...";
+      }
+    }
+    return mailtoUrl;
   }
 
   function voegOfUpdateGeschiedenis(entryId, vraagHtml, antwoordHtml) {
@@ -245,6 +388,22 @@
         key: "feMm",
         label: `${actiefGespreksGeheugen.feMm} mm Fe`,
         title: "Staalafscherming",
+      });
+    }
+    if (actiefGespreksGeheugen.betonMm && actiefGespreksGeheugen.betonMm > 0) {
+      const bVal = actiefGespreksGeheugen.betonMm;
+      items.push({
+        key: "betonMm",
+        label: bVal >= 10 && bVal % 10 === 0 ? `${bVal / 10} cm beton` : `${bVal} mm beton`,
+        title: "Betonafscherming",
+      });
+    }
+    if (actiefGespreksGeheugen.baksteenMm && actiefGespreksGeheugen.baksteenMm > 0) {
+      const mVal = actiefGespreksGeheugen.baksteenMm;
+      items.push({
+        key: "baksteenMm",
+        label: mVal >= 10 && mVal % 10 === 0 ? `${mVal / 10} cm baksteen` : `${mVal} mm baksteen`,
+        title: "Baksteenafscherming",
       });
     }
     if (actiefGespreksGeheugen.lascompensatie !== null && actiefGespreksGeheugen.lascompensatie !== undefined) {
@@ -442,6 +601,10 @@
       actiefGespreksGeheugen.pbMm = 0;
     } else if (key === "feMm") {
       actiefGespreksGeheugen.feMm = 0;
+    } else if (key === "betonMm") {
+      actiefGespreksGeheugen.betonMm = 0;
+    } else if (key === "baksteenMm") {
+      actiefGespreksGeheugen.baksteenMm = 0;
     } else if (key === "isolatieMm" || key === "isolatie") {
       actiefGespreksGeheugen.isolatieMm = null;
     } else if (key === "onstreamKlasse" || key === "klasse") {
@@ -949,6 +1112,14 @@
       if (it.key === "feMm" && actiefGespreksGeheugen.feMm) {
         return `Fe ${actiefGespreksGeheugen.feMm} mm`;
       }
+      if (it.key === "betonMm" && actiefGespreksGeheugen.betonMm) {
+        const bVal = actiefGespreksGeheugen.betonMm;
+        return bVal >= 10 && bVal % 10 === 0 ? `Beton ${bVal / 10} cm` : `Beton ${bVal} mm`;
+      }
+      if (it.key === "baksteenMm" && actiefGespreksGeheugen.baksteenMm) {
+        const mVal = actiefGespreksGeheugen.baksteenMm;
+        return mVal >= 10 && mVal % 10 === 0 ? `Baksteen ${mVal / 10} cm` : `Baksteen ${mVal} mm`;
+      }
       if (it.key === "lascompensatie") {
         return `Las ${actiefGespreksGeheugen.lascompensatie} mm`;
       }
@@ -1202,9 +1373,12 @@
         wisGeheugenParameter("filmType");
         wisGeheugenParameter("filmWissel");
         gewistNaam = "Filmtype";
-      } else if (doel.includes("lood") || doel.includes("afscherming")) {
+      } else if (doel.includes("lood") || doel.includes("afscherming") || doel.includes("beton") || doel.includes("baksteen") || doel.includes("muur")) {
         wisGeheugenParameter("pbMm");
         wisGeheugenParameter("feMm");
+        wisGeheugenParameter("betonMm");
+        wisGeheugenParameter("baksteenMm");
+        actiefGespreksGeheugen.muurOnbekendMm = null;
         gewistNaam = "Afscherming";
       } else if (doel.includes("langsnaad") || doel === "lengte") {
         wisGeheugenParameter("langsnaadLengte");
@@ -1242,9 +1416,15 @@
           if (actiefGespreksGeheugen.verwachtParameter === "isolatieMm") {
             actiefGespreksGeheugen.verwachtParameter = null;
           }
-        } else if (typeof nieuwParsed[k] === "number" && (k === "pbMm" || k === "feMm")) {
-          if (nieuwParsed[k] > 0 || nieuwParsed.verzetZonderAfscherming || /\b(lood|pb|staal|fe|zonder|geen)\b/i.test(gefilterdeTekst)) {
+        } else if (typeof nieuwParsed[k] === "number" && (k === "pbMm" || k === "feMm" || k === "betonMm" || k === "baksteenMm" || k === "muurOnbekendMm")) {
+          if (nieuwParsed[k] > 0 || nieuwParsed.verzetZonderAfscherming || /\b(lood|pb|staal|fe|beton|baksteen|metselwerk|muur|zonder|geen)\b/i.test(gefilterdeTekst)) {
             actiefGespreksGeheugen[k] = nieuwParsed[k];
+            if ((k === "betonMm" || k === "baksteenMm") && nieuwParsed[k] > 0) {
+              actiefGespreksGeheugen.muurOnbekendMm = null;
+              if (actiefGespreksGeheugen.verwachtParameter === "muurMateriaal") {
+                actiefGespreksGeheugen.verwachtParameter = null;
+              }
+            }
           }
         } else if (k === "onstreamTechniek" || k === "onstreamKlasse" || k === "afzettingDoelMeter" || k === "afzettingSubModus") {
           actiefGespreksGeheugen[k] = nieuwParsed[k];
@@ -1365,6 +1545,7 @@
     const heeftNieuweParameter =
       nieuwParsed.wanddikte !== null ||
       nieuwParsed.procedure !== null ||
+      nieuwParsed.asmeLastype !== null ||
       nieuwParsed.brongrootte !== null ||
       nieuwParsed.bronTekst !== null ||
       nieuwParsed.activiteit !== null ||
@@ -1384,6 +1565,9 @@
       nieuwParsed.materiaalFactor !== null ||
       (typeof nieuwParsed.pbMm === "number" && nieuwParsed.pbMm > 0) ||
       (typeof nieuwParsed.feMm === "number" && nieuwParsed.feMm > 0) ||
+      (typeof nieuwParsed.betonMm === "number" && nieuwParsed.betonMm > 0) ||
+      (typeof nieuwParsed.baksteenMm === "number" && nieuwParsed.baksteenMm > 0) ||
+      (typeof nieuwParsed.muurOnbekendMm === "number" && nieuwParsed.muurOnbekendMm > 0) ||
       Boolean(nieuwParsed.verzetZonderAfscherming) ||
       nieuwParsed.afzettingDoelMeter !== null ||
       (typeof nieuwParsed.isolatieMm === "number") ||
@@ -1452,7 +1636,7 @@
           intenties = ["opnames"];
         } else if (nieuwParsed.materiaalNaam !== null) {
           intenties = ["materiaalfactor"];
-        } else if ((typeof nieuwParsed.pbMm === "number" && nieuwParsed.pbMm > 0) || (typeof nieuwParsed.feMm === "number" && nieuwParsed.feMm > 0) || /\b(afscherming|loodafscherming|lood\s*afscherming)\b/i.test(gefilterdeTekst)) {
+        } else if ((typeof nieuwParsed.pbMm === "number" && nieuwParsed.pbMm > 0) || (typeof nieuwParsed.feMm === "number" && nieuwParsed.feMm > 0) || (typeof nieuwParsed.betonMm === "number" && nieuwParsed.betonMm > 0) || (typeof nieuwParsed.baksteenMm === "number" && nieuwParsed.baksteenMm > 0) || (typeof nieuwParsed.muurOnbekendMm === "number" && nieuwParsed.muurOnbekendMm > 0) || /\b(afscherming|loodafscherming|lood\s*afscherming)\b/i.test(gefilterdeTekst)) {
           intenties = ["afzetting"];
         } else if (!heeftNieuweParameter && !isVraagZin && !context.isChip) {
           renderGeheugenBalk();

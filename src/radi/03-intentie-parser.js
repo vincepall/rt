@@ -61,7 +61,7 @@
     const isRTKennisVraag =
       /\b(loodletter\s*b|loden\s*letter\s*b|letter\s*b|backscatter|terugverstrooiing|terugstrooiing)\b/i.test(lower) ||
       (/\b(kwadratenwet|omgekeerde\s*kwadratenwet|inverse\s*square\s*law)\b/i.test(lower) && !/\b(naar|tijd|minuut|sec|van\s+\d+)\b/i.test(lower)) ||
-      (/\b(geometrische\s*onscherpte|wat\s+is\s+ug|formule\s+voor\s+ug|ug\s+eisen|ug\s+norm|ug\s+grenzen)\b/i.test(lower) && !/\b(bereken|wat\s+is\s+de\s+ug\s+bij)\b/i.test(lower)) ||
+      (/\b(geometrische\s*onscherpte|onscherpte|wat\s+is\s+ug|formule\s+(?:voor|van)\s+(?:de\s+)?(?:geometrische\s*)?(?:onscherpte|ug)|hoe\s+bereken\s+(?:je|ik|men)\s+(?:de\s+)?(?:geometrische\s*)?(?:onscherpte|ug)|ug\s+eisen|ug\s+norm|ug\s+grenzen)\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|m\b)\b/i.test(lower) && !/\b(?:ffd|sfd|ofa|focus|brongrootte)\s*(?:is|van|=)?\s*\d+/i.test(lower)) ||
       /\b(keverregel|waarom\s+(?:laag|lage)\s*kv|waarom\s+buisspanning\s+beperken|wat\s+is\s+(?:de\s+)?(?:keverregel|kv[-\s]?regel))\b/i.test(lower) ||
       (/\b(halfwaardetijd|halveringstijd|halveringtijd|eigenschappen\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|isotopen|isotoop|iridium|selenium|kobalt)|energie\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|iridium|selenium|kobalt))\b/i.test(lower) && !/\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower)) ||
       (/\b(agfa|structurix)\b/i.test(lower) && /\b(film|klasse|c[1-6]|d[2-8]|type|overeen)\b/i.test(lower)) ||
@@ -73,11 +73,18 @@
       /\b(verschil\s+tussen\s+(?:een\s+)?(?:draadje|draadjes|wire)(?:\s*bki)?\s+en\s+(?:een\s+)?(?:gaatje|gaatjes|gat|gaten|plaatje|plaatjes|hole)|draadje\s+vs\s+(?:gaatje|gat|plaatje)|wat\s+is\s+(?:een\s+)?2t[-\s]*gat|waarom\s+2t|hole\s*type\s*iqi\s*uitleg)\b/i.test(lower) ||
       /\b(waarom\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+van\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower) ||
       /\b(hoeveel\s+straling\s+mag\s+(?:een\s+)?(?:medewerker|werknemer|persoon|radiograaf)|dosislimiet|dosislimieten|maximaal\s+toegestane\s+dosis\s+(?:per\s+jaar|jaarlijks)|hoeveel\s+(?:msv|millisievert)\s+(?:per\s+jaar|mag\s+een\s+medewerker)|dosislimiet\s+straling|wettelijke\s+dosislimiet)\b/i.test(lower) ||
-      (/\b(hoe\s+bereken\s+(?:je|men)\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|focus|film\s*focus\s*afstand)|hoe\s+wordt\s+de\s+(?:minimale\s+)?ffd\s+berekend|formule\s+(?:voor\s+)?(?:de\s+)?(?:minimale\s+)?ffd|hoe\s+bepaal\s+(?:je|men)\s+(?:de\s+)?(?:minimale\s+)?ffd)\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|duim|inch|dik)\b/i.test(lower)) ||
+      (/\b(hoe\s+bereken\s+(?:je|ik|men)\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|focus|film\s*focus\s*afstand)|hoe\s+wordt\s+de\s+(?:minimale\s+)?ffd\s+berekend|formule\s+(?:voor|van)\s+(?:de\s+)?(?:minimale\s+)?ffd|hoe\s+bepaal\s+(?:je|ik|men)\s+(?:de\s+)?(?:minimale\s+)?ffd)\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|duim|inch|dik)\b/i.test(lower)) ||
       /\b(strooistraling|secundaire\s*straling|waarom\s+(?:een\s+)?collimator|werking\s+collimator|hoe\s+werkt\s+een\s+collimator|wat\s+doet\s+(?:een\s+)?collimator)\b/i.test(lower) ||
       /\b(welke\s+normen\s*(?:zijn\s*er|gelden)|overzicht\s+van\s+normen|rt\s+normen|radiografie\s+normen)\b/i.test(lower) ||
       /\b(verschil\s+tussen\s+iso\s*5817\s+en\s+iso\s*10675|iso\s*5817\s*vs\s*iso\s*10675|wat\s+is\s+iso\s*5817|wat\s+is\s+iso\s*10675)\b/i.test(lower) ||
-      /\b(verschil\s+tussen\s+swsi\s+en\s+dwsi|swsi\s+vs\s+dwsi|verschil\s+tussen\s+dwsi\s+en\s+dwdi|verschil\s+tussen\s+swsi\s+en\s+dwdi)\b/i.test(lower);
+      /\b(verschil\s+tussen\s+swsi\s+en\s+dwsi|swsi\s+vs\s+dwsi|verschil\s+tussen\s+dwsi\s+en\s+dwdi|verschil\s+tussen\s+swsi\s+en\s+dwdi)\b/i.test(lower) ||
+      /\b(alara|drie\s+basisregels\s+stralingsbescherming|3\s+basisregels\s+stralingsbescherming|tijd\s+afstand\s+afscherming|basisregels\s+stralingsbescherming)\b/i.test(lower) ||
+      (/\b(optische\s+dichtheid|wat\s+is\s+zwarting|formule\s+(?:voor|van)\s+(?:de\s+)?(?:zwarting|optische\s+dichtheid)|hoe\s+bereken\s+(?:je|ik|men)\s+(?:de\s+)?(?:zwarting|optische\s+dichtheid))\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\b/.test(lower)) ||
+      (/\b(halveringsdikte|half\s*value\s*layer|\bhvl\b|tiendewaardelaag|tenth\s*value\s*layer|\btvl\b|formule\s+(?:voor|van)\s+(?:de\s+)?(?:afscherming|verzwakking))\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|m\b|ci|curie)\b/i.test(lower)) ||
+      /\b(loodscherm|loodschermen|loodschermpje|loodschermpjes|versterkingsscherm|versterkingsschermen|versterkingsfolie|lood\s*folies?|lead\s*screens?|waarom\s+lood\s+in\s+(?:de\s+)?cassette)\b/i.test(lower) ||
+      (/\b(formule\s+(?:voor|van)\s+(?:het\s+)?(?:radioactief\s+)?verval|hoe\s+bereken\s+(?:je|ik|men)\s+(?:het\s+)?(?:radioactief\s+)?verval|vervalformule|verval\s+formule)\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:ci|curie|dagen|weken|maanden|jaar)\b/i.test(lower)) ||
+      (/\b(wat\s+is\s+(?:een\s+)?equivalentiefactor|uitleg\s+equivalentiefactor|hoe\s+werkt\s+(?:een\s+)?equivalentiefactor|wat\s+is\s+staalequivalent)\b/i.test(lower)) ||
+      /\b(donkere\s+kamer|film\s+ontwikkelen|stappen\s+(?:van\s+)?(?:film\s*)?ontwikkelen|ontwikkelproces|waarom\s+fixeren|functie\s+(?:van\s+)?(?:het\s+)?(?:stopbad|fixeerbad|ontwikkelbad))\b/i.test(lower);
 
     if (isRTKennisVraag) {
       intenties.push("rt_kennis");
@@ -193,7 +200,7 @@
 
     // Geometrische onscherpte (Ug) formule of directe Ug berekening
     const isUgVraag =
-      /\b(geometrische\s+onscherpte|\bug\b)\b/i.test(lower) &&
+      /\b(geometrische\s+onscherpte|onscherpte|\bug\b)\b/i.test(lower) &&
       !/\b(min\w*\s+ffd|minimale\s+focus|wat\s+is\s+de\s+(?:min\w*\s+)?ffd|welke\s+ffd|fmin)\b/i.test(lower);
     if (isUgVraag) {
       intenties.push("ug_berekening");
@@ -289,7 +296,7 @@
       /\b(?:lood|afscherming)\s*(?:plakken|hangen|tussen|ervoor|nodig|toevoegen)\b/i.test(lower) ||
       /\b(afzetlint|lint\s*hangen|waar\s+(?:moet|kan)\s+(?:ik\s+)?(?:het\s+)?lint|veiligheidszone|stralingszone|iedereen\s+weg(?:blijven)?|wegwezen|veilige\s+zone)\b/i.test(lower) ||
       /\bkan\s+ik\s+(?:binnen|maximaal)\s+\d+.*?(?:afzetten|blijven)\b/i.test(lower) ||
-      (/\b(afscherming|afschermen|lood|loden|pb)\b/i.test(lower) && /\b(nodig|meter|m\b|afzetten|afzetting|dosistempo|microsievert|usv|µsv|iridium|selenium|se-?75|ir-?192|curie|ci|collimator)\b/i.test(lower));
+      (/\b(afscherming|afschermen|lood|loden|pb|beton(?:nen)?|betonmuur|bakste(?:en|nen)|baksteenmuur|metselwerk|muur|tussenmuur|scheidingsmuur)\b/i.test(lower) && /\b(nodig|meter|m\b|afzetten|afzetting|dosistempo|microsievert|usv|µsv|iridium|selenium|se-?75|ir-?192|curie|ci|collimator)\b/i.test(lower));
 
     const isAfzettingVervolg =
       typeof actiefGespreksGeheugen !== "undefined" &&
@@ -298,7 +305,7 @@
       !isStralingstijdVraag &&
       !isFocusVeranderingVraag &&
       !/\b(opnames?|draadje|bki|iqi|ffd|sfd|focus|onstream|wmax|lasfout|schedule|langsnaad|verzet|bundel|kv|zwarting)\b/i.test(lower) &&
-      (/\b(\d+(?:[.,]\d+)?\s*(?:meter|m\b|mm|ci|curie)|lood|loden|pb|staal|fe|afscherming|collimator|open\s+bundel|sterkste|zwakste|iridium|selenium|seleen|se-?75|ir-?192|zonder\s+(?:lood|afscherming)|geen\s+(?:lood|afscherming))\b/i.test(lower));
+      (/\b(\d+(?:[.,]\d+)?\s*(?:meter|m\b|cm|mm|ci|curie)|lood|loden|pb|staal|fe|beton(?:nen)?|betonmuur|bakste(?:en|nen)|baksteenmuur|metselwerk|muur|afscherming|collimator|open\s+bundel|sterkste|zwakste|iridium|selenium|seleen|se-?75|ir-?192|zonder\s+(?:lood|afscherming|muur|beton|baksteen)|geen\s+(?:lood|afscherming|muur|beton|baksteen))\b/i.test(lower));
 
     if (isAfzettingDirect || isAfzettingVervolg) {
       intenties.push("afzetting");
@@ -408,6 +415,7 @@
       (/\b(draad|draadje|draadjes|bki|beeldkwaliteit|iq|iqi|gevoeligheid)\b/i.test(lower) ||
         /\b(welke\s+kwaliteit|welk[e]?\s+(?:beeld)?kwaliteit|kwaliteit\s+(?:moet|te|worden|behaald|behalen|zien))\b/i.test(lower) ||
         /\bwat\s+moet\s+(?:ik\s+)?(?:zien|zichtbaar\s+zijn)\s+op\s+de\s+film\b/i.test(lower) ||
+        /\b(?:lastype\s*[abcd]|lascategorie\s*[abcd]|zonder\s+lasoverdikte|lasoverdikte)\b/i.test(lower) ||
         (/\bkwaliteit\b/i.test(lower) && !/\bfilm(?:kwaliteit)?\b/i.test(lower) && /\b(moet|zien|behalen|behaald|nodig|geëist|geeist)\b/i.test(lower)))
     ) {
       intenties.push("draadje");
@@ -584,6 +592,7 @@
       sfd: null,
       ofa: null,
       procedure: null,
+      asmeLastype: null,
       bronTekst: null,
       bronType: null,
       brongrootte: null,
@@ -623,6 +632,9 @@
       pbMm: 0,
       aantalLoodplaten: null,
       feMm: 0,
+      betonMm: 0,
+      baksteenMm: 0,
+      muurOnbekendMm: 0,
       dosisGrens: 10,
       // KV-regel, Gevulde leiding & Bronverval
       doorstraaldeDikte: null,
@@ -747,18 +759,102 @@
     if (/\b(zonder\s+(?:lood|pb|afscherming)|geen\s+(?:lood|pb|afscherming)|0\s*mm\s*(?:lood|pb))\b/i.test(lower)) {
       res.pbMm = 0;
       res.feMm = 0;
+      res.betonMm = 0;
+      res.baksteenMm = 0;
+      res.muurOnbekendMm = 0;
+      res.verzetZonderAfscherming = true;
+    }
+    if (/\b(zonder|geen)\s+(?:beton(?:nen)?|betonmuur|muur)\b/i.test(lower)) {
+      res.betonMm = 0;
+      res.muurOnbekendMm = 0;
+      res.verzetZonderAfscherming = true;
+    }
+    if (/\b(zonder|geen)\s+(?:bakste(?:en|nen)|baksteenmuur|metselwerk|muur)\b/i.test(lower)) {
+      res.baksteenMm = 0;
+      res.muurOnbekendMm = 0;
       res.verzetZonderAfscherming = true;
     }
 
     const isAfschermingContext =
-      /\b(afzetting|afzettingsafstand|afzetten|afzettingszone|afscherming|afschermen|lood|loden|pb|dosis|dosistempo|microsievert|usv|µsv|halveringsdikte|hvl)\b/i.test(lower) ||
-      (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.laatsteIntentie === "afzetting");
+      /\b(afzetting|afzettingsafstand|afzetten|afzettingszone|afscherming|afschermen|lood|loden|pb|beton(?:nen)?|betonmuur|bakste(?:en|nen)|baksteenmuur|metselwerk|muur|tussenmuur|scheidingsmuur|dosis|dosistempo|microsievert|usv|µsv|halveringsdikte|hvl)\b/i.test(lower) ||
+      (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && (actiefGespreksGeheugen.laatsteIntentie === "afzetting" || actiefGespreksGeheugen.verwachtParameter === "muurMateriaal"));
     if (isAfschermingContext) {
       let matchFe = tekst.match(/(?:staal|fe|ijzer)\s*(?:afscherming\s*)?(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
       if (!matchFe) {
         matchFe = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:staal|fe|ijzer)(?:\s*afscherming)?\b/i);
       }
       if (matchFe) res.feMm = parseFloat(matchFe[1].replace(",", "."));
+
+      // Beton (betonnen muur / betonmuur / betonwand / beton in mm, cm of < 1 m)
+      let matchBeton = tekst.match(/(?:beton(?:nen)?(?:\s*(?:muur|wand))?|betonmuur|betonwand)\s*(?:er\s*)?(?:tussen\s*)?(?:van|is|met|:)?\s*(\d+(?:[.,]\d+)?)\s*(mm|millimeter|cm|centimeter|m\b|meter)?/i);
+      if (!matchBeton) {
+        matchBeton = tekst.match(/(\d+(?:[.,]\d+)?)\s*(mm|millimeter|cm|centimeter|m\b|meter)?\s*(?:dikke?\s+)?(?:beton(?:nen)?(?:\s*(?:muur|wand))?|betonmuur|betonwand)\b/i);
+      }
+      if (matchBeton) {
+        let bVal = parseFloat(matchBeton[1].replace(",", "."));
+        const bUnit = (matchBeton[2] || "").toLowerCase();
+        const isOnrealistischeMeter = (bUnit === "m" || bUnit === "meter") && bVal >= 1;
+        if (!isOnrealistischeMeter) {
+          if (bUnit === "cm" || bUnit === "centimeter") bVal *= 10;
+          else if (bUnit === "m" || bUnit === "meter") bVal *= 1000;
+          else if (!bUnit && bVal <= 40) bVal *= 10; // bijv. "betonnen muur van 20" = 20 cm = 200 mm
+          if (bVal > 0 && bVal <= 1000) res.betonMm = Math.round(bVal);
+        }
+      }
+
+      // Baksteen (bakstenen muur / baksteenmuur / stenen muur / metselwerk in mm, cm of < 1 m)
+      let matchBaksteen = tekst.match(/(?:bakste(?:en|nen)(?:\s*(?:muur|wand))?|baksteenmuur|stenen\s*(?:muur|wand)|metselwerk(?:\s*muur)?)\s*(?:er\s*)?(?:tussen\s*)?(?:van|is|met|:)?\s*(\d+(?:[.,]\d+)?)\s*(mm|millimeter|cm|centimeter|m\b|meter)?/i);
+      if (!matchBaksteen) {
+        matchBaksteen = tekst.match(/(\d+(?:[.,]\d+)?)\s*(mm|millimeter|cm|centimeter|m\b|meter)?\s*(?:dikke?\s+)?(?:bakste(?:en|nen)(?:\s*(?:muur|wand))?|baksteenmuur|stenen\s*(?:muur|wand)|metselwerk)\b/i);
+      }
+      if (matchBaksteen) {
+        let mVal = parseFloat(matchBaksteen[1].replace(",", "."));
+        const mUnit = (matchBaksteen[2] || "").toLowerCase();
+        const isOnrealistischeMeter = (mUnit === "m" || mUnit === "meter") && mVal >= 1;
+        if (!isOnrealistischeMeter) {
+          if (mUnit === "cm" || mUnit === "centimeter") mVal *= 10;
+          else if (mUnit === "m" || mUnit === "meter") mVal *= 1000;
+          else if (!mUnit && mVal <= 40) mVal *= 10;
+          if (mVal > 0 && mVal <= 1000) res.baksteenMm = Math.round(mVal);
+        }
+      }
+
+      // Antwoord op de vervolgvraag "Gaat het om beton of baksteen?"
+      if (
+        res.betonMm === 0 &&
+        res.baksteenMm === 0 &&
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.muurOnbekendMm > 0
+      ) {
+        if (/\b(beton|betonnen)\b/i.test(lower)) {
+          res.betonMm = actiefGespreksGeheugen.muurOnbekendMm;
+          res.muurOnbekendMm = 0;
+        } else if (/\b(baksteen|bakstenen|metselwerk|steen|stenen)\b/i.test(lower)) {
+          res.baksteenMm = actiefGespreksGeheugen.muurOnbekendMm;
+          res.muurOnbekendMm = 0;
+        }
+      }
+
+      // Onbekend muurmateriaal ("er zit een muur van 10cm tussen") -> vraag beton of baksteen!
+      // Let op: NOOIT "op X meter" (dat is de meet-/afzettingsafstand, geen muurdikte!)
+      if (res.betonMm === 0 && res.baksteenMm === 0) {
+        let matchMuur = tekst.match(/\b(?:muur|muren|tussenmuur|scheidingsmuur|tussenwand|scheidingswand)\s*(?:er\s*)?(?:tussen\s*)?(?:van|is|met|:)\s*(\d+(?:[.,]\d+)?)\s*(mm|millimeter|cm|centimeter|m\b|meter)?/i);
+        if (!matchMuur) {
+          matchMuur = tekst.match(/(\d+(?:[.,]\d+)?)\s*(mm|millimeter|cm|centimeter|m\b|meter)?\s*(?:dikke?\s+)?(?:muur|tussenmuur|scheidingsmuur|tussenwand|scheidingswand)\b/i);
+        }
+        if (matchMuur) {
+          let uVal = parseFloat(matchMuur[1].replace(",", "."));
+          const uUnit = (matchMuur[2] || "").toLowerCase();
+          const isOnrealistischeMeter = (uUnit === "m" || uUnit === "meter") && uVal >= 1;
+          if (!isOnrealistischeMeter) {
+            if (uUnit === "cm" || uUnit === "centimeter") uVal *= 10;
+            else if (uUnit === "m" || uUnit === "meter") uVal *= 1000;
+            else if (!uUnit && uVal <= 40) uVal *= 10;
+            if (uVal > 0 && uVal <= 1000) res.muurOnbekendMm = Math.round(uVal);
+          }
+        }
+      }
 
       // Sub-modus detectie (lood_nodig, dosistempo_op_afstand, afzettingsafstand)
       const vraagtLoodNodig =
@@ -771,11 +867,16 @@
         !vraagtLoodNodig &&
         /\b(wat\s+is\s+(?:het|de)\s+dosistempo|hoe\s+hoog\s+is\s+(?:het|de)\s+dosistempo|hoeveel\s+(?:microsievert|usv|µsv)|dosistempo\s+(?:op|bij|achter|daar))\b/i.test(lower);
 
+      const isAlInDosistempoModus =
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.afzettingSubModus === "dosistempo_op_afstand";
+
       const vraagtAfzettingsAfstand =
         !vraagtLoodNodig &&
         !vraagtDosistempo &&
         (/\b(hoe\s+ver.*afzetten|hoe\s+groot.*afzetting|wat\s+(?:is|wordt)\s+de\s+afzetting(?:safstand)?|veilige\s+afzetting|afzetting\s+met\s+\d+\s*(?:mm\s*)?(?:lood|pb|staal))\b/i.test(lower) ||
-          (matchPb !== null && !/\b\d+(?:[.,]\d+)?\s*(?:meter|m\b)\b/i.test(lower)));
+          (!isAlInDosistempoModus && matchPb !== null && !/\b\d+(?:[.,]\d+)?\s*(?:meter|m\b)\b/i.test(lower)));
 
       if (vraagtLoodNodig) {
         res.afzettingSubModus = "lood_nodig";
@@ -813,6 +914,14 @@
     if (/\b(en[-\s]?a|klasse\s*a)\b/i.test(lower)) res.procedure = "EN-A";
     else if (/\b(en[-\s]?b|klasse\s*b)\b/i.test(lower)) res.procedure = "EN-B";
     else if (/\basme\b/i.test(lower)) res.procedure = "ASME";
+
+    // ASME Lastype (A/B/C/D) voor optionele lasoverdikte bij draadjesberekening
+    const matchLastype = lower.match(/\b(?:lastype|lascategorie|type\s*las|categorie)\s*([abcd])\b/i);
+    if (matchLastype) {
+      res.asmeLastype = matchLastype[1].toUpperCase();
+    } else if (/\bzonder\s+lasoverdikte\b/i.test(lower)) {
+      res.asmeLastype = "GEEN";
+    }
 
     // Opstelling herkenning & Groeperingen (EN ISO 17636-1 / ASME)
     // 1. DWDI: 11/F (ovaal), 12/G (superpositie)
@@ -1533,14 +1642,14 @@
         .replace(/\b([0-9]{1,3}[a-z]?)\s*(?:schedule|sch|sched)\b/gi, "")
         .replace(/\b(se-75|se75|ir-192|ir192|co-60|selenium|iridium|balteau|yxlon|smart|rondstraler|rr\d+|\d{5}[a-z]?|d[234578])\b/gi, "")
         .replace(/\bdn\s*[-]?\s*\d+\b/gi, "")
-        .replace(/\b\d+(?:[.,]\d+)?\s*(?:mm\s*)?(?:ci|curie|gbq|tbq|usv|µsv|microsievert|pb|fe|lood|staal|isolatie|ma\*min|mamin|ma|milliamp|miliamp)\b/gi, "")
-        .replace(/(?:lood|pb|staal|fe|isolatie)\s*(?:van|is|op|:)?\s*\d+(?:[.,]\d+)?\s*(?:mm)?/gi, "");
+        .replace(/\b\d+(?:[.,]\d+)?\s*(?:mm\s*|cm\s*)?(?:ci|curie|gbq|tbq|usv|µsv|microsievert|pb|fe|lood|staal|beton|baksteen|metselwerk|isolatie|ma\*min|mamin|ma|milliamp|miliamp)\b/gi, "")
+        .replace(/(?:lood|pb|staal|fe|beton(?:nen)?(?:\s*muur)?|bakste(?:en|nen)(?:\s*muur)?|metselwerk|isolatie)\s*(?:tussen\s*)?(?:van|is|op|:)?\s*\d+(?:[.,]\d+)?\s*(?:mm|cm|m\b)?/gi, "");
       if (res.brongrootte !== null && res.brongrootte !== undefined) {
         tZonder = tZonder.replace(new RegExp(`\\b${String(res.brongrootte).replace(".", "[.,]")}\\s*(?:mm)?\\b`, "gi"), "");
       }
       const bevatDiaTerm = /\b(diameter|buis|pijp|leiding|rondnaad|duim|duims|duimer|\bde\b|\bdn\b|wanddikte|dikte|dik)\b/i.test(tekst);
       const isPuurBron = Boolean(res.bronTekst) && !bevatDiaTerm;
-      const isAfscherming = (res.pbMm > 0 || res.feMm > 0 || res.isolatieMm > 0) && !bevatDiaTerm;
+      const isAfscherming = (res.pbMm > 0 || res.feMm > 0 || res.betonMm > 0 || res.baksteenMm > 0 || res.muurOnbekendMm > 0 || res.isolatieMm > 0) && !bevatDiaTerm;
 
       const getallen = (isPuurBron || isAfscherming) ? [] : [...tZonder.matchAll(/\b(\d+(?:[.,]\d+)?)\b/g)].map((m) => parseFloat(m[1].replace(",", ".")));
       if (getallen.length === 2 && res.diameter === null && res.wanddikte === null) {

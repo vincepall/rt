@@ -711,7 +711,14 @@
       let outputHtml = (res && res.text) ? res.text : (typeof res === "string" ? res : "Geen antwoord beschikbaar.");
       if (res && res.chips && res.chips.length > 0) {
         outputHtml += `<div class="rt-ai-chips-row">` +
-          res.chips.map(c => `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${c}')">${c}</button>`).join("") +
+          res.chips.map(c => {
+            const trimmedChip = String(c || "").trim();
+            if (/^[a-z0-9_.-]+\.html(?:[?#].*)?$/i.test(trimmedChip)) {
+              return `<a href="${trimmedChip}" target="_blank" rel="noopener" class="rt-ai-chip-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;">🔗 ${trimmedChip}</a>`;
+            }
+            const safeChip = trimmedChip.replace(/'/g, "\\'");
+            return `<button type="button" class="rt-ai-chip-btn" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${safeChip}')">${trimmedChip}</button>`;
+          }).join("") +
           `</div>`;
       }
       voegOfUpdateGeschiedenis(mijnVraagId, vraagHeaderHtml, outputHtml);
@@ -741,6 +748,14 @@
   }
 
   function verstuurSuggestie(tekst) {
+    const trimmedChip = String(tekst || "").trim();
+    if (/^[a-z0-9_.-]+\.html(?:[?#].*)?$/i.test(trimmedChip)) {
+      if (typeof window !== "undefined") {
+        const opened = window.open(trimmedChip, "_blank", "noopener");
+        if (!opened && window.location) window.location.href = trimmedChip;
+      }
+      return;
+    }
     isExamplesOpen = false;
     const exBtn = document.getElementById("rt-ai-examples-toggle");
     if (exBtn) exBtn.classList.remove("active");
@@ -1143,6 +1158,9 @@
     ASME_PIPE_SCHEDULES,
     OPSTELLINGEN_NDO,
     resetGespreksGeheugen,
+    kopieerGesprek,
+    meldFoutViaMail,
+    formatteerGesprekAlsTekst,
     wisGeheugenParameter,
     geefGeheugenItems,
     geefGeheugenBadgesHtml,

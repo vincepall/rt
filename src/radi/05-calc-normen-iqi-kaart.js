@@ -14,8 +14,9 @@
   }
 
   function formatSecondenKort(totalSeconds) {
-    const m = Math.floor(totalSeconds / 60);
-    const s = Math.round(totalSeconds % 60);
+    let m = Math.floor(totalSeconds / 60);
+    let s = Math.round(totalSeconds % 60);
+    if (s === 60) { m++; s = 0; }
     const sStr = s < 10 ? "0" + s : s;
     if (m > 0) {
       return `${m}m ${sStr}s`;
@@ -24,8 +25,9 @@
   }
 
   function formatSecondenVoluit(totalSeconds) {
-    const m = Math.floor(totalSeconds / 60);
-    const s = Math.round(totalSeconds % 60);
+    let m = Math.floor(totalSeconds / 60);
+    let s = Math.round(totalSeconds % 60);
+    if (s === 60) { m++; s = 0; }
     const minTxt = m === 1 ? "1 minuut" : `${m} minuten`;
     const secTxt = s === 1 ? "1 seconde" : `${s} seconden`;
     if (m > 0 && s > 0) {
@@ -334,8 +336,15 @@
     if (!materiaalNaam) return null;
     const nameLower = (materiaalNaam || "").toLowerCase();
 
-    // 1. Titanium (ISO 19232-1 TI, ASTM 01)
-    if (nameLower.includes("tita") || nameLower.includes("ti")) {
+    // 1. Titanium (ISO 19232-1 TI, ASTM 01) — voorkom false positives op RVS 316Ti en Tinbrons!
+    if (
+      (nameLower.includes("tita") || /\bti(?:[-\s]?\d|6al4v)?\b/i.test(nameLower)) &&
+      !nameLower.includes("316ti") &&
+      !nameLower.includes("321") &&
+      !nameLower.includes("brons") &&
+      !nameLower.includes("rvs") &&
+      !nameLower.includes("staal")
+    ) {
       return {
         isoGroup: "TI",
         astmGroup: "01",
@@ -787,7 +796,7 @@
     }
 
     // 2b. Minimale FFD theorie & berekeningswijze (EN ISO 17636-1 en ASME)
-    if (/\b(hoe\s+bereken\s+(?:je|men)\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|focus|film\s*focus\s*afstand)|hoe\s+wordt\s+de\s+(?:minimale\s+)?ffd\s+berekend|formule\s+(?:voor\s+)?(?:de\s+)?(?:minimale\s+)?ffd|hoe\s+bepaal\s+(?:je|men)\s+(?:de\s+)?(?:minimale\s+)?ffd)\b/i.test(lower)) {
+    if (/\b(hoe\s+bereken\s+(?:je|ik|men)\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|focus|film\s*focus\s*afstand)|hoe\s+wordt\s+de\s+(?:minimale\s+)?ffd\s+berekend|formule\s+(?:voor|van)\s+(?:de\s+)?(?:minimale\s+)?ffd|hoe\s+bepaal\s+(?:je|ik|men)\s+(?:de\s+)?(?:minimale\s+)?ffd)\b/i.test(lower)) {
       if (chips) chips.push("Min FFD 4 duim Sch 40", "Min FFD SWSI", "Geometrische onscherpte Ug");
       return (
         "<strong>Hoe bereken je de minimale Film-Focus Afstand (FFD / f<sub>min</sub>)?</strong><br><br>" +
@@ -821,14 +830,14 @@
       );
     }
 
-    // 3. Geometrische onscherpte (Ug) theorie & normgrenzen
-    if (/\b(geometrische\s*onscherpte|formule\s*voor\s*ug|wat\s*is\s*ug|ug\s*eisen|ug\s*norm|ug\s*grenzen)\b/i.test(lower)) {
-      if (chips) chips.push("Minimale FFD", "Brongrootte Ir-192", "Klasse B FFD");
+    // 3. Geometrische onscherpte (Ug) theorie & normgrenzen (ASME & EN ISO 17636-1)
+    if (/\b(geometrische\s*onscherpte|onscherpte|formule\s+(?:voor|van)\s+(?:de\s+)?(?:geometrische\s*)?(?:onscherpte|ug)|hoe\s+bereken\s+(?:je|ik|men)\s+(?:de\s+)?(?:geometrische\s*)?(?:onscherpte|ug)|wat\s+is\s+ug|ug\s*eisen|ug\s*norm|ug\s*grenzen)\b/i.test(lower)) {
+      if (chips) chips.push("Minimale FFD", "Hoe bereken je minimale FFD?", "Kwadratenwet", "MinFFD.html");
       return (
-        "<strong>Geometrische Onscherpte (U<sub>g</sub>) &ndash; Formule en Normgrenzen:</strong><br><br>" +
+        "<strong>Geometrische Onscherpte (U<sub>g</sub>) &ndash; Formule en Normgrenzen (ASME &amp; EN ISO 17636-1):</strong><br><br>" +
         "Omdat een industriële stralingsbron of röntgenbrandvlek geen oneindig klein punt is maar een bepaalde afmeting heeft (brandvlekgrootte <em>F</em>), ontstaat er aan de randen van het object altijd een halfschaduw. Dit is de <strong>geometrische onscherpte (U<sub>g</sub>)</strong>.<br><br>" +
         "<div style='background:#14171f; border:1px solid rgba(245,223,77,0.4); border-radius:8px; padding:12px 14px; margin:10px 0; box-shadow:inset 0 1px 4px rgba(0,0,0,0.5);'>" +
-          "<div style='font-size:0.8rem; color:#F5DF4D; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>📐 Formule Geometrische Onscherpte:</div>" +
+          "<div style='font-size:0.8rem; color:#F5DF4D; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>📐 Formule Geometrische Onscherpte (ASME Sec. V Art. 2):</div>" +
           "<div style='display:flex; align-items:center; justify-content:center; gap:8px; font-family:monospace; font-size:1.15rem; color:#fff; flex-wrap:wrap;'>" +
             "<span style='font-weight:700; color:#F5DF4D;'>U<sub>g</sub></span>" +
             "<span>=</span>" +
@@ -843,17 +852,22 @@
             "</span>" +
           "</div>" +
           "<div style='font-size:0.82rem; color:#ccc; margin-top:8px; text-align:center;'>" +
-            "<em>F = focusgrootte (mm) &bull; d = OFA / object-tot-film (mm) &bull; D = bron-tot-object afstand (mm)</em>" +
+            "<em>F = brongrootte / focus (mm) &bull; d = OFA / object-tot-film (mm) &bull; D = BOA / bron-tot-object (FFD &minus; d, in mm)</em>" +
           "</div>" +
         "</div><br>" +
-        "Waarbij:<br>" +
-        "• <strong>F</strong> = Brandvlekgrootte / focusafmeting van de bron of buis (in mm)<br>" +
-        "• <strong>d</strong> = Object-tot-film afstand (OFA): afstand van de bronzijde van de las tot de film<br>" +
-        "• <strong>D</strong> = Bron-tot-object afstand (FFD &minus; d)<br><br>" +
-        "• <strong>Normatieve grenzen volgens EN ISO 17636-1:</strong><br>" +
-        "&nbsp;&nbsp;&bull; <strong>Klasse A:</strong> U<sub>g</sub> &le; 0.3 mm bij d &le; 12 mm, tot max. 0.5 mm bij d &approx; 40 mm.<br>" +
-        "&nbsp;&nbsp;&bull; <strong>Klasse B (streng):</strong> U<sub>g</sub> &le; 0.15 mm bij d &le; 12 mm, tot max. 0.3 mm bij d &approx; 40 mm.<br>" +
-        "&nbsp;&nbsp;&bull; <strong>ASME Sec. V Art. 2 (T-274.2):</strong> U<sub>g</sub> &le; 0.51 mm (0.020″) voor diktes &lt; 50 mm (2″)."
+        "• <strong>Omgevormd naar Minimale FFD (ASME):</strong><br>" +
+        "<span class='rt-math-inline'>FFD<sub>min</sub> = <span class='rt-math-frac'><span class='rt-math-num'><i>F</i> &times; <i>d</i></span><span class='rt-math-den'><i>U</i><sub>g,max</sub></span></span> + <i>d</i></span><br><br>" +
+        "• <strong>Maximaal toegestane U<sub>g</sub> volgens ASME Sec. V Art. 2 (T-274.2 / T-285) op basis van wanddikte (<i>wt</i>):</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong><i>wt</i> &lt; 50 mm (2″):</strong> <strong>U<sub>g</sub> &le; 0.51 mm</strong> (0.020″)<br>" +
+        "&nbsp;&nbsp;&bull; <strong>50 mm &le; <i>wt</i> &lt; 75 mm (2″&ndash;3″):</strong> <strong>U<sub>g</sub> &le; 0.76 mm</strong> (0.030″)<br>" +
+        "&nbsp;&nbsp;&bull; <strong>75 mm &le; <i>wt</i> &le; 100 mm (3″&ndash;4″):</strong> <strong>U<sub>g</sub> &le; 1.02 mm</strong> (0.040″)<br>" +
+        "&nbsp;&nbsp;&bull; <strong><i>wt</i> &gt; 100 mm (&gt; 4″):</strong> <strong>U<sub>g</sub> &le; 1.78 mm</strong> (0.070″)<br><br>" +
+        "• <strong>Ter vergelijking &ndash; EN ISO 17636-1 (&sect;7.4):</strong><br>" +
+        "EN ISO 17636-1 werkt <strong>niet</strong> met vaste U<sub>g</sub>-drempels zoals ASME, maar schrijft de minimale bron-objectafstand (<i>f</i>) voor via een formule (met brongrootte <i>d</i> en OFA <i>b</i>; bij SWSI geldt <i>b</i> = wanddikte <i>t</i>):<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Klasse A:</strong> <span class='rt-math-inline'><i>f</i> / <i>d</i> &ge; 7.5 &middot; <i>b</i><sup>2/3</sup></span> &rarr; omgerekend <span class='rt-math-inline'><i>U</i><sub>g</sub> &le; <i>b</i><sup>1/3</sup> / 7.5</span> (bijv. <strong>0.31 mm</strong> bij <i>b</i> = 12 mm; <strong>0.46 mm</strong> bij <i>b</i> = 40 mm).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Klasse B (streng):</strong> <span class='rt-math-inline'><i>f</i> / <i>d</i> &ge; 15 &middot; <i>b</i><sup>2/3</sup></span> &rarr; omgerekend <span class='rt-math-inline'><i>U</i><sub>g</sub> &le; <i>b</i><sup>1/3</sup> / 15</span> (bijv. <strong>0.15 mm</strong> bij <i>b</i> = 12 mm; <strong>0.23 mm</strong> bij <i>b</i> = 40 mm).<br>" +
+        "&nbsp;&nbsp;&bull; <em>Let op:</em> voor het opsporen van vlakke fouten (scheuren/bindingsfouten) in Klasse A geldt toch de strengere <i>f</i><sub>min</sub> van Klasse B.<br><br>" +
+        "<small style='opacity:0.85;'>Tip: Wil je direct U<sub>g</sub> of de minimale FFD uitrekenen? Zeg bijv. <em>\"Bereken Ug bij focus 3 mm, OFA 50 mm en FFD 500 mm\"</em> of open <a href='MinFFD.html' class='ai-link' target='_blank'>MinFFD.html</a>.</small>"
       );
     }
 
@@ -1066,6 +1080,154 @@
       );
     }
 
+    // 12. ALARA-principe & de 3 basisregels van stralingsbescherming
+    if (/\b(alara|drie\s+basisregels\s+stralingsbescherming|3\s+basisregels\s+stralingsbescherming|tijd\s+afstand\s+afscherming|basisregels\s+stralingsbescherming)\b/i.test(lower)) {
+      if (chips) chips.push("Dosislimiet medewerker", "Grens 10 microSv/uur", "Halveringsdikte (HVL)", "Kwadratenwet");
+      return (
+        "<strong>Het ALARA-principe &amp; de 3 Basisregels van Stralingsbescherming:</strong><br><br>" +
+        "<strong>ALARA</strong> staat voor <em>As Low As Reasonably Achievable</em>: elke blootstelling aan ioniserende straling moet zo laag als redelijkerwijs mogelijk worden gehouden, ruim onder de wettelijke dosislimieten.<br><br>" +
+        "• <strong>De 3 gouden basisregels (Tijd, Afstand, Afscherming):</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>1. Tijd (zo kort mogelijk):</strong> Halveer je de verblijftijd bij de bron, dan halveert je dosis direct (<span class='rt-math-inline'>Dosis = Dosistempo &times; Tijd</span>). Bereid opstellingen altijd voor vóórdat de bron wordt uitgedraaid.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>2. Afstand (zo groot mogelijk):</strong> Via de <strong>omgekeerde kwadratenwet</strong> daalt het dosistempo met het kwadraat van de afstand (2&times; verder = 4&times; minder straling; 10&times; verder = 100&times; minder).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>3. Afscherming (effectief materiaal):</strong> Gebruik altijd een <strong>collimator</strong> (wolfraam/lood), loodschorten/loodplaten of bestaande betonnen/stalen wanden om de bundel te verzwakken via halveringsdiktes (HVL)."
+      );
+    }
+
+    // 13. Optische dichtheid / Zwarting (D) & formule
+    if (/\b(optische\s+dichtheid|wat\s+is\s+zwarting|formule\s+(?:voor|van)\s+(?:de\s+)?(?:zwarting|optische\s+dichtheid)|hoe\s+bereken\s+(?:je|ik|men)\s+(?:de\s+)?(?:zwarting|optische\s+dichtheid))\b/i.test(lower)) {
+      if (chips) chips.push("Minimale zwarting Klasse B", "Minimale zwarting ASME", "Film D4 vs D7");
+      return (
+        "<strong>Zwarting / Optische Dichtheid (D) &ndash; Formule en Betekenis:</strong><br><br>" +
+        "De zwarting (optische dichtheid <em>D</em>) geeft aan hoeveel licht een ontwikkelde röntgenfilm tegenhoudt op de filmkijkkast (densitometer).<br><br>" +
+        "<div style='background:#14171f; border:1px solid rgba(245,223,77,0.4); border-radius:8px; padding:12px 14px; margin:10px 0; box-shadow:inset 0 1px 4px rgba(0,0,0,0.5);'>" +
+          "<div style='font-size:0.8rem; color:#F5DF4D; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>📐 Formule Optische Dichtheid (Zwarting):</div>" +
+          "<div style='display:flex; align-items:center; justify-content:center; gap:8px; font-family:monospace; font-size:1.15rem; color:#fff; flex-wrap:wrap;'>" +
+            "<span style='font-weight:700; color:#F5DF4D;'>D</span>" +
+            "<span>=</span>" +
+            "<span>log<sub>10</sub></span>" +
+            "<span style='display:inline-flex; align-items:center;'>" +
+              "<span style='font-size:1.5rem; font-weight:300;'>&#40;</span>" +
+              "<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; padding:0 4px; line-height:1.15;'>" +
+                "<span style='border-bottom:1.5px solid #eee; padding-bottom:2px; font-weight:600;'>I<sub>0</sub></span>" +
+                "<span style='padding-top:2px; font-weight:600;'>I</span>" +
+              "</span>" +
+              "<span style='font-size:1.5rem; font-weight:300;'>&#41;</span>" +
+            "</span>" +
+          "</div>" +
+          "<div style='font-size:0.82rem; color:#ccc; margin-top:8px; text-align:center;'>" +
+            "<em>I₀ = invallende lichtintensiteit van de kijkkast &bull; I = doorgelaten licht door de film</em>" +
+          "</div>" +
+        "</div><br>" +
+        "• <strong>Wat betekent de waarde in de praktijk?</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>D = 1.0:</strong> 10% van het licht komt door de film (1 op 10).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>D = 2.0:</strong> 1% van het licht komt door (1 op 100) &ndash; minimum voor EN Klasse A en ASME (X-ray: 1.8, gamma: 2.0).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>D = 2.3:</strong> ca. 0.5% lichtdoorlaat &ndash; minimum voor EN Klasse B.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>D = 3.0:</strong> 0.1% lichtdoorlaat (1 op 1000) &ndash; hoog contrast, vereist een sterke kijkkast.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>D = 4.0:</strong> 0.01% lichtdoorlaat (1 op 10.000) &ndash; bovengrens volgens ASME / EN."
+      );
+    }
+
+    // 14. Halveringsdikte (HVL) & Tiendewaardelaag (TVL)
+    if (/\b(halveringsdikte|half\s*value\s*layer|\bhvl\b|tiendewaardelaag|tenth\s*value\s*layer|\btvl\b|formule\s+(?:voor|van)\s+(?:de\s+)?(?:afscherming|verzwakking))\b/i.test(lower)) {
+      if (chips) chips.push("Afzettingsafstand", "ALARA principe", "Eigenschappen Ir-192 en Se-75", "afzettinggamma.html");
+      return (
+        "<strong>Halveringsdikte (HVL) &amp; Tiendewaardelaag (TVL) &ndash; Afscherming:</strong><br><br>" +
+        "• <strong>Halveringsdikte (HVL / Half Value Layer):</strong> De dikte van een afschermmateriaal die de stralingsintensiteit precies <strong>halveert</strong> (factor 2 reductie).<br>" +
+        "• <strong>Tiendewaardelaag (TVL / Tenth Value Layer):</strong> De dikte die de straling met een <strong>factor 10</strong> vermindert (<span class='rt-math-inline'>TVL &approx; 3.32 &times; HVL</span>).<br><br>" +
+        "<div style='background:#14171f; border:1px solid rgba(91,192,222,0.4); border-radius:8px; padding:12px 14px; margin:10px 0; box-shadow:inset 0 1px 4px rgba(0,0,0,0.5);'>" +
+          "<div style='font-size:0.8rem; color:#5bc0de; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>🛡️ Verzwakkingsformule met Halveringsdiktes:</div>" +
+          "<div style='display:flex; align-items:center; justify-content:center; gap:8px; font-family:monospace; font-size:1.15rem; color:#fff; flex-wrap:wrap;'>" +
+            "<span style='font-weight:700; color:#5bc0de;'>I</span>" +
+            "<span>=</span>" +
+            "<span style='font-weight:700; color:#5bc0de;'>I<sub>0</sub></span>" +
+            "<span>&times;</span>" +
+            "<span>(0.5)<sup>d / HVL</sup></span>" +
+          "</div>" +
+          "<div style='font-size:0.82rem; color:#ccc; margin-top:8px; text-align:center;'>" +
+            "<em>I₀ = dosistempo zonder afscherming &bull; d = materiaaldikte (mm) &bull; n = d / HVL = aantal halveringsdiktes</em>" +
+          "</div>" +
+        "</div><br>" +
+        "• <strong>Praktische HVL-waarden in RT (<a href='afzettinggamma.html' class='ai-link' target='_blank'>afzettinggamma.html</a>):</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Se-75:</strong> Lood <strong>2.0 mm</strong> &bull; Staal <strong>5 mm</strong> &bull; Beton <strong>30 mm</strong> &bull; Baksteen <strong>40 mm</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Ir-192:</strong> Lood <strong>3.0 mm</strong> &bull; Staal <strong>13 mm</strong> &bull; Beton <strong>45 mm</strong> &bull; Baksteen <strong>60 mm</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Co-60:</strong> Lood <strong>12.5 mm</strong> &bull; Staal <strong>21 mm</strong> &bull; Beton ca. <strong>62 mm</strong>"
+      );
+    }
+
+    // 15. Loodfolie / Loodschermen / Versterkingsschermen in de cassette
+    if (/\b(loodscherm|loodschermen|loodschermpje|loodschermpjes|versterkingsscherm|versterkingsschermen|versterkingsfolie|lood\s*folies?|lead\s*screens?|waarom\s+lood\s+in\s+(?:de\s+)?cassette)\b/i.test(lower)) {
+      if (chips) chips.push("Loodletter B", "Strooistraling & Collimator", "Film D4 vs D7");
+      return (
+        "<strong>Loodfolie / Versterkingsschermen (Loodschermen / Lead Screens) in de Filmcassette:</strong><br><br>" +
+        "In een röntgencassette ligt de film strak ingeklemd tussen een voor- en achter-<strong>loodfolie (versterkingsscherm)</strong>. Deze dunne loodschermen hebben twee belangrijke functies:<br><br>" +
+        "• <strong>1. Versterkende werking (foto-elektronen):</strong><br>" +
+        "Wanneer röntgen- of gammastraling op het lood valt, maakt het <strong>secundaire elektronen</strong> vrij die de filmemulsie veel efficiënter belichten dan de fotonen zelf. Dit verkort de belichtingstijd met een factor 2 tot 5.<br><br>" +
+        "• <strong>2. Filterwerking tegen strooistraling:</strong><br>" +
+        "Het voorloodscherm absorbeert zachte, laag-energetische <strong>strooistraling</strong> (die alleen maar een grijze sluier geeft), terwijl de harde, beeldvormende straling er gewoon doorheen gaat. Het achterloodscherm houdt bovendien <em>backscatter</em> tegen.<br><br>" +
+        "• <strong>Richtwaarden voor schermdiktes (EN ISO 17636-1):</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>X-ray &lt; 100 kV:</strong> meestal geen loodscherm (te veel absorptie) of zeer dun.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>X-ray 100&ndash;250 kV &amp; Se-75:</strong> <strong>0.02 &ndash; 0.15 mm</strong> lood (vaak 0.027 mm in vacuümverpakte film).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Ir-192 &amp; X-ray &gt; 250 kV:</strong> <strong>0.10 &ndash; 0.25 mm</strong> lood (voor- en achterscherm).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Co-60:</strong> <strong>0.25 &ndash; 0.50 mm</strong> lood of staal/koper."
+      );
+    }
+
+    // 16. Radioactief verval formule
+    if (/\b(formule\s+(?:voor|van)\s+(?:het\s+)?(?:radioactief\s+)?verval|hoe\s+bereken\s+(?:je|ik|men)\s+(?:het\s+)?(?:radioactief\s+)?verval|vervalformule|verval\s+formule)\b/i.test(lower)) {
+      if (chips) chips.push("Halfwaardetijd Ir-192 en Se-75", "Bronnenoverzicht", "verval2.html");
+      return (
+        "<strong>Formule voor Radioactief Verval (Activiteit berekenen):</strong><br><br>" +
+        "De activiteit van een gammabron neemt exponentieel af met de tijd. Na elke <strong>halfwaardetijd (T<sub>&frac12;</sub>)</strong> is precies de helft van de oorspronkelijke activiteit over.<br><br>" +
+        "<div style='background:#14171f; border:1px solid rgba(245,223,77,0.4); border-radius:8px; padding:12px 14px; margin:10px 0; box-shadow:inset 0 1px 4px rgba(0,0,0,0.5);'>" +
+          "<div style='font-size:0.8rem; color:#F5DF4D; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; margin-bottom:8px; text-align:center;'>☢️ Vervalformule:</div>" +
+          "<div style='display:flex; align-items:center; justify-content:center; gap:8px; font-family:monospace; font-size:1.15rem; color:#fff; flex-wrap:wrap;'>" +
+            "<span style='font-weight:700; color:#F5DF4D;'>A(t)</span>" +
+            "<span>=</span>" +
+            "<span style='font-weight:700; color:#F5DF4D;'>A<sub>0</sub></span>" +
+            "<span>&times;</span>" +
+            "<span>(0.5)<sup>t / T<sub>&frac12;</sub></sup></span>" +
+          "</div>" +
+          "<div style='font-size:0.82rem; color:#ccc; margin-top:8px; text-align:center;'>" +
+            "<em>A₀ = beginactiviteit (Ci of GBq) &bull; t = verstreken tijd (dagen) &bull; T½ = halfwaardetijd (dagen)</em>" +
+          "</div>" +
+        "</div><br>" +
+        "• <strong>Halfwaardetijden in RT:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Ir-192:</strong> <strong>73.83 dagen</strong> (~1% verval per dag)<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Se-75:</strong> <strong>119.78 dagen</strong> (~0.58% verval per dag)<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Co-60:</strong> <strong>5.27 jaar</strong> (1925 dagen)<br><br>" +
+        "<small style='opacity:0.85;'>Tip: Vraag bijv. <em>\"Hoe sterk is 35598P over 30 dagen?\"</em> of open <a href='verval2.html' class='ai-link' target='_blank'>verval2.html</a>.</small>"
+      );
+    }
+
+    // 17. Equivalentiefactor / Staalequivalent
+    if (/\b(wat\s+is\s+(?:een\s+)?equivalentiefactor|uitleg\s+equivalentiefactor|hoe\s+werkt\s+(?:een\s+)?equivalentiefactor|wat\s+is\s+staalequivalent)\b/i.test(lower)) {
+      if (chips) chips.push("Equivalentiefactor aluminium", "Equivalentiefactor koper", "Materiaal opzoeken");
+      return (
+        "<strong>Wat is een Radiografische Equivalentiefactor (Staalequivalent)?</strong><br><br>" +
+        "Belichtingstabellen en grafieken voor röntgen- en gammastraling zijn standaard opgesteld voor <strong>koolstofstaal (factor = 1.0)</strong>. Omdat andere materialen een andere dichtheid en atoomnummer hebben, absorberen ze meer of minder straling.<br><br>" +
+        "• <strong>Formule:</strong> <span class='rt-math-inline'>Staalequivalent = Wanddikte &times; Equivalentiefactor</span><br><br>" +
+        "• <strong>Voorbeelden in de praktijk:</strong><br>" +
+        "&nbsp;&nbsp;&bull; <strong>Aluminium:</strong> factor ca. <strong>0.18 &ndash; 0.35</strong> (lichter materiaal &rarr; 10 mm alu straalt ongeveer zoals 2&ndash;3.5 mm staal).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>RVS / Koolstofstaal:</strong> factor <strong>1.0</strong>.<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Koper / Nikkel / Inconel / Monel:</strong> factor ca. <strong>1.1 &ndash; 1.4</strong> (zwaarder &rarr; vereist langere belichtingstijd dan staal).<br>" +
+        "&nbsp;&nbsp;&bull; <strong>Lood:</strong> factor <strong>4.0 &ndash; 14.0</strong> (sterk afhankelijk van kV/isotoop).<br><br>" +
+        "<small style='opacity:0.85;'>Let op: De factor hangt ook af van de stralingsenergie (kV of isotoop). Vraag gerust naar een specifiek materiaal (bijv. <em>\"equivalentiefactor Inconel\"</em>).</small>"
+      );
+    }
+
+    // 18. Filmverwerking / Donkere kamer
+    if (/\b(donkere\s+kamer|film\s+ontwikkelen|stappen\s+(?:van\s+)?(?:film\s*)?ontwikkelen|ontwikkelproces|waarom\s+fixeren|functie\s+(?:van\s+)?(?:het\s+)?(?:stopbad|fixeerbad|ontwikkelbad))\b/i.test(lower)) {
+      if (chips) chips.push("Wat is zwarting?", "Loodschermen", "Film D4 vs D7");
+      return (
+        "<strong>Filmverwerking in de Donkere Kamer (5 Stappen):</strong><br><br>" +
+        "1. <strong>Ontwikkelen (Developer):</strong> Zet de belichte zilverhalogenide-kristallen (het latente beeld) chemisch om in zichtbaar zwart metallisch zilver. <em>(Standaard handontwikkeling: ca. 5 min bij 20 °C).</em><br>" +
+        "2. <strong>Stopbad (Stop bath):</strong> Een zwak zuur bad dat de alkalische ontwikkelaar direct neutraliseert. Zo stopt de zwarting meteen en raakt het fixeerbad niet vervuild.<br>" +
+        "3. <strong>Fixeren (Fixer):</strong> Lost alle <strong>onbelichte</strong> zilverzouten op zodat de film lichtbestendig en blijvend transparant wordt op de niet-belichte delen. <em>(Vuistregel: 2&times; de ophelderingstijd).</em><br>" +
+        "4. <strong>Spoelen (Washing):</strong> Spoelt alle achtergebleven fixeerchemicaliën weg met stromend water. Slecht spoelen veroorzaakt na verloop van tijd bruine/gele vlekken en aantasting van het archiefbeeld.<br>" +
+        "5. <strong>Drogen (Drying):</strong> Droogt de film stofvrij in de droogkast zonder waterdruppels (vaak met een beetje netmiddel / wetting agent)."
+      );
+    }
+
     // Default / fallback
     return geefOpstellingEnGroeperingInfo(params, vraagTekst, chips);
   }
@@ -1224,8 +1386,9 @@
     }
 
     const totalMinutes = mamin / ma;
-    const m = Math.floor(totalMinutes);
-    const s = Math.round((totalMinutes - m) * 60);
+    let m = Math.floor(totalMinutes);
+    let s = Math.round((totalMinutes - m) * 60);
+    if (s === 60) { m++; s = 0; }
     let tijdTekst = "";
     if (m === 0) {
       tijdTekst = `${s} seconden`;
@@ -1498,7 +1661,11 @@
 
       const isoLabel = isotoop === "Ir192" ? "Ir-192" : (isotoop === "Co60" ? "Co-60" : "Se-75");
       if (params.vervalInVerleden && !doelDateObj) {
-        const vraagtWatHijNuHeeft = /\b(nu|vandaag|heden|nog)\b/i.test(lower) || /\bwas\b/i.test(lower);
+        // "wat was een 50 Ci Ir-192 bron 30 dagen geleden?" -> terugrekenen (grotere activiteit!)
+        // "30 dagen geleden was hij 50 Ci, hoeveel is hij nu?" -> vooruit vervallen naar nu!
+        const vraagtWatHijNuHeeft =
+          /\b(nu|vandaag|heden|nog|over\s+is|resterend)\b/i.test(lower) &&
+          !/\bwat\s+was\b/i.test(lower);
         if (vraagtWatHijNuHeeft) {
           return `Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen):<br>` +
                  `• Activiteit <strong>${Math.round(daysDiff)} dagen geleden</strong>: ${initAct.toFixed(1)} Ci<br>` +
@@ -1749,32 +1916,72 @@
         altGammaInfo = `<br><small style="opacity:0.85;">(Bij gebruik van ${bronnen.join(" of ")}: <strong>${gammaWire}</strong> wegens 1 draadje vermindering conform EN ISO 17636-1).</small>`;
       }
 
-    } else if (proc === "ASME") {
+    }
+
+    let asmeOverdikteInfo = "";
+    let asmeOverdiktePrompt = "";
+    if (proc === "ASME") {
+      const getAsmeMaxOverdikte = (weldType, wtVal) => {
+        if (weldType === "A" || weldType === "D") {
+          if (wtVal <= 2.4) return 0.8;
+          if (wtVal <= 4.8) return 1.5;
+          if (wtVal <= 25) return 2.5;
+          return 3.0;
+        }
+        if (weldType === "B" || weldType === "C") {
+          if (wtVal <= 2.4) return 2.5;
+          if (wtVal <= 4.8) return 3.0;
+          if (wtVal <= 13) return 4.0;
+          if (wtVal <= 25) return 5.0;
+          return 6.0;
+        }
+        return 0;
+      };
+
+      const gekozenLastype = (params.asmeLastype && ["A", "B", "C", "D"].includes(params.asmeLastype))
+        ? params.asmeLastype
+        : null;
+      const lasOverdikteMm = gekozenLastype ? getAsmeMaxOverdikte(gekozenLastype, t) : 0;
+      const tAsme = t + lasOverdikteMm;
+
       const bkiLocatie = (tech === "DWSI") ? "Filmside" : "Sourceside";
       let asmeWire = 5;
       let enEq = "W13";
       if (bkiLocatie === "Sourceside") {
-        if (t <= 6.4) { asmeWire = 5; enEq = "W13"; }
-        else if (t <= 9.5) { asmeWire = 6; enEq = "W12"; }
-        else if (t <= 12.7) { asmeWire = 7; enEq = "W11"; }
-        else if (t <= 19.0) { asmeWire = 8; enEq = "W10"; }
-        else if (t <= 25.4) { asmeWire = 9; enEq = "W9"; }
-        else if (t <= 38.1) { asmeWire = 10; enEq = "W8"; }
-        else if (t <= 50.8) { asmeWire = 11; enEq = "W7"; }
-        else if (t <= 63.5) { asmeWire = 12; enEq = "W6"; }
+        if (tAsme <= 6.4) { asmeWire = 5; enEq = "W13"; }
+        else if (tAsme <= 9.5) { asmeWire = 6; enEq = "W12"; }
+        else if (tAsme <= 12.7) { asmeWire = 7; enEq = "W11"; }
+        else if (tAsme <= 19.0) { asmeWire = 8; enEq = "W10"; }
+        else if (tAsme <= 25.4) { asmeWire = 9; enEq = "W9"; }
+        else if (tAsme <= 38.1) { asmeWire = 10; enEq = "W8"; }
+        else if (tAsme <= 50.8) { asmeWire = 11; enEq = "W7"; }
+        else if (tAsme <= 63.5) { asmeWire = 12; enEq = "W6"; }
         else { asmeWire = 13; enEq = "W5"; }
       } else {
-        if (t <= 6.4) { asmeWire = 4; enEq = "W14"; }
-        else if (t <= 9.5) { asmeWire = 5; enEq = "W13"; }
-        else if (t <= 12.7) { asmeWire = 6; enEq = "W12"; }
-        else if (t <= 19.0) { asmeWire = 7; enEq = "W11"; }
-        else if (t <= 25.4) { asmeWire = 8; enEq = "W10"; }
-        else if (t <= 38.1) { asmeWire = 9; enEq = "W9"; }
-        else if (t <= 50.8) { asmeWire = 10; enEq = "W8"; }
-        else if (t <= 63.5) { asmeWire = 11; enEq = "W7"; }
+        if (tAsme <= 6.4) { asmeWire = 4; enEq = "W14"; }
+        else if (tAsme <= 9.5) { asmeWire = 5; enEq = "W13"; }
+        else if (tAsme <= 12.7) { asmeWire = 6; enEq = "W12"; }
+        else if (tAsme <= 19.0) { asmeWire = 7; enEq = "W11"; }
+        else if (tAsme <= 25.4) { asmeWire = 8; enEq = "W10"; }
+        else if (tAsme <= 38.1) { asmeWire = 9; enEq = "W9"; }
+        else if (tAsme <= 50.8) { asmeWire = 10; enEq = "W8"; }
+        else if (tAsme <= 63.5) { asmeWire = 11; enEq = "W7"; }
         else { asmeWire = 12; enEq = "W6"; }
       }
       wire = `EN ${enEq} (ASME #${asmeWire})`;
+
+      if (gekozenLastype) {
+        asmeOverdikteInfo = `<br><small style="color:#F5DF4D;">ℹ️ <strong>ASME lasoverdikte (Lastype ${gekozenLastype}):</strong> ${t.toFixed(1)} mm + ${lasOverdikteMm.toFixed(1)} mm = <strong>${tAsme.toFixed(1)} mm</strong> (conform ASME Sec. V T-276.2 / <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a>).</small>`;
+        if (chips) chips.push("Zonder lasoverdikte", "Lastype A", "Lastype B", "Lastype C", "Lastype D");
+      } else if (params.asmeLastype !== "GEEN") {
+        if (chips) chips.push("Lastype A", "Lastype B", "Lastype C", "Lastype D");
+        asmeOverdiktePrompt =
+          `<div style="margin-top:10px; padding:8px 10px; background:rgba(245,223,77,0.08); border:1px solid rgba(245,223,77,0.35); border-radius:8px; font-size:0.88rem;">` +
+          `💡 <strong>Wil je bij ASME extra lasoverdikte meerekenen?</strong> Kies hieronder het <strong>lastype (A, B, C of D)</strong> aan de hand van de afbeelding:` +
+          `<div style="margin-top:8px; text-align:center;">` +
+          `<img src="Lascategorie.png" alt="ASME Lascategorieën A, B, C en D" style="max-width:100%; max-height:220px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#fff; padding:4px;">` +
+          `</div></div>`;
+      }
     }
 
     const bkiPos = (tech === "DWSI") ? "BKI filmzijde" : "BKI bronzijde";
@@ -1809,7 +2016,7 @@
 
     const bronMelding = bron !== "X-ray" ? ` met ${bronLabel}` : "";
     const ttsDraad = params.materiaalNaam && bkiInfo ? `Vereist draadje: ${wire}, op houder ${geefBkiSetsVoorDraad(wireNum, bkiInfo.isoGroup)}` : `Vereist draadje: ${wire}`;
-    return `Vereist draadje: <strong>${wire}</strong> (${bkiPos}, doorstraalde dikte: ${doorstraaldeDikte.toFixed(1)} mm bij ${tech} volgens ${proc}${bronMelding}).${verminderingTekst}${altGammaInfo}${bkiExtra}<span class="rt-tts-summary" style="display:none">${ttsDraad}</span><br><small style="opacity:0.85;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small>`;
+    return `Vereist draadje: <strong>${wire}</strong> (${bkiPos}, doorstraalde dikte: ${doorstraaldeDikte.toFixed(1)} mm bij ${tech} volgens ${proc}${bronMelding}).${asmeOverdikteInfo}${verminderingTekst}${altGammaInfo}${bkiExtra}${asmeOverdiktePrompt}<span class="rt-tts-summary" style="display:none">${ttsDraad}</span><br><small style="opacity:0.85;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small>`;
   }
 
   // 15. Pipe Schedule Wanddiktes (ASME B36.10M / ASME B36.19M)
@@ -1901,14 +2108,14 @@
     3: { iso: "W15", diaMm: 0.125, diaIn: 0.0050, setIso: ["13 FE EN"], setAsme: "Set 1A" },
     4: { iso: "W14", diaMm: 0.16, diaIn: 0.0063, setIso: ["10 FE EN", "13 FE EN"], setAsme: "Set 1A" },
     5: { iso: "W13", diaMm: 0.20, diaIn: 0.0080, setIso: ["10 FE EN", "13 FE EN"], setAsme: "Set 1A" },
-    6: { iso: "W12", diaMm: 0.25, diaIn: 0.0100, setIso: ["10 FE EN", "13 FE EN"], setAsme: "Set 1A of Set 1B" },
-    7: { iso: "W11", diaMm: 0.32, diaIn: 0.0125, setIso: ["10 FE EN", "13 FE EN"], setAsme: "Set 1B" },
-    8: { iso: "W10", diaMm: 0.40, diaIn: 0.0160, setIso: ["10 FE EN", "13 FE EN"], setAsme: "Set 1B" },
-    9: { iso: "W9",  diaMm: 0.50, diaIn: 0.0200, setIso: ["6 FE EN", "10 FE EN"],  setAsme: "Set 1B" },
-    10: { iso: "W8", diaMm: 0.63, diaIn: 0.0250, setIso: ["6 FE EN"],             setAsme: "Set 1B" },
-    11: { iso: "W7", diaMm: 0.80, diaIn: 0.0320, setIso: ["6 FE EN"],             setAsme: "Set 1B of Set 1C" },
-    12: { iso: "W6", diaMm: 1.00, diaIn: 0.0400, setIso: ["6 FE EN"],             setAsme: "Set 1C" },
-    13: { iso: "W5", diaMm: 1.25, diaIn: 0.0500, setIso: ["1 FE EN", "6 FE EN"],  setAsme: "Set 1C" },
+    6: { iso: "W12", diaMm: 0.25, diaIn: 0.0100, setIso: ["6 FE EN", "10 FE EN"],   setAsme: "Set 1A of Set 1B" },
+    7: { iso: "W11", diaMm: 0.32, diaIn: 0.0125, setIso: ["6 FE EN", "10 FE EN"],   setAsme: "Set 1B" },
+    8: { iso: "W10", diaMm: 0.40, diaIn: 0.0160, setIso: ["6 FE EN", "10 FE EN"],   setAsme: "Set 1B" },
+    9: { iso: "W9",  diaMm: 0.50, diaIn: 0.0200, setIso: ["6 FE EN"],               setAsme: "Set 1B" },
+    10: { iso: "W8", diaMm: 0.63, diaIn: 0.0250, setIso: ["6 FE EN"],               setAsme: "Set 1B" },
+    11: { iso: "W7", diaMm: 0.80, diaIn: 0.0320, setIso: ["1 FE EN", "6 FE EN"],    setAsme: "Set 1B of Set 1C" },
+    12: { iso: "W6", diaMm: 1.00, diaIn: 0.0400, setIso: ["1 FE EN", "6 FE EN"],    setAsme: "Set 1C" },
+    13: { iso: "W5", diaMm: 1.25, diaIn: 0.0500, setIso: ["1 FE EN"],               setAsme: "Set 1C" },
     14: { iso: "W4", diaMm: 1.60, diaIn: 0.0630, setIso: ["1 FE EN"],             setAsme: "Set 1C" },
     15: { iso: "W3", diaMm: 2.00, diaIn: 0.0800, setIso: ["1 FE EN"],             setAsme: "Set 1C" },
     16: { iso: "W2", diaMm: 2.50, diaIn: 0.1000, setIso: ["1 FE EN"],             setAsme: "Set 1C" },
@@ -1979,14 +2186,14 @@
     return `<strong>Vergelijkingstabel ASME (ASTM E747) vs EN (ISO 19232-1) draadjes:</strong><br><br>` +
            `• <strong>ASME 4</strong> (0.16 mm) &harr; <strong>EN W14</strong> (houder 10 FE EN / 13 FE EN)<br>` +
            `• <strong>ASME 5</strong> (0.20 mm) &harr; <strong>EN W13</strong> (houder 10 FE EN / 13 FE EN)<br>` +
-           `• <strong>ASME 6</strong> (0.25 mm) &harr; <strong>EN W12</strong> (houder 10 FE EN / 13 FE EN)<br>` +
-           `• <strong>ASME 7</strong> (0.32 mm) &harr; <strong>EN W11</strong> (houder 10 FE EN / 13 FE EN)<br>` +
-           `• <strong>ASME 8</strong> (0.40 mm) &harr; <strong>EN W10</strong> (houder 10 FE EN / 13 FE EN)<br>` +
-           `• <strong>ASME 9</strong> (0.50 mm) &harr; <strong>EN W9</strong> (houder 6 FE EN / 10 FE EN)<br>` +
+           `• <strong>ASME 6</strong> (0.25 mm) &harr; <strong>EN W12</strong> (houder 6 FE EN / 10 FE EN)<br>` +
+           `• <strong>ASME 7</strong> (0.32 mm) &harr; <strong>EN W11</strong> (houder 6 FE EN / 10 FE EN)<br>` +
+           `• <strong>ASME 8</strong> (0.40 mm) &harr; <strong>EN W10</strong> (houder 6 FE EN / 10 FE EN)<br>` +
+           `• <strong>ASME 9</strong> (0.50 mm) &harr; <strong>EN W9</strong> (houder 6 FE EN)<br>` +
            `• <strong>ASME 10</strong> (0.63 mm) &harr; <strong>EN W8</strong> (houder 6 FE EN)<br>` +
-           `• <strong>ASME 11</strong> (0.80 mm) &harr; <strong>EN W7</strong> (houder 6 FE EN)<br>` +
-           `• <strong>ASME 12</strong> (1.00 mm) &harr; <strong>EN W6</strong> (houder 6 FE EN)<br>` +
-           `• <strong>ASME 13</strong> (1.25 mm) &harr; <strong>EN W5</strong> (houder 1 FE EN / 6 FE EN)<br><br>` +
+           `• <strong>ASME 11</strong> (0.80 mm) &harr; <strong>EN W7</strong> (houder 1 FE EN / 6 FE EN)<br>` +
+           `• <strong>ASME 12</strong> (1.00 mm) &harr; <strong>EN W6</strong> (houder 1 FE EN / 6 FE EN)<br>` +
+           `• <strong>ASME 13</strong> (1.25 mm) &harr; <strong>EN W5</strong> (houder 1 FE EN)<br><br>` +
            `⚠️ <strong>Belangrijke normregel:</strong><br>` +
            `• ✅ <strong>ASME:</strong> Toegestaan om EN/ISO draadjes te gebruiken.<br>` +
            `• ❌ <strong>EN (ISO 17636-1):</strong> <u>Niet</u> toegestaan om ASME draadjes te gebruiken.`;

@@ -4,13 +4,13 @@
   function berekenAfzetting(params, vraagTekst, chips = []) {
     const lower = (vraagTekst || "").toLowerCase();
 
-    // Specifieke vraag naar halveringsdikte (HVL) van lood / staal voor Ir-192 en Se-75
+    // Specifieke vraag naar halveringsdikte (HVL) van lood / staal / beton / baksteen voor Ir-192 en Se-75
     if (/\b(halveringsdikte|halveringsdiktes|hvl)\b/i.test(lower)) {
       if (chips) chips.push("Afzetting Ir-192", "Afzetting Se-75", "6 mm lood");
       return (
         `<strong>Halveringsdiktes (HVL) voor afscherming (conform <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>):</strong><br>` +
-        `• <strong>Iridium-192 (Ir-192):</strong> <strong>3 mm lood (Pb)</strong> (en <strong>13 mm staal (Fe)</strong>).<br>` +
-        `• <strong>Seleen-75 (Se-75):</strong> <strong>2 mm lood (Pb)</strong> (en <strong>5 mm staal (Fe)</strong>).`
+        `• <strong>Iridium-192 (Ir-192):</strong> <strong>3 mm lood (Pb)</strong>, <strong>13 mm staal (Fe)</strong>, <strong>45 mm beton</strong> en <strong>60 mm baksteen</strong>.<br>` +
+        `• <strong>Seleen-75 (Se-75):</strong> <strong>2 mm lood (Pb)</strong>, <strong>5 mm staal (Fe)</strong>, <strong>30 mm beton</strong> en <strong>40 mm baksteen</strong>.`
       );
     }
 
@@ -74,12 +74,25 @@
 
     const pb = params.pbMm || 0;
     const fe = params.feMm || 0;
+    const beton = params.betonMm || 0;
+    const baksteen = params.baksteenMm || 0;
     const dosis = params.dosisGrens || 10;
 
     const k = isIr ? 0.13 : 0.054;
     const hvlPb = isIr ? 3 : 2;
     const hvlFe = isIr ? 13 : 5;
+    const hvlBeton = isIr ? 45 : 30;
+    const hvlBaksteen = isIr ? 60 : 40;
     const collimatorFactor = isIr ? 0.012 : 0.05; // Ir: 1/85, Se: 1/20
+
+    const maakAfschermDelen = (inclPb = true, loodSuffix = "") => {
+      const delen = [];
+      if (inclPb && pb > 0) delen.push(`${pb} mm lood (Pb)${loodSuffix}`);
+      if (fe > 0) delen.push(`${fe} mm staal (Fe)`);
+      if (beton > 0) delen.push(`${beton >= 10 && beton % 10 === 0 ? `${beton / 10} cm (${beton} mm)` : `${beton} mm`} beton`);
+      if (baksteen > 0) delen.push(`${baksteen >= 10 && baksteen % 10 === 0 ? `${baksteen / 10} cm (${baksteen} mm)` : `${baksteen} mm`} baksteen`);
+      return delen;
+    };
 
     // Bepaal sub-modus (lood_nodig, dosistempo_op_afstand, of afzettingsafstand) met behoud voor vervolgvragen
     const isDosistempoExpliciet =
@@ -111,6 +124,41 @@
       actiefGespreksGeheugen.afzettingDoelMeter = doelM;
     }
 
+    // Als de gebruiker alleen "een muur van X cm" noemt zonder beton/baksteen te specificeren: vraag eerst om het materiaal!
+    if (params.muurOnbekendMm && params.muurOnbekendMm > 0 && beton === 0 && baksteen === 0) {
+      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+        actiefGespreksGeheugen.verwachtParameter = "muurMateriaal";
+        actiefGespreksGeheugen.muurOnbekendMm = params.muurOnbekendMm;
+      }
+      const muurLabel = params.muurOnbekendMm >= 10 && params.muurOnbekendMm % 10 === 0
+        ? `${params.muurOnbekendMm / 10} cm (${params.muurOnbekendMm} mm)`
+        : `${params.muurOnbekendMm} mm`;
+      if (chips) chips.push("Beton", "Baksteen");
+      return `Je noemt een <strong>muur van ${muurLabel}</strong>. Gaat het om <strong>beton</strong> (HVL ${hvlBeton} mm voor ${bronType}) of <strong>baksteen</strong> (HVL ${hvlBaksteen} mm voor ${bronType})?`;
+    }
+
+    // Als de gebruiker een muur noemt zónder dikte ("achter een muur op 5 meter" of "achter een betonnen muur op 5 meter"):
+    const noemtMuurZonderDikte =
+      beton === 0 &&
+      baksteen === 0 &&
+      !(params.muurOnbekendMm && params.muurOnbekendMm > 0) &&
+      !/\b(zonder|geen)\s+(?:beton(?:nen)?|bakste(?:en|nen)|muur|tussenmuur|afscherming)\b/i.test(lower) &&
+      /\b(muur|betonmuur|betonnen\s*muur|baksteenmuur|bakstenen\s*muur|tussenmuur|scheidingsmuur|metselwerk)\b/i.test(lower);
+    if (noemtMuurZonderDikte) {
+      const isBetonGenoemd = /\b(beton|betonnen|betonmuur)\b/i.test(lower);
+      const isBaksteenGenoemd = /\b(baksteen|bakstenen|baksteenmuur|metselwerk)\b/i.test(lower);
+      if (isBetonGenoemd) {
+        if (chips) chips.push("10 cm beton", "15 cm beton", "20 cm beton", "30 cm beton");
+        return `Hoe dik is de <strong>betonnen muur</strong> (in cm)?`;
+      }
+      if (isBaksteenGenoemd) {
+        if (chips) chips.push("10 cm baksteen", "15 cm baksteen", "20 cm baksteen", "30 cm baksteen");
+        return `Hoe dik is de <strong>bakstenen muur</strong> (in cm)?`;
+      }
+      if (chips) chips.push("10 cm beton", "20 cm beton", "10 cm baksteen", "20 cm baksteen");
+      return `Je noemt een <strong>muur</strong>, maar de dikte en het materiaal zijn nog niet bekend. Hoe dik is de muur (in cm) en gaat het om <strong>beton</strong> of <strong>baksteen</strong>?`;
+    }
+
     // Specifieke vraag 1: "Wat is het dosistempo op X meter afstand?" (omgevormde afzettingsformule)
     if (subModus === "dosistempo_op_afstand") {
       if (!doelM || doelM <= 0) {
@@ -123,12 +171,21 @@
       if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.verwachtParameter === "afzettingDoelMeter") {
         actiefGespreksGeheugen.verwachtParameter = null;
       }
-      const atten = Math.pow(0.5, pb / hvlPb) * Math.pow(0.5, fe / hvlFe);
+      const atten =
+        Math.pow(0.5, pb / hvlPb) *
+        Math.pow(0.5, fe / hvlFe) *
+        Math.pow(0.5, beton / hvlBeton) *
+        Math.pow(0.5, baksteen / hvlBaksteen);
       const dtOpen = (ci * 37000 * k * atten) / (doelM * doelM);
       const dtCollimator = dtOpen * collimatorFactor;
-      const afschermTxt = pb > 0 || fe > 0
-        ? ` met ${pb > 0 ? pb + " mm lood" : ""}${pb > 0 && fe > 0 ? " en " : ""}${fe > 0 ? fe + " mm staal" : ""}`
+      const afschermDelen = maakAfschermDelen(true);
+      const afschermTxt = afschermDelen.length > 0
+        ? ` met ${afschermDelen.join(" en ")}`
         : " zonder afscherming";
+      const hvlHintDelen = [];
+      if (beton > 0) hvlHintDelen.push(`HVL beton = ${hvlBeton} mm`);
+      if (baksteen > 0) hvlHintDelen.push(`HVL baksteen = ${hvlBaksteen} mm`);
+      const hvlHint = hvlHintDelen.length > 0 ? ` • ${hvlHintDelen.join(", ")}` : "";
       if (chips && chips.length === 0) {
         chips.push(`Hoeveel lood nodig op ${doelM} meter`, "Op 10 meter", "Op 15 meter", isIr ? "Sterkste Se-75" : "Sterkste Ir-192");
       }
@@ -136,7 +193,7 @@
         `Dosistempo op <strong>${doelM} meter</strong> afstand bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${afschermTxt}:<br>` +
         `• In de open bundel: <strong>${dtOpen.toFixed(1)} μSv/uur</strong> (${(dtOpen / 1000).toFixed(2)} mSv/uur).<br>` +
         `• Achter een standaard collimator: <strong>${dtCollimator.toFixed(1)} μSv/uur</strong>.<br>` +
-        `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>).</small>`
+        `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>${hvlHint}).</small>`
       );
     }
 
@@ -152,11 +209,19 @@
       if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.verwachtParameter === "afzettingDoelMeter") {
         actiefGespreksGeheugen.verwachtParameter = null;
       }
-      const onafgeschermdOpen = Math.sqrt((ci * 37000 * k) / dosis);
-      const collimatorAfst = Math.sqrt((ci * 37000 * k * collimatorFactor) / dosis);
-      const verhoudingOpen = (ci * 37000 * k) / (doelM * doelM * dosis);
+      const attenBestaand =
+        Math.pow(0.5, fe / hvlFe) *
+        Math.pow(0.5, beton / hvlBeton) *
+        Math.pow(0.5, baksteen / hvlBaksteen);
+      const heeftBestaandeAfscherming = (fe > 0 || beton > 0 || baksteen > 0);
+      const bestaandDelen = maakAfschermDelen(false);
+      const bestaandLabel = heeftBestaandeAfscherming ? ` incl. ${bestaandDelen.join(" en ")}` : "";
+
+      const openAfstVoorLood = Math.sqrt((ci * 37000 * k * attenBestaand) / dosis);
+      const collAfstVoorLood = Math.sqrt((ci * 37000 * k * collimatorFactor * attenBestaand) / dosis);
+      const verhoudingOpen = (ci * 37000 * k * attenBestaand) / (doelM * doelM * dosis);
       const benodigdPbOpen = verhoudingOpen > 1 ? hvlPb * Math.log2(verhoudingOpen) : 0;
-      const verhoudingColl = (ci * 37000 * k * collimatorFactor) / (doelM * doelM * dosis);
+      const verhoudingColl = (ci * 37000 * k * collimatorFactor * attenBestaand) / (doelM * doelM * dosis);
       const benodigdPbColl = verhoudingColl > 1 ? hvlPb * Math.log2(verhoudingColl) : 0;
 
       const pbOpenCeil = benodigdPbOpen > 0 ? Math.ceil(benodigdPbOpen) : 0;
@@ -166,24 +231,39 @@
         chips.push("Op 8 meter", "Op 10 meter", "Op 15 meter", isIr ? "Sterkste Se-75" : "Sterkste Ir-192", `Dosistempo op ${doelM} meter`);
       }
 
-      let loodResp = `Om bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam} op een afzettingsafstand van <strong>${doelM} meter</strong> (bij ${dosis} μSv/h) uit te komen (halveringsdikte lood HVL = ${hvlPb} mm):<br>` +
-        `• <strong>In de open bundel (richting van de bundel):</strong> <strong>${pbOpenCeil} mm lood</strong> nodig (reduceert de open bundel van ${onafgeschermdOpen.toFixed(1)} m naar &le; ${doelM} m).<br>`;
-      if (pbCollCeil <= 0) {
-        loodResp += `• <strong>Achter een standaard collimator:</strong> <strong>0 mm extra lood</strong> nodig (de afzettingsafstand achter de collimator is al <strong>${collimatorAfst.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
+      const hvlExtra = [];
+      if (beton > 0) hvlExtra.push(`HVL beton = ${hvlBeton} mm`);
+      if (baksteen > 0) hvlExtra.push(`HVL baksteen = ${hvlBaksteen} mm`);
+      if (fe > 0) hvlExtra.push(`HVL staal = ${hvlFe} mm`);
+      const hvlInfo = hvlExtra.length > 0 ? `, ${hvlExtra.join(", ")}` : "";
+
+      let loodResp = `Om bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${bestaandLabel} op een afzettingsafstand van <strong>${doelM} meter</strong> (bij ${dosis} μSv/h) uit te komen (HVL lood = ${hvlPb} mm${hvlInfo}):<br>`;
+      if (pbOpenCeil <= 0) {
+        const redenOpen = bestaandDelen.length > 0 ? `met ${bestaandDelen.join(" en ")} ` : "";
+        loodResp += `• <strong>In de open bundel:</strong> <strong>0 mm extra lood</strong> nodig (${redenOpen}is de afzettingsafstand al <strong>${openAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
       } else {
-        loodResp += `• <strong>Achter een standaard collimator:</strong> nog <strong>${pbCollCeil} mm extra lood</strong> nodig (reduceert van ${collimatorAfst.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+        loodResp += `• <strong>In de open bundel (richting van de bundel):</strong> <strong>${pbOpenCeil} mm lood</strong> nodig (reduceert van ${openAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+      }
+      if (pbCollCeil <= 0) {
+        loodResp += `• <strong>Achter een standaard collimator:</strong> <strong>0 mm extra lood</strong> nodig (de afzettingsafstand achter de collimator is al <strong>${collAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
+      } else {
+        loodResp += `• <strong>Achter een standaard collimator:</strong> nog <strong>${pbCollCeil} mm extra lood</strong> nodig (reduceert van ${collAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
       }
       loodResp += `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>).</small>`;
       return loodResp;
     }
 
-    // Basis / puur (zonder externe lood/staal afscherming)
+    // Basis / puur (zonder externe lood/staal/muur afscherming)
     const afzettingOpenPuur = Math.sqrt((ci * 37000 * k) / dosis);
     const collimatorAfstandPuur = Math.sqrt((ci * 37000 * k * collimatorFactor) / dosis);
 
-    // Met externe afscherming (loodplaat / pb / fe)
-    const hasAfscherming = (pb > 0 || fe > 0);
-    const attenAfscherming = Math.pow(0.5, pb / hvlPb) * Math.pow(0.5, fe / hvlFe);
+    // Met externe afscherming (loodplaat / pb / fe / beton / baksteen)
+    const hasAfscherming = (pb > 0 || fe > 0 || beton > 0 || baksteen > 0);
+    const attenAfscherming =
+      Math.pow(0.5, pb / hvlPb) *
+      Math.pow(0.5, fe / hvlFe) *
+      Math.pow(0.5, beton / hvlBeton) *
+      Math.pow(0.5, baksteen / hvlBaksteen);
     const afzettingOpenMetAfscherming = Math.sqrt((ci * 37000 * k * attenAfscherming) / dosis);
     const collimatorAfstandMetAfscherming = Math.sqrt((ci * 37000 * k * collimatorFactor * attenAfscherming) / dosis);
 
@@ -222,22 +302,24 @@
     const isLoodplaatGenoemd = /\b(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen)\b/i.test(lower) || Boolean(params.aantalLoodplaten);
     let loodplaatSuffix = "";
     let afschermKortLabel = "";
+    const kortDelen = [];
     if (isLoodplaatGenoemd && pb > 0) {
       const nPlaten = params.aantalLoodplaten || (pb % 6 === 0 ? pb / 6 : 1);
       loodplaatSuffix = nPlaten > 1
         ? ` [${nPlaten} loodplaten &times; 6 mm = ${pb} mm Pb]`
         : " [standaard loodplaat 6 mm Pb]";
-      afschermKortLabel = nPlaten > 1 ? `${nPlaten} loodplaten (${pb} mm Pb)` : `loodplaat (${pb} mm Pb)`;
-    } else if (pb > 0 && fe > 0) {
-      afschermKortLabel = `${pb} mm Pb + ${fe} mm staal`;
+      kortDelen.push(nPlaten > 1 ? `${nPlaten} loodplaten (${pb} mm Pb)` : `loodplaat (${pb} mm Pb)`);
     } else if (pb > 0) {
-      afschermKortLabel = `${pb} mm lood`;
-    } else if (fe > 0) {
-      afschermKortLabel = `${fe} mm staal`;
+      kortDelen.push(`${pb} mm lood`);
     }
+    if (fe > 0) kortDelen.push(`${fe} mm staal`);
+    if (beton > 0) kortDelen.push(`${beton >= 10 && beton % 10 === 0 ? `${beton / 10} cm` : `${beton} mm`} beton`);
+    if (baksteen > 0) kortDelen.push(`${baksteen >= 10 && baksteen % 10 === 0 ? `${baksteen / 10} cm` : `${baksteen} mm`} baksteen`);
+    afschermKortLabel = kortDelen.join(" + ");
 
+    const alleAfschermDelen = maakAfschermDelen(true, loodplaatSuffix);
     const afschermingInfo = hasAfscherming
-      ? ` met ${pb > 0 ? pb + " mm lood (Pb)" + loodplaatSuffix : ""}${pb > 0 && fe > 0 ? " en " : ""}${fe > 0 ? fe + " mm staal (Fe)" : ""}`
+      ? ` met ${alleAfschermDelen.join(" en ")}`
       : "";
 
     if (chips && chips.length === 0) {
@@ -251,12 +333,13 @@
 
     let resp = "";
     if (hasAfscherming) {
+      const exclLabel = (beton > 0 || baksteen > 0 || fe > 0) && pb === 0 ? "afscherming" : "loodafscherming";
       resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam}${afschermingInfo} bij norm ${dosis} μSv/h:<br><br>` +
              `• <strong>In de open bundel:</strong><br>` +
-             `&nbsp;&nbsp;– Excl. loodafscherming: <strong>${afzettingOpenPuur.toFixed(1)} meter</strong><br>` +
+             `&nbsp;&nbsp;– Excl. ${exclLabel}: <strong>${afzettingOpenPuur.toFixed(1)} meter</strong><br>` +
              `&nbsp;&nbsp;– Incl. ${afschermKortLabel}: <strong>${afzettingOpenMetAfscherming.toFixed(1)} meter</strong> afzetting.<br><br>` +
              `• <strong>Achter standaard collimator:</strong><br>` +
-             `&nbsp;&nbsp;– Alleen collimator (excl. lood): <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong><br>` +
+             `&nbsp;&nbsp;– Alleen collimator (excl. ${exclLabel}): <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong><br>` +
              `&nbsp;&nbsp;– Collimator + ${afschermKortLabel}: <strong>${collimatorAfstandMetAfscherming.toFixed(1)} meter</strong> afzetting.<br>`;
 
       if (doorstraaldStaal > 0) {
@@ -533,9 +616,18 @@
         const wmax = 2 * Math.sqrt(t * (De - t));
         const bronnen = bepaalOnstreamBronnen(wmax, techniek, wmaxKlasse);
         const { bronTekst, adviesTekst } = formatteerOnstreamBronnenMetAdvies(bronnen, wmax);
-        const maxWmaxTabel = {
-          ta: { "Se-75": 55, "Ir-192": 80, "Co-60": 120 },
-          tb: { "Se-75": 40, "Ir-192": 60, "Co-60": 85 }
+        const onstreamGrenzen = techniek === "dubbelwand"
+          ? {
+              ta: { "Se-75": [0, 40], "Ir-192": [10, 100], "Co-60": [40, 200] },
+              tb: { "Se-75": [0, 40], "Ir-192": [20, 90], "Co-60": [60, 200] }
+            }
+          : {
+              ta: { "Se-75": [0, 55], "Ir-192": [10, 80], "Co-60": [40, 120] },
+              tb: { "Se-75": [0, 40], "Ir-192": [15, 60], "Co-60": [50, 85] }
+            };
+        const bereikTekst = (bronKey, kl) => {
+          const [mn, mx] = onstreamGrenzen[kl][bronKey];
+          return mn > 0 ? `${mn}&ndash;${mx} mm` : `max. ${mx} mm`;
         };
         const isIrGekozen = /\b(iridium|ir[-\s]?192|ir192)\b/i.test(lower) || (params.bronTekst && /ir[-\s]?192|iridium/i.test(params.bronTekst)) || params.bronType === "Ir192";
         const isSeGekozen = /\b(selenium|seleen|se[-\s]?75|se75)\b/i.test(lower) || (params.bronTekst && /se[-\s]?75|selenium|seleen/i.test(params.bronTekst)) || params.bronType === "Se75";
@@ -543,14 +635,11 @@
 
         let extraWaarschuwing = "";
         if (isIrGekozen && !bronnen.includes("Ir-192")) {
-          const maxIr = maxWmaxTabel[wmaxKlasse]["Ir-192"];
-          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Ir-192 (Iridium)</strong> is NIET geschikt/toegestaan voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (maximaal toelaatbaar voor Ir-192 is <strong>${maxIr} mm</strong> voor Klasse ${wmaxKlasse.toUpperCase()} volgens Tabel 1 RT21021 / RT21022).`;
+          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Ir-192 (Iridium)</strong> is NIET geschikt/toegestaan voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (toelaatbaar bereik voor Ir-192 bij ${techniek} Klasse ${wmaxKlasse.toUpperCase()} is <strong>${bereikTekst("Ir-192", wmaxKlasse)}</strong> volgens Tabel 1 RT21021 / RT21022).`;
         } else if (isSeGekozen && !bronnen.includes("Se-75")) {
-          const maxSe = maxWmaxTabel[wmaxKlasse]["Se-75"];
-          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Se-75 (Selenium)</strong> is NIET geschikt/toegestaan voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (maximaal toelaatbaar voor Se-75 is <strong>${maxSe} mm</strong> voor Klasse ${wmaxKlasse.toUpperCase()} volgens Tabel 1 RT21021 / RT21022).`;
+          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Se-75 (Selenium)</strong> is NIET geschikt/toegestaan voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (toelaatbaar bereik voor Se-75 bij ${techniek} Klasse ${wmaxKlasse.toUpperCase()} is <strong>${bereikTekst("Se-75", wmaxKlasse)}</strong> volgens Tabel 1 RT21021 / RT21022).`;
         } else if (isCoGekozen && !bronnen.includes("Co-60")) {
-          const maxCo = maxWmaxTabel[wmaxKlasse]["Co-60"];
-          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Co-60 (Kobalt)</strong> is NIET geschikt voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (max. <strong>${maxCo} mm</strong> voor Klasse ${wmaxKlasse.toUpperCase()}).`;
+          extraWaarschuwing = `<br>• ❌ <strong>Let op:</strong> <strong>Co-60 (Kobalt)</strong> is NIET geschikt voor deze wanddikte! De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (toelaatbaar bereik bij ${techniek} Klasse ${wmaxKlasse.toUpperCase()} is <strong>${bereikTekst("Co-60", wmaxKlasse)}</strong>).`;
         }
 
         resp += `<br><br><div style="padding:8px 10px; background:rgba(255,255,255,0.05); border-left:3px solid ${extraWaarschuwing ? "#ff6b6b" : "#F5DF4D"}; border-radius:4px; font-size:0.92rem;">` +
@@ -586,31 +675,37 @@
     const wilKobalt = /\b(kobalt|co[-\s]?60|co60)\b/i.test(lower) || (params.bronTekst && /co[-\s]?60|kobalt/i.test(params.bronTekst)) || params.bronType === "Co60";
     const isWmaxVraag = /\b(wmax|w-max|wat\s+is\s+de\s+w)\b/i.test(lower);
 
-    const maxWmaxTabel = {
-      ta: { "Se-75": 55, "Ir-192": 80, "Co-60": 120 },
-      tb: { "Se-75": 40, "Ir-192": 60, "Co-60": 85 }
+    const onstreamGrenzen2 = techniek === "dubbelwand"
+      ? {
+          ta: { "Se-75": [0, 40], "Ir-192": [10, 100], "Co-60": [40, 200] },
+          tb: { "Se-75": [0, 40], "Ir-192": [20, 90], "Co-60": [60, 200] }
+        }
+      : {
+          ta: { "Se-75": [0, 55], "Ir-192": [10, 80], "Co-60": [40, 120] },
+          tb: { "Se-75": [0, 40], "Ir-192": [15, 60], "Co-60": [50, 85] }
+        };
+    const bereikLabel = (bronKey) => {
+      const [mn, mx] = onstreamGrenzen2[effectiveKlasse][bronKey];
+      return mn > 0 ? `${mn}&ndash;${mx} mm` : `max. ${mx} mm`;
     };
-    const maxIr = maxWmaxTabel[effectiveKlasse]["Ir-192"];
-    const maxSe = maxWmaxTabel[effectiveKlasse]["Se-75"];
-    const maxCo = maxWmaxTabel[effectiveKlasse]["Co-60"];
 
     if (wilIridium) {
       if (bronnen.includes("Ir-192")) {
-        regels.push(`✅ <strong>Ja, Ir-192 (Iridium) is toegestaan/geschikt!</strong> (Wmax = <strong>${wmax.toFixed(1)} mm</strong> &le; max toelaatbaar <strong>${maxIr} mm</strong> voor Klasse ${effectiveKlasse.toUpperCase()} conform Tabel 1 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
+        regels.push(`✅ <strong>Ja, Ir-192 (Iridium) is toegestaan/geschikt!</strong> (Wmax = <strong>${wmax.toFixed(1)} mm</strong> binnen toelaatbaar bereik <strong>${bereikLabel("Ir-192")}</strong> voor ${techniek} Klasse ${effectiveKlasse.toUpperCase()} conform Tabel 1 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
       } else {
-        regels.push(`❌ <strong>Nee, Ir-192 (Iridium) is NIET geschikt/toegestaan voor deze onstream opname!</strong> De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (maximaal toelaatbaar voor Ir-192 is <strong>${maxIr} mm</strong> voor Klasse ${effectiveKlasse.toUpperCase()} volgens Tabel 1 RT21021 / RT21022 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
+        regels.push(`❌ <strong>Nee, Ir-192 (Iridium) is NIET geschikt/toegestaan voor deze onstream opname!</strong> De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (toelaatbaar bereik voor Ir-192 bij ${techniek} Klasse ${effectiveKlasse.toUpperCase()} is <strong>${bereikLabel("Ir-192")}</strong> volgens Tabel 1 RT21021 / RT21022 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
       }
     } else if (wilSelenium) {
       if (bronnen.includes("Se-75")) {
-        regels.push(`✅ <strong>Ja, Se-75 (Selenium) is toegestaan/geschikt!</strong> (Wmax = <strong>${wmax.toFixed(1)} mm</strong> &le; max toelaatbaar <strong>${maxSe} mm</strong> voor Klasse ${effectiveKlasse.toUpperCase()} conform Tabel 1 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
+        regels.push(`✅ <strong>Ja, Se-75 (Selenium) is toegestaan/geschikt!</strong> (Wmax = <strong>${wmax.toFixed(1)} mm</strong> binnen toelaatbaar bereik <strong>${bereikLabel("Se-75")}</strong> voor ${techniek} Klasse ${effectiveKlasse.toUpperCase()} conform Tabel 1 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
       } else {
-        regels.push(`❌ <strong>Nee, Se-75 (Selenium) is NIET geschikt/toegestaan voor deze onstream opname!</strong> De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (maximaal toelaatbaar voor Se-75 is <strong>${maxSe} mm</strong> voor Klasse ${effectiveKlasse.toUpperCase()} volgens Tabel 1 RT21021 / RT21022 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
+        regels.push(`❌ <strong>Nee, Se-75 (Selenium) is NIET geschikt/toegestaan voor deze onstream opname!</strong> De berekende doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (toelaatbaar bereik voor Se-75 bij ${techniek} Klasse ${effectiveKlasse.toUpperCase()} is <strong>${bereikLabel("Se-75")}</strong> volgens Tabel 1 RT21021 / RT21022 / <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).`);
       }
     } else if (wilKobalt) {
       if (bronnen.includes("Co-60")) {
-        regels.push(`✅ <strong>Ja, Co-60 (Kobalt) is toegestaan/geschikt!</strong> (Wmax = <strong>${wmax.toFixed(1)} mm</strong> &le; max toelaatbaar <strong>${maxCo} mm</strong> voor Klasse ${effectiveKlasse.toUpperCase()} conform Tabel 1).`);
+        regels.push(`✅ <strong>Ja, Co-60 (Kobalt) is toegestaan/geschikt!</strong> (Wmax = <strong>${wmax.toFixed(1)} mm</strong> binnen toelaatbaar bereik <strong>${bereikLabel("Co-60")}</strong> voor ${techniek} Klasse ${effectiveKlasse.toUpperCase()} conform Tabel 1).`);
       } else {
-        regels.push(`❌ <strong>Nee, Co-60 (Kobalt) is NIET geschikt voor deze onstream opname!</strong> De doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (boven de maximale grenswaarde van <strong>${maxCo} mm</strong> voor Klasse ${effectiveKlasse.toUpperCase()} volgens Tabel 1).`);
+        regels.push(`❌ <strong>Nee, Co-60 (Kobalt) is NIET geschikt voor deze onstream opname!</strong> De doorstraalde wanddikte Wmax is <strong>${wmax.toFixed(1)} mm</strong> (toelaatbaar bereik bij ${techniek} Klasse ${effectiveKlasse.toUpperCase()} is <strong>${bereikLabel("Co-60")}</strong> volgens Tabel 1).`);
       }
     }
 
@@ -823,7 +918,7 @@
     const isCentraal = /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower) || params.optie === "1" || isRondstralerBron(params, lower);
     const isExcentrisch = /\bexcentrisch/i.test(lower) || params.optie === "2";
     const isDWDI =
-      (De && De < 100 && !isCentraal && !isExcentrisch) ||
+      (De && De <= 100 && !isCentraal && !isExcentrisch) ||
       params.technique === "DWDI" ||
       /\b(dwdi|ovaal|ovaaltje|verzet)\b/i.test(lower);
 
@@ -920,7 +1015,7 @@
     if (isExcentrisch) return null;
 
     const isDWDI =
-      (De < 100 && params.technique !== "DWSI" && !lower.includes("dwsi")) ||
+      (De <= 100 && params.technique !== "DWSI" && !lower.includes("dwsi")) ||
       params.technique === "DWDI" ||
       /\b(dwdi|ovaal|ovaaltje|verzet)\b/i.test(lower);
     if (isDWDI) return null;
@@ -1271,8 +1366,9 @@
     }
 
     function formatTijd(minutenDecimaal) {
-      const m = Math.floor(minutenDecimaal);
-      const s = Math.round((minutenDecimaal - m) * 60);
+      let m = Math.floor(minutenDecimaal);
+      let s = Math.round((minutenDecimaal - m) * 60);
+      if (s === 60) { m++; s = 0; }
       if (m === 0) return `${s} seconden`;
       const mStr = m === 1 ? "1 minuut" : `${m} minuten`;
       if (s === 0) return mStr;
@@ -1506,14 +1602,14 @@
     const omtrek = De * Math.PI;
     const omtrekCm = (omtrek / 10).toFixed(1);
 
-    // 1. Diameter < 100 mm (DWDI - Dubbelwand Dubbelbeeld)
-    if (De < 100) {
+    // 1. Diameter <= 100 mm (DWDI - Dubbelwand Dubbelbeeld)
+    if (De <= 100) {
       if (params.wanddikte && params.wanddikte > 8) {
         return `Voor ${diaLabel} met een wanddikte van <strong>${params.wanddikte} mm</strong> (&gt; 8 mm):<br>` +
                `• Ovaaltjes schieten (opstelling 11 / F) is <strong>niet toegestaan</strong> boven 8 mm wanddikte.<br>` +
                `• Vereist: <strong>3 opnames onder 60° of 120°</strong> recht door de las (<strong>Opstelling 12 / G, superpositie</strong>).`;
       }
-      return `Voor ${diaLabel} (diameter &lt; 100 mm via DWDI):<br>` +
+      return `Voor ${diaLabel} (diameter &le; 100 mm via DWDI):<br>` +
              `• <strong>2 opnames onder 90°</strong> als ovaaltjes worden geschoten (opstelling 11 / F, mits wanddikte &le; 8 mm en lasbreedte &le; ${(De / 4).toFixed(1)} mm).<br>` +
              `• <strong>3 opnames onder 60° of 120°</strong> als er recht door de las (opstelling 12 / G, superpositie) wordt geschoten.`;
     }
@@ -1765,7 +1861,8 @@
       const werkelijkeFfd = De / 2;
       let minFfd = 0;
       if (proc === "ASME") {
-        minFfd = ((b * t) / 0.51) + t;
+        const ugMax = t < 50 ? 0.51 : (t < 75 ? 0.76 : (t <= 100 ? 1.02 : 1.78));
+        minFfd = ((b * t) / ugMax) + t;
       } else {
         const factor = proc === "EN-A" ? 7.5 : 15;
         minFfd = (b * factor * Math.pow(t, 2 / 3) * 0.5) + t;
@@ -1880,7 +1977,8 @@
 
       let minFfd = 0;
       if (proc === "ASME") {
-        minFfd = ((b * t) / 0.51) + t;
+        const ugMax = t < 50 ? 0.51 : (t < 75 ? 0.76 : (t <= 100 ? 1.02 : 1.78));
+        minFfd = ((b * t) / ugMax) + t;
       } else {
         const factor = proc === "EN-A" ? 7.5 : 15;
         minFfd = (b * factor * Math.pow(t, 2 / 3) * 0.8) + t;
@@ -2003,7 +2101,7 @@
     const diaLabel = De ? formatMmNaarDuimLabel(De) : "vlakke plaat";
     const isCentraal = /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower) || params.optie === "1" || isRondstralerBron(params, lower);
     const isExcentrisch = /\bexcentrisch/i.test(lower) || params.optie === "2";
-    const isDWDI = (De && De < 100 && !isCentraal && !isExcentrisch) || params.technique === "DWDI" || /\b(dwdi|ovaal|ovaaltje|verzet)\b/i.test(lower);
+    const isDWDI = (De && De <= 100 && !isCentraal && !isExcentrisch) || params.technique === "DWDI" || /\b(dwdi|ovaal|ovaaltje|verzet)\b/i.test(lower);
 
     let ofa = 0;
     if (params.ofa && params.ofa > 0) {
@@ -2327,6 +2425,14 @@
     }
 
     if (wilMinFocus && targetFilm) {
+      if (customAngle && customAngle > 0 && customAngle < 180) {
+        const customRad = (customAngle / 2) * (Math.PI / 180);
+        const minFfdCustom = Math.ceil((targetFilm / 2) / Math.tan(customRad));
+        const flStr = targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm";
+        return `Om <strong>${flStr}</strong> (${targetFilm} mm) te belichten bij een openingshoek van <strong>${customAngle}°</strong>:<br>` +
+               `• Minimaal vereiste focusafstand: <strong>${minFfdCustom} mm</strong> (${(minFfdCustom / 10).toFixed(1)} cm &approx; ${Math.round(minFfdCustom / 10)} cm).<br>` +
+               `<small style="opacity: 0.85;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small>`;
+      }
       const angleSmallRad = (tube.axes.small / 2) * (Math.PI / 180);
       const angleLargeVal = tube.axes.large === 360 ? 40 : tube.axes.large;
       const angleLargeRad = (angleLargeVal / 2) * (Math.PI / 180);
