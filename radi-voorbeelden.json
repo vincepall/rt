@@ -91,6 +91,12 @@
   },
   {
     "categorie": "Opstelling & Opnames",
+    "type": "Aantal opnames rondnaad met röntgenbuis (X-ray)",
+    "voorbeeld": "ASME, Balteau, hoeveel opnames moet ik maken op een 8 duimer van 7.8 mm dik?",
+    "toelichting": "Gebruikt bij röntgenbuizen automatisch De + 150 mm als voorgestelde FFD (en bij Balteau Rondstraler centraal De / 2)."
+  },
+  {
+    "categorie": "Opstelling & Opnames",
     "type": "Aantal opnames kleine diameter (DWDI <= 100 mm)",
     "voorbeeld": "Hoeveel opnames op een 2 duimer van 12 mm dik?",
     "toelichting": "Bepaalt of 2 opnames (ovaaltje, <= 8 mm) of 3 opnames (superpositie, > 8 mm) nodig zijn."
@@ -151,6 +157,12 @@
   },
   {
     "categorie": "FFD, Ug & Bundel",
+    "type": "Minimale FFD met directe OFA & brongrootte (ASME)",
+    "voorbeeld": "Wat is de minimale FFD volgens ASME als ik een brongrootte heb van 3 mm en mijn OFA is 50 mm?",
+    "toelichting": "Rekent direct met brongrootte en OFA en vraagt bij ASME de wanddikte (wt) voor de juiste Ug-grens conform MinFFD.html."
+  },
+  {
+    "categorie": "FFD, Ug & Bundel",
     "type": "Controle contactopname (bron op de pijp)",
     "voorbeeld": "Kan ik met de bron op de pijp zitten bij een 8 duimer van 8 mm dik en focus 2 mm (klasse B)?",
     "toelichting": "Vergelijkt de voorgestelde FFD op de buis met de minimaal vereiste FFD."
@@ -174,10 +186,16 @@
     "toelichting": "Berekent de uitgelichte bundelbreedte voor een standaard gammacollimator of Balteau Ceram 300."
   },
   {
+    "categorie": "FFD, Ug & Bundel",
+    "type": "Minimale focus bij eigen openingshoek & filmlengte",
+    "voorbeeld": "Welke focus heb ik nodig voor een 48 cm film bij een openingshoek van 35 graden?",
+    "toelichting": "Berekent de benodigde focusafstand voor elke gewenste filmlengte en bundelhoek."
+  },
+  {
     "categorie": "Draadjes & 2T-gat",
-    "type": "Vereist BKI-draadje op plaat (SWSI)",
-    "voorbeeld": "Welk draadje moet ik zien volgens ASME op een wanddikte van 10 mm?",
-    "toelichting": "Bepaalt het vereiste EN/ASME draadje en de bijbehorende BKI-houder (standaard SWSI zonder diameter)."
+    "type": "Vereist BKI-draadje op plaat (ASME + lasoverdikte)",
+    "voorbeeld": "Welk draadje moet ik zien op een plaat van 6 mm volgens ASME?",
+    "toelichting": "Bepaalt direct het vereiste ASME/EN draadje en toont de afbeelding om optioneel lasoverdikte (Lastype A/B/C/D) mee te rekenen."
   },
   {
     "categorie": "Draadjes & 2T-gat",
@@ -247,9 +265,33 @@
   },
   {
     "categorie": "Afzetting & Lood",
-    "type": "Halveringsdikte (HVL) lood & staal",
+    "type": "Benodigd lood achter een betonnen muur (sterkste bron)",
+    "voorbeeld": "Ik heb met de sterkste selenium een afzetting van 5 meter en er zit een betonnen muur tussen van 10 cm, hoeveel lood heb ik nodig?",
+    "toelichting": "Verrekent eerst de verzwakking van de betonnen muur (HVL 30 mm voor Se-75 / 45 mm voor Ir-192) en berekent daarna exact de resterende mm lood."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Dosistempo achter een bakstenen muur",
+    "voorbeeld": "Wat is het dosistempo op 10 meter achter een bakstenen muur van 15 cm met de sterkste iridium?",
+    "toelichting": "Berekent het dosistempo (open bundel & achter collimator) met verzwakking door baksteen (HVL 40 mm voor Se-75 / 60 mm voor Ir-192)."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Afzettingsafstand met betonnen of bakstenen muur",
+    "voorbeeld": "Wat is de afzettingsafstand voor 30 Ci Ir-192 met een betonnen muur van 20 cm?",
+    "toelichting": "Toont de afzettingsafstand excl. en incl. betonnen of bakstenen muur (je kunt daarna ook nog een loodplaat toevoegen)."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Onbekende muur ertussen (R.A.D.I. vraagt door)",
+    "voorbeeld": "Wat is het dosistempo achter een muur van 10 cm op 5 meter met de sterkste iridium?",
+    "toelichting": "Als je alleen 'muur' noemt zonder materiaal of dikte, vraagt R.A.D.I. gericht of het om beton of baksteen gaat."
+  },
+  {
+    "categorie": "Afzetting & Lood",
+    "type": "Halveringsdikte (HVL) lood, staal, beton & baksteen",
     "voorbeeld": "Welke halveringsdikte heeft lood voor Iridium-192 en voor Seleen-75?",
-    "toelichting": "Toont de halveringsdiktes van lood (Pb) en staal (Fe) voor Ir-192 en Se-75."
+    "toelichting": "Toont de halveringsdiktes van lood (Pb), staal (Fe), beton en baksteen voor Ir-192 en Se-75."
   },
   {
     "categorie": "Bronnen & Verval",
@@ -292,6 +334,12 @@
     "type": "Onstream bronkeuze & Wmax",
     "voorbeeld": "Welke bron moet ik kiezen voor onstream op een 6 duimer van 7.1 mm dik?",
     "toelichting": "Berekent de maximale doorstraalde wanddikte (Wmax) en adviseert Se-75, Ir-192 of Co-60."
+  },
+  {
+    "categorie": "Onstream & Schedule",
+    "type": "Onstream dubbelwand RT21022 broncontrole",
+    "voorbeeld": "Mag ik voor onstream dubbelwand klasse TA iridium gebruiken op een 6 duimer van 13 mm dik?",
+    "toelichting": "Controleert Wmax direct tegen de exacte onder- en bovengrens van RT21021 (tangentiaal) of RT21022 (dubbelwand)."
   },
   {
     "categorie": "Onstream & Schedule",
@@ -370,5 +418,47 @@
     "type": "kV-regel (Keverregel) & Buisspanning",
     "voorbeeld": "Wat is de keverregel en waarom beperken we de buisspanning?",
     "toelichting": "Verklaart het foto-elektrisch effect vs Compton-effect en de maximale kV formule uit EN ISO 17636-1."
+  },
+  {
+    "categorie": "Theorie & Kennis",
+    "type": "Geometrische onscherpte (Ug) bij ASME & EN",
+    "voorbeeld": "Hoe bereken ik de onscherpte bij ASME?",
+    "toelichting": "Geeft de Ug-formule, alle ASME-grenzen per wanddikte en het verschil met de EN ISO 17636-1 formule."
+  },
+  {
+    "categorie": "Theorie & Kennis",
+    "type": "ALARA-principe & stralingsbescherming",
+    "voorbeeld": "Wat is het ALARA principe?",
+    "toelichting": "Legt ALARA en de 3 basisregels van stralingsbescherming (Tijd, Afstand, Afscherming) uit."
+  },
+  {
+    "categorie": "Theorie & Kennis",
+    "type": "Halveringsdikte (HVL) & Tiendewaardelaag (TVL)",
+    "voorbeeld": "Wat is het verschil tussen halveringsdikte (HVL) en tiendewaardelaag (TVL)?",
+    "toelichting": "Toont de verzwakkingsformule en praktische HVL-waarden voor lood, staal, beton en baksteen."
+  },
+  {
+    "categorie": "Theorie & Kennis",
+    "type": "Loodfolie / Versterkingsschermen in de cassette",
+    "voorbeeld": "Waarom gebruiken we loodfolie in de filmcassette?",
+    "toelichting": "Legt de versterkende werking (foto-elektronen), filterwerking en aanbevolen diktes per kV/isotoop uit."
+  },
+  {
+    "categorie": "Theorie & Kennis",
+    "type": "Optische dichtheid / Zwarting formule",
+    "voorbeeld": "Wat is de formule van zwarting?",
+    "toelichting": "Geeft D = log10(I0 / I) en legt de lichtdoorlaat bij D = 1.0 t/m 4.0 uit."
+  },
+  {
+    "categorie": "Theorie & Kennis",
+    "type": "Radioactief verval formule",
+    "voorbeeld": "Hoe bereken ik het radioactief verval?",
+    "toelichting": "Toont de vervalformule A(t) = A0 × 0.5^(t / T½) met de halfwaardetijden van Ir-192, Se-75 en Co-60."
+  },
+  {
+    "categorie": "Theorie & Kennis",
+    "type": "Filmverwerking in de donkere kamer",
+    "voorbeeld": "Wat zijn de stappen van film ontwikkelen in de donkere kamer?",
+    "toelichting": "Legt alle 5 stappen uit: ontwikkelen, stopbad, fixeren, spoelen en drogen."
   }
 ]
