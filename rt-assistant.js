@@ -6602,7 +6602,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 05-calc-normen-iqi-kaart.js (2581 regels)
+  // MODULE: 05-calc-normen-iqi-kaart.js (2582 regels)
   // ==========================================================================
   // 9. Focus & Filmtype Calculator / Kwadratenwet (focusverandering.html)
   function convertFilmTime(seconds, fromFilm, toFilm) {
@@ -8585,7 +8585,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           `<div style="margin-top:10px; padding:8px 10px; background:rgba(245,223,77,0.08); border:1px solid rgba(245,223,77,0.35); border-radius:8px; font-size:0.88rem;">` +
           `💡 <strong>Wil je bij ASME extra lasoverdikte meerekenen?</strong> Kies hieronder het <strong>lastype (A, B, C of D)</strong> aan de hand van de afbeelding:` +
           `<div style="margin-top:8px; text-align:center;">` +
-          `<img src="Lascategorie.png" alt="ASME Lascategorieën A, B, C en D" style="max-width:100%; max-height:220px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#fff; padding:4px;">` +
+          `<img src="Lascategorie.png" alt="ASME Lascategorieën A, B, C en D" onclick="window.RtAssistant && window.RtAssistant.openAfbeeldingZoom('Lascategorie.png', 'ASME Lascategorieën A, B, C en D')" style="max-width:100%; max-height:220px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background:#fff; padding:4px; cursor:zoom-in;">` +
+          `<div style="font-size:0.78rem; color:#F5DF4D; margin-top:4px; opacity:0.9;">🔍 Tik op de afbeelding voor vergrootglas &amp; inzoomen</div>` +
           `</div></div>`;
       }
     }
@@ -9187,7 +9188,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 06-geheugen-en-vraagrouter.js (2185 regels)
+  // MODULE: 06-geheugen-en-vraagrouter.js (2182 regels)
   // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
@@ -9444,14 +9445,11 @@ ${stralingstijdPlat}========================================`;
         const entries = respEl.querySelectorAll(".rt-ai-history-entry");
         const lastEl = entries.length ? entries[entries.length - 1] : null;
         if (!lastEl) {
-          respEl.scrollTop = respEl.scrollHeight;
+          respEl.scrollTop = 0;
           return;
         }
-        if (lastEl.offsetHeight > respEl.clientHeight - 16) {
-          respEl.scrollTop = Math.max(0, lastEl.offsetTop - 8);
-        } else {
-          respEl.scrollTop = respEl.scrollHeight;
-        }
+        // Spring altijd naar het BEGIN van het nieuwste antwoord (zodat je bovenaan kunt beginnen met lezen)
+        respEl.scrollTop = Math.max(0, lastEl.offsetTop - 8);
       };
       scrollFn();
       if (typeof requestAnimationFrame === "function") requestAnimationFrame(scrollFn);
@@ -11376,7 +11374,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 07-ui-modal-styles.js (1225 regels)
+  // MODULE: 07-ui-modal-styles.js (1336 regels)
   // ==========================================================================
   // --- UI Controller (Universeel op elke pagina) ---
   let assistantModal = null;
@@ -11664,6 +11662,7 @@ ${stralingstijdPlat}========================================`;
         touch-action: none !important;
       }
       .rt-ai-response-box {
+        position: relative;
         background: #1e1e1e;
         border-left: 4px solid #F5DF4D;
         padding: 14px;
@@ -12364,6 +12363,116 @@ ${stralingstijdPlat}========================================`;
           padding-bottom: max(14px, env(safe-area-inset-bottom)) !important;
         }
       }
+      .rt-ai-img-lightbox {
+        position: fixed;
+        inset: 0;
+        z-index: 100005;
+        background: rgba(10, 12, 16, 0.96);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: max(10px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) 12px;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+      }
+      .rt-ai-img-lightbox-bar {
+        width: 100%;
+        max-width: 900px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        color: #fff;
+        font-family: 'Roboto Condensed', sans-serif;
+      }
+      .rt-ai-img-lightbox-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #F5DF4D;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .rt-ai-img-lightbox-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .rt-ai-img-zoom-btn {
+        background: #2b2f3a;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 8px;
+        padding: 6px 11px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'Roboto Condensed', sans-serif;
+      }
+      .rt-ai-img-zoom-btn:active {
+        background: #F5DF4D;
+        color: #000;
+      }
+      .rt-ai-img-stage {
+        position: relative;
+        flex: 1 1 auto;
+        width: 100%;
+        max-width: 960px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin: 8px 0;
+        touch-action: none;
+      }
+      .rt-ai-img-stage img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        background: #fff;
+        border-radius: 8px;
+        padding: 6px;
+        box-sizing: border-box;
+        transform-origin: center center;
+        transition: transform 0.08s ease-out;
+        touch-action: none;
+        -webkit-user-drag: none;
+      }
+      .rt-ai-img-loupe {
+        position: fixed;
+        width: 156px;
+        height: 156px;
+        border-radius: 50%;
+        border: 3px solid #F5DF4D;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+        background-color: #fff;
+        background-repeat: no-repeat;
+        pointer-events: none;
+        display: none;
+        z-index: 100010;
+      }
+      .rt-ai-img-loupe::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 8px;
+        height: 8px;
+        margin: -4px 0 0 -4px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255, 60, 60, 0.85);
+        box-sizing: border-box;
+      }
+      .rt-ai-img-lightbox-hint {
+        font-size: 0.82rem;
+        color: #ccc;
+        text-align: center;
+        font-family: 'Roboto Condensed', sans-serif;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -12605,7 +12714,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 08-ui-speech-tts-init.js (1205 regels)
+  // MODULE: 08-ui-speech-tts-init.js (1360 regels)
   // ==========================================================================
   let isPushing = false;
   let isFinishingPTT = false;
@@ -13729,6 +13838,159 @@ ${stralingstijdPlat}========================================`;
     }
   }
 
+  let imgLightboxEl = null;
+
+  function sluitAfbeeldingZoom() {
+    if (imgLightboxEl && imgLightboxEl.parentNode) {
+      imgLightboxEl.parentNode.removeChild(imgLightboxEl);
+    }
+    imgLightboxEl = null;
+  }
+
+  function openAfbeeldingZoom(src, alt = "Afbeelding") {
+    if (typeof document === "undefined" || !document.body) return;
+    sluitAfbeeldingZoom();
+
+    const lb = document.createElement("div");
+    lb.id = "rt-ai-img-lightbox";
+    lb.className = "rt-ai-img-lightbox";
+    lb.innerHTML =
+      `<div class="rt-ai-img-lightbox-bar">` +
+        `<span class="rt-ai-img-lightbox-title">${escapeHtmlTekst(alt)}</span>` +
+        `<div class="rt-ai-img-lightbox-controls">` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-out" title="Uitzoomen">&minus;</button>` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-reset" title="Reset zoom">100%</button>` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-in" title="Inzoomen">+</button>` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-close" title="Sluiten" style="background:#5a2323;">&times;</button>` +
+        `</div>` +
+      `</div>` +
+      `<div class="rt-ai-img-stage" id="rt-img-stage">` +
+        `<img id="rt-img-zoom-target" src="${escapeHtmlTekst(src)}" alt="${escapeHtmlTekst(alt)}" draggable="false">` +
+      `</div>` +
+      `<div class="rt-ai-img-loupe" id="rt-img-loupe"></div>` +
+      `<div class="rt-ai-img-lightbox-hint">🔍 Houd 1 vinger (of muis) op de afbeelding voor het vergrootglas erboven • Knijp met 2 vingers of tik + / &minus; om in te zoomen</div>`;
+
+    document.body.appendChild(lb);
+    imgLightboxEl = lb;
+
+    const imgEl = document.getElementById("rt-img-zoom-target");
+    const loupeEl = document.getElementById("rt-img-loupe");
+    const resetBtn = document.getElementById("rt-img-zoom-reset");
+    const stageEl = document.getElementById("rt-img-stage");
+
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    const loupeZoom = 2.6;
+    const loupeSize = 156;
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+    let isLoupeActive = false;
+
+    const applyTransform = () => {
+      if (!imgEl) return;
+      if (scale <= 1) {
+        scale = 1;
+        panX = 0;
+        panY = 0;
+      }
+      imgEl.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      if (resetBtn) resetBtn.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    const updateLoupe = (clientX, clientY, isTouchEvent) => {
+      if (!imgEl || !loupeEl) return;
+      const rect = imgEl.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+        loupeEl.style.display = "none";
+        return;
+      }
+      const relX = (clientX - rect.left) / rect.width;
+      const relY = (clientY - rect.top) / rect.height;
+
+      const bgW = rect.width * loupeZoom;
+      const bgH = rect.height * loupeZoom;
+      const bgPosX = -(relX * bgW - loupeSize / 2);
+      const bgPosY = -(relY * bgH - loupeSize / 2);
+
+      // Plaats het vergrootglas net BOVEN de vinger zodat de vinger het detail nooit bedekt
+      const offsetY = isTouchEvent ? 112 : 96;
+      const vw = typeof window !== "undefined" ? window.innerWidth : 800;
+      const left = Math.max(8, Math.min(vw - loupeSize - 8, clientX - loupeSize / 2));
+      let top = clientY - offsetY - loupeSize / 2;
+      if (top < 54) top = clientY + 38;
+
+      loupeEl.style.backgroundImage = `url("${src}")`;
+      loupeEl.style.backgroundSize = `${bgW}px ${bgH}px`;
+      loupeEl.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+      loupeEl.style.left = `${left}px`;
+      loupeEl.style.top = `${top}px`;
+      loupeEl.style.display = "block";
+    };
+
+    const hideLoupe = () => {
+      isLoupeActive = false;
+      if (loupeEl) loupeEl.style.display = "none";
+    };
+
+    if (stageEl) {
+      stageEl.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches.length === 2) {
+          hideLoupe();
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          pinchStartDist = Math.hypot(dx, dy);
+          pinchStartScale = scale;
+        } else if (e.touches && e.touches.length === 1) {
+          isLoupeActive = true;
+          updateLoupe(e.touches[0].clientX, e.touches[0].clientY, true);
+        }
+      }, { passive: true });
+
+      stageEl.addEventListener("touchmove", (e) => {
+        if (e.cancelable) e.preventDefault();
+        if (e.touches && e.touches.length === 2 && pinchStartDist > 0) {
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          const dist = Math.hypot(dx, dy);
+          scale = Math.max(1, Math.min(4, pinchStartScale * (dist / pinchStartDist)));
+          applyTransform();
+        } else if (e.touches && e.touches.length === 1 && isLoupeActive) {
+          updateLoupe(e.touches[0].clientX, e.touches[0].clientY, true);
+        }
+      }, { passive: false });
+
+      stageEl.addEventListener("touchend", (e) => {
+        if (!e.touches || e.touches.length === 0) {
+          pinchStartDist = 0;
+          hideLoupe();
+        }
+      });
+
+      stageEl.addEventListener("mousedown", (e) => {
+        isLoupeActive = true;
+        updateLoupe(e.clientX, e.clientY, false);
+      });
+      stageEl.addEventListener("mousemove", (e) => {
+        if (isLoupeActive) updateLoupe(e.clientX, e.clientY, false);
+      });
+      stageEl.addEventListener("mouseup", hideLoupe);
+      stageEl.addEventListener("mouseleave", hideLoupe);
+    }
+
+    const zoomInBtn = document.getElementById("rt-img-zoom-in");
+    const zoomOutBtn = document.getElementById("rt-img-zoom-out");
+    const closeBtn = document.getElementById("rt-img-zoom-close");
+    if (zoomInBtn) zoomInBtn.addEventListener("click", () => { scale = Math.min(4, scale + 0.5); applyTransform(); });
+    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => { scale = Math.max(1, scale - 0.5); applyTransform(); });
+    if (resetBtn) resetBtn.addEventListener("click", () => { scale = 1; panX = 0; panY = 0; applyTransform(); });
+    if (closeBtn) closeBtn.addEventListener("click", sluitAfbeeldingZoom);
+    lb.addEventListener("click", (e) => {
+      if (e.target === lb) sluitAfbeeldingZoom();
+    });
+  }
+
   // Expose API
   const RtAssistant = {
     NDO_SPRAAK_WOORDENBOEK,
@@ -13778,6 +14040,8 @@ ${stralingstijdPlat}========================================`;
     verwerkUniverseleVraag,
     openAssistant,
     sluitAssistant,
+    openAfbeeldingZoom,
+    sluitAfbeeldingZoom,
     verstuurTekst,
     verstuurSuggestie,
     laadBronnenCsv,

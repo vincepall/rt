@@ -253,14 +253,11 @@
         const entries = respEl.querySelectorAll(".rt-ai-history-entry");
         const lastEl = entries.length ? entries[entries.length - 1] : null;
         if (!lastEl) {
-          respEl.scrollTop = respEl.scrollHeight;
+          respEl.scrollTop = 0;
           return;
         }
-        if (lastEl.offsetHeight > respEl.clientHeight - 16) {
-          respEl.scrollTop = Math.max(0, lastEl.offsetTop - 8);
-        } else {
-          respEl.scrollTop = respEl.scrollHeight;
-        }
+        // Spring altijd naar het BEGIN van het nieuwste antwoord (zodat je bovenaan kunt beginnen met lezen)
+        respEl.scrollTop = Math.max(0, lastEl.offsetTop - 8);
       };
       scrollFn();
       if (typeof requestAnimationFrame === "function") requestAnimationFrame(scrollFn);

@@ -1120,6 +1120,159 @@
     }
   }
 
+  let imgLightboxEl = null;
+
+  function sluitAfbeeldingZoom() {
+    if (imgLightboxEl && imgLightboxEl.parentNode) {
+      imgLightboxEl.parentNode.removeChild(imgLightboxEl);
+    }
+    imgLightboxEl = null;
+  }
+
+  function openAfbeeldingZoom(src, alt = "Afbeelding") {
+    if (typeof document === "undefined" || !document.body) return;
+    sluitAfbeeldingZoom();
+
+    const lb = document.createElement("div");
+    lb.id = "rt-ai-img-lightbox";
+    lb.className = "rt-ai-img-lightbox";
+    lb.innerHTML =
+      `<div class="rt-ai-img-lightbox-bar">` +
+        `<span class="rt-ai-img-lightbox-title">${escapeHtmlTekst(alt)}</span>` +
+        `<div class="rt-ai-img-lightbox-controls">` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-out" title="Uitzoomen">&minus;</button>` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-reset" title="Reset zoom">100%</button>` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-in" title="Inzoomen">+</button>` +
+          `<button type="button" class="rt-ai-img-zoom-btn" id="rt-img-zoom-close" title="Sluiten" style="background:#5a2323;">&times;</button>` +
+        `</div>` +
+      `</div>` +
+      `<div class="rt-ai-img-stage" id="rt-img-stage">` +
+        `<img id="rt-img-zoom-target" src="${escapeHtmlTekst(src)}" alt="${escapeHtmlTekst(alt)}" draggable="false">` +
+      `</div>` +
+      `<div class="rt-ai-img-loupe" id="rt-img-loupe"></div>` +
+      `<div class="rt-ai-img-lightbox-hint">🔍 Houd 1 vinger (of muis) op de afbeelding voor het vergrootglas erboven • Knijp met 2 vingers of tik + / &minus; om in te zoomen</div>`;
+
+    document.body.appendChild(lb);
+    imgLightboxEl = lb;
+
+    const imgEl = document.getElementById("rt-img-zoom-target");
+    const loupeEl = document.getElementById("rt-img-loupe");
+    const resetBtn = document.getElementById("rt-img-zoom-reset");
+    const stageEl = document.getElementById("rt-img-stage");
+
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    const loupeZoom = 2.6;
+    const loupeSize = 156;
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+    let isLoupeActive = false;
+
+    const applyTransform = () => {
+      if (!imgEl) return;
+      if (scale <= 1) {
+        scale = 1;
+        panX = 0;
+        panY = 0;
+      }
+      imgEl.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      if (resetBtn) resetBtn.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    const updateLoupe = (clientX, clientY, isTouchEvent) => {
+      if (!imgEl || !loupeEl) return;
+      const rect = imgEl.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+        loupeEl.style.display = "none";
+        return;
+      }
+      const relX = (clientX - rect.left) / rect.width;
+      const relY = (clientY - rect.top) / rect.height;
+
+      const bgW = rect.width * loupeZoom;
+      const bgH = rect.height * loupeZoom;
+      const bgPosX = -(relX * bgW - loupeSize / 2);
+      const bgPosY = -(relY * bgH - loupeSize / 2);
+
+      // Plaats het vergrootglas net BOVEN de vinger zodat de vinger het detail nooit bedekt
+      const offsetY = isTouchEvent ? 112 : 96;
+      const vw = typeof window !== "undefined" ? window.innerWidth : 800;
+      const left = Math.max(8, Math.min(vw - loupeSize - 8, clientX - loupeSize / 2));
+      let top = clientY - offsetY - loupeSize / 2;
+      if (top < 54) top = clientY + 38;
+
+      loupeEl.style.backgroundImage = `url("${src}")`;
+      loupeEl.style.backgroundSize = `${bgW}px ${bgH}px`;
+      loupeEl.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+      loupeEl.style.left = `${left}px`;
+      loupeEl.style.top = `${top}px`;
+      loupeEl.style.display = "block";
+    };
+
+    const hideLoupe = () => {
+      isLoupeActive = false;
+      if (loupeEl) loupeEl.style.display = "none";
+    };
+
+    if (stageEl) {
+      stageEl.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches.length === 2) {
+          hideLoupe();
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          pinchStartDist = Math.hypot(dx, dy);
+          pinchStartScale = scale;
+        } else if (e.touches && e.touches.length === 1) {
+          isLoupeActive = true;
+          updateLoupe(e.touches[0].clientX, e.touches[0].clientY, true);
+        }
+      }, { passive: true });
+
+      stageEl.addEventListener("touchmove", (e) => {
+        if (e.cancelable) e.preventDefault();
+        if (e.touches && e.touches.length === 2 && pinchStartDist > 0) {
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          const dist = Math.hypot(dx, dy);
+          scale = Math.max(1, Math.min(4, pinchStartScale * (dist / pinchStartDist)));
+          applyTransform();
+        } else if (e.touches && e.touches.length === 1 && isLoupeActive) {
+          updateLoupe(e.touches[0].clientX, e.touches[0].clientY, true);
+        }
+      }, { passive: false });
+
+      stageEl.addEventListener("touchend", (e) => {
+        if (!e.touches || e.touches.length === 0) {
+          pinchStartDist = 0;
+          hideLoupe();
+        }
+      });
+
+      stageEl.addEventListener("mousedown", (e) => {
+        isLoupeActive = true;
+        updateLoupe(e.clientX, e.clientY, false);
+      });
+      stageEl.addEventListener("mousemove", (e) => {
+        if (isLoupeActive) updateLoupe(e.clientX, e.clientY, false);
+      });
+      stageEl.addEventListener("mouseup", hideLoupe);
+      stageEl.addEventListener("mouseleave", hideLoupe);
+    }
+
+    const zoomInBtn = document.getElementById("rt-img-zoom-in");
+    const zoomOutBtn = document.getElementById("rt-img-zoom-out");
+    const closeBtn = document.getElementById("rt-img-zoom-close");
+    if (zoomInBtn) zoomInBtn.addEventListener("click", () => { scale = Math.min(4, scale + 0.5); applyTransform(); });
+    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => { scale = Math.max(1, scale - 0.5); applyTransform(); });
+    if (resetBtn) resetBtn.addEventListener("click", () => { scale = 1; panX = 0; panY = 0; applyTransform(); });
+    if (closeBtn) closeBtn.addEventListener("click", sluitAfbeeldingZoom);
+    lb.addEventListener("click", (e) => {
+      if (e.target === lb) sluitAfbeeldingZoom();
+    });
+  }
+
   // Expose API
   const RtAssistant = {
     NDO_SPRAAK_WOORDENBOEK,
@@ -1169,6 +1322,8 @@
     verwerkUniverseleVraag,
     openAssistant,
     sluitAssistant,
+    openAfbeeldingZoom,
+    sluitAfbeeldingZoom,
     verstuurTekst,
     verstuurSuggestie,
     laadBronnenCsv,

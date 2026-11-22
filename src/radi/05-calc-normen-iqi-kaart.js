@@ -1979,7 +1979,8 @@
           `<div style="margin-top:10px; padding:8px 10px; background:rgba(245,223,77,0.08); border:1px solid rgba(245,223,77,0.35); border-radius:8px; font-size:0.88rem;">` +
           `💡 <strong>Wil je bij ASME extra lasoverdikte meerekenen?</strong> Kies hieronder het <strong>lastype (A, B, C of D)</strong> aan de hand van de afbeelding:` +
           `<div style="margin-top:8px; text-align:center;">` +
-          `<img src="Lascategorie.png" alt="ASME Lascategorieën A, B, C en D" style="max-width:100%; max-height:220px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#fff; padding:4px;">` +
+          `<img src="Lascategorie.png" alt="ASME Lascategorieën A, B, C en D" onclick="window.RtAssistant && window.RtAssistant.openAfbeeldingZoom('Lascategorie.png', 'ASME Lascategorieën A, B, C en D')" style="max-width:100%; max-height:220px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background:#fff; padding:4px; cursor:zoom-in;">` +
+          `<div style="font-size:0.78rem; color:#F5DF4D; margin-top:4px; opacity:0.9;">🔍 Tik op de afbeelding voor vergrootglas &amp; inzoomen</div>` +
           `</div></div>`;
       }
     }

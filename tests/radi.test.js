@@ -601,9 +601,10 @@ function laadRtAssistant() {
     await new Promise((r) => setImmediate(r));
     await new Promise((r) => setImmediate(r));
     const count2 = (respEl.innerHTML.match(/rt-ai-history-entry/g) || []).length;
-    const scrolledDown = respEl.scrollTop === respEl.scrollHeight;
+    const scrolledToStartOfLatest = respEl.scrollTop === 112;
     assert("Geschiedenis bewaart eerdere antwoorden", count1 === 1 && count2 === 2 && respEl.innerHTML.includes("Selenium-75") && respEl.innerHTML.includes("Iridium-192"), `c1=${count1}, c2=${count2}`);
-    assert("Geschiedenis scrolt automatisch omlaag", scrolledDown, `scrollTop=${respEl.scrollTop}`);
+    assert("Geschiedenis springt naar het begin van het laatste antwoord", scrolledToStartOfLatest, `scrollTop=${respEl.scrollTop}`);
+    assert("UI exporteert openAfbeeldingZoom voor vergrootglas/inzoomen", typeof RT.openAfbeeldingZoom === "function");
 
     RT.resetGespreksGeheugen();
     const afterReset = respEl.innerHTML;
