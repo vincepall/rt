@@ -566,6 +566,15 @@ function laadRtAssistant() {
       /ASME #6/.test(tAsmeDraad2) && /W12/.test(tAsmeDraad2) && /8\.5 mm/.test(tAsmeDraad2),
       tAsmeDraad2
     );
+
+    RT.resetGespreksGeheugen();
+    const rZwCompact = await RT.verwerkUniverseleVraag("Ik straal 1m20s en heb zwarting 2.0, hoelang moet ik stralen om 2.5 te krijgen");
+    const tZwCompact = stripTags(rZwCompact && rZwCompact.text);
+    assert(
+      "E2E Compacte tijd 1m20s bij zwarting 2.0 -> 2.5 geeft 1m 40s (100s) zonder DN50/wanddikte in geheugen",
+      /1m 40s/.test(tZwCompact) && /100s/.test(tZwCompact) && RT.actiefGespreksGeheugen.diameter === null && RT.actiefGespreksGeheugen.wanddikte === null,
+      `${tZwCompact} | mem=${JSON.stringify({ d: RT.actiefGespreksGeheugen.diameter, wt: RT.actiefGespreksGeheugen.wanddikte })}`
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

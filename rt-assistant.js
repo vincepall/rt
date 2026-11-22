@@ -2016,13 +2016,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 03-intentie-parser.js (1719 regels)
+  // MODULE: 03-intentie-parser.js (1725 regels)
   // ==========================================================================
   // --- Intentie Bepaling ---
   function bepaalVraagIntenties(tekst) {
     const lower = tekst.toLowerCase();
     const intenties = [];
-    const heeftTijdSeenheid = /\b\d+(?:[.,]\d+)?\s*(?:minuut|minuten|min\b|sec\b|seconden)\b/i.test(lower);
+    const heeftTijdSeenheid = /\b\d+(?:[.,]\d+)?\s*(?:minuut|minuten|min\b|sec\b|seconden)\b|\b\d+\s*m\s*\d{1,2}\s*s\b|\b\d+:\d{2}\b|\b\d+(?:[.,]\d+)?s\b/i.test(lower);
     const heeftVanNaar =
       /\b(?:van|vanuit)\s+\S+.*?\b(?:naar|tot)\b/i.test(lower) ||
       /\b(?:wissel|focusverandering|kwadratenwet|oude\s+(?:focus|ffd|tijd|ci|curie)|nieuwe\s+(?:focus|ffd|tijd|ci|curie)|vorig\s+jaar|vroeger|eerst)\b/i.test(lower) ||
@@ -3306,7 +3306,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     // Focus & Filmtype Calculator parameters (focusverandering.html)
     // 1. Tijd extractie
-    let matchTijd = tekst.match(/(?:tijd|begintijd|oude\s*tijd|duurt|is\s+nu|nu\s+op)\s*(?:van|is|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:minuut|minuten|min\b|m\b)\s*(?:en\s*)?(\d{1,2})?\s*(?:seconden?|sec\b|s\b)?/i);
+    let matchTijd = tekst.match(/\b(\d+)\s*m\s*(\d{1,2})\s*s\b/i);
+    if (!matchTijd) {
+      matchTijd = tekst.match(/\b(\d{1,2}):(\d{2})\b/);
+    }
+    if (!matchTijd) {
+      matchTijd = tekst.match(/(?:tijd|begintijd|oude\s*tijd|duurt|is\s+nu|nu\s+op)\s*(?:van|is|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:minuut|minuten|min\b|m\b)\s*(?:en\s*)?(\d{1,2})?\s*(?:seconden?|sec\b|s\b)?/i);
+    }
     if (!matchTijd) {
       matchTijd = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:minuut|minuten|min\b)\s*(?:en\s*)?(\d{1,2})\s*(?:seconden?|sec\b|s\b)/i);
     }
@@ -3328,7 +3334,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const sVal = matchTijd[2] ? parseFloat(matchTijd[2].replace(",", ".")) : 0;
       res.focusBegintijdSec = (mVal * 60) + sVal;
     } else {
-      const matchSec = tekst.match(/(?:tijd|begintijd|duurt)?\s*(\d+(?:[.,]\d+)?)\s*(?:seconden?|sec\b)/i);
+      const matchSec = tekst.match(/(?:tijd|begintijd|duurt|straal|belicht)?\s*(\d+(?:[.,]\d+)?)\s*(?:seconden?|sec\b|s\b)(?!\s*(?:schedule|sch))/i);
       if (matchSec) {
         res.focusBegintijdSec = parseFloat(matchSec[1].replace(",", "."));
       }
@@ -3655,8 +3661,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
-    // Veilig getallenvangnet (bronkeuzes en OFA isoleren zodat bronmaten/OFA nooit als diameter worden gezien)
-    if ((res.diameter === null || res.wanddikte === null) && !isBundelVraag && res.sfd === null && res.ofa === null && res.langsnaadLengte === null && res.oudeFocus === null && res.nieuweFocus === null && res.focusBegintijdSec === null && res.maminVal === null && res.maVal === null) {
+    // Veilig getallenvangnet (bronkeuzes, OFA en zwartingswaarden isoleren zodat ze nooit als diameter/wanddikte worden gezien)
+    if ((res.diameter === null || res.wanddikte === null) && !isBundelVraag && res.sfd === null && res.ofa === null && res.zwartingOud === null && res.zwartingNieuw === null && res.langsnaadLengte === null && res.oudeFocus === null && res.nieuweFocus === null && res.focusBegintijdSec === null && res.maminVal === null && res.maVal === null) {
       let tZonder = tekst
         .replace(/\b(?:schedule|sch|sched)[-\s]*([0-9]{1,3}[a-z]?|std|xs|xxs)\b/gi, "")
         .replace(/\b([0-9]{1,3}[a-z]?)\s*(?:schedule|sch|sched)\b/gi, "")
