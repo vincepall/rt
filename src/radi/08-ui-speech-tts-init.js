@@ -1150,7 +1150,7 @@
         `<img id="rt-img-zoom-target" src="${escapeHtmlTekst(src)}" alt="${escapeHtmlTekst(alt)}" draggable="false">` +
       `</div>` +
       `<div class="rt-ai-img-loupe" id="rt-img-loupe"></div>` +
-      `<div class="rt-ai-img-lightbox-hint">🔍 Houd 1 vinger (of muis) op de afbeelding voor het vergrootglas erboven • Knijp met 2 vingers of tik + / &minus; om in te zoomen</div>`;
+      `<div class="rt-ai-img-lightbox-hint">🔍 Op 100%: houd 1 vinger vast voor vergrootglas • Ingezoomd (+ / knijpen / dubbeltik): sleep met 1 vinger om te verschuiven</div>`;
 
     document.body.appendChild(lb);
     imgLightboxEl = lb;
@@ -1168,15 +1168,41 @@
     let pinchStartDist = 0;
     let pinchStartScale = 1;
     let isLoupeActive = false;
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let panOriginX = 0;
+    let panOriginY = 0;
+    let lastTapTime = 0;
 
-    const applyTransform = () => {
+    const clampPan = () => {
+      if (!imgEl || !stageEl || scale <= 1) {
+        panX = 0;
+        panY = 0;
+        return;
+      }
+      const baseW = imgEl.offsetWidth || stageEl.clientWidth || 300;
+      const baseH = imgEl.offsetHeight || stageEl.clientHeight || 300;
+      const stageW = stageEl.clientWidth || baseW;
+      const stageH = stageEl.clientHeight || baseH;
+      const maxX = Math.max(0, (baseW * scale - stageW) / 2 + 40);
+      const maxY = Math.max(0, (baseH * scale - stageH) / 2 + 40);
+      panX = Math.max(-maxX, Math.min(maxX, panX));
+      panY = Math.max(-maxY, Math.min(maxY, panY));
+    };
+
+    const applyTransform = (animate = false) => {
       if (!imgEl) return;
       if (scale <= 1) {
         scale = 1;
         panX = 0;
         panY = 0;
+      } else {
+        clampPan();
       }
+      imgEl.style.transition = animate ? "transform 0.14s ease-out" : "none";
       imgEl.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      imgEl.style.cursor = scale > 1 ? (isPanning ? "grabbing" : "grab") : "zoom-in";
       if (resetBtn) resetBtn.textContent = `${Math.round(scale * 100)}%`;
     };
 
@@ -1220,13 +1246,37 @@
       stageEl.addEventListener("touchstart", (e) => {
         if (e.touches && e.touches.length === 2) {
           hideLoupe();
+          isPanning = false;
           const dx = e.touches[0].clientX - e.touches[1].clientX;
           const dy = e.touches[0].clientY - e.touches[1].clientY;
           pinchStartDist = Math.hypot(dx, dy);
           pinchStartScale = scale;
         } else if (e.touches && e.touches.length === 1) {
-          isLoupeActive = true;
-          updateLoupe(e.touches[0].clientX, e.touches[0].clientY, true);
+          const now = Date.now();
+          const t0 = e.touches[0];
+          if (now - lastTapTime < 280) {
+            // Dubbeltik: snel wisselen tussen 100% en 250%
+            hideLoupe();
+            isPanning = false;
+            scale = scale > 1.2 ? 1 : 2.5;
+            applyTransform(true);
+            lastTapTime = 0;
+            return;
+          }
+          lastTapTime = now;
+
+          if (scale > 1) {
+            hideLoupe();
+            isPanning = true;
+            panStartX = t0.clientX;
+            panStartY = t0.clientY;
+            panOriginX = panX;
+            panOriginY = panY;
+          } else {
+            isPanning = false;
+            isLoupeActive = true;
+            updateLoupe(t0.clientX, t0.clientY, true);
+          }
         }
       }, { passive: true });
 
@@ -1237,36 +1287,73 @@
           const dy = e.touches[0].clientY - e.touches[1].clientY;
           const dist = Math.hypot(dx, dy);
           scale = Math.max(1, Math.min(4, pinchStartScale * (dist / pinchStartDist)));
-          applyTransform();
-        } else if (e.touches && e.touches.length === 1 && isLoupeActive) {
-          updateLoupe(e.touches[0].clientX, e.touches[0].clientY, true);
+          applyTransform(false);
+        } else if (e.touches && e.touches.length === 1) {
+          const t0 = e.touches[0];
+          if (isPanning && scale > 1) {
+            panX = panOriginX + (t0.clientX - panStartX);
+            panY = panOriginY + (t0.clientY - panStartY);
+            applyTransform(false);
+          } else if (isLoupeActive) {
+            updateLoupe(t0.clientX, t0.clientY, true);
+          }
         }
       }, { passive: false });
 
       stageEl.addEventListener("touchend", (e) => {
         if (!e.touches || e.touches.length === 0) {
           pinchStartDist = 0;
+          isPanning = false;
           hideLoupe();
+        } else if (e.touches.length === 1 && scale > 1) {
+          // Na loslaten van 1 vinger uit pinch: soepel verder slepen met 1 vinger
+          pinchStartDist = 0;
+          isPanning = true;
+          panStartX = e.touches[0].clientX;
+          panStartY = e.touches[0].clientY;
+          panOriginX = panX;
+          panOriginY = panY;
         }
       });
 
       stageEl.addEventListener("mousedown", (e) => {
-        isLoupeActive = true;
-        updateLoupe(e.clientX, e.clientY, false);
+        if (scale > 1) {
+          hideLoupe();
+          isPanning = true;
+          panStartX = e.clientX;
+          panStartY = e.clientY;
+          panOriginX = panX;
+          panOriginY = panY;
+          applyTransform(false);
+        } else {
+          isLoupeActive = true;
+          updateLoupe(e.clientX, e.clientY, false);
+        }
       });
       stageEl.addEventListener("mousemove", (e) => {
-        if (isLoupeActive) updateLoupe(e.clientX, e.clientY, false);
+        if (isPanning && scale > 1) {
+          panX = panOriginX + (e.clientX - panStartX);
+          panY = panOriginY + (e.clientY - panStartY);
+          applyTransform(false);
+        } else if (isLoupeActive) {
+          updateLoupe(e.clientX, e.clientY, false);
+        }
       });
-      stageEl.addEventListener("mouseup", hideLoupe);
-      stageEl.addEventListener("mouseleave", hideLoupe);
+      stageEl.addEventListener("mouseup", () => { isPanning = false; hideLoupe(); applyTransform(false); });
+      stageEl.addEventListener("mouseleave", () => { isPanning = false; hideLoupe(); });
+      stageEl.addEventListener("dblclick", () => {
+        hideLoupe();
+        scale = scale > 1.2 ? 1 : 2.5;
+        applyTransform(true);
+      });
     }
 
     const zoomInBtn = document.getElementById("rt-img-zoom-in");
     const zoomOutBtn = document.getElementById("rt-img-zoom-out");
     const closeBtn = document.getElementById("rt-img-zoom-close");
-    if (zoomInBtn) zoomInBtn.addEventListener("click", () => { scale = Math.min(4, scale + 0.5); applyTransform(); });
-    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => { scale = Math.max(1, scale - 0.5); applyTransform(); });
-    if (resetBtn) resetBtn.addEventListener("click", () => { scale = 1; panX = 0; panY = 0; applyTransform(); });
+    if (zoomInBtn) zoomInBtn.addEventListener("click", () => { scale = Math.min(4, scale + 0.5); applyTransform(true); });
+    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => { scale = Math.max(1, scale - 0.5); applyTransform(true); });
+    if (resetBtn) resetBtn.addEventListener("click", () => { scale = 1; panX = 0; panY = 0; applyTransform(true); });
     if (closeBtn) closeBtn.addEventListener("click", sluitAfbeeldingZoom);
     lb.addEventListener("click", (e) => {
       if (e.target === lb) sluitAfbeeldingZoom();
