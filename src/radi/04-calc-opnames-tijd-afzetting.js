@@ -78,7 +78,7 @@
     const baksteen = params.baksteenMm || 0;
     const dosis = params.dosisGrens || 10;
 
-    const k = isIr ? 0.13 : 0.054;
+    const k = isIr ? 0.11 : 0.054;
     const hvlPb = isIr ? 3 : 2;
     const hvlFe = isIr ? 13 : 5;
     const hvlBeton = isIr ? 45 : 30;

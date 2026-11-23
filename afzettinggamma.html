@@ -32,8 +32,8 @@
     </style>
     <script>
         function berekenAfzettingIr192(Ci, wanddikte_pb, wanddikte_fe, gewenste_dosis) {
-            const afzetting = Math.sqrt((Ci * 37000 * 0.13 * Math.pow(0.5, (wanddikte_pb / 3)) * Math.pow(0.5, (wanddikte_fe / 13))) / gewenste_dosis);
-            const afstand_collimator = Math.sqrt((Ci * 37000 * 0.13 * 0.012) / gewenste_dosis);
+            const afzetting = Math.sqrt((Ci * 37000 * 0.11 * Math.pow(0.5, (wanddikte_pb / 3)) * Math.pow(0.5, (wanddikte_fe / 13))) / gewenste_dosis);
+            const afstand_collimator = Math.sqrt((Ci * 37000 * 0.11 * 0.012) / gewenste_dosis);
             return { afzetting, afstand_collimator };
         }
 
