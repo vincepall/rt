@@ -1968,7 +1968,7 @@
         else if (tAsme <= 63.5) { asmeWire = 11; enEq = "W7"; }
         else { asmeWire = 12; enEq = "W6"; }
       }
-      wire = `EN ${enEq} (ASME #${asmeWire})`;
+      wire = `ASTM #${asmeWire} (EN ${enEq})`;
 
       if (gekozenLastype) {
         asmeOverdikteInfo = `<br><small style="color:#F5DF4D;">ℹ️ <strong>ASME lasoverdikte (Lastype ${gekozenLastype}):</strong> ${t.toFixed(1)} mm + ${lasOverdikteMm.toFixed(1)} mm = <strong>${tAsme.toFixed(1)} mm</strong> (conform ASME Sec. V T-276.2 / <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a>).</small>`;
@@ -1995,23 +1995,25 @@
     const numMatch = wire.match(/W\s*(\d+)/i) || wire.match(/\b(\d+)\b/);
     const wireNum = numMatch ? parseInt(numMatch[1], 10) : 14;
     const bkiInfo = geefBkiMateriaalgroepInfo(params.materiaalNaam || "staal");
-    if (bkiInfo) {
-      const bkiSets = geefBkiSetsVoorDraad(wireNum, bkiInfo.isoGroup);
-      if (params.materiaalNaam) {
-        bkiExtra = `<br><span style="color:#FFA726;">⚠️ <strong>BKI houder voor ${params.materiaalNaam}:</strong> Draad <strong>${wire}</strong> staat op houder <strong>${bkiSets}</strong> (${bkiInfo.omschrijving}).</span>`;
-      } else {
-        bkiExtra = `<br><small style="opacity:0.85;">Draad <strong>${wire}</strong> staat op ISO BKI houder: <strong>${bkiSets}</strong>.</small>`;
-      }
-    }
     if (proc === "ASME") {
-      const asmeSetMatch = wire.match(/ASME\s*#?(\d+)/i);
+      const asmeSetMatch = wire.match(/(?:ASTM|ASME)\s*#?(\d+)/i);
       if (asmeSetMatch) {
         const asmeNr = parseInt(asmeSetMatch[1], 10);
         const asmeSets = [];
         if (asmeNr >= 1 && asmeNr <= 6) asmeSets.push("Set 1A");
         if (asmeNr >= 6 && asmeNr <= 11) asmeSets.push("Set 1B");
         if (asmeNr >= 11 && asmeNr <= 16) asmeSets.push("Set 1C");
-        bkiExtra += `<br><small style="opacity:0.85;">ASME BKI houder: <strong>${asmeSets.join(" of ")}</strong>.</small>`;
+        bkiExtra += `<br><small style="opacity:0.85;">ASTM / ASME BKI houder: <strong>${asmeSets.join(" of ")}</strong>.</small>`;
+      }
+    }
+    if (bkiInfo) {
+      const bkiSets = geefBkiSetsVoorDraad(wireNum, bkiInfo.isoGroup);
+      if (params.materiaalNaam) {
+        bkiExtra += `<br><span style="color:#FFA726;">⚠️ <strong>BKI houder voor ${params.materiaalNaam}:</strong> Draad <strong>${wire}</strong> staat op houder <strong>${bkiSets}</strong> (${bkiInfo.omschrijving}).</span>`;
+      } else if (proc === "ASME") {
+        bkiExtra += `<br><small style="opacity:0.85;">Vergelijkbaar EN draadje <strong>W${wireNum}</strong> staat op ISO BKI houder: <strong>${bkiSets}</strong>.</small>`;
+      } else {
+        bkiExtra += `<br><small style="opacity:0.85;">Draad <strong>${wire}</strong> staat op ISO BKI houder: <strong>${bkiSets}</strong>.</small>`;
       }
     }
 

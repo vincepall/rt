@@ -555,15 +555,15 @@ function laadRtAssistant() {
     RT.resetGespreksGeheugen();
     const rAsmeDraad1 = await RT.verwerkUniverseleVraag("Welk draadje moet ik zien op een plaat van 6 mm volgens ASME?");
     assert(
-      "Audit fix 7a: ASME draadje toont direct resultaat + vraagt lasoverdikte met Lascategorie.png en chips A/B/C/D",
-      /ASME #5/.test(rAsmeDraad1.text) && /Lascategorie\.png/.test(rAsmeDraad1.text) && rAsmeDraad1.chips.includes("Lastype A"),
+      "Audit fix 7a: ASME draadje toont ASTM eerst (EN tussen haakjes) + vraagt lasoverdikte met Lascategorie.png en chips A/B/C/D",
+      /ASTM #5 \(EN W13\)/.test(rAsmeDraad1.text) && /Lascategorie\.png/.test(rAsmeDraad1.text) && rAsmeDraad1.chips.includes("Lastype A"),
       rAsmeDraad1.text.slice(0, 260)
     );
     const rAsmeDraad2 = await RT.verwerkUniverseleVraag("Lastype A", { isChip: true });
     const tAsmeDraad2 = stripTags(rAsmeDraad2 && rAsmeDraad2.text);
     assert(
-      "Audit fix 7b: Lastype A telt 2.5 mm overdikte op bij 6 mm (8.5 mm -> ASME #6 / W12)",
-      /ASME #6/.test(tAsmeDraad2) && /W12/.test(tAsmeDraad2) && /8\.5 mm/.test(tAsmeDraad2),
+      "Audit fix 7b: Lastype A telt 2.5 mm overdikte op bij 6 mm (8.5 mm -> ASTM #6 (EN W12))",
+      /ASTM #6 \(EN W12\)/.test(tAsmeDraad2) && /8\.5 mm/.test(tAsmeDraad2),
       tAsmeDraad2
     );
 
