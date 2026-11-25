@@ -916,7 +916,7 @@
     if (
       /\b(agfa|structurix)\b/i.test(lower) ||
       /\b(filmklasse\s*c[1-6]|film\s*c[1-6]|wat\s+is\s+film\s*c[1-6]|wat\s+is\s+c[1-6]|welke\s+film\s+is\s+c[1-6]|welk\s+type\s+agfa\s*(?:film)?\s*(?:komt\s+overeen\s+)?met\s+c[1-6]|overeenkomst\s+c[1-6])\b/i.test(lower) ||
-      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5|filmkwaliteit\s*uitleg)\b/i.test(lower)
+      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|d4\s+vs\s+d7|d7\s+vs\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5|filmkwaliteit\s*uitleg)\b/i.test(lower)
     ) {
       if (chips) chips.push("Film D4 advies", "Film D7 advies", "Klasse B zwarting");
       return (
@@ -992,7 +992,7 @@
     }
 
     // 8. Afzettingsnorm (10 µSv/h) & Oorsprong gecontroleerde zone
-    if (/\b(waarom\s*10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+van\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower)) {
+    if (/\b(waarom\s*10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+(?:van\s+)?)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+(?:van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower)) {
       if (chips) chips.push("Dosislimiet medewerker", "Collimator factor", "Afzettingsafstand berekenen");
       return (
         "<strong>Waar komt de grens van 10 &mu;Sv/uur vandaan? (Stralingsbescherming &amp; Afzettingen):</strong><br><br>" +

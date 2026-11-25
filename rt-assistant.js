@@ -2086,12 +2086,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       (/\b(halfwaardetijd|halveringstijd|halveringtijd|eigenschappen\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|isotopen|isotoop|iridium|selenium|kobalt)|energie\s*(?:van\s*)?(?:ir-?192|se-?75|co-?60|iridium|selenium|kobalt))\b/i.test(lower) && !/\b(over\s+\d+|na\s+\d+|\d+\s*dagen|\d+\s*weken|\d+\s*maanden|geleden|op\s+\d{1,2}[-\/]\d{1,2})\b/i.test(lower)) ||
       (/\b(agfa|structurix)\b/i.test(lower) && /\b(film|klasse|c[1-6]|d[2-8]|type|overeen)\b/i.test(lower)) ||
       /\b(filmklasse\s*c[1-6]|film\s*c[1-6]|wat\s+is\s+film\s*c[1-6]|wat\s+is\s+c[1-6]|welke\s+film\s+is\s+c[1-6]|welk\s+type\s+agfa\s*(?:film)?\s*(?:komt\s+overeen\s+)?met\s+c[1-6])\b/i.test(lower) ||
-      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5)\b/i.test(lower) ||
+      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|d4\s+vs\s+d7|d7\s+vs\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5)\b/i.test(lower) ||
       (/\b(hoeveel|aantal)\s+(?:draadjes?|draden|draadje(?:\s*bki)?)\b/i.test(lower) && /\b(en\s*bki|iso\s*bki|bki|iqi|houder|en\b|iso\b)/i.test(lower)) ||
       /\b(verschil\s+tussen\s+(?:een\s+)?(?:asme|astm)\s*(?:en\s+|vs\s*)?(?:en|iso)?\s*(?:bki|iqi)|(?:asme|astm)\s*(?:vs|tegenover)\s*(?:en|iso)\s*(?:bki|iqi)|verschil\s+tussen\s+(?:en\s+en\s+asme|asme\s+en\s+en)\s*(?:bki|iqi))\b/i.test(lower) ||
       (/\b(verschil|vergelijk)\b/i.test(lower) && /\b(asme|astm)\b/i.test(lower) && /\b(en|iso)\b/i.test(lower) && /\b(bki|iqi|draad|indicator)\b/i.test(lower)) ||
       /\b(verschil\s+tussen\s+(?:een\s+)?(?:draadje|draadjes|wire)(?:\s*bki)?\s+en\s+(?:een\s+)?(?:gaatje|gaatjes|gat|gaten|plaatje|plaatjes|hole)|draadje\s+vs\s+(?:gaatje|gat|plaatje)|wat\s+is\s+(?:een\s+)?2t[-\s]*gat|waarom\s+2t|hole\s*type\s*iqi\s*uitleg)\b/i.test(lower) ||
-      /\b(waarom\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+van\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower) ||
+      /\b(waarom\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+(?:van\s+)?)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+(?:van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower) ||
       /\b(hoeveel\s+straling\s+mag\s+(?:een\s+)?(?:medewerker|werknemer|persoon|radiograaf)|dosislimiet|dosislimieten|maximaal\s+toegestane\s+dosis\s+(?:per\s+jaar|jaarlijks)|hoeveel\s+(?:msv|millisievert)\s+(?:per\s+jaar|mag\s+een\s+medewerker)|dosislimiet\s+straling|wettelijke\s+dosislimiet)\b/i.test(lower) ||
       (/\b(hoe\s+bereken\s+(?:je|ik|men)\s+(?:de\s+)?(?:minimale\s+)?(?:ffd|focus|film\s*focus\s*afstand)|hoe\s+wordt\s+de\s+(?:minimale\s+)?ffd\s+berekend|formule\s+(?:voor|van)\s+(?:de\s+)?(?:minimale\s+)?ffd|hoe\s+bepaal\s+(?:je|ik|men)\s+(?:de\s+)?(?:minimale\s+)?ffd)\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|duim|inch|dik)\b/i.test(lower)) ||
       /\b(strooistraling|secundaire\s*straling|waarom\s+(?:een\s+)?collimator|werking\s+collimator|hoe\s+werkt\s+een\s+collimator|wat\s+doet\s+(?:een\s+)?collimator)\b/i.test(lower) ||
@@ -7528,7 +7528,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (
       /\b(agfa|structurix)\b/i.test(lower) ||
       /\b(filmklasse\s*c[1-6]|film\s*c[1-6]|wat\s+is\s+film\s*c[1-6]|wat\s+is\s+c[1-6]|welke\s+film\s+is\s+c[1-6]|welk\s+type\s+agfa\s*(?:film)?\s*(?:komt\s+overeen\s+)?met\s+c[1-6]|overeenkomst\s+c[1-6])\b/i.test(lower) ||
-      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5|filmkwaliteit\s*uitleg)\b/i.test(lower)
+      /\b(waarom\s+d4|verschil\s+tussen\s+d4\s+en\s+d7|verschil\s+tussen\s+d7\s+en\s+d4|d4\s+vs\s+d7|d7\s+vs\s+d4|filmklasse\s*c[1-5]|wanneer\s+d4|wanneer\s+d7|wanneer\s+d5|filmkwaliteit\s*uitleg)\b/i.test(lower)
     ) {
       if (chips) chips.push("Film D4 advies", "Film D7 advies", "Klasse B zwarting");
       return (
@@ -7604,7 +7604,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // 8. Afzettingsnorm (10 µSv/h) & Oorsprong gecontroleerde zone
-    if (/\b(waarom\s*10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+van\s+10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower)) {
+    if (/\b(waarom\s*10\s*(?:microsievert|usv|µsv|micro\s*sv)|waar\s+komt\s+(?:de\s+)?(?:grens\s+(?:van\s+)?)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|grens\s+(?:van\s+)?10\s*(?:microsievert|usv|µsv|micro\s*sv)|10\s*(?:microsievert|usv|µsv|micro\s*sv)(?:\s*\/\s*(?:uur|h))?\s*(?:vandaan|grens|norm)|gecontroleerde\s*zone\s*(?:norm|grens)|grens\s*gecontroleerde\s*zone)\b/i.test(lower)) {
       if (chips) chips.push("Dosislimiet medewerker", "Collimator factor", "Afzettingsafstand berekenen");
       return (
         "<strong>Waar komt de grens van 10 &mu;Sv/uur vandaan? (Stralingsbescherming &amp; Afzettingen):</strong><br><br>" +

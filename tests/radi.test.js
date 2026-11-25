@@ -387,6 +387,12 @@ function laadRtAssistant() {
     const rAlara = await RT.verwerkUniverseleVraag("Wat is het ALARA principe?");
     assert("E2E Kennisvraag: ALARA principe", /As Low As Reasonably Achievable/i.test(stripTags(rAlara && rAlara.text)), stripTags(rAlara && rAlara.text));
 
+    const rGrens10 = await RT.verwerkUniverseleVraag("Grens 10 microSv/uur", { isChip: true });
+    assert("E2E Chip: Grens 10 microSv/uur geeft uitleg gecontroleerde zone (niet NDO-groeperingen)", /gecontroleerde zone/i.test(stripTags(rGrens10 && rGrens10.text)) && /Euratom/i.test(stripTags(rGrens10 && rGrens10.text)), stripTags(rGrens10 && rGrens10.text));
+
+    const rD4D7 = await RT.verwerkUniverseleVraag("Film D4 vs D7", { isChip: true });
+    assert("E2E Chip: Film D4 vs D7 geeft Agfa Structurix uitleg", /Agfa Structurix/i.test(stripTags(rD4D7 && rD4D7.text)), stripTags(rD4D7 && rD4D7.text));
+
     const rHvl = await RT.verwerkUniverseleVraag("Wat is de halveringsdikte HVL?");
     assert("E2E Kennisvraag: Halveringsdikte HVL", /Half Value Layer/i.test(stripTags(rHvl && rHvl.text)) && /3\.0 mm/i.test(stripTags(rHvl && rHvl.text)), stripTags(rHvl && rHvl.text));
 
