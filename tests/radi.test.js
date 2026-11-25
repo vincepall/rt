@@ -393,6 +393,10 @@ function laadRtAssistant() {
     const rD4D7 = await RT.verwerkUniverseleVraag("Film D4 vs D7", { isChip: true });
     assert("E2E Chip: Film D4 vs D7 geeft Agfa Structurix uitleg", /Agfa Structurix/i.test(stripTags(rD4D7 && rD4D7.text)), stripTags(rD4D7 && rD4D7.text));
 
+    const rRadi = await RT.verwerkUniverseleVraag("Wat betekent R.A.D.I?");
+    const tRadi = stripTags(rRadi && rRadi.text);
+    assert("E2E App-info: Wat betekent R.A.D.I? legt alle 4 woorden uit", /Radiografie Assistent Deterministische Inferentie/i.test(tRadi) && /Deterministische/i.test(tRadi) && /Inferentie/i.test(tRadi), tRadi);
+
     const rHvl = await RT.verwerkUniverseleVraag("Wat is de halveringsdikte HVL?");
     assert("E2E Kennisvraag: Halveringsdikte HVL", /Half Value Layer/i.test(stripTags(rHvl && rHvl.text)) && /3\.0 mm/i.test(stripTags(rHvl && rHvl.text)), stripTags(rHvl && rHvl.text));
 
@@ -625,6 +629,14 @@ function laadRtAssistant() {
     const afterReset = respEl.innerHTML;
     const countReset = (afterReset.match(/rt-ai-history-entry/g) || []).length;
     assert("Prullenbak-reset wist geschiedenis", countReset === 0 && afterReset.includes("Stel je vraag") && respEl.scrollTop === 0, `count=${countReset}`);
+
+    context.innerWidth = 1200;
+    const htmlPc = RT.genereerStartSchermHtml();
+    const countPc = (htmlPc.match(/rt-ai-start-example-item/g) || []).length;
+    context.innerWidth = 390;
+    const htmlMob = RT.genereerStartSchermHtml();
+    const countMob = (htmlMob.match(/rt-ai-start-example-item/g) || []).length;
+    assert("Startscherm toont 5 random vragen op PC en 2 op mobiel met minimalistisch icoon", countPc === 5 && countMob === 2 && htmlPc.includes("rt-ai-start-example-icon"), `pc=${countPc}, mob=${countMob}`);
   }
 
   // 6. TTS Kernantwoord

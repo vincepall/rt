@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v65";
+const CACHE_NAME = "pwa-cache-v66";
 
 // Lijst van bestanden om te cachen bij installatie
 const FILES_TO_CACHE = [
@@ -7,6 +7,7 @@ const FILES_TO_CACHE = [
   "/rt/styles.css",
   "/rt/rt-assistant.js",
   "/rt/radi-voorbeelden.json",
+  "/rt/radi-startvragen.json",
   "/rt/Draadjesv2.html",
   "/rt/manifest.json",
   "/rt/LW_Verdeler.html",

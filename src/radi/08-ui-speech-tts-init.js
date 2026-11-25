@@ -285,6 +285,7 @@
 
   function openAssistant(startSpraak = false) {
     laadBronnenCsv(true);
+    laadStartschermVragen();
     maakAssistantUI();
     updateTtsButtonUi();
 
@@ -299,6 +300,9 @@
     if (document.documentElement) document.documentElement.style.overflow = "hidden";
 
     assistantModal.style.display = "flex";
+    if (!gespreksGeschiedenis.length) {
+      renderGespreksGeschiedenis(false);
+    }
 
     if (typeof window !== "undefined") {
       if (window.visualViewport) {
@@ -1386,6 +1390,9 @@
     toggleVoorbeeldVragen,
     laadVoorbeeldVragen,
     STANDAARD_VOORBEELDVRAGEN,
+    STARTSCHERM_VOORBEELDVRAGEN,
+    laadStartschermVragen,
+    genereerStartSchermHtml,
     berekenKVRegel,
     berekenBuistabel,
     berekenGevuldeLeiding,

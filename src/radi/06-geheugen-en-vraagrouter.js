@@ -225,13 +225,99 @@
     renderGespreksGeschiedenis(true);
   }
 
+  const STARTSCHERM_VOORBEELDVRAGEN = [
+    "Hoe groot moet de afzetting zijn bij 25 Ci Se-75 als ik een 6 duimer schedule 40 schiet en er een muur van 10cm baksteen tussen zit?",
+    "Hoeveel opnames op een 4 duimer van 6 dik volgens klasse B met 40cm focus?",
+    "Wat is de wanddikte van een 8 duimer schedule XS?",
+    "Welk draadje moet ik zien op een proefplaat van 20 dik volgens ASME?",
+    "Hoeveel lood heb ik nodig om een afzetting van 10 meter te krijgen als ik 20 Curie Iridium gebruik?",
+    "Hoe bereken ik de onscherpte?",
+    "Hoeveel verzet heb ik nodig op een DN50 van 4.5mm dik met een focus van 700 en een lasbreedte van 8?",
+    "Ik heb zwarting 1.8 en straal 30 seconden, hoe krijg ik zwarting 2.6?",
+    "Wat is het dosistempo achter een loodplaat op 15 meter met 35 curie selenium?",
+    "Welk gat is vergelijkbaar met 2T van plaatje 20?",
+    "Welk gaatje moet ik zien op een plaat van 30 dik?",
+    "Welk draadje moet ik zien als ik een 6 duimer sch40 schiet met selenium volgens klasse B?",
+    "Hoeveel films heb ik nodig om een rondnaad van 2 meter 15 centraal te schieten?",
+    "Hoelang moet ik stralen met een selenium van 30 curie op een 10 duimer van 8 dik?",
+    "Wat is de stralingstijd als ik een 12 duimer van 12 dik centraal schiet met 20 curie selenium?",
+    "Hoe kan ik een langsnaad van 2 meter 55 het beste verdelen?",
+    "Welk type Agfa film is C3?",
+    "Wat is het ALARA principe?",
+    "Wat is de halveringsdikte van lood?",
+    "Wat is de halfwaardetijd van selenium?",
+    "Hoe groot mag een gaspit zijn volgens level 1 bij wanddikte 3.2?",
+    "Wat is mijn doorstraalde dikte als ik een 4 duimer van 6 dik gevuld met water heb?",
+    "Mag ik een iridium gebruiken om een onstream opname te maken van een 3 duimer sch XXS volgens onstream klasse TA?",
+    "Wat is mijn stralingstijd als ik een 40 curie iridium heb en een 6 duimer van 4 dik gevuld met olie doe schieten op 800 focus?",
+    "Ik straal 2 minuten op 80 op D4, hoelang is dat op 56 focus op D5?",
+    "Ik heb 25 mili ampere minuten, hoelang is het stralen met 3 mili ampere?",
+    "Wat betekent R.A.D.I?"
+  ];
+
+  let geladenStartschermVragen = null;
+
+  async function laadStartschermVragen() {
+    if (Array.isArray(geladenStartschermVragen) && geladenStartschermVragen.length > 0) {
+      return geladenStartschermVragen;
+    }
+    if (typeof fetch === "function") {
+      try {
+        const res = await fetch("radi-startvragen.json", { cache: "no-store" });
+        if (res && res.ok && typeof res.json === "function") {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const schoon = data.map((v) => String(v || "").trim()).filter(Boolean);
+            if (schoon.length > 0) {
+              geladenStartschermVragen = schoon;
+              if (!gespreksGeschiedenis.length) {
+                renderGespreksGeschiedenis(false);
+              }
+              return geladenStartschermVragen;
+            }
+          }
+        }
+      } catch (e) {}
+    }
+    geladenStartschermVragen = STARTSCHERM_VOORBEELDVRAGEN;
+    return geladenStartschermVragen;
+  }
+
+  function genereerStartSchermHtml() {
+    const isMobiel = typeof window !== "undefined" && typeof window.innerWidth === "number" && window.innerWidth <= 768;
+    const aantal = isMobiel ? 2 : 5;
+    const bronLijst = (Array.isArray(geladenStartschermVragen) && geladenStartschermVragen.length > 0)
+      ? geladenStartschermVragen
+      : STARTSCHERM_VOORBEELDVRAGEN;
+    const kopie = bronLijst.slice();
+    for (let i = kopie.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [kopie[i], kopie[j]] = [kopie[j], kopie[i]];
+    }
+    const gekozen = kopie.slice(0, aantal);
+    const itemsHtml = gekozen
+      .map((vraag) => {
+        const safeJs = vraag.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+        return (
+          `<li class="rt-ai-start-example-item">` +
+          `<button type="button" class="rt-ai-start-example-icon" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${safeJs}')" title="Stel deze voorbeeldvraag" aria-label="Stel voorbeeldvraag">` +
+          `<i class="fas fa-play"></i>` +
+          `</button>` +
+          `<span class="rt-ai-start-example-text"><em>&ldquo;${escapeHtmlTekst(vraag)}&rdquo;</em></span>` +
+          `</li>`
+        );
+      })
+      .join("");
+    return `<div class="rt-ai-start-welcome">Stel je vraag, bijvoorbeeld:<ul class="rt-ai-start-examples">${itemsHtml}</ul></div>`;
+  }
+
   function renderGespreksGeschiedenis(scrollNaarLaatste = true) {
     if (typeof document === "undefined") return;
     const respEl = document.getElementById("rt-ai-response");
     if (!respEl) return;
 
     if (!gespreksGeschiedenis.length) {
-      respEl.innerHTML = `Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).`;
+      respEl.innerHTML = genereerStartSchermHtml();
       respEl.scrollTop = 0;
       return;
     }
@@ -2088,7 +2174,7 @@
       } else if (intentie === "app_info") {
         if (!uitgevoerdeHandlers.has("app_info")) {
           uitgevoerdeHandlers.add("app_info");
-          antwoorden.push(geefAppInfo(chips));
+          antwoorden.push(geefAppInfo(chips, gefilterdeTekst));
         }
       } else if (intentie === "doorstraalde_dikte") {
         if (!uitgevoerdeHandlers.has("doorstraalde_dikte") && !uitgevoerdeHandlers.has("gevulde_leiding")) {
@@ -2167,9 +2253,23 @@
   }
 
   // 17. Over R.A.D.I. / Disclaimer & Contact
-  function geefAppInfo(chips) {
+  function geefAppInfo(chips, vraagTekst = "") {
+    const lower = (vraagTekst || "").toLowerCase();
+    if (/\b(wat\s+betekent|waar\s+staat.*voor|afkorting)\b/i.test(lower)) {
+      if (chips) {
+        chips.push("Over R.A.D.I.", "Voorbeelden", "Disclaimer");
+      }
+      return (
+        `<strong>Waar staat R.A.D.I. voor?</strong><br><br>` +
+        `<strong>R.A.D.I.</strong> is de afkorting van <strong>Radiografie Assistent Deterministische Inferentie</strong>:<br><br>` +
+        `• <strong>R &mdash; Radiografie:</strong> Ontworpen specifiek voor industrieel radiografisch onderzoek (RT), met directe ondersteuning voor EN ISO 17636-1, ASME Section V, RT21021/RT21022, stralingstijden, BKI-draadjes, afzetting en lasfouten.<br><br>` +
+        `• <strong>A &mdash; Assistent:</strong> Helpt je snel via spraak of tekst in het veld &mdash; onthoudt je gekozen bron, norm en buismaten in het gespreksgeheugen en denkt mee bij vervolgvragen.<br><br>` +
+        `• <strong>D &mdash; Deterministische:</strong> Geen gokkende of hallucinerende AI, maar <strong>100% vaste, controleerbare formules en normtabellen</strong>. Dezelfde invoer geeft altijd exact dezelfde, reproduceerbare uitkomst &mdash; ook volledig offline.<br><br>` +
+        `• <strong>I &mdash; Inferentie:</strong> Het stap-voor-stap logisch afleiden van de juiste berekening uit jouw gewone spreektaal (bijv. een <em>6-duimer Sch 40</em> automatisch herleiden naar <em>168.3 mm &times; 7.11 mm</em>, de juiste opstelling kiezen en gericht doorvragen als er nog een gegeven mist).`
+      );
+    }
     if (chips) {
-      chips.push("Hoe werkt het?", "Disclaimer", "Fout melden", "vincepall@gmail.com");
+      chips.push("Wat betekent R.A.D.I?", "Hoe werkt het?", "Disclaimer");
     }
     return `ℹ️ <strong>Over R.A.D.I. (Radiografie Assistent Deterministische Inferentie)</strong><br><br>` +
            `• <strong>Hoe werkt de app?</strong><br>` +

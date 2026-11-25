@@ -92,7 +92,7 @@
     }
 
     // Over R.A.D.I. / Info / Disclaimer / Contact / Fout melden
-    if (/\b(wie\s+ben\s+(je|jij)|wat\s+is\s+radi|hoe\s+werkt\s+(deze\s+app|radi|het)|over\s+radi|disclaimer|eigen\s+risico|fout\s+melden|contact|feedback|over\s+deze\s+app)\b/i.test(lower)) {
+    if (/\b(wie\s+ben\s+(je|jij)|wat\s+is\s+r\.?a\.?d\.?i\.?|wat\s+betekent\s+r\.?a\.?d\.?i\.?|waar\s+staat\s+r\.?a\.?d\.?i\.?\s+voor|afkorting\s+(?:van\s+)?r\.?a\.?d\.?i\.?|hoe\s+werkt\s+(deze\s+app|r\.?a\.?d\.?i\.?|het)|over\s+r\.?a\.?d\.?i\.?|disclaimer|eigen\s+risico|fout\s+melden|contact|feedback|over\s+deze\s+app)\b/i.test(lower)) {
       intenties.push("app_info");
       return intenties;
     }

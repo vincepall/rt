@@ -300,6 +300,53 @@
         overscroll-behavior: contain !important;
         touch-action: pan-y !important;
       }
+      .rt-ai-start-welcome {
+        color: #ddd;
+        font-size: 0.96rem;
+        line-height: 1.45;
+      }
+      .rt-ai-start-examples {
+        list-style: none;
+        margin: 10px 0 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .rt-ai-start-example-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .rt-ai-start-example-icon {
+        background: none;
+        border: 1px solid rgba(245, 223, 77, 0.35);
+        color: #F5DF4D;
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.62rem;
+        padding: 0 0 0 1px;
+        margin-top: 2px;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.15s, background 0.15s, transform 0.15s;
+      }
+      .rt-ai-start-example-icon:hover,
+      .rt-ai-start-example-icon:active {
+        opacity: 1;
+        background: rgba(245, 223, 77, 0.2);
+        transform: scale(1.08);
+      }
+      .rt-ai-start-example-text {
+        color: #ccc;
+        font-size: 0.92rem;
+        line-height: 1.4;
+      }
       .rt-ai-response-box strong,
       .rt-ai-response-box b {
         color: #F5DF4D !important;
@@ -1140,7 +1187,7 @@
           Houd 🎙️ ingedrukt om in te spreken (PTT), of typ je vraag...
         </div>
         <div class="rt-ai-response-box" id="rt-ai-response">
-          Stel je vraag (bijv. <em>"hoe groot moet de afzetting zijn bij 25 Ci Se-75"</em> of <em>"hoeveel opnames op een 4 duimer van 6 dik"</em>).
+          ${genereerStartSchermHtml()}
         </div>
         <div id="rt-ai-memory-bar" class="rt-ai-memory-bar">
           ${geefGeheugenBadgesHtml()}
