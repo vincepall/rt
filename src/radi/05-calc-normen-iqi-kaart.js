@@ -43,6 +43,7 @@
     const oorspronkelijkeBegintijdSec = begintijdSec;
     let maminMsg = "";
     let ciMsg = "";
+    let maMsg = "";
 
     // 1. mA*min berekening
     if (params.maminVal && params.maVal && params.maVal > 0) {
@@ -60,6 +61,20 @@
         const ciFactor = params.oudeCi / params.nieuweCi;
         if (chips) chips.push("90 seconden", "2 minuten", "3 minuten");
         return `Bij een bronwissel van <strong>${params.oudeCi} Ci</strong> naar <strong>${params.nieuweCi} Ci</strong> is de omrekenfactor <strong>${ciFactor.toFixed(2)}x</strong> (de tijd wordt ${ciFactor >= 1 ? ((ciFactor - 1) * 100).toFixed(0) + "% langer" : ((1 - ciFactor) * 100).toFixed(0) + "% korter"}).<br><br>Wat is de <strong>oude stralingstijd</strong> (bijv. 2 minuten of 90 seconden)?<br><small style="opacity: 0.85;">(Berekend volgens <a href="focusverandering.html" class="ai-link" target="_blank">focusverandering.html</a> conform <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; <span class="rt-math-frac"><span class="rt-math-num">Ci<sub>1</sub></span><span class="rt-math-den">Ci<sub>2</sub></span></span></span>).</small>`;
+      }
+    }
+
+    // 2b. Buisstroom (mA) wissel berekening: mA * tijd = constant -> t2 = t1 * (mA1 / mA2)
+    if (params.oudeMa && params.nieuweMa && params.nieuweMa > 0) {
+      if (begintijdSec) {
+        const oudeTijdSec = begintijdSec;
+        const maMinTotaal = params.oudeMa * (oudeTijdSec / 60);
+        begintijdSec = oudeTijdSec * (params.oudeMa / params.nieuweMa);
+        maMsg = `• Buisstroom (mA) wissel: van <strong>${params.oudeMa} mA</strong> naar <strong>${params.nieuweMa} mA</strong> (${maMinTotaal.toFixed(2).replace(/\.00$/, "")} mA&middot;min: ${formatSecondenKort(oudeTijdSec)} &rarr; <strong>${formatSecondenKort(begintijdSec)}</strong>)<br>`;
+      } else {
+        const maFactor = params.oudeMa / params.nieuweMa;
+        if (chips) chips.push("1 minuut", "2 minuten", "90 seconden");
+        return `Bij een buisstroomwissel van <strong>${params.oudeMa} mA</strong> naar <strong>${params.nieuweMa} mA</strong> is de omrekenfactor <strong>${maFactor.toFixed(2)}x</strong> (de belichtingstijd wordt ${maFactor >= 1 ? ((maFactor - 1) * 100).toFixed(0) + "% langer" : ((1 - maFactor) * 100).toFixed(0) + "% korter"}).<br><br>Wat is de <strong>huidige stralingstijd</strong> (bijv. 2 minuten of 90 seconden)?<br><small style="opacity: 0.85;">(Conform <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; <span class="rt-math-frac"><span class="rt-math-num">mA<sub>1</sub></span><span class="rt-math-den">mA<sub>2</sub></span></span></span>).</small>`;
       }
     }
 
@@ -225,6 +240,7 @@
     if (maminMsg) out += maminMsg;
     out += `• Begintijd: <strong>${formatSecondenKort(oorspronkelijkeBegintijdSec || begintijdSec)}</strong><br>`;
     if (ciMsg) out += ciMsg;
+    if (maMsg) out += maMsg;
     if (focusTxt) out += focusTxt;
     if (matTxt) out += matTxt;
     if (filmTxt) out += filmTxt;
@@ -254,6 +270,24 @@
     if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && !isNaN(eindTijdSec) && eindTijdSec > 0) {
       actiefGespreksGeheugen.focusBegintijdSec = Math.round(eindTijdSec);
       actiefGespreksGeheugen.laatsteStralingstijdSec = Math.round(eindTijdSec);
+      // Schuif voltooide wissels door naar de nieuwe huidige toestand zodat vervolgvragen ze niet nogmaals toepassen!
+      if (params.nieuweMa && params.nieuweMa > 0) {
+        actiefGespreksGeheugen.oudeMa = params.nieuweMa;
+        actiefGespreksGeheugen.nieuweMa = null;
+      }
+      if (params.nieuweFilmType) {
+        actiefGespreksGeheugen.oudeFilmType = params.nieuweFilmType;
+        actiefGespreksGeheugen.filmType = params.nieuweFilmType;
+        actiefGespreksGeheugen.nieuweFilmType = null;
+      }
+      if (params.nieuweFocus && params.nieuweFocus > 0) {
+        actiefGespreksGeheugen.oudeFocus = params.nieuweFocus;
+        actiefGespreksGeheugen.nieuweFocus = null;
+      }
+      if (params.nieuweCi && params.nieuweCi > 0) {
+        actiefGespreksGeheugen.oudeCi = params.nieuweCi;
+        actiefGespreksGeheugen.nieuweCi = null;
+      }
     }
     out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="focusverandering.html" class="ai-link" target="_blank">focusverandering.html</a> conform kwadratenwet & filmfactoren).</small>`;
     out += `</div>`;

@@ -7,7 +7,8 @@
       /\b(?:van|vanuit)\s+\S+.*?\b(?:naar|tot)\b/i.test(lower) ||
       /\b(?:wissel|focusverandering|kwadratenwet|oude\s+(?:focus|ffd|tijd|ci|curie)|nieuwe\s+(?:focus|ffd|tijd|ci|curie)|vorig\s+jaar|vroeger|eerst)\b/i.test(lower) ||
       /\bd[234578]\b.*?\bd[234578]\b/i.test(lower) ||
-      /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower);
+      /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) ||
+      /\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b).*?\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i.test(lower);
     const isZwartingTijdSchatting =
       (/\b(zwarting\w*|optische\s+dichtheid|density)\b/i.test(lower) || /\bvan\s+\d+(?:[.,]\d+)?\s+naar\s+\d+(?:[.,]\d+)?\b/i.test(lower)) &&
       (heeftTijdSeenheid ||
@@ -227,7 +228,8 @@
       /\b(?:oude\s+focus|oude\s+ffd|nieuwe\s+focus|nieuwe\s+ffd)\b/i.test(lower) ||
       /\b(van\s+d[234578]\s+naar\s+d[234578]|wissel\s+(?:van\s+)?d[234578]\s+naar\s+d[234578])\b/i.test(lower) ||
       (/\bd[234578]\b.*?\bd[234578]\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wissel|gebruik)/i.test(lower)) ||
-      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b).*?\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i.test(lower) && /\b(stralen|straal|belichten|belicht|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang|naar|omrekenen)\b/i.test(lower)) ||
       (/\b(?:op|bij|van)\s+\d+\s*cm\b.*?\b(?:op|bij|naar|tot)\s+\d+\s*cm\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
       (/\b\d+\s*(?:minuut|minuten|min\b|sec|seconden)\b/i.test(lower) &&
         /\b(hoe\s*lang|hoelang|wat\s+wordt|nieuwe\s+tijd|omrekenen|vergelijken)\b/i.test(lower) &&
@@ -255,7 +257,21 @@
     }
 
     // Focus & Filmtype Calculator / Focusverandering (focusverandering.html)
+    const isFocusVervolgVraag =
+      typeof actiefGespreksGeheugen !== "undefined" &&
+      actiefGespreksGeheugen &&
+      actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+      Boolean(actiefGespreksGeheugen.focusBegintijdSec) &&
+      !/\b(se-?75|ir-?192|selenium|iridium|duim|duimer|schedule|sch\b|plaat|dik|wanddikte|diameter|afzetting|draadje|opnames?|onstream)\b/i.test(lower) &&
+      (
+        (Boolean(actiefGespreksGeheugen.oudeMa) && /\b(?:met|op|bij|naar|en)\s*\d+(?:[.,]\d+)?(?:\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b))?\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeFocus) && /\b(?:met|op|bij|naar|en)\s*(?:\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b))\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeCi) && /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeFilmType) && /\bd[234578]\b/i.test(lower))
+      );
+
     const isFocusVeranderingVraag =
+      isFocusVervolgVraag ||
       heeftFocusCombinatieMetGeheugen ||
       /\b(focusverandering|focus\s*verandering|ffd\s*verandering|kwadratenwet|ci\s*wissel|curie\s*wissel)\b/i.test(lower) ||
       /\b(van\s+\d+\s*(?:cm|mm)?\s*(?:naar|tot)\s+\d+\s*(?:cm|mm)?\s*(?:ffd|sfd|focus))\b/i.test(lower) ||
@@ -263,7 +279,8 @@
       /\b(?:oude\s+focus|oude\s+ffd|nieuwe\s+focus|nieuwe\s+ffd)\b/i.test(lower) ||
       /\b(van\s+d[234578]\s+naar\s+d[234578]|wissel\s+(?:van\s+)?d[234578]\s+naar\s+d[234578]|omrekenen.*d[234578])\b/i.test(lower) ||
       /\b(wissel\s+van\s+\d+.*(?:ci|curie)\s+naar\s+\d+)\b/i.test(lower) ||
-      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b).*?\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i.test(lower) && /\b(stralen|straal|belichten|belicht|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang|naar|omrekenen)\b/i.test(lower)) ||
       (/\b(?:op|bij|van)\s+\d+\s*cm\b.*?\b(?:op|bij|naar|tot)\s+\d+\s*cm\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
       (/\b\d+\s*(?:minuut|minuten|min\b|sec|seconden)\b/i.test(lower) &&
         /\b(hoe\s*lang|hoelang|wat\s+wordt|nieuwe\s+tijd|omrekenen|vergelijken)\b/i.test(lower) &&
@@ -348,7 +365,7 @@
     const isLasfoutVraag =
       /\b(lasfout|lasfouten|lasfoutcode|gaspit|gaspitten|porie|porien|poriën|porositeit|nestporositeit|wormgat|wormgaten|slakinsluitsel|slaklijn|oxide[-\s]?insluitsel|wolfraaminsluitsel|bindingsfout|bindingsfouten|doorlassing|onvolkomen\s*doorlassing|geen\s*doorlassing|randinkarteling|inkarteling|doorbranden|doorbranding|eindkrater|kraterscheur|worteldoorzakking|teruggetrokken\s*wortel|wortelfout)\b/i.test(lower) ||
       (/\b(scheur|scheuren)\b/i.test(lower) && /\b(mag|toegestaan|toelaatbaar|acceptatie|norm|eis|eisen|level|asme|en|herken|foto|film)\b/i.test(lower)) ||
-      (/\b(2011|2013|2014|2015|2016|301|303|304|401|402|5011|510|100|104)\b/.test(lower) && /\b(lasfout|fout|norm|level|asme|en|acceptatie|mag|toegestaan|groot|code)\b/i.test(lower)) ||
+      (/\b(2011|2013|2014|2015|2016|301|303|304|401|402|5011|510|100|104)\b(?!\s*(?:cm|mm|m\b|meter|kv|ci|curie|ma\b|sec|min))/i.test(lower) && /\b(lasfout|fout|norm|level|asme|en\s*level|en\s*iso|acceptatie|mag|toegestaan|groot|code)\b/i.test(lower)) ||
       (/\b(acceptatiecriteria|acceptatie|toegestaan|toelaatbaar|hoe\s*groot\s*mag)\b/i.test(lower) && /\b(level\s*[123]|en\s*level|iso\s*5817|iso\s*10675|asme|lasfout)\b/i.test(lower));
 
     if (isLasfoutVraag) {
@@ -616,6 +633,8 @@
       nieuweFocus: null,
       oudeCi: null,
       nieuweCi: null,
+      oudeMa: null,
+      nieuweMa: null,
       oudeFilmType: null,
       nieuweFilmType: null,
       maminVal: null,
@@ -1090,16 +1109,40 @@
       const tZonderDiaEnSchVoorMat = tekst
         .replace(/(?:diameter|buis|pijp|leiding|\bde\b)\s*\d+(?:[.,]\d+)?\s*(?:mm)?/gi, "")
         .replace(/\b(?:schedule|sch)\s*[a-z0-9]+\b/gi, "")
+        .replace(/\b(?:level|niveau)\s*[123]\b/gi, "")
         .replace(/(?:lasbreedte|naadbreedte|las\s*breedte|focus|brongrootte|bron|ffd|sfd|verzet|isolatie|isolatiedikte)\s*(?:van|is|op|:)?\s*\d+(?:[.,]\d+)?\s*(?:mm)?/gi, "");
       const matchWtMat = tZonderDiaEnSchVoorMat.match(/(?:op|bij|voor)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:staal|aluminium|alu|hdpe|pe|kunststof)\b/i);
       if (matchWtMat) {
         res.wanddikte = parseFloat(matchWtMat[1].replace(",", "."));
-      } else if (res.diameter !== null) {
-        const matchVanMm = tZonderDiaEnSchVoorMat.match(/\b(?:van|met)\s+(\d+(?:[.,]\d+)?)\s*mm\b(?!\s*(?:isolatie|isolatiedikte|lood|pb|staal|fe|ffd|sfd|focus|focusgrootte|brongrootte|bron|lasbreedte|afstand))/i);
-        if (matchVanMm) {
-          const vMm = parseFloat(matchVanMm[1].replace(",", "."));
-          if (vMm > 0 && vMm < 100) {
-            res.wanddikte = vMm;
+      } else {
+        const laatsteInt = (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) ? actiefGespreksGeheugen.laatsteIntentie : null;
+        const isWanddikteContext =
+          res.diameter !== null ||
+          laatsteInt === "draadje" ||
+          laatsteInt === "kv_regel" ||
+          laatsteInt === "lasfout" ||
+          /\b(porie|gaspit|slak|bindingsfout|doorlassing|lasfout|level\s*[123]|draadje|bki|iqi)\b/i.test(lower);
+        if (isWanddikteContext) {
+          const matchVanMm = tZonderDiaEnSchVoorMat.match(/\b(?:van|met|bij|op|en|voor)?\s*(\d+(?:[.,]\d+)?)\s*mm\b(?!\s*(?:isolatie|isolatiedikte|lood|pb|staal|fe|beton|baksteen|ffd|sfd|focus|focusgrootte|brongrootte|bron|lasbreedte|afstand))/i);
+          if (matchVanMm) {
+            const vMm = parseFloat(matchVanMm[1].replace(",", "."));
+            if (vMm > 0 && vMm < 100) {
+              res.wanddikte = vMm;
+            }
+          }
+        }
+      }
+    }
+
+    // Vervolgvraag met kale afstand voor stralingstijd / opnames / bundel (bijv. "en op 500 mm", "en op 1 meter 20")
+    if (res.sfd === null && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      const li = actiefGespreksGeheugen.laatsteIntentie;
+      if (li === "stralingstijd" || li === "opnames" || li === "bundel") {
+        const matchKaleFfd = lower.match(/\b(?:op|bij|naar|met|en)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|m\b))\b(?!\s*(?:dik|wanddikte|isolatie|lood|pb|staal|fe|beton|baksteen|duim|inch))/i);
+        if (matchKaleFfd) {
+          const cmVal = parseFocusAfstandCm(matchKaleFfd[1]);
+          if (cmVal !== null && cmVal >= 10 && cmVal <= 500) {
+            res.sfd = Math.round(cmVal * 10);
           }
         }
       }
@@ -1332,12 +1375,43 @@
 
     let tekstZonderMaMin = tekst.replace(new RegExp(`\\b\\d+(?:[.,]\\d+)?\\s*${reMaMinVal.source}\\b`, "gi"), "")
                                 .replace(new RegExp(`\\b${reMaMinVal.source}\\s*(?:van|is|op|:)?\\s*\\d+(?:[.,]\\d+)?\\b`, "gi"), "");
-    let matchMaOnly = tekstZonderMaMin.match(/(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
-    if (!matchMaOnly) {
-      matchMaOnly = tekstZonderMaMin.match(/(?:stroom|buisstroom|op|met|bij|kan)\s*(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
-    }
-    if (matchMaOnly) {
-      res.maVal = parseFloat(matchMaOnly[1].replace(",", "."));
+    const alleMaHits = [...tekstZonderMaMin.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/gi)]
+      .map((m) => parseFloat(m[1].replace(",", ".")))
+      .filter((v) => !isNaN(v) && v > 0);
+    if (alleMaHits.length >= 2) {
+      res.oudeMa = alleMaHits[0];
+      res.nieuweMa = alleMaHits[1];
+    } else if (alleMaHits.length === 1) {
+      const heeftActieveMaContext =
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+        Boolean(actiefGespreksGeheugen.oudeMa && actiefGespreksGeheugen.focusBegintijdSec) &&
+        res.maminVal === null;
+      if (heeftActieveMaContext) {
+        res.nieuweMa = alleMaHits[0];
+      } else {
+        res.maVal = alleMaHits[0];
+      }
+    } else {
+      const matchMaOnly = tekstZonderMaMin.match(/(?:stroom|buisstroom|op|met|bij|kan)\s*(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
+      if (matchMaOnly) {
+        res.maVal = parseFloat(matchMaOnly[1].replace(",", "."));
+      } else if (
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+        Boolean(actiefGespreksGeheugen.oudeMa && actiefGespreksGeheugen.focusBegintijdSec) &&
+        !/\b(cm|mm|meter|m\b|duim|duimer|ci|curie|kv|d[234578]|minuut|minuten|sec|seconden|zwarting)\b/i.test(lower)
+      ) {
+        const matchKaleMa = lower.match(/\b(?:met|op|bij|naar|en)\s*(\d+(?:[.,]\d+)?)\b/);
+        if (matchKaleMa) {
+          const vMa = parseFloat(matchKaleMa[1].replace(",", "."));
+          if (!isNaN(vMa) && vMa > 0 && vMa <= 30) {
+            res.nieuweMa = vMa;
+          }
+        }
+      }
     }
 
     // 2. Focus verandering (Kwadratenwet F1 -> F2)
@@ -1414,6 +1488,14 @@
         if (cmHits.length >= 2 && (res.focusBegintijdSec !== null || res.maminVal !== null || /\b(ci|curie|wissel|omrekenen|stralen|tijd)\b/i.test(tekst))) {
           res.oudeFocus = cmHits[0];
           res.nieuweFocus = cmHits[1];
+        } else if (
+          cmHits.length === 1 &&
+          typeof actiefGespreksGeheugen !== "undefined" &&
+          actiefGespreksGeheugen &&
+          actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+          actiefGespreksGeheugen.oudeFocus > 0
+        ) {
+          res.nieuweFocus = cmHits[0];
         }
       }
     }
@@ -1436,6 +1518,19 @@
           res.zwartingOud = z1;
           res.zwartingNieuw = z2;
         }
+      } else if (
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "zwarting" &&
+        actiefGespreksGeheugen.zwartingOud > 0
+      ) {
+        const matchZwVervolg = lower.match(/\b(?:naar|tot|op|voor)\s*(?:zwarting\s*)?(\d+(?:[.,]\d+)?)(?![.,\d])(?!\s*(?:minuut|minuten|min\b|sec\b|seconden|s\b|mm|cm|meter|m\b|ci|curie|kv|ma\b))/i);
+        if (matchZwVervolg) {
+          const zNieuw = parseFloat(matchZwVervolg[1].replace(",", "."));
+          if (zNieuw >= 0.5 && zNieuw <= 6.0) {
+            res.zwartingNieuw = zNieuw;
+          }
+        }
       }
     }
 
@@ -1445,7 +1540,16 @@
       res.oudeFilmType = filmMatches[0];
       res.nieuweFilmType = filmMatches[1];
     } else if (filmMatches.length === 1) {
-      if (/\b(?:naar|wissel\s+naar|nieuwe\s+film)\s*d[234578]\b/i.test(tekst) || /\b(?:wat\s+wordt\s+de\s+tijd|hoe\s+lang\s+moet)\b/i.test(tekst)) {
+      const heeftActieveFilmContext =
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+        Boolean(actiefGespreksGeheugen.oudeFilmType && actiefGespreksGeheugen.focusBegintijdSec);
+      if (
+        heeftActieveFilmContext ||
+        /\b(?:naar|wissel\s+naar|nieuwe\s+film)\s*d[234578]\b/i.test(tekst) ||
+        /\b(?:wat\s+wordt\s+de\s+tijd|hoe\s+lang\s+moet)\b/i.test(tekst)
+      ) {
         res.nieuweFilmType = filmMatches[0];
       } else {
         res.oudeFilmType = filmMatches[0];
@@ -1467,6 +1571,14 @@
         if (ciHits.length >= 2) {
           res.oudeCi = ciHits[0];
           res.nieuweCi = ciHits[1];
+        } else if (
+          ciHits.length === 1 &&
+          typeof actiefGespreksGeheugen !== "undefined" &&
+          actiefGespreksGeheugen &&
+          actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+          actiefGespreksGeheugen.oudeCi > 0
+        ) {
+          res.nieuweCi = ciHits[0];
         }
       }
     }

@@ -1617,10 +1617,11 @@
     // 2. Centrale / Panoramische opstelling (SWSI / rondstraler)
     const isCentraal = /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower) || params.optie === "1" || isRondstralerBron(params, lower);
     if (isCentraal) {
-      if (!params.sfd && De) {
-        params.sfd = Math.round(De / 2);
+      const centraleFfd = De ? Math.round(De / 2) : params.sfd;
+      if (centraleFfd) {
+        params.sfd = centraleFfd;
         if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
-          actiefGespreksGeheugen.sfd = params.sfd;
+          actiefGespreksGeheugen.sfd = centraleFfd;
         }
       }
       const f48 = Math.ceil(omtrek / 400);
@@ -2331,18 +2332,28 @@
   function berekenBundelbreedte(params, vraagTekst, chips = []) {
     const lower = (vraagTekst || "").toLowerCase();
 
-    // 1. Bron / Buis detectie
+    // 1. Bron / Buis detectie (eerst huidige tekst, daarna geheugen)
     let tube = null;
+    const bronCheckTekst = (lower + " " + (params.bronTekst || "")).toLowerCase();
     if (/\b(balteau\s*rondstraler|rondstraler|rondstralen)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.balteauRondstraler;
     } else if (/\b(smart\s*evo|evo\s*300|smart|yxlon\s*smart)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.smartEvo300;
     } else if (/\b(yxlon|yxlon\s*300)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.yxlon300;
-    } else if (/\b(se-75|se75|selenium|seleen|ir-192|ir192|iridium)\b/i.test(lower) || params.bronType === "Se75" || params.bronType === "Ir192") {
+    } else if (/\b(se-75|se75|selenium|seleen|ir-192|ir192|iridium)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.Se75;
     } else if (/\b(balteau\s*(?:ceram|directional)|ceram\s*300|directional)\b/i.test(lower) || /balteau/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.balteauCeram300;
+    } else if (params.bronTekst || params.bronType) {
+      if (/rondstraler/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauRondstraler;
+      else if (/smart\s*evo|evo\s*300|smart/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.smartEvo300;
+      else if (/yxlon/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.yxlon300;
+      else if (/balteau|ceram|directional/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauCeram300;
+      else if (params.bronType === "Se75" || params.bronType === "Ir192" || /se-?75|ir-?192|selenium|iridium/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.Se75;
+    }
+    if (tube && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.bronTekst = tube.name;
     }
 
     // Custom angle check
@@ -2362,14 +2373,14 @@
       }
     }
     if (!ffd) {
-      const match2m = lower.match(/(?:op|bij|afstand(?: van)?|focus(?: van)?)\s*(\d+(?:[.,]\d+)?)\s*(meter|m\b|cm|mm)\b/i);
+      const match2m = lower.match(/(?:op|bij|afstand(?: van)?|focus(?: van)?)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:meter|m\b|cm|mm))\b/i);
       if (match2m) {
-        let val = parseFloat(match2m[1].replace(",", "."));
-        const unit = match2m[2].toLowerCase();
-        if (unit === "meter" || unit === "m") val *= 1000;
-        else if (unit === "cm") val *= 10;
-        ffd = val;
+        const cmVal = parseFocusAfstandCm(match2m[1]);
+        if (cmVal) ffd = Math.round(cmVal * 10);
       }
+    }
+    if (ffd && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.sfd = ffd;
     }
 
     // Filmlengte / te dekken lengte check (bijv. "film van 48 cm", "480 mm film", "film van 40 cm", "om 65 cm te belichten")
@@ -2643,11 +2654,12 @@
       }
     }
 
-    // 2. Wanddikte (s / t in mm)
+    // 2. Wanddikte (s / t in mm) — strip "level 1/2/3" zodat het level-cijfer nooit als wanddikte wordt gelezen
     let t = params.wanddikte;
     if (!t) {
-      const matchT = lower.match(/(?:wanddikte|dikte|bij|op|van|voor)\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?\b/i) ||
-                     lower.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:dik|wanddikte)/i);
+      const lowerZonderLevel = lower.replace(/\b(?:level|niveau)\s*[123]\b/gi, " ");
+      const matchT = lowerZonderLevel.match(/(?:wanddikte|dikte|bij|op|van|voor)\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?\b/i) ||
+                     lowerZonderLevel.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:dik|wanddikte)/i);
       if (matchT) {
         t = parseFloat(matchT[1].replace(",", "."));
       }

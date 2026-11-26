@@ -1142,6 +1142,56 @@
         text-align: center;
         font-family: 'Roboto Condensed', sans-serif;
       }
+      /* Strakke donkere scrollbalk op PC (Chrome, Edge, Firefox) */
+      @media (min-width: 769px) {
+        .rt-ai-response-box,
+        .rt-ai-info-body,
+        .rt-ai-memory-bar,
+        .rt-ai-text-input,
+        .rt-ai-examples-list {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(245, 223, 77, 0.35) transparent;
+        }
+        .rt-ai-response-box::-webkit-scrollbar,
+        .rt-ai-info-body::-webkit-scrollbar,
+        .rt-ai-memory-bar::-webkit-scrollbar,
+        .rt-ai-text-input::-webkit-scrollbar,
+        .rt-ai-examples-list::-webkit-scrollbar {
+          width: 7px;
+          height: 7px;
+        }
+        .rt-ai-response-box::-webkit-scrollbar-track,
+        .rt-ai-info-body::-webkit-scrollbar-track,
+        .rt-ai-memory-bar::-webkit-scrollbar-track,
+        .rt-ai-text-input::-webkit-scrollbar-track,
+        .rt-ai-examples-list::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: 999px;
+        }
+        .rt-ai-response-box::-webkit-scrollbar-thumb,
+        .rt-ai-info-body::-webkit-scrollbar-thumb,
+        .rt-ai-memory-bar::-webkit-scrollbar-thumb,
+        .rt-ai-text-input::-webkit-scrollbar-thumb,
+        .rt-ai-examples-list::-webkit-scrollbar-thumb {
+          background: rgba(245, 223, 77, 0.3);
+          border-radius: 999px;
+          transition: background 0.15s ease;
+        }
+        .rt-ai-response-box::-webkit-scrollbar-thumb:hover,
+        .rt-ai-info-body::-webkit-scrollbar-thumb:hover,
+        .rt-ai-memory-bar::-webkit-scrollbar-thumb:hover,
+        .rt-ai-text-input::-webkit-scrollbar-thumb:hover,
+        .rt-ai-examples-list::-webkit-scrollbar-thumb:hover {
+          background: rgba(245, 223, 77, 0.65);
+        }
+        .rt-ai-response-box::-webkit-scrollbar-corner,
+        .rt-ai-info-body::-webkit-scrollbar-corner,
+        .rt-ai-memory-bar::-webkit-scrollbar-corner,
+        .rt-ai-text-input::-webkit-scrollbar-corner,
+        .rt-ai-examples-list::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+      }
     `;
     document.head.appendChild(style);
   }

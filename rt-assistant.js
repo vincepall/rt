@@ -2016,7 +2016,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 03-intentie-parser.js (1725 regels)
+  // MODULE: 03-intentie-parser.js (1837 regels)
   // ==========================================================================
   // --- Intentie Bepaling ---
   function bepaalVraagIntenties(tekst) {
@@ -2027,7 +2027,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       /\b(?:van|vanuit)\s+\S+.*?\b(?:naar|tot)\b/i.test(lower) ||
       /\b(?:wissel|focusverandering|kwadratenwet|oude\s+(?:focus|ffd|tijd|ci|curie)|nieuwe\s+(?:focus|ffd|tijd|ci|curie)|vorig\s+jaar|vroeger|eerst)\b/i.test(lower) ||
       /\bd[234578]\b.*?\bd[234578]\b/i.test(lower) ||
-      /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower);
+      /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) ||
+      /\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b).*?\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i.test(lower);
     const isZwartingTijdSchatting =
       (/\b(zwarting\w*|optische\s+dichtheid|density)\b/i.test(lower) || /\bvan\s+\d+(?:[.,]\d+)?\s+naar\s+\d+(?:[.,]\d+)?\b/i.test(lower)) &&
       (heeftTijdSeenheid ||
@@ -2247,7 +2248,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       /\b(?:oude\s+focus|oude\s+ffd|nieuwe\s+focus|nieuwe\s+ffd)\b/i.test(lower) ||
       /\b(van\s+d[234578]\s+naar\s+d[234578]|wissel\s+(?:van\s+)?d[234578]\s+naar\s+d[234578])\b/i.test(lower) ||
       (/\bd[234578]\b.*?\bd[234578]\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wissel|gebruik)/i.test(lower)) ||
-      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b).*?\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i.test(lower) && /\b(stralen|straal|belichten|belicht|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang|naar|omrekenen)\b/i.test(lower)) ||
       (/\b(?:op|bij|van)\s+\d+\s*cm\b.*?\b(?:op|bij|naar|tot)\s+\d+\s*cm\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
       (/\b\d+\s*(?:minuut|minuten|min\b|sec|seconden)\b/i.test(lower) &&
         /\b(hoe\s*lang|hoelang|wat\s+wordt|nieuwe\s+tijd|omrekenen|vergelijken)\b/i.test(lower) &&
@@ -2275,7 +2277,21 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // Focus & Filmtype Calculator / Focusverandering (focusverandering.html)
+    const isFocusVervolgVraag =
+      typeof actiefGespreksGeheugen !== "undefined" &&
+      actiefGespreksGeheugen &&
+      actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+      Boolean(actiefGespreksGeheugen.focusBegintijdSec) &&
+      !/\b(se-?75|ir-?192|selenium|iridium|duim|duimer|schedule|sch\b|plaat|dik|wanddikte|diameter|afzetting|draadje|opnames?|onstream)\b/i.test(lower) &&
+      (
+        (Boolean(actiefGespreksGeheugen.oudeMa) && /\b(?:met|op|bij|naar|en)\s*\d+(?:[.,]\d+)?(?:\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b))?\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeFocus) && /\b(?:met|op|bij|naar|en)\s*(?:\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b))\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeCi) && /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeFilmType) && /\bd[234578]\b/i.test(lower))
+      );
+
     const isFocusVeranderingVraag =
+      isFocusVervolgVraag ||
       heeftFocusCombinatieMetGeheugen ||
       /\b(focusverandering|focus\s*verandering|ffd\s*verandering|kwadratenwet|ci\s*wissel|curie\s*wissel)\b/i.test(lower) ||
       /\b(van\s+\d+\s*(?:cm|mm)?\s*(?:naar|tot)\s+\d+\s*(?:cm|mm)?\s*(?:ffd|sfd|focus))\b/i.test(lower) ||
@@ -2283,7 +2299,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       /\b(?:oude\s+focus|oude\s+ffd|nieuwe\s+focus|nieuwe\s+ffd)\b/i.test(lower) ||
       /\b(van\s+d[234578]\s+naar\s+d[234578]|wissel\s+(?:van\s+)?d[234578]\s+naar\s+d[234578]|omrekenen.*d[234578])\b/i.test(lower) ||
       /\b(wissel\s+van\s+\d+.*(?:ci|curie)\s+naar\s+\d+)\b/i.test(lower) ||
-      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b.*?\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang)\b/i.test(lower)) ||
+      (/\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b).*?\b\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i.test(lower) && /\b(stralen|straal|belichten|belicht|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang|hoelang|naar|omrekenen)\b/i.test(lower)) ||
       (/\b(?:op|bij|van)\s+\d+\s*cm\b.*?\b(?:op|bij|naar|tot)\s+\d+\s*cm\b/i.test(lower) && /\b(stralen|belichten|tijd|minuut|minuten|min\b|sec|seconden|lang|wat\s+wordt|nieuwe\s+tijd|hoe\s*lang)\b/i.test(lower)) ||
       (/\b\d+\s*(?:minuut|minuten|min\b|sec|seconden)\b/i.test(lower) &&
         /\b(hoe\s*lang|hoelang|wat\s+wordt|nieuwe\s+tijd|omrekenen|vergelijken)\b/i.test(lower) &&
@@ -2368,7 +2385,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const isLasfoutVraag =
       /\b(lasfout|lasfouten|lasfoutcode|gaspit|gaspitten|porie|porien|poriën|porositeit|nestporositeit|wormgat|wormgaten|slakinsluitsel|slaklijn|oxide[-\s]?insluitsel|wolfraaminsluitsel|bindingsfout|bindingsfouten|doorlassing|onvolkomen\s*doorlassing|geen\s*doorlassing|randinkarteling|inkarteling|doorbranden|doorbranding|eindkrater|kraterscheur|worteldoorzakking|teruggetrokken\s*wortel|wortelfout)\b/i.test(lower) ||
       (/\b(scheur|scheuren)\b/i.test(lower) && /\b(mag|toegestaan|toelaatbaar|acceptatie|norm|eis|eisen|level|asme|en|herken|foto|film)\b/i.test(lower)) ||
-      (/\b(2011|2013|2014|2015|2016|301|303|304|401|402|5011|510|100|104)\b/.test(lower) && /\b(lasfout|fout|norm|level|asme|en|acceptatie|mag|toegestaan|groot|code)\b/i.test(lower)) ||
+      (/\b(2011|2013|2014|2015|2016|301|303|304|401|402|5011|510|100|104)\b(?!\s*(?:cm|mm|m\b|meter|kv|ci|curie|ma\b|sec|min))/i.test(lower) && /\b(lasfout|fout|norm|level|asme|en\s*level|en\s*iso|acceptatie|mag|toegestaan|groot|code)\b/i.test(lower)) ||
       (/\b(acceptatiecriteria|acceptatie|toegestaan|toelaatbaar|hoe\s*groot\s*mag)\b/i.test(lower) && /\b(level\s*[123]|en\s*level|iso\s*5817|iso\s*10675|asme|lasfout)\b/i.test(lower));
 
     if (isLasfoutVraag) {
@@ -2636,6 +2653,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       nieuweFocus: null,
       oudeCi: null,
       nieuweCi: null,
+      oudeMa: null,
+      nieuweMa: null,
       oudeFilmType: null,
       nieuweFilmType: null,
       maminVal: null,
@@ -3110,16 +3129,40 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const tZonderDiaEnSchVoorMat = tekst
         .replace(/(?:diameter|buis|pijp|leiding|\bde\b)\s*\d+(?:[.,]\d+)?\s*(?:mm)?/gi, "")
         .replace(/\b(?:schedule|sch)\s*[a-z0-9]+\b/gi, "")
+        .replace(/\b(?:level|niveau)\s*[123]\b/gi, "")
         .replace(/(?:lasbreedte|naadbreedte|las\s*breedte|focus|brongrootte|bron|ffd|sfd|verzet|isolatie|isolatiedikte)\s*(?:van|is|op|:)?\s*\d+(?:[.,]\d+)?\s*(?:mm)?/gi, "");
       const matchWtMat = tZonderDiaEnSchVoorMat.match(/(?:op|bij|voor)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:staal|aluminium|alu|hdpe|pe|kunststof)\b/i);
       if (matchWtMat) {
         res.wanddikte = parseFloat(matchWtMat[1].replace(",", "."));
-      } else if (res.diameter !== null) {
-        const matchVanMm = tZonderDiaEnSchVoorMat.match(/\b(?:van|met)\s+(\d+(?:[.,]\d+)?)\s*mm\b(?!\s*(?:isolatie|isolatiedikte|lood|pb|staal|fe|ffd|sfd|focus|focusgrootte|brongrootte|bron|lasbreedte|afstand))/i);
-        if (matchVanMm) {
-          const vMm = parseFloat(matchVanMm[1].replace(",", "."));
-          if (vMm > 0 && vMm < 100) {
-            res.wanddikte = vMm;
+      } else {
+        const laatsteInt = (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) ? actiefGespreksGeheugen.laatsteIntentie : null;
+        const isWanddikteContext =
+          res.diameter !== null ||
+          laatsteInt === "draadje" ||
+          laatsteInt === "kv_regel" ||
+          laatsteInt === "lasfout" ||
+          /\b(porie|gaspit|slak|bindingsfout|doorlassing|lasfout|level\s*[123]|draadje|bki|iqi)\b/i.test(lower);
+        if (isWanddikteContext) {
+          const matchVanMm = tZonderDiaEnSchVoorMat.match(/\b(?:van|met|bij|op|en|voor)?\s*(\d+(?:[.,]\d+)?)\s*mm\b(?!\s*(?:isolatie|isolatiedikte|lood|pb|staal|fe|beton|baksteen|ffd|sfd|focus|focusgrootte|brongrootte|bron|lasbreedte|afstand))/i);
+          if (matchVanMm) {
+            const vMm = parseFloat(matchVanMm[1].replace(",", "."));
+            if (vMm > 0 && vMm < 100) {
+              res.wanddikte = vMm;
+            }
+          }
+        }
+      }
+    }
+
+    // Vervolgvraag met kale afstand voor stralingstijd / opnames / bundel (bijv. "en op 500 mm", "en op 1 meter 20")
+    if (res.sfd === null && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      const li = actiefGespreksGeheugen.laatsteIntentie;
+      if (li === "stralingstijd" || li === "opnames" || li === "bundel") {
+        const matchKaleFfd = lower.match(/\b(?:op|bij|naar|met|en)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:mm|cm|meter|m\b))\b(?!\s*(?:dik|wanddikte|isolatie|lood|pb|staal|fe|beton|baksteen|duim|inch))/i);
+        if (matchKaleFfd) {
+          const cmVal = parseFocusAfstandCm(matchKaleFfd[1]);
+          if (cmVal !== null && cmVal >= 10 && cmVal <= 500) {
+            res.sfd = Math.round(cmVal * 10);
           }
         }
       }
@@ -3352,12 +3395,43 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     let tekstZonderMaMin = tekst.replace(new RegExp(`\\b\\d+(?:[.,]\\d+)?\\s*${reMaMinVal.source}\\b`, "gi"), "")
                                 .replace(new RegExp(`\\b${reMaMinVal.source}\\s*(?:van|is|op|:)?\\s*\\d+(?:[.,]\\d+)?\\b`, "gi"), "");
-    let matchMaOnly = tekstZonderMaMin.match(/(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
-    if (!matchMaOnly) {
-      matchMaOnly = tekstZonderMaMin.match(/(?:stroom|buisstroom|op|met|bij|kan)\s*(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
-    }
-    if (matchMaOnly) {
-      res.maVal = parseFloat(matchMaOnly[1].replace(",", "."));
+    const alleMaHits = [...tekstZonderMaMin.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/gi)]
+      .map((m) => parseFloat(m[1].replace(",", ".")))
+      .filter((v) => !isNaN(v) && v > 0);
+    if (alleMaHits.length >= 2) {
+      res.oudeMa = alleMaHits[0];
+      res.nieuweMa = alleMaHits[1];
+    } else if (alleMaHits.length === 1) {
+      const heeftActieveMaContext =
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+        Boolean(actiefGespreksGeheugen.oudeMa && actiefGespreksGeheugen.focusBegintijdSec) &&
+        res.maminVal === null;
+      if (heeftActieveMaContext) {
+        res.nieuweMa = alleMaHits[0];
+      } else {
+        res.maVal = alleMaHits[0];
+      }
+    } else {
+      const matchMaOnly = tekstZonderMaMin.match(/(?:stroom|buisstroom|op|met|bij|kan)\s*(\d+(?:[.,]\d+)?)\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)/i);
+      if (matchMaOnly) {
+        res.maVal = parseFloat(matchMaOnly[1].replace(",", "."));
+      } else if (
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+        Boolean(actiefGespreksGeheugen.oudeMa && actiefGespreksGeheugen.focusBegintijdSec) &&
+        !/\b(cm|mm|meter|m\b|duim|duimer|ci|curie|kv|d[234578]|minuut|minuten|sec|seconden|zwarting)\b/i.test(lower)
+      ) {
+        const matchKaleMa = lower.match(/\b(?:met|op|bij|naar|en)\s*(\d+(?:[.,]\d+)?)\b/);
+        if (matchKaleMa) {
+          const vMa = parseFloat(matchKaleMa[1].replace(",", "."));
+          if (!isNaN(vMa) && vMa > 0 && vMa <= 30) {
+            res.nieuweMa = vMa;
+          }
+        }
+      }
     }
 
     // 2. Focus verandering (Kwadratenwet F1 -> F2)
@@ -3434,6 +3508,14 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         if (cmHits.length >= 2 && (res.focusBegintijdSec !== null || res.maminVal !== null || /\b(ci|curie|wissel|omrekenen|stralen|tijd)\b/i.test(tekst))) {
           res.oudeFocus = cmHits[0];
           res.nieuweFocus = cmHits[1];
+        } else if (
+          cmHits.length === 1 &&
+          typeof actiefGespreksGeheugen !== "undefined" &&
+          actiefGespreksGeheugen &&
+          actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+          actiefGespreksGeheugen.oudeFocus > 0
+        ) {
+          res.nieuweFocus = cmHits[0];
         }
       }
     }
@@ -3456,6 +3538,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
           res.zwartingOud = z1;
           res.zwartingNieuw = z2;
         }
+      } else if (
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "zwarting" &&
+        actiefGespreksGeheugen.zwartingOud > 0
+      ) {
+        const matchZwVervolg = lower.match(/\b(?:naar|tot|op|voor)\s*(?:zwarting\s*)?(\d+(?:[.,]\d+)?)(?![.,\d])(?!\s*(?:minuut|minuten|min\b|sec\b|seconden|s\b|mm|cm|meter|m\b|ci|curie|kv|ma\b))/i);
+        if (matchZwVervolg) {
+          const zNieuw = parseFloat(matchZwVervolg[1].replace(",", "."));
+          if (zNieuw >= 0.5 && zNieuw <= 6.0) {
+            res.zwartingNieuw = zNieuw;
+          }
+        }
       }
     }
 
@@ -3465,7 +3560,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       res.oudeFilmType = filmMatches[0];
       res.nieuweFilmType = filmMatches[1];
     } else if (filmMatches.length === 1) {
-      if (/\b(?:naar|wissel\s+naar|nieuwe\s+film)\s*d[234578]\b/i.test(tekst) || /\b(?:wat\s+wordt\s+de\s+tijd|hoe\s+lang\s+moet)\b/i.test(tekst)) {
+      const heeftActieveFilmContext =
+        typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+        Boolean(actiefGespreksGeheugen.oudeFilmType && actiefGespreksGeheugen.focusBegintijdSec);
+      if (
+        heeftActieveFilmContext ||
+        /\b(?:naar|wissel\s+naar|nieuwe\s+film)\s*d[234578]\b/i.test(tekst) ||
+        /\b(?:wat\s+wordt\s+de\s+tijd|hoe\s+lang\s+moet)\b/i.test(tekst)
+      ) {
         res.nieuweFilmType = filmMatches[0];
       } else {
         res.oudeFilmType = filmMatches[0];
@@ -3487,6 +3591,14 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         if (ciHits.length >= 2) {
           res.oudeCi = ciHits[0];
           res.nieuweCi = ciHits[1];
+        } else if (
+          ciHits.length === 1 &&
+          typeof actiefGespreksGeheugen !== "undefined" &&
+          actiefGespreksGeheugen &&
+          actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
+          actiefGespreksGeheugen.oudeCi > 0
+        ) {
+          res.nieuweCi = ciHits[0];
         }
       }
     }
@@ -3745,7 +3857,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 04-calc-opnames-tijd-afzetting.js (2859 regels)
+  // MODULE: 04-calc-opnames-tijd-afzetting.js (2871 regels)
   // ==========================================================================
   // --- Rekenmodules ---
 
@@ -5366,10 +5478,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     // 2. Centrale / Panoramische opstelling (SWSI / rondstraler)
     const isCentraal = /\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower) || params.optie === "1" || isRondstralerBron(params, lower);
     if (isCentraal) {
-      if (!params.sfd && De) {
-        params.sfd = Math.round(De / 2);
+      const centraleFfd = De ? Math.round(De / 2) : params.sfd;
+      if (centraleFfd) {
+        params.sfd = centraleFfd;
         if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
-          actiefGespreksGeheugen.sfd = params.sfd;
+          actiefGespreksGeheugen.sfd = centraleFfd;
         }
       }
       const f48 = Math.ceil(omtrek / 400);
@@ -6080,18 +6193,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   function berekenBundelbreedte(params, vraagTekst, chips = []) {
     const lower = (vraagTekst || "").toLowerCase();
 
-    // 1. Bron / Buis detectie
+    // 1. Bron / Buis detectie (eerst huidige tekst, daarna geheugen)
     let tube = null;
+    const bronCheckTekst = (lower + " " + (params.bronTekst || "")).toLowerCase();
     if (/\b(balteau\s*rondstraler|rondstraler|rondstralen)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.balteauRondstraler;
     } else if (/\b(smart\s*evo|evo\s*300|smart|yxlon\s*smart)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.smartEvo300;
     } else if (/\b(yxlon|yxlon\s*300)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.yxlon300;
-    } else if (/\b(se-75|se75|selenium|seleen|ir-192|ir192|iridium)\b/i.test(lower) || params.bronType === "Se75" || params.bronType === "Ir192") {
+    } else if (/\b(se-75|se75|selenium|seleen|ir-192|ir192|iridium)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.Se75;
     } else if (/\b(balteau\s*(?:ceram|directional)|ceram\s*300|directional)\b/i.test(lower) || /balteau/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.balteauCeram300;
+    } else if (params.bronTekst || params.bronType) {
+      if (/rondstraler/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauRondstraler;
+      else if (/smart\s*evo|evo\s*300|smart/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.smartEvo300;
+      else if (/yxlon/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.yxlon300;
+      else if (/balteau|ceram|directional/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauCeram300;
+      else if (params.bronType === "Se75" || params.bronType === "Ir192" || /se-?75|ir-?192|selenium|iridium/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.Se75;
+    }
+    if (tube && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.bronTekst = tube.name;
     }
 
     // Custom angle check
@@ -6111,14 +6234,14 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
     if (!ffd) {
-      const match2m = lower.match(/(?:op|bij|afstand(?: van)?|focus(?: van)?)\s*(\d+(?:[.,]\d+)?)\s*(meter|m\b|cm|mm)\b/i);
+      const match2m = lower.match(/(?:op|bij|afstand(?: van)?|focus(?: van)?)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:meter|m\b|cm|mm))\b/i);
       if (match2m) {
-        let val = parseFloat(match2m[1].replace(",", "."));
-        const unit = match2m[2].toLowerCase();
-        if (unit === "meter" || unit === "m") val *= 1000;
-        else if (unit === "cm") val *= 10;
-        ffd = val;
+        const cmVal = parseFocusAfstandCm(match2m[1]);
+        if (cmVal) ffd = Math.round(cmVal * 10);
       }
+    }
+    if (ffd && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.sfd = ffd;
     }
 
     // Filmlengte / te dekken lengte check (bijv. "film van 48 cm", "480 mm film", "film van 40 cm", "om 65 cm te belichten")
@@ -6392,11 +6515,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
-    // 2. Wanddikte (s / t in mm)
+    // 2. Wanddikte (s / t in mm) — strip "level 1/2/3" zodat het level-cijfer nooit als wanddikte wordt gelezen
     let t = params.wanddikte;
     if (!t) {
-      const matchT = lower.match(/(?:wanddikte|dikte|bij|op|van|voor)\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?\b/i) ||
-                     lower.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:dik|wanddikte)/i);
+      const lowerZonderLevel = lower.replace(/\b(?:level|niveau)\s*[123]\b/gi, " ");
+      const matchT = lowerZonderLevel.match(/(?:wanddikte|dikte|bij|op|van|voor)\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?\b/i) ||
+                     lowerZonderLevel.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:dik|wanddikte)/i);
       if (matchT) {
         t = parseFloat(matchT[1].replace(",", "."));
       }
@@ -6608,7 +6732,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 05-calc-normen-iqi-kaart.js (2584 regels)
+  // MODULE: 05-calc-normen-iqi-kaart.js (2618 regels)
   // ==========================================================================
   // 9. Focus & Filmtype Calculator / Kwadratenwet (focusverandering.html)
   function convertFilmTime(seconds, fromFilm, toFilm) {
@@ -6655,6 +6779,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const oorspronkelijkeBegintijdSec = begintijdSec;
     let maminMsg = "";
     let ciMsg = "";
+    let maMsg = "";
 
     // 1. mA*min berekening
     if (params.maminVal && params.maVal && params.maVal > 0) {
@@ -6672,6 +6797,20 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         const ciFactor = params.oudeCi / params.nieuweCi;
         if (chips) chips.push("90 seconden", "2 minuten", "3 minuten");
         return `Bij een bronwissel van <strong>${params.oudeCi} Ci</strong> naar <strong>${params.nieuweCi} Ci</strong> is de omrekenfactor <strong>${ciFactor.toFixed(2)}x</strong> (de tijd wordt ${ciFactor >= 1 ? ((ciFactor - 1) * 100).toFixed(0) + "% langer" : ((1 - ciFactor) * 100).toFixed(0) + "% korter"}).<br><br>Wat is de <strong>oude stralingstijd</strong> (bijv. 2 minuten of 90 seconden)?<br><small style="opacity: 0.85;">(Berekend volgens <a href="focusverandering.html" class="ai-link" target="_blank">focusverandering.html</a> conform <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; <span class="rt-math-frac"><span class="rt-math-num">Ci<sub>1</sub></span><span class="rt-math-den">Ci<sub>2</sub></span></span></span>).</small>`;
+      }
+    }
+
+    // 2b. Buisstroom (mA) wissel berekening: mA * tijd = constant -> t2 = t1 * (mA1 / mA2)
+    if (params.oudeMa && params.nieuweMa && params.nieuweMa > 0) {
+      if (begintijdSec) {
+        const oudeTijdSec = begintijdSec;
+        const maMinTotaal = params.oudeMa * (oudeTijdSec / 60);
+        begintijdSec = oudeTijdSec * (params.oudeMa / params.nieuweMa);
+        maMsg = `• Buisstroom (mA) wissel: van <strong>${params.oudeMa} mA</strong> naar <strong>${params.nieuweMa} mA</strong> (${maMinTotaal.toFixed(2).replace(/\.00$/, "")} mA&middot;min: ${formatSecondenKort(oudeTijdSec)} &rarr; <strong>${formatSecondenKort(begintijdSec)}</strong>)<br>`;
+      } else {
+        const maFactor = params.oudeMa / params.nieuweMa;
+        if (chips) chips.push("1 minuut", "2 minuten", "90 seconden");
+        return `Bij een buisstroomwissel van <strong>${params.oudeMa} mA</strong> naar <strong>${params.nieuweMa} mA</strong> is de omrekenfactor <strong>${maFactor.toFixed(2)}x</strong> (de belichtingstijd wordt ${maFactor >= 1 ? ((maFactor - 1) * 100).toFixed(0) + "% langer" : ((1 - maFactor) * 100).toFixed(0) + "% korter"}).<br><br>Wat is de <strong>huidige stralingstijd</strong> (bijv. 2 minuten of 90 seconden)?<br><small style="opacity: 0.85;">(Conform <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; <span class="rt-math-frac"><span class="rt-math-num">mA<sub>1</sub></span><span class="rt-math-den">mA<sub>2</sub></span></span></span>).</small>`;
       }
     }
 
@@ -6837,6 +6976,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (maminMsg) out += maminMsg;
     out += `• Begintijd: <strong>${formatSecondenKort(oorspronkelijkeBegintijdSec || begintijdSec)}</strong><br>`;
     if (ciMsg) out += ciMsg;
+    if (maMsg) out += maMsg;
     if (focusTxt) out += focusTxt;
     if (matTxt) out += matTxt;
     if (filmTxt) out += filmTxt;
@@ -6866,6 +7006,24 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && !isNaN(eindTijdSec) && eindTijdSec > 0) {
       actiefGespreksGeheugen.focusBegintijdSec = Math.round(eindTijdSec);
       actiefGespreksGeheugen.laatsteStralingstijdSec = Math.round(eindTijdSec);
+      // Schuif voltooide wissels door naar de nieuwe huidige toestand zodat vervolgvragen ze niet nogmaals toepassen!
+      if (params.nieuweMa && params.nieuweMa > 0) {
+        actiefGespreksGeheugen.oudeMa = params.nieuweMa;
+        actiefGespreksGeheugen.nieuweMa = null;
+      }
+      if (params.nieuweFilmType) {
+        actiefGespreksGeheugen.oudeFilmType = params.nieuweFilmType;
+        actiefGespreksGeheugen.filmType = params.nieuweFilmType;
+        actiefGespreksGeheugen.nieuweFilmType = null;
+      }
+      if (params.nieuweFocus && params.nieuweFocus > 0) {
+        actiefGespreksGeheugen.oudeFocus = params.nieuweFocus;
+        actiefGespreksGeheugen.nieuweFocus = null;
+      }
+      if (params.nieuweCi && params.nieuweCi > 0) {
+        actiefGespreksGeheugen.oudeCi = params.nieuweCi;
+        actiefGespreksGeheugen.nieuweCi = null;
+      }
     }
     out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="focusverandering.html" class="ai-link" target="_blank">focusverandering.html</a> conform kwadratenwet & filmfactoren).</small>`;
     out += `</div>`;
@@ -9196,7 +9354,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 06-geheugen-en-vraagrouter.js (2282 regels)
+  // MODULE: 06-geheugen-en-vraagrouter.js (2290 regels)
   // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
@@ -9243,6 +9401,8 @@ ${stralingstijdPlat}========================================`;
     nieuweFocus: null,
     oudeCi: null,
     nieuweCi: null,
+    oudeMa: null,
+    nieuweMa: null,
     oudeFilmType: null,
     nieuweFilmType: null,
     maminVal: null,
@@ -9290,6 +9450,7 @@ ${stralingstijdPlat}========================================`;
       .replace(/&ndash;/gi, "–")
       .replace(/&mdash;/gi, "—")
       .replace(/&bull;/gi, "•")
+      .replace(/&middot;/gi, "·")
       .replace(/&rarr;/gi, "→")
       .replace(/&mu;/gi, "μ")
       .replace(/&approx;/gi, "≈")
@@ -9452,7 +9613,8 @@ ${stralingstijdPlat}========================================`;
     "Wat is mijn stralingstijd als ik een 40 curie iridium heb en een 6 duimer van 4 dik gevuld met olie doe schieten op 800 focus?",
     "Ik straal 2 minuten op 80 op D4, hoelang is dat op 56 focus op D5?",
     "Ik heb 25 mili ampere minuten, hoelang is het stralen met 3 mili ampere?",
-    "Wat betekent R.A.D.I?"
+    "Wat betekent R.A.D.I?",
+    "Wat is de minimale focus voor een 3 duimer volgens klasse B?"
   ];
 
   let geladenStartschermVragen = null;
@@ -10842,6 +11004,8 @@ ${stralingstijdPlat}========================================`;
       nieuwParsed.nieuweFocus !== null ||
       nieuwParsed.oudeCi !== null ||
       nieuwParsed.nieuweCi !== null ||
+      nieuwParsed.oudeMa !== null ||
+      nieuwParsed.nieuweMa !== null ||
       nieuwParsed.oudeFilmType !== null ||
       nieuwParsed.nieuweFilmType !== null ||
       nieuwParsed.maminVal !== null ||
@@ -11197,6 +11361,8 @@ ${stralingstijdPlat}========================================`;
               if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
                 actiefGespreksGeheugen.focusBegintijdSec = tNieuwSec;
                 actiefGespreksGeheugen.laatsteStralingstijdSec = tNieuwSec;
+                actiefGespreksGeheugen.zwartingOud = dNieuw;
+                actiefGespreksGeheugen.zwartingNieuw = null;
               }
 
               if (chips) chips.push("Naar zwarting 2.0", "Naar zwarting 2.5", "Naar zwarting 3.0");
@@ -11482,7 +11648,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 07-ui-modal-styles.js (1383 regels)
+  // MODULE: 07-ui-modal-styles.js (1433 regels)
   // ==========================================================================
   // --- UI Controller (Universeel op elke pagina) ---
   let assistantModal = null;
@@ -12628,6 +12794,56 @@ ${stralingstijdPlat}========================================`;
         text-align: center;
         font-family: 'Roboto Condensed', sans-serif;
       }
+      /* Strakke donkere scrollbalk op PC (Chrome, Edge, Firefox) */
+      @media (min-width: 769px) {
+        .rt-ai-response-box,
+        .rt-ai-info-body,
+        .rt-ai-memory-bar,
+        .rt-ai-text-input,
+        .rt-ai-examples-list {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(245, 223, 77, 0.35) transparent;
+        }
+        .rt-ai-response-box::-webkit-scrollbar,
+        .rt-ai-info-body::-webkit-scrollbar,
+        .rt-ai-memory-bar::-webkit-scrollbar,
+        .rt-ai-text-input::-webkit-scrollbar,
+        .rt-ai-examples-list::-webkit-scrollbar {
+          width: 7px;
+          height: 7px;
+        }
+        .rt-ai-response-box::-webkit-scrollbar-track,
+        .rt-ai-info-body::-webkit-scrollbar-track,
+        .rt-ai-memory-bar::-webkit-scrollbar-track,
+        .rt-ai-text-input::-webkit-scrollbar-track,
+        .rt-ai-examples-list::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: 999px;
+        }
+        .rt-ai-response-box::-webkit-scrollbar-thumb,
+        .rt-ai-info-body::-webkit-scrollbar-thumb,
+        .rt-ai-memory-bar::-webkit-scrollbar-thumb,
+        .rt-ai-text-input::-webkit-scrollbar-thumb,
+        .rt-ai-examples-list::-webkit-scrollbar-thumb {
+          background: rgba(245, 223, 77, 0.3);
+          border-radius: 999px;
+          transition: background 0.15s ease;
+        }
+        .rt-ai-response-box::-webkit-scrollbar-thumb:hover,
+        .rt-ai-info-body::-webkit-scrollbar-thumb:hover,
+        .rt-ai-memory-bar::-webkit-scrollbar-thumb:hover,
+        .rt-ai-text-input::-webkit-scrollbar-thumb:hover,
+        .rt-ai-examples-list::-webkit-scrollbar-thumb:hover {
+          background: rgba(245, 223, 77, 0.65);
+        }
+        .rt-ai-response-box::-webkit-scrollbar-corner,
+        .rt-ai-info-body::-webkit-scrollbar-corner,
+        .rt-ai-memory-bar::-webkit-scrollbar-corner,
+        .rt-ai-text-input::-webkit-scrollbar-corner,
+        .rt-ai-examples-list::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -12869,7 +13085,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 08-ui-speech-tts-init.js (1454 regels)
+  // MODULE: 08-ui-speech-tts-init.js (1503 regels)
   // ==========================================================================
   let isPushing = false;
   let isFinishingPTT = false;
@@ -13156,11 +13372,51 @@ ${stralingstijdPlat}========================================`;
     }
   }
 
+  let radiHistoryPushed = false;
+  let radiPopstateRegistered = false;
+
   function openAssistant(startSpraak = false) {
     laadBronnenCsv(true);
     laadStartschermVragen();
     maakAssistantUI();
     updateTtsButtonUi();
+
+    if (typeof window !== "undefined" && !radiPopstateRegistered) {
+      radiPopstateRegistered = true;
+      window.addEventListener("popstate", () => {
+        if (imgLightboxEl) {
+          sluitAfbeeldingZoom();
+          if (assistantModal && assistantModal.style.display !== "none" && window.history && typeof window.history.pushState === "function") {
+            try {
+              window.history.pushState({ radiModalOpen: true }, "");
+              radiHistoryPushed = true;
+            } catch (e) {}
+          }
+          return;
+        }
+        const infoPanel = typeof document !== "undefined" ? document.getElementById("rt-ai-info-panel") : null;
+        if (infoPanel && infoPanel.style.display === "flex") {
+          toggleInfoPanel(false);
+          if (assistantModal && assistantModal.style.display !== "none" && window.history && typeof window.history.pushState === "function") {
+            try {
+              window.history.pushState({ radiModalOpen: true }, "");
+              radiHistoryPushed = true;
+            } catch (e) {}
+          }
+          return;
+        }
+        if (assistantModal && assistantModal.style.display !== "none") {
+          radiHistoryPushed = false;
+          sluitAssistant(true);
+        }
+      });
+    }
+    if (typeof window !== "undefined" && window.history && typeof window.history.pushState === "function" && !radiHistoryPushed) {
+      try {
+        window.history.pushState({ radiModalOpen: true }, "");
+        radiHistoryPushed = true;
+      } catch (e) {}
+    }
 
     // Blokkeer achtergrond scrollen op body & html
     savedScrollY = window.scrollY || window.pageYOffset || (document.documentElement && document.documentElement.scrollTop) || 0;
@@ -13202,7 +13458,8 @@ ${stralingstijdPlat}========================================`;
     }
   }
 
-  function sluitAssistant() {
+  function sluitAssistant(vanuitPopstate = false) {
+    sluitAfbeeldingZoom();
     toggleInfoPanel(false);
     isExamplesOpen = false;
     const exBtn = document.getElementById("rt-ai-examples-toggle");
@@ -13241,6 +13498,14 @@ ${stralingstijdPlat}========================================`;
     document.body.style.right = "";
     document.body.style.width = "";
     document.body.style.overflow = "";
+    if (!vanuitPopstate && radiHistoryPushed) {
+      radiHistoryPushed = false;
+      if (typeof window !== "undefined" && window.history && window.history.state && window.history.state.radiModalOpen) {
+        try {
+          window.history.back();
+        } catch (e) {}
+      }
+    }
     if (document.documentElement) document.documentElement.style.overflow = "";
     window.scrollTo(0, savedScrollY);
   }

@@ -283,11 +283,51 @@
     }
   }
 
+  let radiHistoryPushed = false;
+  let radiPopstateRegistered = false;
+
   function openAssistant(startSpraak = false) {
     laadBronnenCsv(true);
     laadStartschermVragen();
     maakAssistantUI();
     updateTtsButtonUi();
+
+    if (typeof window !== "undefined" && !radiPopstateRegistered) {
+      radiPopstateRegistered = true;
+      window.addEventListener("popstate", () => {
+        if (imgLightboxEl) {
+          sluitAfbeeldingZoom();
+          if (assistantModal && assistantModal.style.display !== "none" && window.history && typeof window.history.pushState === "function") {
+            try {
+              window.history.pushState({ radiModalOpen: true }, "");
+              radiHistoryPushed = true;
+            } catch (e) {}
+          }
+          return;
+        }
+        const infoPanel = typeof document !== "undefined" ? document.getElementById("rt-ai-info-panel") : null;
+        if (infoPanel && infoPanel.style.display === "flex") {
+          toggleInfoPanel(false);
+          if (assistantModal && assistantModal.style.display !== "none" && window.history && typeof window.history.pushState === "function") {
+            try {
+              window.history.pushState({ radiModalOpen: true }, "");
+              radiHistoryPushed = true;
+            } catch (e) {}
+          }
+          return;
+        }
+        if (assistantModal && assistantModal.style.display !== "none") {
+          radiHistoryPushed = false;
+          sluitAssistant(true);
+        }
+      });
+    }
+    if (typeof window !== "undefined" && window.history && typeof window.history.pushState === "function" && !radiHistoryPushed) {
+      try {
+        window.history.pushState({ radiModalOpen: true }, "");
+        radiHistoryPushed = true;
+      } catch (e) {}
+    }
 
     // Blokkeer achtergrond scrollen op body & html
     savedScrollY = window.scrollY || window.pageYOffset || (document.documentElement && document.documentElement.scrollTop) || 0;
@@ -329,7 +369,8 @@
     }
   }
 
-  function sluitAssistant() {
+  function sluitAssistant(vanuitPopstate = false) {
+    sluitAfbeeldingZoom();
     toggleInfoPanel(false);
     isExamplesOpen = false;
     const exBtn = document.getElementById("rt-ai-examples-toggle");
@@ -368,6 +409,14 @@
     document.body.style.right = "";
     document.body.style.width = "";
     document.body.style.overflow = "";
+    if (!vanuitPopstate && radiHistoryPushed) {
+      radiHistoryPushed = false;
+      if (typeof window !== "undefined" && window.history && window.history.state && window.history.state.radiModalOpen) {
+        try {
+          window.history.back();
+        } catch (e) {}
+      }
+    }
     if (document.documentElement) document.documentElement.style.overflow = "";
     window.scrollTo(0, savedScrollY);
   }

@@ -43,6 +43,8 @@
     nieuweFocus: null,
     oudeCi: null,
     nieuweCi: null,
+    oudeMa: null,
+    nieuweMa: null,
     oudeFilmType: null,
     nieuweFilmType: null,
     maminVal: null,
@@ -90,6 +92,7 @@
       .replace(/&ndash;/gi, "–")
       .replace(/&mdash;/gi, "—")
       .replace(/&bull;/gi, "•")
+      .replace(/&middot;/gi, "·")
       .replace(/&rarr;/gi, "→")
       .replace(/&mu;/gi, "μ")
       .replace(/&approx;/gi, "≈")
@@ -252,7 +255,8 @@
     "Wat is mijn stralingstijd als ik een 40 curie iridium heb en een 6 duimer van 4 dik gevuld met olie doe schieten op 800 focus?",
     "Ik straal 2 minuten op 80 op D4, hoelang is dat op 56 focus op D5?",
     "Ik heb 25 mili ampere minuten, hoelang is het stralen met 3 mili ampere?",
-    "Wat betekent R.A.D.I?"
+    "Wat betekent R.A.D.I?",
+    "Wat is de minimale focus voor een 3 duimer volgens klasse B?"
   ];
 
   let geladenStartschermVragen = null;
@@ -1642,6 +1646,8 @@
       nieuwParsed.nieuweFocus !== null ||
       nieuwParsed.oudeCi !== null ||
       nieuwParsed.nieuweCi !== null ||
+      nieuwParsed.oudeMa !== null ||
+      nieuwParsed.nieuweMa !== null ||
       nieuwParsed.oudeFilmType !== null ||
       nieuwParsed.nieuweFilmType !== null ||
       nieuwParsed.maminVal !== null ||
@@ -1997,6 +2003,8 @@
               if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
                 actiefGespreksGeheugen.focusBegintijdSec = tNieuwSec;
                 actiefGespreksGeheugen.laatsteStralingstijdSec = tNieuwSec;
+                actiefGespreksGeheugen.zwartingOud = dNieuw;
+                actiefGespreksGeheugen.zwartingNieuw = null;
               }
 
               if (chips) chips.push("Naar zwarting 2.0", "Naar zwarting 2.5", "Naar zwarting 3.0");

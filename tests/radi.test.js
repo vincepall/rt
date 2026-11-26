@@ -585,6 +585,92 @@ function laadRtAssistant() {
       /1m 40s/.test(tZwCompact) && /100s/.test(tZwCompact) && RT.actiefGespreksGeheugen.diameter === null && RT.actiefGespreksGeheugen.wanddikte === null,
       `${tZwCompact} | mem=${JSON.stringify({ d: RT.actiefGespreksGeheugen.diameter, wt: RT.actiefGespreksGeheugen.wanddikte })}`
     );
+
+    RT.resetGespreksGeheugen();
+    const rMaWissel = await RT.verwerkUniverseleVraag("Ik straal 2 minuten met 3 mA hoelang is het met 5 mA");
+    const tMaWissel = stripTags(rMaWissel && rMaWissel.text);
+    assert(
+      "E2E Buisstroom (mA) wissel: 2 minuten bij 3 mA -> 5 mA geeft 1m 12s (6 mA·min)",
+      /1m 12s/.test(tMaWissel) && /3 mA/.test(tMaWissel) && /5 mA/.test(tMaWissel),
+      tMaWissel
+    );
+    const rMaVervolg = await RT.verwerkUniverseleVraag("hoelang met 1.75");
+    const tMaVervolg = stripTags(rMaVervolg && rMaVervolg.text);
+    assert(
+      "E2E Buisstroom vervolgvraag 'hoelang met 1.75' rekent direct door (6 mA·min -> 3m 26s)",
+      /3m 26s/.test(tMaVervolg) && /1\.75 mA/.test(tMaVervolg),
+      tMaVervolg
+    );
+
+    RT.resetGespreksGeheugen();
+    const rCombo1 = await RT.verwerkUniverseleVraag("ik straal 1 minuut met 2 mA op d4, hoelang is het met 4 mA op d5");
+    const tCombo1 = stripTags(rCombo1 && rCombo1.text);
+    assert("E2E Combinatie mA + film: 1m bij 2mA D4 -> 4mA D5 = 18s", /18 seconden/.test(tCombo1), tCombo1);
+    const rCombo2 = await RT.verwerkUniverseleVraag("en met 3 ma");
+    const tCombo2 = stripTags(rCombo2 && rCombo2.text);
+    assert(
+      "E2E Combinatie vervolg 'en met 3 ma' past D4->D5 niet dubbel toe (18s * 4/3 = 24s, niet 14s)",
+      /24 seconden/.test(tCombo2) && !/14 seconden/.test(tCombo2),
+      tCombo2
+    );
+
+    // Regressietests voor alle 9 vervolgvraag-fixes
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("1 minuut op 80 cm, hoelang op 56 cm");
+    const rFoc100 = await RT.verwerkUniverseleVraag("en op 100 cm");
+    const tFoc100 = stripTags(rFoc100 && rFoc100.text);
+    assert("Vervolg 1: 'en op 100 cm' blijft focuswissel (niet Scheur code 100)", /56 naar 100 cm FFD/.test(tFoc100) && !/Scheur/i.test(tFoc100), tFoc100);
+
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("2 minuten met 30 Ci, hoelang met 20 Ci");
+    const rCi15 = await RT.verwerkUniverseleVraag("en met 15 Ci");
+    const tCi15 = stripTags(rCi15 && rCi15.text);
+    assert("Vervolg 2: 'en met 15 Ci' rekent door van 20 Ci naar 15 Ci (4 minuten)", /van 20 Ci naar 15 Ci/.test(tCi15) && /4 minuten/.test(tCi15), tCi15);
+
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("1 minuut op D7, hoelang op D4");
+    const rFilmD5 = await RT.verwerkUniverseleVraag("en op D5");
+    const tFilmD5 = stripTags(rFilmD5 && rFilmD5.text);
+    assert("Vervolg 3: 'en op D5' rekent van D4 naar D5 (1m 28s)", /D4 naar D5/.test(tFilmD5) && /1m 28s/.test(tFilmD5), tFilmD5);
+
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("ik straal 1 minuut en heb zwarting 1.5, hoe krijg ik 2.5");
+    const rZw3 = await RT.verwerkUniverseleVraag("en naar 3.0");
+    const tZw3 = stripTags(rZw3 && rZw3.text);
+    assert("Vervolg 4: zwarting 'en naar 3.0' rekent door van 2.5 naar 3.0 (2 minuten)", /van 2\.5 naar 3/.test(tZw3) && /2 minuten/.test(tZw3), tZw3);
+
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("hoeveel opnames op een 6 duimer van 8 dik volgens klasse B");
+    await RT.verwerkUniverseleVraag("400 mm");
+    const rOpnCentr = await RT.verwerkUniverseleVraag("en centraal");
+    const tOpnCentr = stripTags(rOpnCentr && rOpnCentr.text);
+    assert("Vervolg 5: opnames 'en centraal' zet FFD op halve diameter (84 mm, niet 400 mm)", /84 mm/.test(tOpnCentr) && !/400 mm/.test(tOpnCentr), tOpnCentr);
+
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("hoeveel kV op 10 mm staal");
+    const rKv15 = await RT.verwerkUniverseleVraag("en 15 mm");
+    const tKv15 = stripTags(rKv15 && rKv15.text);
+    assert("Vervolg 6: KV-regel 'en 15 mm' werkt wanddikte bij naar 15 mm (30.0 mm dubbelwandig)", /30\.0 mm/.test(tKv15), tKv15);
+
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("hoe lang stralen op een 6 duimer sch 40 met 25 Ci Se-75 op 400 mm");
+    const rStr500 = await RT.verwerkUniverseleVraag("en op 500 mm");
+    const tStr500 = stripTags(rStr500 && rStr500.text);
+    assert("Vervolg 7: stralingstijd 'en op 500 mm' werkt FFD bij naar 500 mm", /500 mm/.test(tStr500), tStr500);
+
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("bundelbreedte balteau op 80 cm");
+    const rBund120 = await RT.verwerkUniverseleVraag("en op 1 meter 20");
+    const tBund120 = stripTags(rBund120 && rBund120.text);
+    assert("Vervolg 8a: bundelbreedte 'en op 1 meter 20' onthoudt Balteau Ceram 300", /Balteau Ceram 300/.test(tBund120) && /1200 mm/.test(tBund120), tBund120);
+    const rBundSmart = await RT.verwerkUniverseleVraag("en met smart evo");
+    const tBundSmart = stripTags(rBundSmart && rBundSmart.text);
+    assert("Vervolg 8b: bundelbreedte 'en met smart evo' onthoudt 1200 mm", /Smart EVO/.test(tBundSmart) && /1200 mm/.test(tBundSmart), tBundSmart);
+
+    RT.resetGespreksGeheugen();
+    const rLas10 = await RT.verwerkUniverseleVraag("hoe groot mag een porie zijn bij 10 mm level 1");
+    const tLas10 = stripTags(rLas10 && rLas10.text);
+    assert("Vervolg 9: lasfout 'bij 10 mm level 1' leest 10 mm (niet 1 mm uit level 1)", /wanddikte van 10 mm/.test(tLas10), tLas10);
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows
