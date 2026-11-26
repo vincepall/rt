@@ -689,6 +689,47 @@ function laadRtAssistant() {
       /20 mA\*min bij 4 mA = 5m 00s/.test(tMaMinCombo) && /80 naar 56 cm FFD/.test(tMaMinCombo) && /D4 naar D5/.test(tMaMinCombo) && /1m 28s/.test(tMaMinCombo),
       tMaMinCombo
     );
+
+    RT.resetGespreksGeheugen();
+    const rOmtrek = await RT.verwerkUniverseleVraag("Wat is de omtrek van een 8 duimer");
+    const tOmtrek = stripTags(rOmtrek && rOmtrek.text);
+    assert(
+      "E2E Omtrek van een 8 duimer (68.8 cm / 688.3 mm, geen opnames-wizard)",
+      /68\.8 cm/.test(tOmtrek) && /688\.3 mm/.test(tOmtrek) && !/welke opstelling/i.test(tOmtrek),
+      tOmtrek
+    );
+
+    RT.resetGespreksGeheugen();
+    const rVerdeel = await RT.verwerkUniverseleVraag("Hoe verdeel ik een 4 duimer in 7 opnames");
+    const tVerdeel = stripTags(rVerdeel && rVerdeel.text);
+    assert(
+      "E2E Verdelen 4 duimer in 7 opnames (5.1 cm, Film 1 = 0.0 cm t/m Film 7 = 30.8 cm)",
+      /Effectieve filmlengte: 5\.1 cm/.test(tVerdeel) &&
+        /Film 1 = 0\.0 cm/.test(tVerdeel) &&
+        /Film 2 = 5\.1 cm/.test(tVerdeel) &&
+        /Film 3 = 10\.3 cm/.test(tVerdeel) &&
+        /Film 7 = 30\.8 cm/.test(tVerdeel),
+      tVerdeel
+    );
+
+    RT.resetGespreksGeheugen();
+    const rOpn4 = await RT.verwerkUniverseleVraag("Hoeveel opnames op een 4 duimer van 6 dik volgens klasse B met 40cm focus?");
+    const tOpn4 = stripTags(rOpn4 && rOpn4.text);
+    assert(
+      "E2E Aantal opnames toont effectieve filmlengte (cm) zonder graden + chip 'Verdelen van de opnames'",
+      /Effectieve filmlengte: \d+\.\d cm/.test(tOpn4) &&
+        !/om de \d+°/.test(tOpn4) &&
+        Array.isArray(rOpn4.chips) &&
+        rOpn4.chips.includes("Verdelen van de opnames"),
+      tOpn4
+    );
+    const rOpn4Verdeel = await RT.verwerkUniverseleVraag("Verdelen van de opnames", { isChip: true });
+    const tOpn4Verdeel = stripTags(rOpn4Verdeel && rOpn4Verdeel.text);
+    assert(
+      "E2E Chip 'Verdelen van de opnames' gebruikt berekende aantal opnames en diameter uit geheugen",
+      /Effectieve filmlengte: \d+\.\d cm/.test(tOpn4Verdeel) && /Film 1 = 0\.0 cm/.test(tOpn4Verdeel),
+      tOpn4Verdeel
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

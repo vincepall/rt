@@ -61,6 +61,7 @@
     kv: null,
     vervalDagen: null,
     vervalDoelDatum: null,
+    laatsteAantalOpnames: null,
   };
 
   let actieveVraagId = 0;
@@ -945,6 +946,8 @@
     }
     const intentMap = {
       opnames: "Hoeveel opnames?",
+      omtrek: "Wat is de omtrek?",
+      opname_verdeling: "Verdelen van de opnames",
       stralingstijd: "Wat is de stralingstijd?",
       min_ffd: "Wat is de minimale FFD?",
       draadjes: "Welk draadje moet ik zien?",
@@ -1776,6 +1779,8 @@
       min_ffd: 6,
       ug_berekening: 6.2,
       bundel: 6.5,
+      omtrek: 6.8,
+      opname_verdeling: 6.9,
       opnames: 7,
       draadje: 8,
       zwarting: 9,
@@ -2093,6 +2098,16 @@
             }
             antwoorden.push(`<strong>Actuele bronnen uit bronnen.csv (gesorteerd op sterkte):</strong><br><br>${blokken.join("<br><br>")}`);
           }
+        }
+      } else if (intentie === "omtrek") {
+        if (!uitgevoerdeHandlers.has("omtrek")) {
+          uitgevoerdeHandlers.add("omtrek");
+          antwoorden.push(berekenOmtrek(params, gefilterdeTekst, chips));
+        }
+      } else if (intentie === "opname_verdeling") {
+        if (!uitgevoerdeHandlers.has("opname_verdeling")) {
+          uitgevoerdeHandlers.add("opname_verdeling");
+          antwoorden.push(berekenOpnameVerdeling(params, gefilterdeTekst, chips));
         }
       } else if (intentie === "opnames") {
         if (!uitgevoerdeHandlers.has("opnames")) {

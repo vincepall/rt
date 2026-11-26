@@ -1764,27 +1764,33 @@
     const expA = calculateMinimumExposures(De, t, sfd, techniek, "EN-A", params.optie || "");
 
     const gekozenExp = proc === "EN-B" ? expB : expA;
-    const graden = Math.round(360 / gekozenExp);
-    const effFilm = (omtrek / gekozenExp).toFixed(1);
+    const effFilmCm = (omtrek / gekozenExp / 10).toFixed(1);
+
+    if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.laatsteAantalOpnames = gekozenExp;
+    }
+    if (chips) {
+      chips.push("Verdelen van de opnames");
+    }
 
     const opstellingTekst = params.opstelling || (techniek === "SWSI" && params.optie === "2" ? "SWSI excentrisch (opstelling 8/B)" : (techniek === "SWSI" ? "SWSI (opstelling 2/C)" : "DWSI"));
     let resp = `Voor ${diaLabel} van ${t} mm dik volgens ${proc} (${opstellingTekst}, ${sfdInfo}):<br>` +
-               `• Minimaal aantal opnames: <strong>${gekozenExp} opnames</strong> (om de ${graden}°).<br>` +
-               `• Omtrek: ${omtrekCm} cm (effectieve lengte per opname: ${effFilm} mm).`;
+               `• Minimaal aantal opnames: <strong>${gekozenExp} opnames</strong>.<br>` +
+               `• Effectieve filmlengte: <strong>${effFilmCm} cm</strong> (omtrek: ${omtrekCm} cm).`;
 
     if (proc === "EN-B" && expA !== expB) {
-      const gradenA = Math.round(360 / expA);
-      resp += `<br><small style="opacity: 0.85;">(Volgens Klasse A of ASME: minimaal ${expA} opnames om de ${gradenA}° vanwege ruimere 20% diktetolerantie t.o.v. 10% bij Klasse B).</small>`;
+      const effFilmACm = (omtrek / expA / 10).toFixed(1);
+      resp += `<br><small style="opacity: 0.85;">(Volgens Klasse A of ASME: minimaal ${expA} opnames, effectieve filmlengte ${effFilmACm} cm, vanwege ruimere 20% diktetolerantie t.o.v. 10% bij Klasse B).</small>`;
     }
 
     const berekendeMinFFD = (params.brongrootte || params.bronTekst) ? bepaalNumeriekeMinFFD(params, vraagTekst) : null;
     if (berekendeMinFFD && sfd < berekendeMinFFD) {
       const expMin = calculateMinimumExposures(De, t, berekendeMinFFD, techniek, proc, params.optie || "");
-      const gradenMin = Math.round(360 / expMin);
-      resp += `<br><small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD/10).toFixed(1)} cm):</em> minimaal <strong>${expMin} opnames</strong> (om de ${gradenMin}°).</small>`;
+      const effFilmMinCm = (omtrek / expMin / 10).toFixed(1);
+      resp += `<br><small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD/10).toFixed(1)} cm):</em> minimaal <strong>${expMin} opnames</strong> (effectieve filmlengte ${effFilmMinCm} cm).</small>`;
     }
 
-    let ttsOpnames = `Minimaal ${gekozenExp} ${gekozenExp === 1 ? "opname" : "opnames"}, om de ${graden} graden`;
+    let ttsOpnames = `Minimaal ${gekozenExp} ${gekozenExp === 1 ? "opname" : "opnames"}, effectieve filmlengte ${effFilmCm} centimeter`;
     if (berekendeMinFFD && sfd < berekendeMinFFD) {
       ttsOpnames = `Let op, minimale FFD onderschreden. ${ttsOpnames}`;
     }
@@ -1792,6 +1798,82 @@
     resp += `<br><small style="opacity: 0.85;">(Berekend volgens <a href="opnamesklasseb.html" class="ai-link" target="_blank">opnamesklasseb.html</a> conform EN ISO 17636-1 / ASME). Opmerking: 1 opname rondom is alleen mogelijk bij een <em>centrale/panoramische</em> opstelling van binnenuit.</small>`;
 
     return resp;
+  }
+
+  function berekenOmtrek(params, vraagTekst, chips = []) {
+    const De = params.diameter;
+    if (!De) {
+      if (chips) chips.push("4 duimer", "6 duimer", "8 duimer");
+      return "Om de <strong>omtrek</strong> te berekenen heb ik de <strong>diameter</strong> van de buis nodig (bijv. 4 duimer, DN200 of 219.1 mm). Wat is de diameter?";
+    }
+    const diaLabel = formatMmNaarDuimLabel(De);
+    const omtrekMm = De * Math.PI;
+    const omtrekCm = (omtrekMm / 10).toFixed(1);
+    const omtrekM = (omtrekMm / 1000).toFixed(3);
+    if (chips) {
+      chips.push("Verdelen van de opnames", "Aantal opnames", "Minimale FFD");
+    }
+    return `De omtrek van <strong>${diaLabel}</strong> (OD ${De} mm) is:<br>` +
+           `• <strong>${omtrekCm} cm</strong> (${omtrekMm.toFixed(1)} mm / ${omtrekM} m)` +
+           `<span class="rt-tts-summary" style="display:none">De omtrek van ${diaLabel} is ${omtrekCm} centimeter</span>` +
+           `<br><small style="opacity: 0.85;">(Formule: &pi; &times; ${De} mm = ${omtrekMm.toFixed(1)} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small>`;
+  }
+
+  function berekenOpnameVerdeling(params, vraagTekst, chips = []) {
+    const lower = (vraagTekst || "").toLowerCase();
+    const De = params.diameter;
+    if (!De) {
+      if (chips) chips.push("4 duimer", "6 duimer", "8 duimer");
+      return "Om de <strong>filmposities</strong> op de rondnaad te verdelen heb ik de <strong>diameter</strong> van de buis nodig (bijv. 4 duimer of DN100). Wat is de diameter?";
+    }
+
+    const diaLabel = formatMmNaarDuimLabel(De);
+    const omtrek = De * Math.PI;
+    const omtrekCm = (omtrek / 10).toFixed(1);
+
+    let nOpn = null;
+    const matchOpn =
+      lower.match(/(?:in|over|met|bij|naar)?\s*(\d+)\s*(?:opname[ns]?|films?|platen|plaatjes|shots?|posities?)\b/i) ||
+      ((params.verwachtParameter === "aantalOpnames" || (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && actiefGespreksGeheugen.laatsteIntentie === "opname_verdeling"))
+        ? lower.match(/^\s*(?:in|over|met|en)?\s*(\d+)\s*$/i)
+        : null);
+    if (matchOpn) {
+      const parsedN = parseInt(matchOpn[1], 10);
+      if (parsedN >= 1 && parsedN <= 100) {
+        nOpn = parsedN;
+      }
+    }
+    if (!nOpn && params.laatsteAantalOpnames && params.laatsteAantalOpnames > 0) {
+      nOpn = params.laatsteAantalOpnames;
+    }
+
+    if (!nOpn) {
+      if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+        actiefGespreksGeheugen.verwachtParameter = "aantalOpnames";
+      }
+      if (chips) chips.push("3 opnames", "4 opnames", "5 opnames", "6 opnames", "7 opnames");
+      return `In hoeveel <strong>opnames</strong> wil je <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) verdelen?`;
+    }
+
+    if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+      actiefGespreksGeheugen.laatsteAantalOpnames = nOpn;
+      actiefGespreksGeheugen.verwachtParameter = null;
+    }
+
+    const afstand = omtrek / nOpn;
+    const effFilmCm = (afstand / 10).toFixed(1);
+    let locaties = "";
+    let huidigeLocatie = 0;
+    for (let i = 1; i <= nOpn; i++) {
+      locaties += `Film ${i} = <strong>${(huidigeLocatie / 10).toFixed(1)} cm</strong><br>`;
+      huidigeLocatie += afstand;
+    }
+
+    return `Verdeling voor <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) in <strong>${nOpn} opnames</strong>:<br>` +
+           `Effectieve filmlengte: <strong>${effFilmCm} cm</strong><br><br>` +
+           `${locaties}` +
+           `<span class="rt-tts-summary" style="display:none">Verdeling voor ${diaLabel} in ${nOpn} opnames: effectieve filmlengte ${effFilmCm} centimeter</span>` +
+           `<small style="opacity: 0.85;">(Berekend volgens <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small>`;
   }
 
   // 6. "Mag ik..." verificatievragen (bijv. Voorbeeld 7: centraal schieten, ovaaltjes, excentrisch)

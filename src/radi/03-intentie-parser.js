@@ -405,7 +405,31 @@
       intenties.push("stralingstijd");
     }
 
-    // Opnames / omtrek / hoekverdeling (graden draaien / aantal foto's / aantal shots)
+    // Verdelen van opnames / filmposities op een rondnaad (pruts.html)
+    const isOpnameVerdelingVraag =
+      /\b(verdelen\s+van\s+(?:de\s+)?(?:opnames?|films?)|opnames?\s+verdelen|films?\s+verdelen|filmverdeling|opnameverdeling|opnamelocaties?|filmposities?|waar\s+(?:komen|moeten|plak\s+ik|leg\s+ik)\s+(?:de\s+)?(?:films?|opnames?))\b/i.test(lower) ||
+      (/\b(verdeel|verdelen|verdeling)\b/i.test(lower) && /\b(opname[ns]?|films?|platen|plaatjes|shots?|duim|duimer|dn\s*\d+|pijp|buis|leiding|rondnaad)\b/i.test(lower)) ||
+      (typeof actiefGespreksGeheugen !== "undefined" &&
+        actiefGespreksGeheugen &&
+        actiefGespreksGeheugen.laatsteIntentie === "opname_verdeling" &&
+        /\b(?:in|over|met|naar|en)?\s*\d+\s*(?:opname[ns]?|films?|platen|plaatjes|shots?)?\b/i.test(lower) &&
+        !/\b(hoeveel\s+opnames|stralingstijd|afzetting|draadje|bki|iqi|ffd|focus|kv|zwarting|onstream)\b/i.test(lower));
+    if (isOpnameVerdelingVraag && !isStralingstijdVraag) {
+      intenties.push("opname_verdeling");
+      return intenties;
+    }
+
+    // Omtrek van een buis / leiding (pruts.html)
+    const isOmtrekVraag =
+      /\b(omtrek|buitenomtrek|buisomtrek|pijpomtrek)\b/i.test(lower) &&
+      !isStralingstijdVraag &&
+      !/\b(hoeveel|aantal)\s*(?:van\s+de\s+)?(films?|opname[ns]?|foto'?s?|shots?|platen|plaatjes)\b/i.test(lower);
+    if (isOmtrekVraag) {
+      intenties.push("omtrek");
+      return intenties;
+    }
+
+    // Opnames / hoekverdeling (graden draaien / aantal foto's / aantal shots)
     const lowerZonderFilm = lower.replace(/\b(d[234578]|d\s*[234578])\s+films?\b/gi, "").replace(/\bfilm(?:kwaliteit|type|klasse|soort)\b/gi, "");
     if (
       /\b(hoeveel|aantal)\s*(?:van\s+de\s+)?(films?|opname[ns]?|foto'?s?|shots?|platen|plaatjes)\b/i.test(lowerZonderFilm) ||
@@ -413,7 +437,7 @@
       /\b(films?|opname[ns]?|foto'?s?|shots?|platen|plaatjes)\s*(?:heb\s+ik\s+)?(?:nodig|moet\s+ik|maken|gebruiken|schieten|leggen|plakken)\b/i.test(lowerZonderFilm) ||
       /\bhoeveel\s+(?:foto'?s?|platen?|shots?|films?|opname[ns]?|plaatjes?)\b/i.test(lowerZonderFilm) ||
       /\b(?:om\s+)?hoeveel\s+graden\b.*?\b(?:draaien|verdraaien|verplaatsen|verschuiven|schieten|opname)\b/i.test(lowerZonderFilm) ||
-      (/\b(omtrek|filmverdeling|opnameverdeling|aantal\s+posities|opnamelocaties?)\b/i.test(lowerZonderFilm) && !isStralingstijdVraag)
+      (/\b(aantal\s+posities)\b/i.test(lowerZonderFilm) && !isStralingstijdVraag)
     ) {
       intenties.push("opnames");
     }
