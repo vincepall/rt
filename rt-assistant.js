@@ -9464,7 +9464,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 06-geheugen-en-vraagrouter.js (2306 regels)
+  // MODULE: 06-geheugen-en-vraagrouter.js (2307 regels)
   // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
@@ -9726,7 +9726,8 @@ ${stralingstijdPlat}========================================`;
     "Ik heb 25 mili ampere minuten, hoelang is het stralen met 3 mili ampere?",
     "Wat betekent R.A.D.I?",
     "Wat is de minimale focus voor een 3 duimer volgens klasse B?",
-    "Ik heb 20 mA*min op 80 op D4, hoelang moet ik stralen op 56 op D5 met 4 mA?"
+    "Ik heb 20 mA*min op 80 op D4, hoelang moet ik stralen op 56 op D5 met 4 mA?",
+    "Verdeel een 6 duimer in 6 opnames."
   ];
 
   let geladenStartschermVragen = null;
@@ -13211,7 +13212,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 08-ui-speech-tts-init.js (1503 regels)
+  // MODULE: 08-ui-speech-tts-init.js (1504 regels)
   // ==========================================================================
   let isPushing = false;
   let isFinishingPTT = false;
@@ -14074,6 +14075,7 @@ ${stralingstijdPlat}========================================`;
     { categorie: "Opstelling & Opnames", type: "Aantal opnames rondnaad (DWSI)", voorbeeld: "Hoeveel opnames op een 6 duimer van 8 mm dik op FFD 250 mm volgens Klasse B?", toelichting: "Berekent het minimaal aantal opnames en de rotatiehoek volgens EN-A, EN-B of ASME." },
     { categorie: "Opstelling & Opnames", type: "Aantal opnames kleine diameter (DWDI <= 100 mm)", voorbeeld: "Hoeveel opnames op een 2 duimer van 12 mm dik?", toelichting: "Bepaalt of 2 opnames (ovaaltje, <= 8 mm) of 3 opnames (superpositie, > 8 mm) nodig zijn." },
     { categorie: "Opstelling & Opnames", type: "Aantal opnames & films bij panoramisch stralen", voorbeeld: "Hoeveel opnames moet ik maken op een 16 duimer van 12.7 mm dik met de bron in het midden?", toelichting: "Geeft de omtrek en het benodigde aantal 10x48 films voor 1 panoramische opname." },
+    { categorie: "Opstelling & Opnames", type: "Opnames verdelen / filmposities op rondnaad", voorbeeld: "Verdeel een 6 duimer in 6 opnames.", toelichting: "Berekent de effectieve filmlengte en exacte filmposities langs de omtrek van de buis." },
     { categorie: "Opstelling & Opnames", type: "Aantal graden draaien tussen opnames", voorbeeld: "Om hoeveel graden moet ik draaien bij 4 opnames op een 6 duimer?", toelichting: "Berekent de hoekverdraaiing per opname (360° / aantal opnames) of bij een ovaaltje (90°)." },
     { categorie: "Opstelling & Opnames", type: "Voorgeschreven opstelling bepalen", voorbeeld: "Volgens welke opstelling moet ik een 3 duimer van 6 mm dik schieten?", toelichting: "Adviseert de juiste EN/ASME opstelling (DWDI 11/F, 12/G of DWSI 13/14/E) op basis van de diameter." },
     { categorie: "Opstelling & Opnames", type: "Controle of ovaaltje (Opstelling 11 / F) mag", voorbeeld: "Mag ik een 2 duimer van 4 mm dik met ovaaltje schieten?", toelichting: "Controleert diameter (<= 100 mm), wanddikte (<= 8 mm) en maximale lasbreedte (De / 4)." },
