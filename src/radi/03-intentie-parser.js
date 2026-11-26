@@ -1415,12 +1415,16 @@
     }
 
     // 2. Focus verandering (Kwadratenwet F1 -> F2)
-    // Specifiek spraakpatroon: "ik straal ... op [80], hoelang moet ik stralen op [1 meter 15 / 56 focus]"
-    const matchOpHoeLangOp = tekst.match(/(?:op|bij)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?\s*,?\s*(?:hoe\s*lang|hoelang)\s*(?:moet|kan|zal)?\s*(?:ik|men|we)?\s*(?:stralen|belichten)?\s*(?:op|bij|naar|tot)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?/i);
+    // Specifiek spraakpatroon: "ik straal ... op [80] (op d4 met 6 mA), hoelang is het op [1 meter 15 / 56 focus]"
+    const matchOpHoeLangOp = tekst.match(/(?:op|bij)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)(?!\s*(?:ma\b|mill?i[-\s]?amp|ci\b|curie|kv|minuut|minuten|min\b|sec|seconden|s\b|duim|duimer|dik|zwarting|d[234578]))\s*(?:ffd|sfd|focus)?(?:[^.?!]{0,45}?)\b(?:hoe\s*lang|hoelang)\b(?:[^.?!]{0,35}?)\b(?:op|bij|naar|tot)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)(?!\s*(?:ma\b|mill?i[-\s]?amp|ci\b|curie|kv|minuut|minuten|min\b|sec|seconden|s\b|duim|duimer|dik|zwarting|d[234578]))\s*(?:ffd|sfd|focus)?/i);
     const matchVanNaar = !matchOpHoeLangOp ? tekst.match(/(?:van|vanuit|op|bij)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?\s*(?:naar|tot|omhoog\s*naar)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?/i) : null;
     if (matchOpHoeLangOp) {
-      res.oudeFocus = parseFocusAfstandCm(matchOpHoeLangOp[1]);
-      res.nieuweFocus = parseFocusAfstandCm(matchOpHoeLangOp[2]);
+      const f1 = parseFocusAfstandCm(matchOpHoeLangOp[1]);
+      const f2 = parseFocusAfstandCm(matchOpHoeLangOp[2]);
+      if (f1 !== null && f2 !== null && f1 >= 15 && f2 >= 15) {
+        res.oudeFocus = f1;
+        res.nieuweFocus = f2;
+      }
     } else if (matchVanNaar) {
       const hasDistanceUnit = /\b(ffd|sfd|focus|cm|mm|meter|m\b)\b/i.test(matchVanNaar[0]);
       const v1 = parseFloat(matchVanNaar[1].replace(",", "."));

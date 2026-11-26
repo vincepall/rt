@@ -671,6 +671,24 @@ function laadRtAssistant() {
     const rLas10 = await RT.verwerkUniverseleVraag("hoe groot mag een porie zijn bij 10 mm level 1");
     const tLas10 = stripTags(rLas10 && rLas10.text);
     assert("Vervolg 9: lasfout 'bij 10 mm level 1' leest 10 mm (niet 1 mm uit level 1)", /wanddikte van 10 mm/.test(tLas10), tLas10);
+
+    RT.resetGespreksGeheugen();
+    const rTriple = await RT.verwerkUniverseleVraag("ik straal 2 minuten op 80 op d4 met 6 mA, hoelang is het op 56 op d5 met 3 mA");
+    const tTriple = stripTags(rTriple && rTriple.text);
+    assert(
+      "E2E Triple combinatie (focus 80->56 + film D4->D5 + mA 6->3) berekent alle 3 (1m 11s)",
+      /80 naar 56 cm FFD/.test(tTriple) && /6 mA naar 3 mA/.test(tTriple) && /D4 naar D5/.test(tTriple) && /1m 11s/.test(tTriple),
+      tTriple
+    );
+
+    RT.resetGespreksGeheugen();
+    const rMaMinCombo = await RT.verwerkUniverseleVraag("Ik heb 20 mA*min op 80 op D4, hoelang moet ik stralen op 56 op D5 met 4 mA?");
+    const tMaMinCombo = stripTags(rMaMinCombo && rMaMinCombo.text);
+    assert(
+      "E2E mA*min combinatie (20 mA*min bij 4 mA + focus 80->56 + film D4->D5 = 1m 28s)",
+      /20 mA\*min bij 4 mA = 5m 00s/.test(tMaMinCombo) && /80 naar 56 cm FFD/.test(tMaMinCombo) && /D4 naar D5/.test(tMaMinCombo) && /1m 28s/.test(tMaMinCombo),
+      tMaMinCombo
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

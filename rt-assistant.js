@@ -2016,7 +2016,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 03-intentie-parser.js (1837 regels)
+  // MODULE: 03-intentie-parser.js (1841 regels)
   // ==========================================================================
   // --- Intentie Bepaling ---
   function bepaalVraagIntenties(tekst) {
@@ -3435,12 +3435,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     // 2. Focus verandering (Kwadratenwet F1 -> F2)
-    // Specifiek spraakpatroon: "ik straal ... op [80], hoelang moet ik stralen op [1 meter 15 / 56 focus]"
-    const matchOpHoeLangOp = tekst.match(/(?:op|bij)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?\s*,?\s*(?:hoe\s*lang|hoelang)\s*(?:moet|kan|zal)?\s*(?:ik|men|we)?\s*(?:stralen|belichten)?\s*(?:op|bij|naar|tot)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?/i);
+    // Specifiek spraakpatroon: "ik straal ... op [80] (op d4 met 6 mA), hoelang is het op [1 meter 15 / 56 focus]"
+    const matchOpHoeLangOp = tekst.match(/(?:op|bij)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)(?!\s*(?:ma\b|mill?i[-\s]?amp|ci\b|curie|kv|minuut|minuten|min\b|sec|seconden|s\b|duim|duimer|dik|zwarting|d[234578]))\s*(?:ffd|sfd|focus)?(?:[^.?!]{0,45}?)\b(?:hoe\s*lang|hoelang)\b(?:[^.?!]{0,35}?)\b(?:op|bij|naar|tot)\s+(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)(?!\s*(?:ma\b|mill?i[-\s]?amp|ci\b|curie|kv|minuut|minuten|min\b|sec|seconden|s\b|duim|duimer|dik|zwarting|d[234578]))\s*(?:ffd|sfd|focus)?/i);
     const matchVanNaar = !matchOpHoeLangOp ? tekst.match(/(?:van|vanuit|op|bij)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?\s*(?:naar|tot|omhoog\s*naar)\s*(\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b)?)\s*(?:ffd|sfd|focus)?/i) : null;
     if (matchOpHoeLangOp) {
-      res.oudeFocus = parseFocusAfstandCm(matchOpHoeLangOp[1]);
-      res.nieuweFocus = parseFocusAfstandCm(matchOpHoeLangOp[2]);
+      const f1 = parseFocusAfstandCm(matchOpHoeLangOp[1]);
+      const f2 = parseFocusAfstandCm(matchOpHoeLangOp[2]);
+      if (f1 !== null && f2 !== null && f1 >= 15 && f2 >= 15) {
+        res.oudeFocus = f1;
+        res.nieuweFocus = f2;
+      }
     } else if (matchVanNaar) {
       const hasDistanceUnit = /\b(ffd|sfd|focus|cm|mm|meter|m\b)\b/i.test(matchVanNaar[0]);
       const v1 = parseFloat(matchVanNaar[1].replace(",", "."));
@@ -9354,7 +9358,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 06-geheugen-en-vraagrouter.js (2290 regels)
+  // MODULE: 06-geheugen-en-vraagrouter.js (2291 regels)
   // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
@@ -9614,7 +9618,8 @@ ${stralingstijdPlat}========================================`;
     "Ik straal 2 minuten op 80 op D4, hoelang is dat op 56 focus op D5?",
     "Ik heb 25 mili ampere minuten, hoelang is het stralen met 3 mili ampere?",
     "Wat betekent R.A.D.I?",
-    "Wat is de minimale focus voor een 3 duimer volgens klasse B?"
+    "Wat is de minimale focus voor een 3 duimer volgens klasse B?",
+    "Ik heb 20 mA*min op 80 op D4, hoelang moet ik stralen op 56 op D5 met 4 mA?"
   ];
 
   let geladenStartschermVragen = null;
