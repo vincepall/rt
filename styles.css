@@ -111,6 +111,7 @@ p {
     font-size: 24px; /* Grootte van het icoontje */
     color: rgba(204, 204, 204, 0.8); /* Lichtgrijze kleur */
     text-decoration: none;
+    z-index: 60;
 }
 
 .home-icon:hover {
@@ -188,6 +189,31 @@ p {
     cursor: pointer;
     width: auto;
     opacity: 0.7; /* Onopvallend maken */
+    z-index: 60;
+}
+
+.iron-frame-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: url("bgpunk-frame.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 50;
+}
+
+body.has-iron-frame {
+    height: auto !important;
+    min-height: 100vh !important;
+    padding: 80px 60px 140px 60px !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+    body.has-iron-frame {
+        padding: 96px 24px 180px 24px !important;
+    }
 }
 
 .info-btn:hover {
