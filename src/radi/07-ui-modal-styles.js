@@ -372,6 +372,104 @@
       .rt-ai-response-box div.rt-ai-result {
         margin-top: 8px;
       }
+      .rt-ai-timer-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .rt-ai-timer-btn {
+        background: rgba(245, 223, 77, 0.12);
+        color: #F5DF4D;
+        border: 1px solid rgba(245, 223, 77, 0.55);
+        border-radius: 999px;
+        padding: 5px 11px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background 0.15s, color 0.15s, transform 0.1s;
+      }
+      .rt-ai-timer-btn:hover {
+        background: #F5DF4D;
+        color: #16181d;
+      }
+      .rt-ai-timer-btn:active {
+        transform: scale(0.96);
+      }
+      #rt-ai-timer-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100005;
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      #rt-ai-timer-overlay.open {
+        display: flex;
+      }
+      .rt-ai-timer-card {
+        width: 100%;
+        max-width: 340px;
+        background: #1c1f26;
+        border: 2px solid #3c4252;
+        border-radius: 16px;
+        padding: 20px 18px;
+        color: #f4f4f4;
+        text-align: center;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
+      }
+      .rt-ai-timer-card.is-alarm {
+        border-color: #ef4444;
+        animation: rtAiTimerFlash 0.55s infinite alternate;
+      }
+      @keyframes rtAiTimerFlash {
+        from { background: #1c1f26; box-shadow: 0 0 12px rgba(239, 68, 68, 0.45); }
+        to { background: #4c1518; box-shadow: 0 0 28px rgba(239, 68, 68, 0.9); }
+      }
+      .rt-ai-timer-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #cbd5e1;
+        margin-bottom: 10px;
+      }
+      .rt-ai-timer-clock {
+        font-size: 3.1rem;
+        font-weight: 800;
+        color: #F5DF4D;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        letter-spacing: 2px;
+        background: #12141a;
+        border: 1px solid #323746;
+        border-radius: 12px;
+        padding: 14px 10px;
+        margin-bottom: 14px;
+      }
+      .rt-ai-timer-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      .rt-ai-timer-actions button {
+        flex: 1;
+        padding: 10px 8px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      .rt-ai-timer-start { background: #F5DF4D; color: #14161b; }
+      .rt-ai-timer-pause { background: #f59e0b; color: #14161b; }
+      .rt-ai-timer-reset { background: #374151; color: #f4f4f4; }
+      .rt-ai-timer-stop-alarm { background: #ef4444; color: #fff; width: 100%; margin-bottom: 8px; padding: 11px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; }
+      .rt-ai-timer-close { background: transparent; color: #9ca3af; border: 1px solid #3c4252 !important; margin-top: 10px; width: 100%; padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+      .rt-ai-timer-close:hover { color: #fff; border-color: #6b7280 !important; }
       .rt-ai-history-entry {
         padding-bottom: 8px;
       }

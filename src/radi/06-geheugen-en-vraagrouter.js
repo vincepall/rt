@@ -78,6 +78,7 @@
   function htmlNaarPlatteTekst(html) {
     return String(html || "")
       .replace(/<div class="rt-ai-chips-row">[\s\S]*?<\/div>/gi, "")
+      .replace(/<div class="rt-ai-timer-row">[\s\S]*?<\/div>/gi, "")
       .replace(/<span class="rt-tts-summary"[^>]*>[\s\S]*?<\/span>/gi, "")
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
@@ -308,10 +309,10 @@
         const safeJs = vraag.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;");
         return (
           `<li class="rt-ai-start-example-item">` +
-          `<button type="button" class="rt-ai-start-example-icon" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${safeJs}')" title="Stel deze voorbeeldvraag" aria-label="Stel voorbeeldvraag">` +
-          `<i class="fas fa-play"></i>` +
+          `<button type="button" class="rt-ai-start-example-icon" onclick="window.RtAssistant && window.RtAssistant.vulVoorbeeldIn('${safeJs}')" title="Zet in invoerveld om aan te passen" aria-label="Zet voorbeeldvraag in invoerveld">` +
+          `<i class="fas fa-arrow-down"></i>` +
           `</button>` +
-          `<span class="rt-ai-start-example-text"><em>&ldquo;${escapeHtmlTekst(vraag)}&rdquo;</em></span>` +
+          `<span class="rt-ai-start-example-text" style="cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.vulVoorbeeldIn('${safeJs}')" title="Zet in invoerveld om aan te passen"><em>&ldquo;${escapeHtmlTekst(vraag)}&rdquo;</em></span>` +
           `</li>`
         );
       })
@@ -2027,7 +2028,9 @@
                 `<div style="font-size:1.05rem; font-weight:700; color:#F5DF4D; margin-bottom:8px;">⏱️ Praktijkschatting stralingstijd voor zwarting van ${dOud} naar ${dNieuw}:</div>` +
                 `Op basis van de lineaire verhouding tussen stralingsdosis en optische zwarting geldt de omrekenfactor <span class="rt-math-inline"><span class="rt-math-frac"><span class="rt-math-num">${dNieuw}</span><span class="rt-math-den">${dOud}</span></span> = <strong>${factor.toFixed(2)}x</strong> (${diffLabel})</span>:<br><br>` +
                 `• <strong>Begintijd bij zwarting ${dOud}:</strong> <strong>${formatSecondenKort(tOudSec)}</strong> (${formatSecondenVoluit(tOudSec)})<br>` +
-                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <span class="rt-ai-result">${formatSecondenVoluit(tNieuwSec)}</span> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).<br><br>` +
+                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <span class="rt-ai-result">${formatSecondenVoluit(tNieuwSec)}</span> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).` +
+                maakTimerKnopHtml(tNieuwSec, `Zwarting ${dNieuw}`) +
+                `<br>` +
                 `<div style="background:#14171f; border:1px solid rgba(245,223,77,0.3); border-radius:6px; padding:8px 12px; margin:6px 0; font-size:0.85rem; color:#ccc;">` +
                 `📐 <em>Formule:</em> <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; (<span class="rt-math-frac"><span class="rt-math-num"><i>D</i><sub>2</sub></span><span class="rt-math-den"><i>D</i><sub>1</sub></span></span>) = ${tOudSec}s &times; (${dNieuw} / ${dOud}) = <strong>${tNieuwSec}s</strong></span><br>` +
                 `⚠️ <em>Let op:</em> Dit is een betrouwbare praktijkschatting (in werkelijkheid speelt ook de sluierzwarting <i>D</i><sub>0</sub> &approx; 0.20 en het ontwikkelproces mee).` +
@@ -2272,6 +2275,53 @@
         if (minFfdVal && chips && !chips.includes(`${minFfdVal} mm FFD (min. ffd)`)) {
           chips.unshift(`${minFfdVal} mm FFD (min. ffd)`);
         }
+      }
+    }
+
+    // Slimme workflow-chips zodra een leiding/las (diameter + wanddikte of plaat + wanddikte) bekend is
+    // en er geen openstaande vervolgvraag meer staat
+    const workflowIntenties = new Set([
+      "opnames", "opname_verdeling", "omtrek", "min_ffd", "draadje",
+      "stralingstijd", "afzetting", "schedule", "verzet", "gevulde_leiding",
+      "kv_regel", "onstream_bron", "onstream_ffd"
+    ]);
+    const isWorkflowHandler = [...uitgevoerdeHandlers].some((h) => workflowIntenties.has(h));
+    const heeftLeidingBasis = Boolean(
+      actiefGespreksGeheugen &&
+      ((actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.wanddikte) ||
+        (actiefGespreksGeheugen.isPlaat && actiefGespreksGeheugen.wanddikte))
+    );
+    if (
+      isWorkflowHandler &&
+      heeftLeidingBasis &&
+      !actiefGespreksGeheugen.verwachtParameter &&
+      !actiefGespreksGeheugen.openVraag
+    ) {
+      const heeftChipGelijkaardig = (regex) => chips.some((c) => regex.test(String(c || "")));
+      const voegWorkflowChipToe = (label, checkRegex) => {
+        if (chips.length >= 7) return;
+        if (!heeftChipGelijkaardig(checkRegex)) {
+          chips.push(label);
+        }
+      };
+
+      if (actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.diameter > 100 && actiefGespreksGeheugen.laatsteAantalOpnames > 0 && !uitgevoerdeHandlers.has("opname_verdeling")) {
+        voegWorkflowChipToe("Verdelen van de opnames", /verdelen/i);
+      }
+      if (actiefGespreksGeheugen.diameter && !uitgevoerdeHandlers.has("opnames")) {
+        voegWorkflowChipToe("Aantal opnames", /opnames/i);
+      }
+      if (!uitgevoerdeHandlers.has("min_ffd") && !uitgevoerdeHandlers.has("onstream_ffd")) {
+        voegWorkflowChipToe("Minimale FFD", /min.*ffd/i);
+      }
+      if (!uitgevoerdeHandlers.has("draadje")) {
+        voegWorkflowChipToe("BKI draadje", /draadje|bki/i);
+      }
+      if (!uitgevoerdeHandlers.has("stralingstijd")) {
+        voegWorkflowChipToe("Stralingstijd", /stralingstijd/i);
+      }
+      if (!uitgevoerdeHandlers.has("afzetting")) {
+        voegWorkflowChipToe("Veilige afzetting", /afzetting/i);
       }
     }
 

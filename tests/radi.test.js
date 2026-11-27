@@ -759,6 +759,32 @@ function laadRtAssistant() {
       /80 naar 145 cm FFD/.test(tMaMinMet4Ma) && /D4 naar D5/.test(tMaMinMet4Ma) && /3m 57s/.test(tMaMinMet4Ma),
       tMaMinMet4Ma
     );
+
+    // Timer-knop + ingebouwde timer API + mini-SVG bij verdelen van opnames
+    assert(
+      "Timer API: openTimer en sluitTimer zijn beschikbaar op RtAssistant",
+      typeof RT.openTimer === "function" && typeof RT.sluitTimer === "function",
+      typeof RT.openTimer
+    );
+    assert(
+      "Timer-knop aanwezig in focusverandering-antwoord (openTimer(237, ...))",
+      /openTimer\(237,/.test(rMaMinMet4Ma && rMaMinMet4Ma.text),
+      rMaMinMet4Ma && rMaMinMet4Ma.text
+    );
+    assert(
+      "Mini-SVG rondnaadschets aanwezig bij verdelen van opnames",
+      /<svg[\s\S]*Rondnaad filmverdeling[\s\S]*<\/svg>/.test(rVerdeel && rVerdeel.text),
+      rVerdeel && rVerdeel.text
+    );
+    assert(
+      "Workflow-chips verschijnen automatisch na complete leidingberekening (opnames -> verdelen, min FFD, draadje, stralingstijd)",
+      Array.isArray(rOpn4.chips) &&
+        rOpn4.chips.includes("Verdelen van de opnames") &&
+        rOpn4.chips.includes("Minimale FFD") &&
+        rOpn4.chips.includes("BKI draadje") &&
+        rOpn4.chips.includes("Stralingstijd"),
+      JSON.stringify(rOpn4.chips)
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

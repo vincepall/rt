@@ -712,14 +712,14 @@
     if (isWmaxVraag) {
       regels.push(
         `Voor ${diaLabel} van ${t} mm dik is de doorstraalde wanddikte:<br>` +
-        `• <strong>Wmax = ${wmax.toFixed(1)} mm</strong> (berekend conform <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).<br>` +
-        `• Toegestane bron(nen) (${techniek === "tangentiaal" ? "Tangentiaal RT21021" : "Dubbelwand RT21022"}, klasse ${effectiveKlasse.toUpperCase()}): ${geformatteerdeBronnen}.${waarschuwing}`
+        `• <span class="rt-ai-result">Wmax = ${wmax.toFixed(1)} mm</span> (berekend conform <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).<br>` +
+        `• Toegestane bron(nen) (${techniek === "tangentiaal" ? "Tangentiaal RT21021" : "Dubbelwand RT21022"}, klasse ${effectiveKlasse.toUpperCase()}): <span class="rt-ai-result">${geformatteerdeBronnen}</span>.${waarschuwing}`
       );
     } else {
       regels.push(
         `Onstream ${techniek.toUpperCase()} (${techniek === "tangentiaal" ? "RT21021" : "RT21022"}, klasse ${effectiveKlasse.toUpperCase()}) voor ${diaLabel} van ${t} mm dik:<br>` +
         `• Doorstraalde dikte Wmax = <strong>${wmax.toFixed(1)} mm</strong>.<br>` +
-        `• Toegestane bron(nen): ${geformatteerdeBronnen}.${waarschuwing}`
+        `• Toegestane bron(nen): <span class="rt-ai-result">${geformatteerdeBronnen}</span>.${waarschuwing}`
       );
     }
 
@@ -760,19 +760,19 @@
         const ffd2 = (b * PDD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         minFFD = Math.max(ffd1, ffd2);
         regels.push(
-          `• Minimale FFD tangentiaal (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, PDD: ${PDD.toFixed(1)} mm).`
+          `• Minimale FFD tangentiaal (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <span class="rt-ai-result">${(minFFD / 10).toFixed(1)} cm</span> (${Math.round(minFFD)} mm, PDD: ${PDD.toFixed(1)} mm).`
         );
       } else if (isDWSI) {
         ffdOnscherpte = (b * OFD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         ffdFysiek = De + 2 * Iso;
         minFFD = Math.max(ffdOnscherpte, ffdFysiek);
         regels.push(
-          `• Minimale FFD dubbelwand DWSI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm en wand ${t} mm): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm vanaf binnenwand filmzijde).`
+          `• Minimale FFD dubbelwand DWSI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm en wand ${t} mm): <span class="rt-ai-result">${(minFFD / 10).toFixed(1)} cm</span> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm vanaf binnenwand filmzijde).`
         );
       } else {
         minFFD = (b * OFD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         regels.push(
-          `• Minimale FFD dubbelwand DWDI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm).`
+          `• Minimale FFD dubbelwand DWDI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <span class="rt-ai-result">${(minFFD / 10).toFixed(1)} cm</span> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm).`
         );
       }
       params.sfd = Math.round(minFFD);
@@ -1428,15 +1428,19 @@
     let resp = `<div class="rt-ai-calc">• Stralingstijd voor <strong>${opstellingUitleg}</strong><br>• Bron &amp; afstand: <strong>${bronNaam}</strong> (${ci.toFixed(1)} Curie), ${ffdLabel}${gevuldExtra}${matExtra}`;
 
     let ttsTijden = [];
+    const timerItems = [];
     if (explicieteFilm === "D4") {
       resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong></div>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`);
+      timerItems.push({ sec: time_d4 * 60, label: "Stralingstijd D4", tekst: `Timer D4 (${formatTijd(time_d4)})` });
     } else if (explicieteFilm === "D5") {
       resp += `<div class="rt-ai-result">• D5: <strong>${formatTijd(time_d5)}</strong></div>`;
       ttsTijden.push(`D5: ${formatTijd(time_d5)}`);
+      timerItems.push({ sec: time_d5 * 60, label: "Stralingstijd D5", tekst: `Timer D5 (${formatTijd(time_d5)})` });
     } else if (explicieteFilm === "D7") {
       resp += `<div class="rt-ai-result">• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
       ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
+      timerItems.push({ sec: time_d7 * 60, label: "Stralingstijd D7", tekst: `Timer D7 (${formatTijd(time_d7)})` });
       if (isKlasseB) {
         resp += `<small style="color:#ffb4b4; display:block; margin-top:4px;">⚠️ Let op: D7 is niet toegestaan volgens EN ISO 17636-1 Klasse B (D4: ${formatTijd(time_d4)}, D5: ${formatTijd(time_d5)}).</small>`;
       }
@@ -1444,13 +1448,19 @@
       resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong><br>` +
               `• D5: <strong>${formatTijd(time_d5)}</strong>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`, `D5: ${formatTijd(time_d5)}`);
+      timerItems.push(
+        { sec: time_d4 * 60, label: "Stralingstijd D4", tekst: "Timer D4" },
+        { sec: time_d5 * 60, label: "Stralingstijd D5", tekst: "Timer D5" }
+      );
       if (!isKlasseB) {
         resp += `<br>• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
         ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
+        timerItems.push({ sec: time_d7 * 60, label: "Stralingstijd D7", tekst: "Timer D7" });
       } else {
         resp += `</div><small style="opacity: 0.85; display:block; margin-top:4px;">(D7 is weggelaten: niet toegestaan volgens EN ISO 17636-1 Klasse B).</small>`;
       }
     }
+    resp += maakTimerKnoppenRijHtml(timerItems);
     resp += `<span class="rt-tts-summary" style="display:none">${ttsTijden.join(". ")}</span>`;
     if (isVoorgesteldeFFDGebruikt) {
       resp += `<small style="color:#F5DF4D; display:block; margin-top:4px;">ℹ️ <em>Let op: berekend op basis van de <strong>voorgestelde FFD (${sfd} mm)</strong> voor een gammabron op de buis. Geef gerust een andere FFD op indien gewenst.</em></small>`;
@@ -1490,6 +1500,28 @@
     }
 
     return resp + `</div>`;
+  }
+
+  function maakTimerKnopHtml(seconden, label = "Stralingstijd", knopTekst = "") {
+    const sec = Math.round(Number(seconden) || 0);
+    if (sec <= 0) return "";
+    const safeLabel = String(label || "Stralingstijd").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    const tijdStr = m > 0 ? `${m}m ${s < 10 ? "0" + s : s}s` : `${s}s`;
+    const tekst = knopTekst || `Timer starten (${tijdStr})`;
+    return `<div class="rt-ai-timer-row"><button type="button" class="rt-ai-timer-btn" onclick="window.RtAssistant && window.RtAssistant.openTimer(${sec}, '${safeLabel}')">⏱️ ${tekst}</button></div>`;
+  }
+
+  function maakTimerKnoppenRijHtml(items) {
+    const geldig = (items || []).filter((it) => it && Math.round(Number(it.sec) || 0) > 0);
+    if (!geldig.length) return "";
+    const btns = geldig.map((it) => {
+      const sec = Math.round(Number(it.sec));
+      const safeLabel = String(it.label || "Stralingstijd").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+      return `<button type="button" class="rt-ai-timer-btn" onclick="window.RtAssistant && window.RtAssistant.openTimer(${sec}, '${safeLabel}')">⏱️ ${it.tekst}</button>`;
+    });
+    return `<div class="rt-ai-timer-row">${btns.join("")}</div>`;
   }
 
   // 5. Geometrisch Aantal Opnames (EN ISO 17636-1 / ASME Section V)
@@ -1605,13 +1637,13 @@
     // 1. Diameter <= 100 mm (DWDI - Dubbelwand Dubbelbeeld)
     if (De <= 100) {
       if (params.wanddikte && params.wanddikte > 8) {
-        return `Voor ${diaLabel} met een wanddikte van <strong>${params.wanddikte} mm</strong> (&gt; 8 mm):<br>` +
-               `• Ovaaltjes schieten (opstelling 11 / F) is <strong>niet toegestaan</strong> boven 8 mm wanddikte.<br>` +
-               `• Vereist: <strong>3 opnames onder 60° of 120°</strong> recht door de las (<strong>Opstelling 12 / G, superpositie</strong>).`;
+        return `<div class="rt-ai-calc">• Leiding: <strong>${diaLabel}</strong> (${params.wanddikte} mm dik, &gt; 8 mm)<br>` +
+               `• Ovaaltjes schieten (opstelling 11 / F) is <strong>niet toegestaan</strong> boven 8 mm wanddikte.` +
+               `<div class="rt-ai-result">Vereist: <strong>3 opnames onder 60° of 120°</strong> (Opstelling 12 / G, superpositie)</div></div>`;
       }
-      return `Voor ${diaLabel} (diameter &le; 100 mm via DWDI):<br>` +
-             `• <strong>2 opnames onder 90°</strong> als ovaaltjes worden geschoten (opstelling 11 / F, mits wanddikte &le; 8 mm en lasbreedte &le; ${(De / 4).toFixed(1)} mm).<br>` +
-             `• <strong>3 opnames onder 60° of 120°</strong> als er recht door de las (opstelling 12 / G, superpositie) wordt geschoten.`;
+      return `<div class="rt-ai-calc">• Leiding: <strong>${diaLabel}</strong> (diameter &le; 100 mm via DWDI)<br>` +
+             `• Ovaaltjes (opstelling 11 / F, mits wanddikte &le; 8 mm en lasbreedte &le; ${(De / 4).toFixed(1)} mm): <span class="rt-ai-result">2 opnames onder 90°</span><br>` +
+             `• Recht door de las (opstelling 12 / G, superpositie): <span class="rt-ai-result">3 opnames onder 60° of 120°</span></div>`;
     }
 
     // 2. Centrale / Panoramische opstelling (SWSI / rondstraler)
@@ -1628,9 +1660,9 @@
       const f40 = Math.ceil(omtrek / 320);
       const film10x40Tekst = De <= 273.1 ? ` (of ${f40} films van 10x40 cm)` : "";
       const ffdCentraalTekst = params.sfd ? `<br>• FFD (centraal, halve diameter): <strong>${params.sfd} mm</strong> (${(params.sfd / 10).toFixed(1)} cm).` : "";
-      return `Voor ${diaLabel} bij een <strong>centrale (panoramische) opstelling</strong>:<br>` +
-             `• Omtrek: <strong>${omtrekCm} cm</strong>.${ffdCentraalTekst}<br>` +
-             `• <strong>1 opname (360° panoramisch)</strong> met <strong>${f48} film(s) van 10x48 cm</strong>${film10x40Tekst}.`;
+      return `<div class="rt-ai-calc">• Leiding: <strong>${diaLabel}</strong> — <strong>centrale (panoramische) opstelling</strong><br>` +
+             `• Omtrek: <strong>${omtrekCm} cm</strong>.${ffdCentraalTekst}` +
+             `<div class="rt-ai-result">1 opname (360° panoramisch) — <strong>${f48} film(s) van 10x48 cm</strong>${film10x40Tekst}</div></div>`;
     }
 
     // Als de opgegeven focus/FFD groter is dan de buitendiameter (en er geen SWSI/centraal is gevraagd),
@@ -1867,15 +1899,48 @@
     const effFilmCm = (afstand / 10).toFixed(1);
     let locaties = "";
     let huidigeLocatie = 0;
+    const svgMarkers = [];
+    const cx = 110;
+    const cy = 110;
+    const rOuter = 66;
+    const rLabel = 88;
+    const toonCmInSvg = nOpn <= 10;
+
     for (let i = 1; i <= nOpn; i++) {
-      locaties += `• Film ${i} = <strong>${(huidigeLocatie / 10).toFixed(1)} cm</strong><br>`;
+      const posCm = (huidigeLocatie / 10).toFixed(1);
+      locaties += `• Film ${i} = <strong>${posCm} cm</strong><br>`;
+      const angle = -Math.PI / 2 + ((i - 1) * 2 * Math.PI) / nOpn;
+      const xDot = (cx + rOuter * Math.cos(angle)).toFixed(1);
+      const yDot = (cy + rOuter * Math.sin(angle)).toFixed(1);
+      const xIn = (cx + (rOuter - 8) * Math.cos(angle)).toFixed(1);
+      const yIn = (cy + (rOuter - 8) * Math.sin(angle)).toFixed(1);
+      const xLbl = (cx + rLabel * Math.cos(angle)).toFixed(1);
+      const yLbl = (cy + rLabel * Math.sin(angle) + 3.5).toFixed(1);
+      const lblTxt = toonCmInSvg ? `F${i} (${posCm})` : `F${i}`;
+      svgMarkers.push(
+        `<line x1="${xIn}" y1="${yIn}" x2="${xDot}" y2="${yDot}" stroke="#F5DF4D" stroke-width="2" />` +
+        `<circle cx="${xDot}" cy="${yDot}" r="3.5" fill="${i === 1 ? "#4ade80" : "#F5DF4D"}" />` +
+        `<text x="${xLbl}" y="${yLbl}" fill="#e6edf3" font-size="${toonCmInSvg ? "8.5" : "8"}" font-weight="700" text-anchor="middle">${lblTxt}</text>`
+      );
       huidigeLocatie += afstand;
     }
+
+    const svgSchets =
+      `<div style="margin:10px 0 6px 0; text-align:center;">` +
+      `<svg viewBox="0 0 220 220" width="190" height="190" style="max-width:100%; height:auto; background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.12); border-radius:10px;" aria-label="Rondnaad filmverdeling">` +
+      `<circle cx="${cx}" cy="${cy}" r="${rOuter}" fill="none" stroke="#64748b" stroke-width="2.2" />` +
+      `<circle cx="${cx}" cy="${cy}" r="${rOuter - 8}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3 3" />` +
+      svgMarkers.join("") +
+      `<text x="${cx}" y="${cy - 4}" fill="#F5DF4D" font-size="11" font-weight="800" text-anchor="middle">${nOpn} opnames</text>` +
+      `<text x="${cx}" y="${cy + 12}" fill="#cbd5e1" font-size="9.5" text-anchor="middle">${omtrekCm} cm</text>` +
+      `</svg>` +
+      `</div>`;
 
     return `<div class="rt-ai-calc">` +
            `• Leiding: <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) in <strong>${nOpn} opnames</strong>` +
            `<div class="rt-ai-result">Effectieve filmlengte: <strong>${effFilmCm} cm</strong></div>` +
            `<div style="margin-top:6px;">${locaties}</div>` +
+           `${svgSchets}` +
            `<span class="rt-tts-summary" style="display:none">Verdeling voor ${diaLabel} in ${nOpn} opnames: effectieve filmlengte ${effFilmCm} centimeter</span>` +
            `<small style="opacity: 0.85; display:block; margin-top:4px;">(Berekend volgens <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small></div>`;
   }
@@ -2529,9 +2594,9 @@
         const customRad = (customAngle / 2) * (Math.PI / 180);
         const minFfdCustom = Math.ceil((targetFilm / 2) / Math.tan(customRad));
         const flStr = targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm";
-        return `Om <strong>${flStr}</strong> (${targetFilm} mm) te belichten bij een openingshoek van <strong>${customAngle}°</strong>:<br>` +
-               `• Minimaal vereiste focusafstand: <strong>${minFfdCustom} mm</strong> (${(minFfdCustom / 10).toFixed(1)} cm &approx; ${Math.round(minFfdCustom / 10)} cm).<br>` +
-               `<small style="opacity: 0.85;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small>`;
+        return `<div class="rt-ai-calc">• Te belichten: <strong>${flStr}</strong> (${targetFilm} mm) bij openingshoek <strong>${customAngle}°</strong>` +
+               `<div class="rt-ai-result">Minimaal vereiste focusafstand: <strong>${minFfdCustom} mm</strong> (${(minFfdCustom / 10).toFixed(1)} cm &approx; ${Math.round(minFfdCustom / 10)} cm)</div>` +
+               `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small></div>`;
       }
       const angleSmallRad = (tube.axes.small / 2) * (Math.PI / 180);
       const angleLargeVal = tube.axes.large === 360 ? 40 : tube.axes.large;
@@ -2539,15 +2604,15 @@
       const minFfdLarge = Math.ceil((targetFilm / 2) / Math.tan(angleLargeRad));
       const minFfdSmall = Math.ceil((targetFilm / 2) / Math.tan(angleSmallRad));
 
-      let resp = `Om <strong>${targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm"}</strong> (${targetFilm} mm) te belichten met de <strong>${tube.name}</strong>:<br>`;
+      let resp = `<div class="rt-ai-calc">• Te belichten: <strong>${targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm"}</strong> (${targetFilm} mm) met <strong>${tube.name}</strong><br>`;
       if (tube.axes.large === 360) {
-        resp += `• Brede as (360° panoramisch): <strong>Rondom panoramisch</strong> (dekt 360° van de buisomtrek).<br>`;
-        resp += `• Smalle as (${tube.axes.small}°): minimaal <strong>${minFfdSmall} mm</strong> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
+        resp += `• Brede as (360° panoramisch): <span class="rt-ai-result">Rondom panoramisch</span> (dekt 360° van de buisomtrek).<br>`;
+        resp += `• Smalle as (${tube.axes.small}°): minimaal <span class="rt-ai-result">${minFfdSmall} mm</span> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
       } else {
-        resp += `• Brede bundel (${tube.axes.large}°): minimaal <strong>${minFfdLarge} mm</strong> (${(minFfdLarge / 10).toFixed(1)} cm &approx; ${Math.round(minFfdLarge / 10)} cm) focus.<br>`;
-        resp += `• Smalle bundel (${tube.axes.small}°): minimaal <strong>${minFfdSmall} mm</strong> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
+        resp += `• Brede bundel (${tube.axes.large}°): minimaal <span class="rt-ai-result">${minFfdLarge} mm</span> (${(minFfdLarge / 10).toFixed(1)} cm &approx; ${Math.round(minFfdLarge / 10)} cm) focus.<br>`;
+        resp += `• Smalle bundel (${tube.axes.small}°): minimaal <span class="rt-ai-result">${minFfdSmall} mm</span> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
       }
-      resp += `<small style="opacity: 0.85;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small></div>`;
       return resp;
     }
 
@@ -2566,18 +2631,18 @@
     let largeTxt = "";
     if (tube.axes.large === 360) {
       wLarge = 360;
-      largeTxt = `• <strong>Brede as (360°):</strong> <strong>360° panoramisch</strong> (volledig rondom).<br>`;
+      largeTxt = `• <strong>Brede as (360°):</strong> <span class="rt-ai-result">360° panoramisch</span> (volledig rondom).<br>`;
     } else {
       const angleLargeRad = (tube.axes.large / 2) * (Math.PI / 180);
       wLarge = Math.round(2 * ffd * Math.tan(angleLargeRad));
-      largeTxt = `• <strong>Brede as (${tube.axes.large}°):</strong> <strong>${wLarge} mm</strong> (${(wLarge / 1000).toFixed(2)} m).<br>`;
+      largeTxt = `• <strong>Brede as (${tube.axes.large}°):</strong> <span class="rt-ai-result">${wLarge} mm</span> (${(wLarge / 1000).toFixed(2)} m).<br>`;
     }
 
     let customTxt = "";
     if (customAngle) {
       const cRad = (customAngle / 2) * (Math.PI / 180);
       const wC = Math.round(2 * ffd * Math.tan(cRad));
-      customTxt = `• <strong>Openingshoek ${customAngle}°:</strong> <strong>${wC} mm</strong> (${(wC / 1000).toFixed(2)} m).<br>`;
+      customTxt = `• <strong>Openingshoek ${customAngle}°:</strong> <span class="rt-ai-result">${wC} mm</span> (${(wC / 1000).toFixed(2)} m).<br>`;
     }
 
     let filmVergelijking = "";
@@ -2608,13 +2673,13 @@
       }
     }
 
-    let out = passHeader;
-    out += `Voor de <strong>${tube.name}</strong> bij een focus van <strong>${ffd} mm</strong> (${(ffd / 1000).toFixed(2)} meter):<br>`;
-    out += `• <strong>Smalle as (${tube.axes.small}°):</strong> <strong>${wSmall} mm</strong> (${(wSmall / 1000).toFixed(2)} m).<br>`;
+    let out = `<div class="rt-ai-calc">${passHeader}`;
+    out += `• Buis &amp; focus: <strong>${tube.name}</strong> op <strong>${ffd} mm</strong> (${(ffd / 1000).toFixed(2)} meter)<br>`;
+    out += `• <strong>Smalle as (${tube.axes.small}°):</strong> <span class="rt-ai-result">${wSmall} mm</span> (${(wSmall / 1000).toFixed(2)} m).<br>`;
     out += largeTxt;
     if (customTxt) out += customTxt;
     if (filmVergelijking) out += filmVergelijking;
-    out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline"><i>L</i> = 2 &times; FFD &times; tan(<span class="rt-math-frac"><span class="rt-math-num">&theta;</span><span class="rt-math-den">2</span></span>)</span>).</small>`;
+    out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline"><i>L</i> = 2 &times; FFD &times; tan(<span class="rt-math-frac"><span class="rt-math-num">&theta;</span><span class="rt-math-den">2</span></span>)</span>).</small></div>`;
     return out;
   }
 
@@ -2926,19 +2991,19 @@
     let antwoord = "";
     if (norm === "en1") {
       antwoord = `Volgens <strong>EN Level 1</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cEN1.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cEN1.eis}</span><br>` +
                  `• Formule / eis: <em>${cEN1.detail}</em><br><br>`;
     } else if (norm === "en2") {
       antwoord = `Volgens <strong>EN Level 2</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cEN2.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cEN2.eis}</span><br>` +
                  `• Formule / eis: <em>${cEN2.detail}</em><br><br>`;
     } else if (norm === "en3") {
       antwoord = `Volgens <strong>EN Level 3</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cEN3.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cEN3.eis}</span><br>` +
                  `• Formule / eis: <em>${cEN3.detail}</em><br><br>`;
     } else if (norm === "asme") {
       antwoord = `Volgens <strong>ASME Sec VIII Div 1 (UW-51/UW-52)</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cASME.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cASME.eis}</span><br>` +
                  `• Formule / eis: <em>${cASME.detail}</em><br><br>`;
     } else {
       antwoord = `Acceptatiecriteria voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> bij wanddikte <strong>${t} mm</strong>:<br><br>`;

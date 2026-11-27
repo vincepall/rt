@@ -3898,7 +3898,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 04-calc-opnames-tijd-afzetting.js (2960 regels)
+  // MODULE: 04-calc-opnames-tijd-afzetting.js (3025 regels)
   // ==========================================================================
   // --- Rekenmodules ---
 
@@ -4614,14 +4614,14 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (isWmaxVraag) {
       regels.push(
         `Voor ${diaLabel} van ${t} mm dik is de doorstraalde wanddikte:<br>` +
-        `• <strong>Wmax = ${wmax.toFixed(1)} mm</strong> (berekend conform <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).<br>` +
-        `• Toegestane bron(nen) (${techniek === "tangentiaal" ? "Tangentiaal RT21021" : "Dubbelwand RT21022"}, klasse ${effectiveKlasse.toUpperCase()}): ${geformatteerdeBronnen}.${waarschuwing}`
+        `• <span class="rt-ai-result">Wmax = ${wmax.toFixed(1)} mm</span> (berekend conform <a href="bronkeuze2.html" class="ai-link" target="_blank">bronkeuze2.html</a>).<br>` +
+        `• Toegestane bron(nen) (${techniek === "tangentiaal" ? "Tangentiaal RT21021" : "Dubbelwand RT21022"}, klasse ${effectiveKlasse.toUpperCase()}): <span class="rt-ai-result">${geformatteerdeBronnen}</span>.${waarschuwing}`
       );
     } else {
       regels.push(
         `Onstream ${techniek.toUpperCase()} (${techniek === "tangentiaal" ? "RT21021" : "RT21022"}, klasse ${effectiveKlasse.toUpperCase()}) voor ${diaLabel} van ${t} mm dik:<br>` +
         `• Doorstraalde dikte Wmax = <strong>${wmax.toFixed(1)} mm</strong>.<br>` +
-        `• Toegestane bron(nen): ${geformatteerdeBronnen}.${waarschuwing}`
+        `• Toegestane bron(nen): <span class="rt-ai-result">${geformatteerdeBronnen}</span>.${waarschuwing}`
       );
     }
 
@@ -4662,19 +4662,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         const ffd2 = (b * PDD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         minFFD = Math.max(ffd1, ffd2);
         regels.push(
-          `• Minimale FFD tangentiaal (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, PDD: ${PDD.toFixed(1)} mm).`
+          `• Minimale FFD tangentiaal (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <span class="rt-ai-result">${(minFFD / 10).toFixed(1)} cm</span> (${Math.round(minFFD)} mm, PDD: ${PDD.toFixed(1)} mm).`
         );
       } else if (isDWSI) {
         ffdOnscherpte = (b * OFD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         ffdFysiek = De + 2 * Iso;
         minFFD = Math.max(ffdOnscherpte, ffdFysiek);
         regels.push(
-          `• Minimale FFD dubbelwand DWSI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm en wand ${t} mm): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm vanaf binnenwand filmzijde).`
+          `• Minimale FFD dubbelwand DWSI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm en wand ${t} mm): <span class="rt-ai-result">${(minFFD / 10).toFixed(1)} cm</span> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm vanaf binnenwand filmzijde).`
         );
       } else {
         minFFD = (b * OFD) / (effectiveKlasse === "tb" ? 0.3 : 0.6);
         regels.push(
-          `• Minimale FFD dubbelwand DWDI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <strong>${(minFFD / 10).toFixed(1)} cm</strong> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm).`
+          `• Minimale FFD dubbelwand DWDI (${effectiveKlasse.toUpperCase()} met brongrootte ${b} mm${Iso > 0 ? `, ${Iso} mm isolatie` : " (ongeïsoleerd)"}): <span class="rt-ai-result">${(minFFD / 10).toFixed(1)} cm</span> (${Math.round(minFFD)} mm, OFD: ${OFD.toFixed(1)} mm).`
         );
       }
       params.sfd = Math.round(minFFD);
@@ -5330,15 +5330,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     let resp = `<div class="rt-ai-calc">• Stralingstijd voor <strong>${opstellingUitleg}</strong><br>• Bron &amp; afstand: <strong>${bronNaam}</strong> (${ci.toFixed(1)} Curie), ${ffdLabel}${gevuldExtra}${matExtra}`;
 
     let ttsTijden = [];
+    const timerItems = [];
     if (explicieteFilm === "D4") {
       resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong></div>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`);
+      timerItems.push({ sec: time_d4 * 60, label: "Stralingstijd D4", tekst: `Timer D4 (${formatTijd(time_d4)})` });
     } else if (explicieteFilm === "D5") {
       resp += `<div class="rt-ai-result">• D5: <strong>${formatTijd(time_d5)}</strong></div>`;
       ttsTijden.push(`D5: ${formatTijd(time_d5)}`);
+      timerItems.push({ sec: time_d5 * 60, label: "Stralingstijd D5", tekst: `Timer D5 (${formatTijd(time_d5)})` });
     } else if (explicieteFilm === "D7") {
       resp += `<div class="rt-ai-result">• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
       ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
+      timerItems.push({ sec: time_d7 * 60, label: "Stralingstijd D7", tekst: `Timer D7 (${formatTijd(time_d7)})` });
       if (isKlasseB) {
         resp += `<small style="color:#ffb4b4; display:block; margin-top:4px;">⚠️ Let op: D7 is niet toegestaan volgens EN ISO 17636-1 Klasse B (D4: ${formatTijd(time_d4)}, D5: ${formatTijd(time_d5)}).</small>`;
       }
@@ -5346,13 +5350,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong><br>` +
               `• D5: <strong>${formatTijd(time_d5)}</strong>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`, `D5: ${formatTijd(time_d5)}`);
+      timerItems.push(
+        { sec: time_d4 * 60, label: "Stralingstijd D4", tekst: "Timer D4" },
+        { sec: time_d5 * 60, label: "Stralingstijd D5", tekst: "Timer D5" }
+      );
       if (!isKlasseB) {
         resp += `<br>• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
         ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
+        timerItems.push({ sec: time_d7 * 60, label: "Stralingstijd D7", tekst: "Timer D7" });
       } else {
         resp += `</div><small style="opacity: 0.85; display:block; margin-top:4px;">(D7 is weggelaten: niet toegestaan volgens EN ISO 17636-1 Klasse B).</small>`;
       }
     }
+    resp += maakTimerKnoppenRijHtml(timerItems);
     resp += `<span class="rt-tts-summary" style="display:none">${ttsTijden.join(". ")}</span>`;
     if (isVoorgesteldeFFDGebruikt) {
       resp += `<small style="color:#F5DF4D; display:block; margin-top:4px;">ℹ️ <em>Let op: berekend op basis van de <strong>voorgestelde FFD (${sfd} mm)</strong> voor een gammabron op de buis. Geef gerust een andere FFD op indien gewenst.</em></small>`;
@@ -5392,6 +5402,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     return resp + `</div>`;
+  }
+
+  function maakTimerKnopHtml(seconden, label = "Stralingstijd", knopTekst = "") {
+    const sec = Math.round(Number(seconden) || 0);
+    if (sec <= 0) return "";
+    const safeLabel = String(label || "Stralingstijd").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    const tijdStr = m > 0 ? `${m}m ${s < 10 ? "0" + s : s}s` : `${s}s`;
+    const tekst = knopTekst || `Timer starten (${tijdStr})`;
+    return `<div class="rt-ai-timer-row"><button type="button" class="rt-ai-timer-btn" onclick="window.RtAssistant && window.RtAssistant.openTimer(${sec}, '${safeLabel}')">⏱️ ${tekst}</button></div>`;
+  }
+
+  function maakTimerKnoppenRijHtml(items) {
+    const geldig = (items || []).filter((it) => it && Math.round(Number(it.sec) || 0) > 0);
+    if (!geldig.length) return "";
+    const btns = geldig.map((it) => {
+      const sec = Math.round(Number(it.sec));
+      const safeLabel = String(it.label || "Stralingstijd").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+      return `<button type="button" class="rt-ai-timer-btn" onclick="window.RtAssistant && window.RtAssistant.openTimer(${sec}, '${safeLabel}')">⏱️ ${it.tekst}</button>`;
+    });
+    return `<div class="rt-ai-timer-row">${btns.join("")}</div>`;
   }
 
   // 5. Geometrisch Aantal Opnames (EN ISO 17636-1 / ASME Section V)
@@ -5507,13 +5539,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     // 1. Diameter <= 100 mm (DWDI - Dubbelwand Dubbelbeeld)
     if (De <= 100) {
       if (params.wanddikte && params.wanddikte > 8) {
-        return `Voor ${diaLabel} met een wanddikte van <strong>${params.wanddikte} mm</strong> (&gt; 8 mm):<br>` +
-               `• Ovaaltjes schieten (opstelling 11 / F) is <strong>niet toegestaan</strong> boven 8 mm wanddikte.<br>` +
-               `• Vereist: <strong>3 opnames onder 60° of 120°</strong> recht door de las (<strong>Opstelling 12 / G, superpositie</strong>).`;
+        return `<div class="rt-ai-calc">• Leiding: <strong>${diaLabel}</strong> (${params.wanddikte} mm dik, &gt; 8 mm)<br>` +
+               `• Ovaaltjes schieten (opstelling 11 / F) is <strong>niet toegestaan</strong> boven 8 mm wanddikte.` +
+               `<div class="rt-ai-result">Vereist: <strong>3 opnames onder 60° of 120°</strong> (Opstelling 12 / G, superpositie)</div></div>`;
       }
-      return `Voor ${diaLabel} (diameter &le; 100 mm via DWDI):<br>` +
-             `• <strong>2 opnames onder 90°</strong> als ovaaltjes worden geschoten (opstelling 11 / F, mits wanddikte &le; 8 mm en lasbreedte &le; ${(De / 4).toFixed(1)} mm).<br>` +
-             `• <strong>3 opnames onder 60° of 120°</strong> als er recht door de las (opstelling 12 / G, superpositie) wordt geschoten.`;
+      return `<div class="rt-ai-calc">• Leiding: <strong>${diaLabel}</strong> (diameter &le; 100 mm via DWDI)<br>` +
+             `• Ovaaltjes (opstelling 11 / F, mits wanddikte &le; 8 mm en lasbreedte &le; ${(De / 4).toFixed(1)} mm): <span class="rt-ai-result">2 opnames onder 90°</span><br>` +
+             `• Recht door de las (opstelling 12 / G, superpositie): <span class="rt-ai-result">3 opnames onder 60° of 120°</span></div>`;
     }
 
     // 2. Centrale / Panoramische opstelling (SWSI / rondstraler)
@@ -5530,9 +5562,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const f40 = Math.ceil(omtrek / 320);
       const film10x40Tekst = De <= 273.1 ? ` (of ${f40} films van 10x40 cm)` : "";
       const ffdCentraalTekst = params.sfd ? `<br>• FFD (centraal, halve diameter): <strong>${params.sfd} mm</strong> (${(params.sfd / 10).toFixed(1)} cm).` : "";
-      return `Voor ${diaLabel} bij een <strong>centrale (panoramische) opstelling</strong>:<br>` +
-             `• Omtrek: <strong>${omtrekCm} cm</strong>.${ffdCentraalTekst}<br>` +
-             `• <strong>1 opname (360° panoramisch)</strong> met <strong>${f48} film(s) van 10x48 cm</strong>${film10x40Tekst}.`;
+      return `<div class="rt-ai-calc">• Leiding: <strong>${diaLabel}</strong> — <strong>centrale (panoramische) opstelling</strong><br>` +
+             `• Omtrek: <strong>${omtrekCm} cm</strong>.${ffdCentraalTekst}` +
+             `<div class="rt-ai-result">1 opname (360° panoramisch) — <strong>${f48} film(s) van 10x48 cm</strong>${film10x40Tekst}</div></div>`;
     }
 
     // Als de opgegeven focus/FFD groter is dan de buitendiameter (en er geen SWSI/centraal is gevraagd),
@@ -5769,15 +5801,48 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     const effFilmCm = (afstand / 10).toFixed(1);
     let locaties = "";
     let huidigeLocatie = 0;
+    const svgMarkers = [];
+    const cx = 110;
+    const cy = 110;
+    const rOuter = 66;
+    const rLabel = 88;
+    const toonCmInSvg = nOpn <= 10;
+
     for (let i = 1; i <= nOpn; i++) {
-      locaties += `• Film ${i} = <strong>${(huidigeLocatie / 10).toFixed(1)} cm</strong><br>`;
+      const posCm = (huidigeLocatie / 10).toFixed(1);
+      locaties += `• Film ${i} = <strong>${posCm} cm</strong><br>`;
+      const angle = -Math.PI / 2 + ((i - 1) * 2 * Math.PI) / nOpn;
+      const xDot = (cx + rOuter * Math.cos(angle)).toFixed(1);
+      const yDot = (cy + rOuter * Math.sin(angle)).toFixed(1);
+      const xIn = (cx + (rOuter - 8) * Math.cos(angle)).toFixed(1);
+      const yIn = (cy + (rOuter - 8) * Math.sin(angle)).toFixed(1);
+      const xLbl = (cx + rLabel * Math.cos(angle)).toFixed(1);
+      const yLbl = (cy + rLabel * Math.sin(angle) + 3.5).toFixed(1);
+      const lblTxt = toonCmInSvg ? `F${i} (${posCm})` : `F${i}`;
+      svgMarkers.push(
+        `<line x1="${xIn}" y1="${yIn}" x2="${xDot}" y2="${yDot}" stroke="#F5DF4D" stroke-width="2" />` +
+        `<circle cx="${xDot}" cy="${yDot}" r="3.5" fill="${i === 1 ? "#4ade80" : "#F5DF4D"}" />` +
+        `<text x="${xLbl}" y="${yLbl}" fill="#e6edf3" font-size="${toonCmInSvg ? "8.5" : "8"}" font-weight="700" text-anchor="middle">${lblTxt}</text>`
+      );
       huidigeLocatie += afstand;
     }
+
+    const svgSchets =
+      `<div style="margin:10px 0 6px 0; text-align:center;">` +
+      `<svg viewBox="0 0 220 220" width="190" height="190" style="max-width:100%; height:auto; background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.12); border-radius:10px;" aria-label="Rondnaad filmverdeling">` +
+      `<circle cx="${cx}" cy="${cy}" r="${rOuter}" fill="none" stroke="#64748b" stroke-width="2.2" />` +
+      `<circle cx="${cx}" cy="${cy}" r="${rOuter - 8}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3 3" />` +
+      svgMarkers.join("") +
+      `<text x="${cx}" y="${cy - 4}" fill="#F5DF4D" font-size="11" font-weight="800" text-anchor="middle">${nOpn} opnames</text>` +
+      `<text x="${cx}" y="${cy + 12}" fill="#cbd5e1" font-size="9.5" text-anchor="middle">${omtrekCm} cm</text>` +
+      `</svg>` +
+      `</div>`;
 
     return `<div class="rt-ai-calc">` +
            `• Leiding: <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) in <strong>${nOpn} opnames</strong>` +
            `<div class="rt-ai-result">Effectieve filmlengte: <strong>${effFilmCm} cm</strong></div>` +
            `<div style="margin-top:6px;">${locaties}</div>` +
+           `${svgSchets}` +
            `<span class="rt-tts-summary" style="display:none">Verdeling voor ${diaLabel} in ${nOpn} opnames: effectieve filmlengte ${effFilmCm} centimeter</span>` +
            `<small style="opacity: 0.85; display:block; margin-top:4px;">(Berekend volgens <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small></div>`;
   }
@@ -6431,9 +6496,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         const customRad = (customAngle / 2) * (Math.PI / 180);
         const minFfdCustom = Math.ceil((targetFilm / 2) / Math.tan(customRad));
         const flStr = targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm";
-        return `Om <strong>${flStr}</strong> (${targetFilm} mm) te belichten bij een openingshoek van <strong>${customAngle}°</strong>:<br>` +
-               `• Minimaal vereiste focusafstand: <strong>${minFfdCustom} mm</strong> (${(minFfdCustom / 10).toFixed(1)} cm &approx; ${Math.round(minFfdCustom / 10)} cm).<br>` +
-               `<small style="opacity: 0.85;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small>`;
+        return `<div class="rt-ai-calc">• Te belichten: <strong>${flStr}</strong> (${targetFilm} mm) bij openingshoek <strong>${customAngle}°</strong>` +
+               `<div class="rt-ai-result">Minimaal vereiste focusafstand: <strong>${minFfdCustom} mm</strong> (${(minFfdCustom / 10).toFixed(1)} cm &approx; ${Math.round(minFfdCustom / 10)} cm)</div>` +
+               `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small></div>`;
       }
       const angleSmallRad = (tube.axes.small / 2) * (Math.PI / 180);
       const angleLargeVal = tube.axes.large === 360 ? 40 : tube.axes.large;
@@ -6441,15 +6506,15 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const minFfdLarge = Math.ceil((targetFilm / 2) / Math.tan(angleLargeRad));
       const minFfdSmall = Math.ceil((targetFilm / 2) / Math.tan(angleSmallRad));
 
-      let resp = `Om <strong>${targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm"}</strong> (${targetFilm} mm) te belichten met de <strong>${tube.name}</strong>:<br>`;
+      let resp = `<div class="rt-ai-calc">• Te belichten: <strong>${targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm"}</strong> (${targetFilm} mm) met <strong>${tube.name}</strong><br>`;
       if (tube.axes.large === 360) {
-        resp += `• Brede as (360° panoramisch): <strong>Rondom panoramisch</strong> (dekt 360° van de buisomtrek).<br>`;
-        resp += `• Smalle as (${tube.axes.small}°): minimaal <strong>${minFfdSmall} mm</strong> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
+        resp += `• Brede as (360° panoramisch): <span class="rt-ai-result">Rondom panoramisch</span> (dekt 360° van de buisomtrek).<br>`;
+        resp += `• Smalle as (${tube.axes.small}°): minimaal <span class="rt-ai-result">${minFfdSmall} mm</span> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
       } else {
-        resp += `• Brede bundel (${tube.axes.large}°): minimaal <strong>${minFfdLarge} mm</strong> (${(minFfdLarge / 10).toFixed(1)} cm &approx; ${Math.round(minFfdLarge / 10)} cm) focus.<br>`;
-        resp += `• Smalle bundel (${tube.axes.small}°): minimaal <strong>${minFfdSmall} mm</strong> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
+        resp += `• Brede bundel (${tube.axes.large}°): minimaal <span class="rt-ai-result">${minFfdLarge} mm</span> (${(minFfdLarge / 10).toFixed(1)} cm &approx; ${Math.round(minFfdLarge / 10)} cm) focus.<br>`;
+        resp += `• Smalle bundel (${tube.axes.small}°): minimaal <span class="rt-ai-result">${minFfdSmall} mm</span> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
       }
-      resp += `<small style="opacity: 0.85;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small></div>`;
       return resp;
     }
 
@@ -6468,18 +6533,18 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     let largeTxt = "";
     if (tube.axes.large === 360) {
       wLarge = 360;
-      largeTxt = `• <strong>Brede as (360°):</strong> <strong>360° panoramisch</strong> (volledig rondom).<br>`;
+      largeTxt = `• <strong>Brede as (360°):</strong> <span class="rt-ai-result">360° panoramisch</span> (volledig rondom).<br>`;
     } else {
       const angleLargeRad = (tube.axes.large / 2) * (Math.PI / 180);
       wLarge = Math.round(2 * ffd * Math.tan(angleLargeRad));
-      largeTxt = `• <strong>Brede as (${tube.axes.large}°):</strong> <strong>${wLarge} mm</strong> (${(wLarge / 1000).toFixed(2)} m).<br>`;
+      largeTxt = `• <strong>Brede as (${tube.axes.large}°):</strong> <span class="rt-ai-result">${wLarge} mm</span> (${(wLarge / 1000).toFixed(2)} m).<br>`;
     }
 
     let customTxt = "";
     if (customAngle) {
       const cRad = (customAngle / 2) * (Math.PI / 180);
       const wC = Math.round(2 * ffd * Math.tan(cRad));
-      customTxt = `• <strong>Openingshoek ${customAngle}°:</strong> <strong>${wC} mm</strong> (${(wC / 1000).toFixed(2)} m).<br>`;
+      customTxt = `• <strong>Openingshoek ${customAngle}°:</strong> <span class="rt-ai-result">${wC} mm</span> (${(wC / 1000).toFixed(2)} m).<br>`;
     }
 
     let filmVergelijking = "";
@@ -6510,13 +6575,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
-    let out = passHeader;
-    out += `Voor de <strong>${tube.name}</strong> bij een focus van <strong>${ffd} mm</strong> (${(ffd / 1000).toFixed(2)} meter):<br>`;
-    out += `• <strong>Smalle as (${tube.axes.small}°):</strong> <strong>${wSmall} mm</strong> (${(wSmall / 1000).toFixed(2)} m).<br>`;
+    let out = `<div class="rt-ai-calc">${passHeader}`;
+    out += `• Buis &amp; focus: <strong>${tube.name}</strong> op <strong>${ffd} mm</strong> (${(ffd / 1000).toFixed(2)} meter)<br>`;
+    out += `• <strong>Smalle as (${tube.axes.small}°):</strong> <span class="rt-ai-result">${wSmall} mm</span> (${(wSmall / 1000).toFixed(2)} m).<br>`;
     out += largeTxt;
     if (customTxt) out += customTxt;
     if (filmVergelijking) out += filmVergelijking;
-    out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline"><i>L</i> = 2 &times; FFD &times; tan(<span class="rt-math-frac"><span class="rt-math-num">&theta;</span><span class="rt-math-den">2</span></span>)</span>).</small>`;
+    out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline"><i>L</i> = 2 &times; FFD &times; tan(<span class="rt-math-frac"><span class="rt-math-num">&theta;</span><span class="rt-math-den">2</span></span>)</span>).</small></div>`;
     return out;
   }
 
@@ -6828,19 +6893,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     let antwoord = "";
     if (norm === "en1") {
       antwoord = `Volgens <strong>EN Level 1</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cEN1.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cEN1.eis}</span><br>` +
                  `• Formule / eis: <em>${cEN1.detail}</em><br><br>`;
     } else if (norm === "en2") {
       antwoord = `Volgens <strong>EN Level 2</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cEN2.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cEN2.eis}</span><br>` +
                  `• Formule / eis: <em>${cEN2.detail}</em><br><br>`;
     } else if (norm === "en3") {
       antwoord = `Volgens <strong>EN Level 3</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cEN3.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cEN3.eis}</span><br>` +
                  `• Formule / eis: <em>${cEN3.detail}</em><br><br>`;
     } else if (norm === "asme") {
       antwoord = `Volgens <strong>ASME Sec VIII Div 1 (UW-51/UW-52)</strong> bij een wanddikte van <strong>${t} mm</strong> is voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> toelaatbaar:<br>` +
-                 `• Maximaal toelaatbaar: ${cASME.eis}<br>` +
+                 `• Maximaal toelaatbaar: <span class="rt-ai-result">${cASME.eis}</span><br>` +
                  `• Formule / eis: <em>${cASME.detail}</em><br><br>`;
     } else {
       antwoord = `Acceptatiecriteria voor <strong>${gekozenDefect.nl} (code ${gekozenDefect.code})</strong> bij wanddikte <strong>${t} mm</strong>:<br><br>`;
@@ -6862,7 +6927,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 05-calc-normen-iqi-kaart.js (2686 regels)
+  // MODULE: 05-calc-normen-iqi-kaart.js (2688 regels)
   // ==========================================================================
   // 9. Focus & Filmtype Calculator / Kwadratenwet (focusverandering.html)
   function convertFilmTime(seconds, fromFilm, toFilm) {
@@ -7187,6 +7252,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       out += `<div class="rt-ai-final-time" style="margin-top:8px; font-size:1.15rem; color:#F5DF4D; font-weight:800;">`;
       out += `Uiteindelijke stralingstijd: ${formatSecondenVoluit(eindTijdSec)}`;
       out += `</div>`;
+      out += maakTimerKnopHtml(Math.round(eindTijdSec), "Stralingstijd");
     }
 
     if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && !isNaN(eindTijdSec) && eindTijdSec > 0) {
@@ -8386,6 +8452,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     return `<div class="rt-ai-calc">` +
            `• Gegevens: <strong>${mamin} mA&middot;min</strong> bij <strong>${ma} mA</strong> (${totalMinutes.toFixed(2)} min)<br>` +
            `<div class="rt-ai-result">Belichtingstijd: <strong>${tijdTekst}</strong></div>` +
+           maakTimerKnopHtml(totalSec, `Buistabel ${ma} mA`) +
            `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>: ${mamin} &divide; ${ma} = ${totalMinutes.toFixed(2)} minuten).</small></div>`;
   }
 
@@ -9552,7 +9619,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 06-geheugen-en-vraagrouter.js (2314 regels)
+  // MODULE: 06-geheugen-en-vraagrouter.js (2364 regels)
   // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
@@ -9634,6 +9701,7 @@ ${stralingstijdPlat}========================================`;
   function htmlNaarPlatteTekst(html) {
     return String(html || "")
       .replace(/<div class="rt-ai-chips-row">[\s\S]*?<\/div>/gi, "")
+      .replace(/<div class="rt-ai-timer-row">[\s\S]*?<\/div>/gi, "")
       .replace(/<span class="rt-tts-summary"[^>]*>[\s\S]*?<\/span>/gi, "")
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
@@ -9864,10 +9932,10 @@ ${stralingstijdPlat}========================================`;
         const safeJs = vraag.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;");
         return (
           `<li class="rt-ai-start-example-item">` +
-          `<button type="button" class="rt-ai-start-example-icon" onclick="window.RtAssistant && window.RtAssistant.verstuurSuggestie('${safeJs}')" title="Stel deze voorbeeldvraag" aria-label="Stel voorbeeldvraag">` +
-          `<i class="fas fa-play"></i>` +
+          `<button type="button" class="rt-ai-start-example-icon" onclick="window.RtAssistant && window.RtAssistant.vulVoorbeeldIn('${safeJs}')" title="Zet in invoerveld om aan te passen" aria-label="Zet voorbeeldvraag in invoerveld">` +
+          `<i class="fas fa-arrow-down"></i>` +
           `</button>` +
-          `<span class="rt-ai-start-example-text"><em>&ldquo;${escapeHtmlTekst(vraag)}&rdquo;</em></span>` +
+          `<span class="rt-ai-start-example-text" style="cursor:pointer;" onclick="window.RtAssistant && window.RtAssistant.vulVoorbeeldIn('${safeJs}')" title="Zet in invoerveld om aan te passen"><em>&ldquo;${escapeHtmlTekst(vraag)}&rdquo;</em></span>` +
           `</li>`
         );
       })
@@ -11583,7 +11651,9 @@ ${stralingstijdPlat}========================================`;
                 `<div style="font-size:1.05rem; font-weight:700; color:#F5DF4D; margin-bottom:8px;">⏱️ Praktijkschatting stralingstijd voor zwarting van ${dOud} naar ${dNieuw}:</div>` +
                 `Op basis van de lineaire verhouding tussen stralingsdosis en optische zwarting geldt de omrekenfactor <span class="rt-math-inline"><span class="rt-math-frac"><span class="rt-math-num">${dNieuw}</span><span class="rt-math-den">${dOud}</span></span> = <strong>${factor.toFixed(2)}x</strong> (${diffLabel})</span>:<br><br>` +
                 `• <strong>Begintijd bij zwarting ${dOud}:</strong> <strong>${formatSecondenKort(tOudSec)}</strong> (${formatSecondenVoluit(tOudSec)})<br>` +
-                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <span class="rt-ai-result">${formatSecondenVoluit(tNieuwSec)}</span> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).<br><br>` +
+                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <span class="rt-ai-result">${formatSecondenVoluit(tNieuwSec)}</span> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).` +
+                maakTimerKnopHtml(tNieuwSec, `Zwarting ${dNieuw}`) +
+                `<br>` +
                 `<div style="background:#14171f; border:1px solid rgba(245,223,77,0.3); border-radius:6px; padding:8px 12px; margin:6px 0; font-size:0.85rem; color:#ccc;">` +
                 `📐 <em>Formule:</em> <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; (<span class="rt-math-frac"><span class="rt-math-num"><i>D</i><sub>2</sub></span><span class="rt-math-den"><i>D</i><sub>1</sub></span></span>) = ${tOudSec}s &times; (${dNieuw} / ${dOud}) = <strong>${tNieuwSec}s</strong></span><br>` +
                 `⚠️ <em>Let op:</em> Dit is een betrouwbare praktijkschatting (in werkelijkheid speelt ook de sluierzwarting <i>D</i><sub>0</sub> &approx; 0.20 en het ontwikkelproces mee).` +
@@ -11831,6 +11901,53 @@ ${stralingstijdPlat}========================================`;
       }
     }
 
+    // Slimme workflow-chips zodra een leiding/las (diameter + wanddikte of plaat + wanddikte) bekend is
+    // en er geen openstaande vervolgvraag meer staat
+    const workflowIntenties = new Set([
+      "opnames", "opname_verdeling", "omtrek", "min_ffd", "draadje",
+      "stralingstijd", "afzetting", "schedule", "verzet", "gevulde_leiding",
+      "kv_regel", "onstream_bron", "onstream_ffd"
+    ]);
+    const isWorkflowHandler = [...uitgevoerdeHandlers].some((h) => workflowIntenties.has(h));
+    const heeftLeidingBasis = Boolean(
+      actiefGespreksGeheugen &&
+      ((actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.wanddikte) ||
+        (actiefGespreksGeheugen.isPlaat && actiefGespreksGeheugen.wanddikte))
+    );
+    if (
+      isWorkflowHandler &&
+      heeftLeidingBasis &&
+      !actiefGespreksGeheugen.verwachtParameter &&
+      !actiefGespreksGeheugen.openVraag
+    ) {
+      const heeftChipGelijkaardig = (regex) => chips.some((c) => regex.test(String(c || "")));
+      const voegWorkflowChipToe = (label, checkRegex) => {
+        if (chips.length >= 7) return;
+        if (!heeftChipGelijkaardig(checkRegex)) {
+          chips.push(label);
+        }
+      };
+
+      if (actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.diameter > 100 && actiefGespreksGeheugen.laatsteAantalOpnames > 0 && !uitgevoerdeHandlers.has("opname_verdeling")) {
+        voegWorkflowChipToe("Verdelen van de opnames", /verdelen/i);
+      }
+      if (actiefGespreksGeheugen.diameter && !uitgevoerdeHandlers.has("opnames")) {
+        voegWorkflowChipToe("Aantal opnames", /opnames/i);
+      }
+      if (!uitgevoerdeHandlers.has("min_ffd") && !uitgevoerdeHandlers.has("onstream_ffd")) {
+        voegWorkflowChipToe("Minimale FFD", /min.*ffd/i);
+      }
+      if (!uitgevoerdeHandlers.has("draadje")) {
+        voegWorkflowChipToe("BKI draadje", /draadje|bki/i);
+      }
+      if (!uitgevoerdeHandlers.has("stralingstijd")) {
+        voegWorkflowChipToe("Stralingstijd", /stralingstijd/i);
+      }
+      if (!uitgevoerdeHandlers.has("afzetting")) {
+        voegWorkflowChipToe("Veilige afzetting", /afzetting/i);
+      }
+    }
+
     renderGeheugenBalk();
 
     return {
@@ -11870,7 +11987,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 07-ui-modal-styles.js (1436 regels)
+  // MODULE: 07-ui-modal-styles.js (1534 regels)
   // ==========================================================================
   // --- UI Controller (Universeel op elke pagina) ---
   let assistantModal = null;
@@ -12246,6 +12363,104 @@ ${stralingstijdPlat}========================================`;
       .rt-ai-response-box div.rt-ai-result {
         margin-top: 8px;
       }
+      .rt-ai-timer-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .rt-ai-timer-btn {
+        background: rgba(245, 223, 77, 0.12);
+        color: #F5DF4D;
+        border: 1px solid rgba(245, 223, 77, 0.55);
+        border-radius: 999px;
+        padding: 5px 11px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background 0.15s, color 0.15s, transform 0.1s;
+      }
+      .rt-ai-timer-btn:hover {
+        background: #F5DF4D;
+        color: #16181d;
+      }
+      .rt-ai-timer-btn:active {
+        transform: scale(0.96);
+      }
+      #rt-ai-timer-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100005;
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      #rt-ai-timer-overlay.open {
+        display: flex;
+      }
+      .rt-ai-timer-card {
+        width: 100%;
+        max-width: 340px;
+        background: #1c1f26;
+        border: 2px solid #3c4252;
+        border-radius: 16px;
+        padding: 20px 18px;
+        color: #f4f4f4;
+        text-align: center;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
+      }
+      .rt-ai-timer-card.is-alarm {
+        border-color: #ef4444;
+        animation: rtAiTimerFlash 0.55s infinite alternate;
+      }
+      @keyframes rtAiTimerFlash {
+        from { background: #1c1f26; box-shadow: 0 0 12px rgba(239, 68, 68, 0.45); }
+        to { background: #4c1518; box-shadow: 0 0 28px rgba(239, 68, 68, 0.9); }
+      }
+      .rt-ai-timer-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #cbd5e1;
+        margin-bottom: 10px;
+      }
+      .rt-ai-timer-clock {
+        font-size: 3.1rem;
+        font-weight: 800;
+        color: #F5DF4D;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        letter-spacing: 2px;
+        background: #12141a;
+        border: 1px solid #323746;
+        border-radius: 12px;
+        padding: 14px 10px;
+        margin-bottom: 14px;
+      }
+      .rt-ai-timer-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      .rt-ai-timer-actions button {
+        flex: 1;
+        padding: 10px 8px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      .rt-ai-timer-start { background: #F5DF4D; color: #14161b; }
+      .rt-ai-timer-pause { background: #f59e0b; color: #14161b; }
+      .rt-ai-timer-reset { background: #374151; color: #f4f4f4; }
+      .rt-ai-timer-stop-alarm { background: #ef4444; color: #fff; width: 100%; margin-bottom: 8px; padding: 11px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; }
+      .rt-ai-timer-close { background: transparent; color: #9ca3af; border: 1px solid #3c4252 !important; margin-top: 10px; width: 100%; padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+      .rt-ai-timer-close:hover { color: #fff; border-color: #6b7280 !important; }
       .rt-ai-history-entry {
         padding-bottom: 8px;
       }
@@ -13310,7 +13525,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 08-ui-speech-tts-init.js (1504 regels)
+  // MODULE: 08-ui-speech-tts-init.js (1683 regels)
   // ==========================================================================
   let isPushing = false;
   let isFinishingPTT = false;
@@ -14251,21 +14466,30 @@ ${stralingstijdPlat}========================================`;
   }
 
   function vulVoorbeeldIn(vraagTekst) {
+    const wasExamplesOpen = isExamplesOpen;
     isExamplesOpen = false;
     const exBtn = document.getElementById("rt-ai-examples-toggle");
     if (exBtn) exBtn.classList.remove("active");
-    const respEl = document.getElementById("rt-ai-response");
-    const transEl = document.getElementById("rt-ai-transcript");
-    if (respEl && opgeslagenResponseHtmlVoorVoorbeelden) {
-      respEl.innerHTML = opgeslagenResponseHtmlVoorVoorbeelden;
-    }
-    if (transEl && opgeslagenTranscriptHtmlVoorVoorbeelden) {
-      transEl.innerHTML = opgeslagenTranscriptHtmlVoorVoorbeelden;
+    if (wasExamplesOpen) {
+      const respEl = document.getElementById("rt-ai-response");
+      const transEl = document.getElementById("rt-ai-transcript");
+      if (respEl && opgeslagenResponseHtmlVoorVoorbeelden) {
+        respEl.innerHTML = opgeslagenResponseHtmlVoorVoorbeelden;
+      }
+      if (transEl && opgeslagenTranscriptHtmlVoorVoorbeelden) {
+        transEl.innerHTML = opgeslagenTranscriptHtmlVoorVoorbeelden;
+      }
     }
     const inp = document.getElementById("rt-ai-input");
     if (inp) {
       inp.value = vraagTekst;
+      inp.style.height = "auto";
+      inp.style.height = `${Math.min(inp.scrollHeight || 44, 112)}px`;
       inp.focus();
+      if (typeof inp.setSelectionRange === "function") {
+        const len = inp.value.length;
+        inp.setSelectionRange(len, len);
+      }
     }
   }
 
@@ -14728,8 +14952,177 @@ ${stralingstijdPlat}========================================`;
     });
   }
 
+  // --- Ingebouwde R.A.D.I. Afteltimer met alarm & Wake Lock ---
+  let radiTimerInterval = null;
+  let radiTimerAlarmInterval = null;
+  let radiTimerWakeLock = null;
+  let radiTimerInitSec = 60;
+  let radiTimerRemSec = 60;
+  let radiTimerEndMs = 0;
+  let radiTimerRunning = false;
+
+  function formatRadiClock(sec) {
+    const s = Math.max(0, Math.round(sec));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+  }
+
+  function releaseRadiTimerWakeLock() {
+    if (radiTimerWakeLock && typeof radiTimerWakeLock.release === "function") {
+      try { radiTimerWakeLock.release(); } catch (e) {}
+    }
+    radiTimerWakeLock = null;
+  }
+
+  function requestRadiTimerWakeLock() {
+    if (typeof navigator !== "undefined" && navigator.wakeLock && typeof navigator.wakeLock.request === "function") {
+      navigator.wakeLock.request("screen").then((wl) => {
+        radiTimerWakeLock = wl;
+      }).catch(() => {});
+    }
+  }
+
+  function speelRadiAlarmPiep() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      [0, 0.22, 0.44].forEach((delay, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = idx === 2 ? 1100 : 880;
+        gain.gain.setValueAtTime(0.25, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.19);
+      });
+      setTimeout(() => { try { ctx.close(); } catch (e) {} }, 800);
+    } catch (e) {}
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      try { navigator.vibrate([250, 120, 250, 120, 400]); } catch (e) {}
+    }
+  }
+
+  function stopRadiTimerAlarm() {
+    if (radiTimerAlarmInterval) {
+      clearInterval(radiTimerAlarmInterval);
+      radiTimerAlarmInterval = null;
+    }
+    const card = document.getElementById("rt-ai-timer-card");
+    const stopBtn = document.getElementById("rt-ai-timer-stop-alarm");
+    if (card) card.classList.remove("is-alarm");
+    if (stopBtn) stopBtn.style.display = "none";
+  }
+
+  function updateRadiTimerUI() {
+    const clockEl = document.getElementById("rt-ai-timer-clock");
+    const toggleBtn = document.getElementById("rt-ai-timer-toggle");
+    if (clockEl) clockEl.textContent = formatRadiClock(radiTimerRemSec);
+    if (toggleBtn) {
+      toggleBtn.textContent = radiTimerRunning ? "⏸ Pauze" : "▶ Start";
+      toggleBtn.className = radiTimerRunning ? "rt-ai-timer-pause" : "rt-ai-timer-start";
+    }
+  }
+
+  function startRadiTimerLoop() {
+    if (radiTimerRemSec <= 0) radiTimerRemSec = radiTimerInitSec;
+    stopRadiTimerAlarm();
+    radiTimerRunning = true;
+    radiTimerEndMs = Date.now() + radiTimerRemSec * 1000;
+    requestRadiTimerWakeLock();
+    if (radiTimerInterval) clearInterval(radiTimerInterval);
+    radiTimerInterval = setInterval(() => {
+      const left = Math.max(0, Math.ceil((radiTimerEndMs - Date.now()) / 1000));
+      radiTimerRemSec = left;
+      updateRadiTimerUI();
+      if (left <= 0) {
+        clearInterval(radiTimerInterval);
+        radiTimerInterval = null;
+        radiTimerRunning = false;
+        releaseRadiTimerWakeLock();
+        updateRadiTimerUI();
+        const card = document.getElementById("rt-ai-timer-card");
+        const stopBtn = document.getElementById("rt-ai-timer-stop-alarm");
+        if (card) card.classList.add("is-alarm");
+        if (stopBtn) stopBtn.style.display = "block";
+        speelRadiAlarmPiep();
+        radiTimerAlarmInterval = setInterval(speelRadiAlarmPiep, 1800);
+      }
+    }, 200);
+    updateRadiTimerUI();
+  }
+
+  function pauzeerRadiTimer() {
+    if (radiTimerInterval) {
+      clearInterval(radiTimerInterval);
+      radiTimerInterval = null;
+    }
+    radiTimerRunning = false;
+    releaseRadiTimerWakeLock();
+    updateRadiTimerUI();
+  }
+
+  function sluitTimer() {
+    pauzeerRadiTimer();
+    stopRadiTimerAlarm();
+    const ov = document.getElementById("rt-ai-timer-overlay");
+    if (ov) ov.classList.remove("open");
+  }
+
+  function maakRadiTimerOverlay() {
+    if (typeof document === "undefined" || !document.body) return null;
+    let ov = document.getElementById("rt-ai-timer-overlay");
+    if (ov) return ov;
+    ov = document.createElement("div");
+    ov.id = "rt-ai-timer-overlay";
+    ov.innerHTML = `
+      <div class="rt-ai-timer-card" id="rt-ai-timer-card">
+        <div class="rt-ai-timer-title" id="rt-ai-timer-title">⏱️ Stralingstijd</div>
+        <div class="rt-ai-timer-clock" id="rt-ai-timer-clock">00:00</div>
+        <button type="button" class="rt-ai-timer-stop-alarm" id="rt-ai-timer-stop-alarm">🔕 Alarm stoppen</button>
+        <div class="rt-ai-timer-actions">
+          <button type="button" class="rt-ai-timer-start" id="rt-ai-timer-toggle">▶ Start</button>
+          <button type="button" class="rt-ai-timer-reset" id="rt-ai-timer-reset">↺ Reset</button>
+        </div>
+        <button type="button" class="rt-ai-timer-close" id="rt-ai-timer-close">Sluiten</button>
+      </div>
+    `;
+    document.body.appendChild(ov);
+    const toggleBtn = document.getElementById("rt-ai-timer-toggle");
+    const resetBtn = document.getElementById("rt-ai-timer-reset");
+    const stopAlarmBtn = document.getElementById("rt-ai-timer-stop-alarm");
+    const closeBtn = document.getElementById("rt-ai-timer-close");
+    if (toggleBtn) toggleBtn.addEventListener("click", () => (radiTimerRunning ? pauzeerRadiTimer() : startRadiTimerLoop()));
+    if (resetBtn) resetBtn.addEventListener("click", () => { pauzeerRadiTimer(); stopRadiTimerAlarm(); radiTimerRemSec = radiTimerInitSec; updateRadiTimerUI(); });
+    if (stopAlarmBtn) stopAlarmBtn.addEventListener("click", stopRadiTimerAlarm);
+    if (closeBtn) closeBtn.addEventListener("click", sluitTimer);
+    ov.addEventListener("click", (e) => { if (e.target === ov) sluitTimer(); });
+    return ov;
+  }
+
+  function openTimer(seconden, label = "Stralingstijd") {
+    const sec = Math.max(1, Math.round(Number(seconden) || 0));
+    const ov = maakRadiTimerOverlay();
+    if (!ov) return false;
+    pauzeerRadiTimer();
+    stopRadiTimerAlarm();
+    radiTimerInitSec = sec;
+    radiTimerRemSec = sec;
+    const titleEl = document.getElementById("rt-ai-timer-title");
+    if (titleEl) titleEl.textContent = `⏱️ ${label || "Stralingstijd"}`;
+    ov.classList.add("open");
+    startRadiTimerLoop();
+    return true;
+  }
+
   // Expose API
   const RtAssistant = {
+    openTimer,
+    sluitTimer,
     NDO_SPRAAK_WOORDENBOEK,
     corrigeerSpraakTekst,
     herstelVakjargon,
@@ -14784,6 +15177,7 @@ ${stralingstijdPlat}========================================`;
     sluitAfbeeldingZoom,
     verstuurTekst,
     verstuurSuggestie,
+    vulVoorbeeldIn,
     laadBronnenCsv,
     geefBrongrootteSuggestieChips,
     bronnenData,

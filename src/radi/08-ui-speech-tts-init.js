@@ -937,21 +937,30 @@
   }
 
   function vulVoorbeeldIn(vraagTekst) {
+    const wasExamplesOpen = isExamplesOpen;
     isExamplesOpen = false;
     const exBtn = document.getElementById("rt-ai-examples-toggle");
     if (exBtn) exBtn.classList.remove("active");
-    const respEl = document.getElementById("rt-ai-response");
-    const transEl = document.getElementById("rt-ai-transcript");
-    if (respEl && opgeslagenResponseHtmlVoorVoorbeelden) {
-      respEl.innerHTML = opgeslagenResponseHtmlVoorVoorbeelden;
-    }
-    if (transEl && opgeslagenTranscriptHtmlVoorVoorbeelden) {
-      transEl.innerHTML = opgeslagenTranscriptHtmlVoorVoorbeelden;
+    if (wasExamplesOpen) {
+      const respEl = document.getElementById("rt-ai-response");
+      const transEl = document.getElementById("rt-ai-transcript");
+      if (respEl && opgeslagenResponseHtmlVoorVoorbeelden) {
+        respEl.innerHTML = opgeslagenResponseHtmlVoorVoorbeelden;
+      }
+      if (transEl && opgeslagenTranscriptHtmlVoorVoorbeelden) {
+        transEl.innerHTML = opgeslagenTranscriptHtmlVoorVoorbeelden;
+      }
     }
     const inp = document.getElementById("rt-ai-input");
     if (inp) {
       inp.value = vraagTekst;
+      inp.style.height = "auto";
+      inp.style.height = `${Math.min(inp.scrollHeight || 44, 112)}px`;
       inp.focus();
+      if (typeof inp.setSelectionRange === "function") {
+        const len = inp.value.length;
+        inp.setSelectionRange(len, len);
+      }
     }
   }
 
@@ -1414,8 +1423,177 @@
     });
   }
 
+  // --- Ingebouwde R.A.D.I. Afteltimer met alarm & Wake Lock ---
+  let radiTimerInterval = null;
+  let radiTimerAlarmInterval = null;
+  let radiTimerWakeLock = null;
+  let radiTimerInitSec = 60;
+  let radiTimerRemSec = 60;
+  let radiTimerEndMs = 0;
+  let radiTimerRunning = false;
+
+  function formatRadiClock(sec) {
+    const s = Math.max(0, Math.round(sec));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+  }
+
+  function releaseRadiTimerWakeLock() {
+    if (radiTimerWakeLock && typeof radiTimerWakeLock.release === "function") {
+      try { radiTimerWakeLock.release(); } catch (e) {}
+    }
+    radiTimerWakeLock = null;
+  }
+
+  function requestRadiTimerWakeLock() {
+    if (typeof navigator !== "undefined" && navigator.wakeLock && typeof navigator.wakeLock.request === "function") {
+      navigator.wakeLock.request("screen").then((wl) => {
+        radiTimerWakeLock = wl;
+      }).catch(() => {});
+    }
+  }
+
+  function speelRadiAlarmPiep() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      [0, 0.22, 0.44].forEach((delay, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = idx === 2 ? 1100 : 880;
+        gain.gain.setValueAtTime(0.25, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.19);
+      });
+      setTimeout(() => { try { ctx.close(); } catch (e) {} }, 800);
+    } catch (e) {}
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      try { navigator.vibrate([250, 120, 250, 120, 400]); } catch (e) {}
+    }
+  }
+
+  function stopRadiTimerAlarm() {
+    if (radiTimerAlarmInterval) {
+      clearInterval(radiTimerAlarmInterval);
+      radiTimerAlarmInterval = null;
+    }
+    const card = document.getElementById("rt-ai-timer-card");
+    const stopBtn = document.getElementById("rt-ai-timer-stop-alarm");
+    if (card) card.classList.remove("is-alarm");
+    if (stopBtn) stopBtn.style.display = "none";
+  }
+
+  function updateRadiTimerUI() {
+    const clockEl = document.getElementById("rt-ai-timer-clock");
+    const toggleBtn = document.getElementById("rt-ai-timer-toggle");
+    if (clockEl) clockEl.textContent = formatRadiClock(radiTimerRemSec);
+    if (toggleBtn) {
+      toggleBtn.textContent = radiTimerRunning ? "⏸ Pauze" : "▶ Start";
+      toggleBtn.className = radiTimerRunning ? "rt-ai-timer-pause" : "rt-ai-timer-start";
+    }
+  }
+
+  function startRadiTimerLoop() {
+    if (radiTimerRemSec <= 0) radiTimerRemSec = radiTimerInitSec;
+    stopRadiTimerAlarm();
+    radiTimerRunning = true;
+    radiTimerEndMs = Date.now() + radiTimerRemSec * 1000;
+    requestRadiTimerWakeLock();
+    if (radiTimerInterval) clearInterval(radiTimerInterval);
+    radiTimerInterval = setInterval(() => {
+      const left = Math.max(0, Math.ceil((radiTimerEndMs - Date.now()) / 1000));
+      radiTimerRemSec = left;
+      updateRadiTimerUI();
+      if (left <= 0) {
+        clearInterval(radiTimerInterval);
+        radiTimerInterval = null;
+        radiTimerRunning = false;
+        releaseRadiTimerWakeLock();
+        updateRadiTimerUI();
+        const card = document.getElementById("rt-ai-timer-card");
+        const stopBtn = document.getElementById("rt-ai-timer-stop-alarm");
+        if (card) card.classList.add("is-alarm");
+        if (stopBtn) stopBtn.style.display = "block";
+        speelRadiAlarmPiep();
+        radiTimerAlarmInterval = setInterval(speelRadiAlarmPiep, 1800);
+      }
+    }, 200);
+    updateRadiTimerUI();
+  }
+
+  function pauzeerRadiTimer() {
+    if (radiTimerInterval) {
+      clearInterval(radiTimerInterval);
+      radiTimerInterval = null;
+    }
+    radiTimerRunning = false;
+    releaseRadiTimerWakeLock();
+    updateRadiTimerUI();
+  }
+
+  function sluitTimer() {
+    pauzeerRadiTimer();
+    stopRadiTimerAlarm();
+    const ov = document.getElementById("rt-ai-timer-overlay");
+    if (ov) ov.classList.remove("open");
+  }
+
+  function maakRadiTimerOverlay() {
+    if (typeof document === "undefined" || !document.body) return null;
+    let ov = document.getElementById("rt-ai-timer-overlay");
+    if (ov) return ov;
+    ov = document.createElement("div");
+    ov.id = "rt-ai-timer-overlay";
+    ov.innerHTML = `
+      <div class="rt-ai-timer-card" id="rt-ai-timer-card">
+        <div class="rt-ai-timer-title" id="rt-ai-timer-title">⏱️ Stralingstijd</div>
+        <div class="rt-ai-timer-clock" id="rt-ai-timer-clock">00:00</div>
+        <button type="button" class="rt-ai-timer-stop-alarm" id="rt-ai-timer-stop-alarm">🔕 Alarm stoppen</button>
+        <div class="rt-ai-timer-actions">
+          <button type="button" class="rt-ai-timer-start" id="rt-ai-timer-toggle">▶ Start</button>
+          <button type="button" class="rt-ai-timer-reset" id="rt-ai-timer-reset">↺ Reset</button>
+        </div>
+        <button type="button" class="rt-ai-timer-close" id="rt-ai-timer-close">Sluiten</button>
+      </div>
+    `;
+    document.body.appendChild(ov);
+    const toggleBtn = document.getElementById("rt-ai-timer-toggle");
+    const resetBtn = document.getElementById("rt-ai-timer-reset");
+    const stopAlarmBtn = document.getElementById("rt-ai-timer-stop-alarm");
+    const closeBtn = document.getElementById("rt-ai-timer-close");
+    if (toggleBtn) toggleBtn.addEventListener("click", () => (radiTimerRunning ? pauzeerRadiTimer() : startRadiTimerLoop()));
+    if (resetBtn) resetBtn.addEventListener("click", () => { pauzeerRadiTimer(); stopRadiTimerAlarm(); radiTimerRemSec = radiTimerInitSec; updateRadiTimerUI(); });
+    if (stopAlarmBtn) stopAlarmBtn.addEventListener("click", stopRadiTimerAlarm);
+    if (closeBtn) closeBtn.addEventListener("click", sluitTimer);
+    ov.addEventListener("click", (e) => { if (e.target === ov) sluitTimer(); });
+    return ov;
+  }
+
+  function openTimer(seconden, label = "Stralingstijd") {
+    const sec = Math.max(1, Math.round(Number(seconden) || 0));
+    const ov = maakRadiTimerOverlay();
+    if (!ov) return false;
+    pauzeerRadiTimer();
+    stopRadiTimerAlarm();
+    radiTimerInitSec = sec;
+    radiTimerRemSec = sec;
+    const titleEl = document.getElementById("rt-ai-timer-title");
+    if (titleEl) titleEl.textContent = `⏱️ ${label || "Stralingstijd"}`;
+    ov.classList.add("open");
+    startRadiTimerLoop();
+    return true;
+  }
+
   // Expose API
   const RtAssistant = {
+    openTimer,
+    sluitTimer,
     NDO_SPRAAK_WOORDENBOEK,
     corrigeerSpraakTekst,
     herstelVakjargon,
@@ -1470,6 +1648,7 @@
     sluitAfbeeldingZoom,
     verstuurTekst,
     verstuurSuggestie,
+    vulVoorbeeldIn,
     laadBronnenCsv,
     geefBrongrootteSuggestieChips,
     bronnenData,
