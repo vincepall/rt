@@ -1246,9 +1246,7 @@
     const normPill = geefNormDropdownHtml();
     const hasAny = nonDropdownItems.length > 0 || hasSourceSelected || hasNormSelected;
 
-    const clearBtnHtml = hasAny
-      ? `<button type="button" class="rt-ai-clear-mem-btn" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis alle parameters uit het geheugen (schone lei)"><i class="fas fa-trash-alt"></i><span class="rt-ai-clear-text">Wis</span></button>`
-      : "";
+    const clearBtnHtml = `<button type="button" class="rt-ai-clear-mem-btn" onclick="event.stopPropagation(); window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Opnieuw beginnen (nieuw gesprek)" aria-label="Opnieuw beginnen"><i class="fas fa-redo"></i><span class="rt-ai-clear-text">Nieuw</span></button>`;
 
     return `<div id="rt-ai-context-container" class="rt-ai-context-container">
       ${nonDropdownItems.length > 0 ? `<div class="rt-ai-memory-items">${badgesHtml}</div>` : ""}

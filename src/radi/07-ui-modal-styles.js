@@ -920,7 +920,7 @@
           min-height: 0 !important;
           border-radius: 0 !important;
           border: none !important;
-          border-top: 4px solid #F5DF4D !important;
+          border-top: 2px solid rgba(245, 223, 77, 0.7) !important;
           padding: 10px 12px !important;
           padding-top: max(8px, env(safe-area-inset-top)) !important;
           padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
@@ -928,7 +928,7 @@
           flex-direction: column !important;
           box-sizing: border-box !important;
           margin: 0 !important;
-          background: #252525 !important;
+          background: #181a20 !important;
           overscroll-behavior: none !important;
         }
         .rt-ai-modal-overlay.rt-ai-kb-open .rt-ai-modal {
@@ -974,7 +974,9 @@
         .rt-ai-modal-subtitle {
           display: none !important;
         }
-        .rt-ai-reset-header-btn,
+        .rt-ai-reset-header-btn {
+          display: none !important;
+        }
         .rt-ai-info-btn,
         .rt-ai-tts-btn {
           padding: 4px !important;
@@ -986,13 +988,26 @@
           line-height: 1 !important;
         }
         .rt-ai-examples-btn {
-          padding: 3px 8px !important;
-          font-size: 0.76rem !important;
+          background: none !important;
+          border: none !important;
+          color: #888 !important;
+          padding: 4px !important;
+          font-size: 16px !important;
+          border-radius: 6px !important;
+          gap: 0 !important;
+        }
+        .rt-ai-examples-btn span {
+          display: none !important;
+        }
+        .rt-ai-examples-btn.active {
+          background: rgba(245, 223, 77, 0.14) !important;
+          color: #F5DF4D !important;
         }
         .rt-ai-transcript {
-          font-size: 0.8rem !important;
+          font-size: 0.78rem !important;
+          color: #94a3b8 !important;
           min-height: 0 !important;
-          margin-bottom: 4px !important;
+          margin-bottom: 6px !important;
           flex-shrink: 0 !important;
           touch-action: none !important;
         }
@@ -1004,15 +1019,18 @@
           -webkit-overflow-scrolling: touch !important;
           overscroll-behavior: contain !important;
           touch-action: pan-y !important;
-          padding: 10px 10px !important;
-          font-size: 0.95rem !important;
-          line-height: 1.5 !important;
+          padding: 12px 12px !important;
+          font-size: 0.94rem !important;
+          line-height: 1.58 !important;
           margin-bottom: 8px !important;
-          border-radius: 8px !important;
+          border-radius: 10px !important;
+          background: #1f222a !important;
+          border: 1px solid rgba(255, 255, 255, 0.07) !important;
+          color: #e5e7eb !important;
         }
         .rt-ai-response-box strong,
         .rt-ai-response-box b {
-          color: #f0f0f0 !important;
+          color: #f3f4f6 !important;
           font-size: 1em !important;
           font-weight: 700 !important;
         }
@@ -1022,16 +1040,27 @@
           margin-top: 10px !important;
         }
         .rt-ai-chip-btn {
-          padding: 6px 8px !important;
-          font-size: 0.78rem !important;
+          background: #262a34 !important;
+          border: 1px solid rgba(255, 255, 255, 0.13) !important;
+          color: #e2e8f0 !important;
+          padding: 6px 9px !important;
+          font-size: 0.8rem !important;
+          font-weight: 600 !important;
           min-height: 34px !important;
-          border-radius: 9px !important;
+          border-radius: 10px !important;
+        }
+        .rt-ai-chip-btn:active {
+          background: rgba(245, 223, 77, 0.18) !important;
+          border-color: rgba(245, 223, 77, 0.6) !important;
+          color: #F5DF4D !important;
         }
         .rt-ai-memory-bar {
-          padding: 6px !important;
+          background: #14161c !important;
+          border: 1px solid rgba(255, 255, 255, 0.08) !important;
+          padding: 6px 7px !important;
           margin-bottom: 6px !important;
-          max-height: 172px !important;
-          border-radius: 8px !important;
+          max-height: 168px !important;
+          border-radius: 10px !important;
         }
         .rt-ai-context-container {
           gap: 5px !important;
@@ -1041,37 +1070,61 @@
           gap: 5px !important;
         }
         .rt-ai-param-badge {
+          background: #20232c !important;
+          border: 1px solid rgba(255, 255, 255, 0.12) !important;
+          color: #cbd5e1 !important;
+          box-shadow: none !important;
           padding: 4px 7px !important;
-          font-size: 0.78rem !important;
-          border-radius: 9px !important;
-          min-height: 32px !important;
+          font-size: 0.76rem !important;
+          border-radius: 8px !important;
+          min-height: 30px !important;
           gap: 4px !important;
         }
+        .rt-ai-param-badge-edit {
+          border-color: rgba(245, 223, 77, 0.45) !important;
+          color: #f3e58d !important;
+        }
         .rt-ai-badge-del {
-          font-size: 1.15rem !important;
+          color: rgba(255, 255, 255, 0.45) !important;
+          font-size: 1.05rem !important;
           min-width: 20px !important;
-          min-height: 26px !important;
+          min-height: 24px !important;
           padding: 2px 3px !important;
+        }
+        .rt-ai-badge-del:active {
+          color: #f87171 !important;
         }
         .rt-ai-memory-controls {
           gap: 5px !important;
         }
         .rt-ai-clear-mem-btn {
-          padding: 4px 9px !important;
-          font-size: 0.78rem !important;
-          border-radius: 9px !important;
-          min-width: 34px !important;
-          min-height: 32px !important;
-          height: 32px !important;
+          background: rgba(255, 255, 255, 0.08) !important;
+          border: 1px solid rgba(255, 255, 255, 0.16) !important;
+          color: #e2e8f0 !important;
+          box-shadow: none !important;
+          padding: 4px 10px !important;
+          font-size: 0.92rem !important;
+          border-radius: 8px !important;
+          min-width: 38px !important;
+          min-height: 34px !important;
+          height: 34px !important;
+        }
+        .rt-ai-clear-mem-btn:active {
+          background: rgba(245, 223, 77, 0.18) !important;
+          border-color: rgba(245, 223, 77, 0.6) !important;
+          color: #F5DF4D !important;
         }
         .rt-ai-clear-text {
           display: none !important;
         }
         .rt-ai-bron-pill,
         .rt-ai-norm-pill {
+          background: #20232c !important;
+          border: 1px solid rgba(255, 255, 255, 0.12) !important;
+          box-shadow: none !important;
           padding: 2px 8px !important;
           font-size: 0.78rem !important;
-          border-radius: 9px !important;
+          border-radius: 8px !important;
           min-height: 32px !important;
           height: 32px !important;
           margin: 0 !important;
@@ -1319,8 +1372,8 @@
             <button type="button" class="rt-ai-bug-header-btn" id="rt-ai-report-bug" onclick="window.RtAssistant && window.RtAssistant.meldFoutViaMail();" title="Meld fout via e-mail (vult gesprek automatisch in)" aria-label="Meld fout" style="background:none; border:none; color:#888; font-size:17px; cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#ffb74d'" onmouseout="this.style.color='#888'">
               <i class="fas fa-bug"></i>
             </button>
-            <button type="button" class="rt-ai-reset-header-btn" id="rt-ai-reset-header" onclick="window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Wis gespreksgeheugen (schone lei)" aria-label="Geheugen wissen" style="background:none; border:none; color:#888; font-size:17px; cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#ff6b6b'" onmouseout="this.style.color='#888'">
-              <i class="fas fa-trash-alt"></i>
+            <button type="button" class="rt-ai-reset-header-btn" id="rt-ai-reset-header" onclick="window.RtAssistant && window.RtAssistant.resetGespreksGeheugen();" title="Opnieuw beginnen (nieuw gesprek)" aria-label="Opnieuw beginnen" style="background:none; border:none; color:#888; font-size:17px; cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseover="this.style.color='#F5DF4D'" onmouseout="this.style.color='#888'">
+              <i class="fas fa-redo"></i>
             </button>
             <button type="button" class="rt-ai-examples-btn" id="rt-ai-examples-toggle" title="Bekijk alle mogelijke vragen &amp; voorbeelden (zoeken &amp; filteren)" aria-label="Voorbeeldvragen">
               <i class="fas fa-list-ul"></i><span>Voorbeelden</span>

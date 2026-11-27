@@ -785,6 +785,20 @@ function laadRtAssistant() {
         rOpn4.chips.includes("Stralingstijd"),
       JSON.stringify(rOpn4.chips)
     );
+    assert(
+      "Spraakherstel: 'Aantal opnames' blijft 'Aantal opnames' (geen 'tantaal opnames')",
+      !/tantaal/i.test(RT.corrigeerSpraakTekst("Aantal opnames")) && /\baantal opnames\b/i.test(RT.corrigeerSpraakTekst("Aantal opnames")),
+      RT.corrigeerSpraakTekst("Aantal opnames")
+    );
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("Hoelang moet ik stralen met een selenium van 30 curie op een 10 duimer van 8 dik?");
+    const rChipOpn = await RT.verwerkUniverseleVraag("Aantal opnames", { isChip: true });
+    const tChipOpn = stripTags(rChipOpn && rChipOpn.text);
+    assert(
+      "E2E Chip 'Aantal opnames' na stralingstijd opent opnames-berekening (niet opnieuw stralingstijd)",
+      !/Stralingstijd voor/i.test(tChipOpn) && /opnames|klasse|norm/i.test(tChipOpn),
+      tChipOpn
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

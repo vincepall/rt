@@ -132,6 +132,7 @@
 
   // Normale Nederlandse woorden die nooit door de fuzzy-matcher veranderd mogen worden
   const NORMALE_NL_STOPWOORDEN = new Set([
+    "aantal", "aantallen", "verdelen", "verdeling", "verdeel", "minimale", "veilige", "posities", "opname", "opnames",
     "straal", "straalt", "stralen", "stalen", "minuut", "minuten", "seconde", "seconden", "bereken", "berekent", "berekenen", "hoeveel", "wanneer",
     "waarom", "waarmee", "waarbij", "waarop", "waarin", "waarvan", "hoelang", "hoever", "hoezo",
     "binnen", "buiten", "tussen", "zonder", "achter", "achteraan", "achteraf", "achtergrond", "achterkant",
