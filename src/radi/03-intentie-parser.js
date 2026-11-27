@@ -261,10 +261,10 @@
       typeof actiefGespreksGeheugen !== "undefined" &&
       actiefGespreksGeheugen &&
       actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
-      Boolean(actiefGespreksGeheugen.focusBegintijdSec) &&
+      Boolean(actiefGespreksGeheugen.focusBegintijdSec || actiefGespreksGeheugen.maminVal) &&
       !/\b(se-?75|ir-?192|selenium|iridium|duim|duimer|schedule|sch\b|plaat|dik|wanddikte|diameter|afzetting|draadje|opnames?|onstream)\b/i.test(lower) &&
       (
-        (Boolean(actiefGespreksGeheugen.oudeMa) && /\b(?:met|op|bij|naar|en)\s*\d+(?:[.,]\d+)?(?:\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b))?\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeMa || actiefGespreksGeheugen.maminVal) && /\b(?:met|op|bij|naar|en)?\s*\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)|\b(?:met|op|bij|naar|en)\s*\d+(?:[.,]\d+)?\b/i.test(lower)) ||
         (Boolean(actiefGespreksGeheugen.oudeFocus) && /\b(?:met|op|bij|naar|en)\s*(?:\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b))\b/i.test(lower)) ||
         (Boolean(actiefGespreksGeheugen.oudeCi) && /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower)) ||
         (Boolean(actiefGespreksGeheugen.oudeFilmType) && /\bd[234578]\b/i.test(lower))

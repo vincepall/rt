@@ -403,17 +403,20 @@
     );
 
     // 1. mA*min varianten (minuten deel is VERPLICHT zodat pure milliampere stroom niet verward wordt!)
-    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]re|amp)|mamp|ma)\s*(?:[\*x\s-]|per\s+)?(?:minuuten|minuten|minuut|min\b)\b/gi, "mA*min");
+    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]res?|amps?)|mamp|m\s*a|ma)\s*(?:[\*x\s-]|per\s+|keer\s+)?(?:minuuten|minuten|minuut|min\b)\b/gi, "mA*min");
 
     // Herstel per ongeluk aaneengeplakt mA*mingebruiken / mA*mingebruik
     s = s.replace(/\bmA\*min(?:gebruik(?:en)?)\b/gi, "mA gebruiken");
 
     // 2. Pure mA (buisstroom in milliampere): strictly without minutes
-    s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:mill?i[-\s]?(?:amp[eè]re|amp))\b/gi, "$1 mA");
-    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]re|amp))\s*(\d+(?:[.,]\d+)?)\b/gi, "$1 mA");
-    s = s.replace(/\bmill?i[-\s]?(?:amp[eè]re|amp)\b/gi, "mA");
+    s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:mill?i[-\s]?(?:amp[eè]res?|amps?)|m\.a\.|m\s+a)\b/gi, "$1 mA");
+    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]res?|amps?))\s*(\d+(?:[.,]\d+)?)\b/gi, "$1 mA");
+    s = s.replace(/\bmill?i[-\s]?(?:amp[eè]res?|amps?)\b/gi, "mA");
 
-    // 3. Film lookalikes in spraak (bijv. "op de 4" -> "op D4", "op de 5" -> "op D5", "en D5", "op de vier" -> "op D4")
+    // Focus spraaklookalikes (fokus / vocus / fokkers / volkus)
+    s = s.replace(/\b(fokus|vocus|fokkers|volkus)\b/gi, "focus");
+
+    // 3. Film lookalikes in spraak (bijv. "op de 4" -> "op D4", "op T5" -> "op D5", "op B5" -> "op D5", "op de vier" -> "op D4")
     s = s.replace(/\b(?:op|naar|met|film|wissel\s+naar)\s+(?:de\s+|d\s+)?([234578])\b(?!\s*[.,]\d)(?!\s*(?:mm|cm|meter|m\b|inch|duim|dik|bar|sec|seconden|min|minuut|minuten|uur|opname|opnames|ma\b|kv\b|ci\b|curie\b|lood|pb|loodplaat|loodplaten|plaat|platen|scherm|schermen))/gi, (match, d) => {
       const prefix = match.split(/\s+(?:de\s+|d\s+)?\d/i)[0];
       return `${prefix} D${d}`;
@@ -425,6 +428,16 @@
     });
     s = s.replace(/\b(?:en|als|of)\s+de\s*([234578])\b(?!\s*[.,]\d)(?!\s*(?:mm|cm|meter|m\b|inch|duim|dik|bar|sec|seconden|min|minuut|minuten|uur|opname|opnames|ma\b|kv\b|ci\b|curie\b|lood|pb|loodplaat|loodplaten|plaat|platen|scherm|schermen))/gi, "en D$1");
     s = s.replace(/\b(?:en|als|of)\s+d\s*([234578])\b(?!\s*(?:ma\b|kv\b|ci\b|curie\b))/gi, "en D$1");
+    s = s.replace(/\b(?:op|naar|met|van|film|agfa|wissel\s+naar|en|of)\s+(?:t|b|p|g|v|tee|thee|day|the)[-\s]*([234578])\b(?!\s*[.,]\d)(?!\s*(?:mm|cm|meter|m\b|inch|duim|dik|bar|sec|seconden|min|minuut|minuten|uur|opname|opnames|ma\b|kv\b|ci\b|curie\b))/gi, (match, d) => {
+      const prefix = match.replace(/\s+(?:t|b|p|g|v|tee|thee|day|the)[-\s]*[234578]$/i, "");
+      return `${prefix} D${d}`;
+    });
+    s = s.replace(/\b(?:op|naar|met|van|film|agfa|wissel\s+naar|en|of)\s+(?:t|b|p|g|v|tee|thee|day|the)\s+(twee|drie|vier|vijf|zeven|acht)\b/gi, (match, w) => {
+      const map = { twee: "2", drie: "3", vier: "4", vijf: "5", zeven: "7", acht: "8" };
+      const prefix = match.replace(/\s+(?:t|b|p|g|v|tee|thee|day|the)\s+(?:twee|drie|vier|vijf|zeven|acht)$/i, "");
+      return `${prefix} D${map[w.toLowerCase()] || w}`;
+    });
+    s = s.replace(/\bt[-\s]?([234578])\b(?!\s*(?:mm|cm|meter|m\b|duim|inch|dik|ma\b|kv\b|ci\b|curie\b))/gi, "D$1");
 
     // Dek / deck / dak / dijk / diks / dikke na een getal of getalwoord -> dik
     s = s.replace(
@@ -1167,12 +1180,12 @@
       // Schedules
       [/\b(schetsjoel|schetjoel|skejoel|sketsjoel|sjedjoel|shedoel|skedjoel|skedule|schedul|shedoel|skedoel|skedool|scheduel)\b/gi, "schedule"],
       // Filmtypen & D-nummers
-      [/\b(d\s*4|dee\s*vier|dee\s*4|d\s*vier|de\s*vier|de\s*4|d-4|b\s*4|dier)\b/gi, "D4"],
-      [/\b(d\s*5|dee\s*vijf|dee\s*5|d\s*vijf|de\s*vijf|de\s*5|d-5|b\s*5)\b/gi, "D5"],
-      [/\b(d\s*7|dee\s*zeven|dee\s*7|d\s*zeven|de\s*zeven|de\s*7|d-7|b\s*7)\b/gi, "D7"],
-      [/\b(d\s*2|dee\s*twee|dee\s*2|d\s*twee|de\s*2|d-2)\b/gi, "D2"],
-      [/\b(d\s*3|dee\s*drie|dee\s*3|d\s*drie|de\s*3|d-3)\b/gi, "D3"],
-      [/\b(d\s*8|dee\s*acht|dee\s*8|d\s*acht|de\s*8|d-8)\b/gi, "D8"],
+      [/\b(d\s*4|dee\s*vier|dee\s*4|d\s*vier|de\s*vier|de\s*4|d-4|b\s*4|t\s*4|t-4|tee\s*4|thee\s*4|t\s*vier|dier)\b/gi, "D4"],
+      [/\b(d\s*5|dee\s*vijf|dee\s*5|d\s*vijf|de\s*vijf|de\s*5|d-5|b\s*5|t\s*5|t-5|tee\s*5|thee\s*5|t\s*vijf)\b/gi, "D5"],
+      [/\b(d\s*7|dee\s*zeven|dee\s*7|d\s*zeven|de\s*zeven|de\s*7|d-7|b\s*7|t\s*7|t-7|tee\s*7|thee\s*7|t\s*zeven)\b/gi, "D7"],
+      [/\b(d\s*2|dee\s*twee|dee\s*2|d\s*twee|de\s*2|d-2|b\s*2|t\s*2|t-2|tee\s*2|thee\s*2|t\s*twee)\b/gi, "D2"],
+      [/\b(d\s*3|dee\s*drie|dee\s*3|d\s*drie|de\s*3|d-3|b\s*3|t\s*3|t-3|tee\s*3|thee\s*3|t\s*drie)\b/gi, "D3"],
+      [/\b(d\s*8|dee\s*acht|dee\s*8|d\s*acht|de\s*8|d-8|b\s*8|t\s*8|t-8|tee\s*8|thee\s*8|t\s*acht)\b/gi, "D8"],
       [/\b(film\s*type|film\s*klasse|film\s*soort|film\s*kwaliteit)\b/gi, "filmkwaliteit"],
       // Lasfouten
       [/\b(undercut|rand\s*inkarteling|inkarteling)\b/gi, "randinkarteling"],

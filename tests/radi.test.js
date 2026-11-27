@@ -730,6 +730,35 @@ function laadRtAssistant() {
       /Effectieve filmlengte: \d+\.\d cm/.test(tOpn4Verdeel) && /Film 1 = 0\.0 cm/.test(tOpn4Verdeel),
       tOpn4Verdeel
     );
+
+    // Spraakherstel T5/T4/T7 -> D5/D4/D7 + mA*min focus+film zonder mA + vervolg met mA
+    assert(
+      "Spraakherstel: 'op T5' wordt gecorrigeerd naar 'op D5'",
+      /\bop D5\b/.test(RT.corrigeerSpraakTekst("Hoe lang moet ik stralen op 1 meter 45 Focus op T5")),
+      RT.corrigeerSpraakTekst("Hoe lang moet ik stralen op 1 meter 45 Focus op T5")
+    );
+    RT.resetGespreksGeheugen();
+    const rMaMinGeenMa = await RT.verwerkUniverseleVraag(
+      RT.corrigeerSpraakTekst("Ik heb een stralingstijd van 8 mA*min op 80 Focus op D4 Hoe lang moet ik stralen op 1 meter 45 Focus op T5")
+    );
+    const tMaMinGeenMa = stripTags(rMaMinGeenMa && rMaMinGeenMa.text);
+    assert(
+      "E2E 8 mA*min (80->145 cm, D4->T5/D5) zonder mA rekent 15.77 mA·min + tabel uit",
+      /80 naar 145 cm FFD/.test(tMaMinGeenMa) &&
+        /D4 naar D5/.test(tMaMinGeenMa) &&
+        /15\.77 mA(?:\*|·|&middot;)min/.test(tMaMinGeenMa) &&
+        /Bij 4 mA\s*:\s*3m 57s/.test(tMaMinGeenMa) &&
+        Array.isArray(rMaMinGeenMa.chips) &&
+        rMaMinGeenMa.chips.includes("4 mA"),
+      tMaMinGeenMa
+    );
+    const rMaMinMet4Ma = await RT.verwerkUniverseleVraag("4 mA", { isChip: true });
+    const tMaMinMet4Ma = stripTags(rMaMinMet4Ma && rMaMinMet4Ma.text);
+    assert(
+      "E2E Vervolg '4 mA' na 8 mA*min focus+film rekent definitieve tijd uit (3m 57s)",
+      /80 naar 145 cm FFD/.test(tMaMinMet4Ma) && /D4 naar D5/.test(tMaMinMet4Ma) && /3m 57s/.test(tMaMinMet4Ma),
+      tMaMinMet4Ma
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

@@ -131,6 +131,59 @@
 
     // Als er nog geen begintijd bekend is
     if (!begintijdSec) {
+      // Speciaal geval: wél mA*min opgegeven (bijv. "8 mA*min op 80 focus op D4, hoelang op 145 focus op D5"), maar nog geen mA (buisstroom)
+      if (params.maminVal && params.maminVal > 0 && !params.maVal) {
+        let huidigMaMin = params.maminVal;
+        let stappenHtml = `• Beginwaarde: <strong>${params.maminVal} mA&middot;min</strong>${fOud ? ` (op ${fOud} cm FFD${params.oudeFilmType ? `, ${params.oudeFilmType.toUpperCase()}` : ""})` : ""}<br>`;
+
+        if (heeftFocus) {
+          const focusFactor = Math.pow(fNieuw / fOud, 2);
+          huidigMaMin *= focusFactor;
+          stappenHtml += `• Focusverandering van <strong>${fOud} naar ${fNieuw} cm FFD</strong>: factor <strong>${focusFactor.toFixed(2)}x</strong> &rarr; <strong>${huidigMaMin.toFixed(2)} mA&middot;min</strong><br>`;
+        }
+
+        if (heeftMateriaal && !toonAlleMateriaalOpties) {
+          let matFactor = params.materiaalFactor || 1.0;
+          if (params.materiaalObj && matFactor === 1.0) {
+            if (params.kv === 150) matFactor = params.materiaalObj.f150;
+            else if (params.kv === 200) matFactor = params.materiaalObj.f200;
+            else if (params.kv === 250) matFactor = params.materiaalObj.f250;
+            else if (params.kv === 300) matFactor = params.materiaalObj.f300;
+          }
+          if (matFactor !== 1.0) {
+            huidigMaMin *= matFactor;
+            stappenHtml += `• Materiaalfactor <strong>${matFactor}x</strong>: &rarr; <strong>${huidigMaMin.toFixed(2)} mA&middot;min</strong><br>`;
+          }
+        }
+
+        const baseFilmMa = (params.oudeFilmType || "D7").toUpperCase();
+        if (params.nieuweFilmType && params.nieuweFilmType.toUpperCase() !== baseFilmMa) {
+          const targetFilmMa = params.nieuweFilmType.toUpperCase();
+          const filmFactorMa = convertFilmTime(1000, baseFilmMa, targetFilmMa) / 1000;
+          huidigMaMin *= filmFactorMa;
+          stappenHtml += `• Filmsoortwissel van <strong>${baseFilmMa} naar ${targetFilmMa}</strong>: factor <strong>${filmFactorMa.toFixed(2)}x</strong> &rarr; <strong>${huidigMaMin.toFixed(2)} mA&middot;min</strong><br>`;
+        }
+
+        const eindMaMinStr = huidigMaMin.toFixed(2).replace(/\.00$/, "");
+        const overzichtMa = [2, 3, 4, 5].map((ma) => {
+          const sec = (huidigMaMin / ma) * 60;
+          return `&nbsp;&nbsp;&bull; Bij <strong>${ma} mA</strong>: <strong>${formatSecondenKort(sec)}</strong>`;
+        }).join("<br>");
+
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "maVal";
+        }
+        if (chips) chips.push("2 mA", "3 mA", "4 mA", "5 mA");
+
+        return `<div class="rt-ai-focus-calc" style="line-height:1.6;">` +
+               stappenHtml +
+               `<div class="rt-ai-final-time" style="margin-top:8px; font-size:1.1rem; color:#F5DF4D; font-weight:800;">Nieuwe belichting: <strong>${eindMaMinStr} mA&middot;min</strong></div>` +
+               `<div style="margin-top:6px;">Omdat er geen <strong>buisstroom (mA)</strong> is opgegeven, hier de stralingstijd per mA:<br>${overzichtMa}</div>` +
+               `<div style="margin-top:8px;">Met hoeveel <strong>mA</strong> straal je?</div>` +
+               `<span class="rt-tts-summary" style="display:none">Nieuwe belichting is ${eindMaMinStr} milliampère minuten. Met hoeveel milliampère straal je?</span>` +
+               `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="focusverandering.html" class="ai-link" target="_blank">focusverandering.html</a> &amp; <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>).</small></div>`;
+      }
+
       if (params.oudeFilmType && params.nieuweFilmType && !heeftFocus) {
         const fVan = params.oudeFilmType.toUpperCase();
         const fNaar = params.nieuweFilmType.toUpperCase();
@@ -237,8 +290,11 @@
     }
 
     let out = `<div class="rt-ai-focus-calc" style="line-height:1.6;">`;
-    if (maminMsg) out += maminMsg;
-    out += `• Begintijd: <strong>${formatSecondenKort(oorspronkelijkeBegintijdSec || begintijdSec)}</strong><br>`;
+    if (maminMsg) {
+      out += maminMsg;
+    } else {
+      out += `• Begintijd: <strong>${formatSecondenKort(oorspronkelijkeBegintijdSec || begintijdSec)}</strong><br>`;
+    }
     if (ciMsg) out += ciMsg;
     if (maMsg) out += maMsg;
     if (focusTxt) out += focusTxt;
@@ -1361,8 +1417,12 @@
       maminToelichting = `<br><small style="opacity:0.9;">💡 <em>Opmerking over mA&middot;minuten / belichtingstijd:</em> R.A.D.I. kan voor een röntgenbuis geen directe stralingstijd of mA&middot;min waarde geven omdat elke röntgenbuis een beetje anders is. Lees het vereiste aantal mA&middot;min af op de buistabel van de betreffende buis en reken deze via <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a> om naar belichtingstijd.</small>`;
     }
 
-    const maxTekst = extraMax > 0 ? `, maximaal <strong>${kv + extraMax} kV</strong> conform EN ISO 17636-1` : "";
-    return `Voor <strong>${materiaal}</strong> bij ${uitlegDikte}: <strong>${kv} kV</strong> volgens de KV-regel${maxTekst}.${enkelwandAlt}${maminToelichting} <small style="opacity:0.85;">(zie <a href="kvregel.html" class="ai-link" target="_blank">kvregel.html</a>)</small>`;
+    const maxTekst = extraMax > 0 ? `<br>• Maximaal toegestaan (EN ISO 17636-1): <strong>${kv + extraMax} kV</strong>` : "";
+    return `<div class="rt-ai-calc">` +
+           `• Materiaal &amp; dikte: <strong>${materiaal}</strong> bij ${uitlegDikte}${maxTekst}` +
+           `<div class="rt-ai-result">Aanbevolen volgens de KV-regel: <strong>${kv} kV</strong></div>` +
+           `${enkelwandAlt}${maminToelichting}` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend volgens <a href="kvregel.html" class="ai-link" target="_blank">kvregel.html</a>).</small></div>`;
   }
 
   // 11b. Buistabel / mA*min omrekenen naar belichtingstijd (buistabel.html)
@@ -1457,9 +1517,10 @@
       alternatives.slice(0, 3).forEach((a) => chips.push(`${a} mA`));
     }
 
-    return `Voor ${mamin} mA*min bij een buisstroom van ${ma} mA:<br>` +
-           `• Belichtingstijd: <strong>${tijdTekst}</strong> (${totalMinutes.toFixed(2)} min).<br>` +
-           `<small style="opacity: 0.85;">(Berekend volgens <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>: ${mamin} &divide; ${ma} = ${totalMinutes.toFixed(2)} minuten).</small>`;
+    return `<div class="rt-ai-calc">` +
+           `• Gegevens: <strong>${mamin} mA&middot;min</strong> bij <strong>${ma} mA</strong> (${totalMinutes.toFixed(2)} min)<br>` +
+           `<div class="rt-ai-result">Belichtingstijd: <strong>${tijdTekst}</strong></div>` +
+           `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>: ${mamin} &divide; ${ma} = ${totalMinutes.toFixed(2)} minuten).</small></div>`;
   }
 
   // 12. Gevulde Leiding Calculator (gevuldeleiding.html)
@@ -1550,11 +1611,12 @@
     }
 
     return (
-      `Gevulde leiding <strong>${formatMmNaarDuimLabel(D)}</strong> (${t} mm wanddikte) gevuld met <strong>${mediumNaam}</strong> (&rho; = ${rho} kg/m³):<br>` +
+      `<div class="rt-ai-calc">` +
+      `• Leiding: <strong>${formatMmNaarDuimLabel(D)}</strong> (${t} mm wanddikte), gevuld met <strong>${mediumNaam}</strong> (&rho; = ${rho} kg/m³)<br>` +
       `• Vloeistofkolom inwendig: <strong>${binnenDia.toFixed(1)} mm</strong><br>` +
       `• Staalequivalent inhoud: <strong>${staalEquivalent.toFixed(2)} mm</strong> staal<br>` +
-      `• <strong>Totale doorstraalde dikte: ${totDikteRond} mm</strong> (2t + staalequivalent).<br>` +
-      `<small style="opacity: 0.85;">(zie <a href="gevuldeleiding.html" class="ai-link" target="_blank">gevuldeleiding.html</a>)</small>`
+      `<div class="rt-ai-result">Totale doorstraalde dikte: <strong>${totDikteRond} mm</strong></div>` +
+      `<small style="opacity: 0.85; display:block; margin-top:6px;">(2t + staalequivalent, zie <a href="gevuldeleiding.html" class="ai-link" target="_blank">gevuldeleiding.html</a>).</small></div>`
     );
   }
 
@@ -1659,23 +1721,23 @@
       if (doelDateObj) {
         const ciDoel = berekenHuidigeActiviteit(specifiekeBron.initialActivity, specifiekeBron.type, specifiekeBron.date, doelDateObj);
         const dStr = `${String(doelDateObj.getDate()).padStart(2, "0")}-${String(doelDateObj.getMonth() + 1).padStart(2, "0")}-${doelDateObj.getFullYear()}`;
-        return `Bron <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, <i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} d, nu ${actVandaag.toFixed(2)} Ci):<br>` +
-               `• Activiteit op <strong>${dStr}</strong>: <strong>${ciDoel.toFixed(2)} Ci</strong>.<br>` +
-               `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+        return `<div class="rt-ai-calc">• Bron: <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, <i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} d, nu ${actVandaag.toFixed(2)} Ci)` +
+               `<div class="rt-ai-result">Activiteit op ${dStr}: <strong>${ciDoel.toFixed(2)} Ci</strong></div>` +
+               `<small style="opacity:0.85; display:block; margin-top:6px;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
       } else if (params.vervalInVerleden) {
         const verledenDatum = new Date(today.getTime() - daysDiff * 24 * 3600 * 1000);
         const ciVerleden = actVandaag * Math.pow(2, daysDiff / halfwaardetijd);
         const dStr = `${String(verledenDatum.getDate()).padStart(2, "0")}-${String(verledenDatum.getMonth() + 1).padStart(2, "0")}-${verledenDatum.getFullYear()}`;
-        return `Bron <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci):<br>` +
-               `• <strong>${Math.round(daysDiff)} dagen geleden</strong> (${dStr}): <strong>${ciVerleden.toFixed(2)} Ci</strong>.<br>` +
-               `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+        return `<div class="rt-ai-calc">• Bron: <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci)` +
+               `<div class="rt-ai-result">${Math.round(daysDiff)} dagen geleden (${dStr}): <strong>${ciVerleden.toFixed(2)} Ci</strong></div>` +
+               `<small style="opacity:0.85; display:block; margin-top:6px;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
       } else {
         const doelDatum = new Date(today.getTime() + daysDiff * 24 * 3600 * 1000);
         const ciDoel = actVandaag / Math.pow(2, daysDiff / halfwaardetijd);
         const dStr = `${String(doelDatum.getDate()).padStart(2, "0")}-${String(doelDatum.getMonth() + 1).padStart(2, "0")}-${doelDatum.getFullYear()}`;
-        return `Bron <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci):<br>` +
-               `• Over <strong>${Math.round(daysDiff)} dagen</strong> (${dStr}): nog <strong>${ciDoel.toFixed(2)} Ci</strong> (vervalfactor ${(ciDoel / actVandaag * 100).toFixed(1)}%).<br>` +
-               `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+        return `<div class="rt-ai-calc">• Bron: <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci)` +
+               `<div class="rt-ai-result">Over ${Math.round(daysDiff)} dagen (${dStr}): <strong>${ciDoel.toFixed(2)} Ci</strong></div>` +
+               `<small style="opacity:0.85; display:block; margin-top:6px;">(Vervalfactor ${(ciDoel / actVandaag * 100).toFixed(1)}%, zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
       }
     } else {
       let ciDoel = 0;
@@ -1695,29 +1757,27 @@
 
       const isoLabel = isotoop === "Ir192" ? "Ir-192" : (isotoop === "Co60" ? "Co-60" : "Se-75");
       if (params.vervalInVerleden && !doelDateObj) {
-        // "wat was een 50 Ci Ir-192 bron 30 dagen geleden?" -> terugrekenen (grotere activiteit!)
-        // "30 dagen geleden was hij 50 Ci, hoeveel is hij nu?" -> vooruit vervallen naar nu!
         const vraagtWatHijNuHeeft =
           /\b(nu|vandaag|heden|nog|over\s+is|resterend)\b/i.test(lower) &&
           !/\bwat\s+was\b/i.test(lower);
         if (vraagtWatHijNuHeeft) {
-          return `Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen):<br>` +
-                 `• Activiteit <strong>${Math.round(daysDiff)} dagen geleden</strong>: ${initAct.toFixed(1)} Ci<br>` +
-                 `• Huidige activiteit <strong>nu (na ${Math.round(daysDiff)} dagen verval)</strong>: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong> (resterend: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%).<br>` +
-                 `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+          return `<div class="rt-ai-calc">• Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen)<br>` +
+                 `• Activiteit ${Math.round(daysDiff)} dagen geleden: <strong>${initAct.toFixed(1)} Ci</strong>` +
+                 `<div class="rt-ai-result">Huidige activiteit nu: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong></div>` +
+                 `<small style="opacity:0.85; display:block; margin-top:6px;">(Resterend na ${Math.round(daysDiff)} dagen: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%, zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
         } else {
           const verledenDatum = new Date(today.getTime() - daysDiff * 24 * 3600 * 1000);
           const ciVerleden = initAct * Math.pow(2, daysDiff / halfwaardetijd);
           const dStrVerleden = `${String(verledenDatum.getDate()).padStart(2, "0")}-${String(verledenDatum.getMonth() + 1).padStart(2, "0")}-${verledenDatum.getFullYear()}`;
-          return `Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen, nu ${initAct.toFixed(1)} Ci):<br>` +
-                 `• Activiteit <strong>${Math.round(daysDiff)} dagen geleden</strong> (${dStrVerleden}): <strong>${ciVerleden.toFixed(2)} Ci</strong>.<br>` +
-                 `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+          return `<div class="rt-ai-calc">• Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen, nu ${initAct.toFixed(1)} Ci)` +
+                 `<div class="rt-ai-result">Activiteit ${Math.round(daysDiff)} dagen geleden (${dStrVerleden}): <strong>${ciVerleden.toFixed(2)} Ci</strong></div>` +
+                 `<small style="opacity:0.85; display:block; margin-top:6px;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
         }
       }
-      return `Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen):<br>` +
-             `• Beginactiviteit: ${initAct.toFixed(1)} Ci<br>` +
-             `• Activiteit ${tijdUitleg}: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong> (resterend: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%).<br>` +
-             `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+      return `<div class="rt-ai-calc">• Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen)<br>` +
+             `• Beginactiviteit: <strong>${initAct.toFixed(1)} Ci</strong>` +
+             `<div class="rt-ai-result">Activiteit ${tijdUitleg}: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong></div>` +
+             `<small style="opacity:0.85; display:block; margin-top:6px;">(Resterend: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%, zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
     }
   }
 
@@ -2053,7 +2113,13 @@
 
     const bronMelding = bron !== "X-ray" ? ` met ${bronLabel}` : "";
     const ttsDraad = params.materiaalNaam && bkiInfo ? `Vereist draadje: ${wire}, op houder ${geefBkiSetsVoorDraad(wireNum, bkiInfo.isoGroup)}` : `Vereist draadje: ${wire}`;
-    return `Vereist draadje: <strong>${wire}</strong> (${bkiPos}, doorstraalde dikte: ${doorstraaldeDikte.toFixed(1)} mm bij ${tech} volgens ${proc}${bronMelding}).${asmeOverdikteInfo}${verminderingTekst}${altGammaInfo}${bkiExtra}${asmeOverdiktePrompt}<span class="rt-tts-summary" style="display:none">${ttsDraad}</span><br><small style="opacity:0.85;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small>`;
+    return `<div class="rt-ai-calc">` +
+           `• Opstelling: <strong>${tech}</strong> volgens <strong>${proc}</strong>${bronMelding} (${bkiPos})<br>` +
+           `• Doorstraalde dikte: <strong>${doorstraaldeDikte.toFixed(1)} mm</strong>` +
+           `<div class="rt-ai-result">Vereist draadje: <strong>${wire}</strong></div>` +
+           `${asmeOverdikteInfo}${verminderingTekst}${altGammaInfo}${bkiExtra}${asmeOverdiktePrompt}` +
+           `<span class="rt-tts-summary" style="display:none">${ttsDraad}</span>` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small></div>`;
   }
 
   // 15. Pipe Schedule Wanddiktes (ASME B36.10M / ASME B36.19M)
@@ -2131,11 +2197,12 @@
       chips.push(`${info.wt} mm`, "Min FFD", "Aantal opnames", "Stralingstijd");
     }
 
-    return `Volgens <strong>ASME B36.10M / B36.19M</strong> voor <strong>${info.nps}" duimer (OD ${info.od} mm / DN ${info.dn})</strong>:<br>` +
-           `• Schedule: <strong>Schedule ${info.schedule}</strong><br>` +
-           `• Enkele wanddikte (t): <strong>${info.wt} mm</strong><br>` +
+    return `<div class="rt-ai-calc">` +
+           `• Leiding: <strong>${info.nps}" duimer</strong> (OD ${info.od} mm / DN ${info.dn}) — <strong>Schedule ${info.schedule}</strong><br>` +
            `• Binnendiameter (ID): <strong>${info.id} mm</strong><br>` +
-           `• Doorstraalde dubbele wand (2t): <strong>${info.doubleWall} mm</strong>`;
+           `• Doorstraalde dubbele wand (2t): <strong>${info.doubleWall} mm</strong>` +
+           `<div class="rt-ai-result">Wanddikte (t): <strong>${info.wt} mm</strong></div>` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform ASME B36.10M / B36.19M).</small></div>`;
   }
 
   // 16. ASME (ASTM E747) vs EN (ISO 19232-1) IQI Draadjes Vergelijking & Toegestaanheid
@@ -2319,9 +2386,9 @@
         const t283 = ASME_TABLE_T283_EQUIVALENTS[plateNum];
         res += `📋 <strong>Toegestane alternatieve Hole-Type IQI's (ASME Sec V Artikel 2 Tabel T-283):</strong><br>` +
                `Als de onderzoeker Plaatje ${plateNum} niet beschikbaar heeft in het veld, mag volgens Tabel T-283 een gelijkwaardig 2-2T kwaliteitsniveau worden behaald met:<br>` +
-               `• <strong>Plaatje ${t283.alt1t} met 1T gat</strong> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt1t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt1t].h1tMm} mm</strong>)<br>`;
+               `• <span class="rt-ai-result">Plaatje ${t283.alt1t} met 1T gat</span> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt1t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt1t].h1tMm} mm</strong>)<br>`;
         if (t283.alt4t && ASME_HOLE_TYPE_DATA[t283.alt4t]) {
-          res += `• <strong>Plaatje ${t283.alt4t} met 4T gat</strong> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt4t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt4t].h4tMm} mm</strong>)<br>`;
+          res += `• <span class="rt-ai-result">Plaatje ${t283.alt4t} met 4T gat</span> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt4t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt4t].h4tMm} mm</strong>)<br>`;
         }
         res += `<br><small style="color:#F5DF4D;">ℹ️ Hiermee wordt voldaan aan hetzelfde equivalente kwaliteitsniveau conform ASME Section V (Equivalent Hole-Type IQI Sensitivity).</small>`;
       } else {
@@ -2349,10 +2416,11 @@
       const srcP = ASME_HOLE_TYPE_DATA[matchRow.srcPlate];
       const filmP = ASME_HOLE_TYPE_DATA[matchRow.filmPlate];
 
-      let res = `<strong>Vereist ASME Hole-Type IQI (Plaatje) en gat voor wanddikte ${t} mm (ASME Sec. V Art. 2 Tabel T-276):</strong><br><br>` +
-                `• <strong>Bronzijde (Source Side):</strong> <strong>ASME plaatje No. ${matchRow.srcPlate}</strong> met zichtbaar <strong>2T gat</strong> (&empty; ${srcP.h2tMm} mm)<br>` +
-                `• <strong>Filmzijde (Film Side):</strong> <strong>ASME plaatje No. ${matchRow.filmPlate}</strong> met zichtbaar <strong>2T gat</strong> (&empty; ${filmP.h2tMm} mm)<br>` +
-                `<small style="opacity:0.85;">(Het vereiste gat bij ASME Hole-Type IQI's is standaard altijd het <strong>2T gat</strong>).</small>`;
+      let res = `<div class="rt-ai-calc">` +
+                `• Wanddikte: <strong>${t} mm</strong> (ASME Sec. V Art. 2 Tabel T-276)<br>` +
+                `• Bronzijde (Source Side): <span class="rt-ai-result">ASME plaatje No. ${matchRow.srcPlate} — 2T gat</span> (&empty; ${srcP.h2tMm} mm)<br>` +
+                `• Filmzijde (Film Side): <span class="rt-ai-result">ASME plaatje No. ${matchRow.filmPlate} — 2T gat</span> (&empty; ${filmP.h2tMm} mm)` +
+                `<small style="opacity:0.85; display:block; margin-top:6px;">(Bij ASME Hole-Type IQI's is standaard het 2T gat vereist).</small></div>`;
 
       if (chips) {
         chips.push(`2T van ${matchRow.srcPlate}`, `2T van ${matchRow.filmPlate}`, "ASME draadje vergelijken");

@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v71";
+const CACHE_NAME = "pwa-cache-v75";
 
 // Lijst van bestanden om te cachen bij installatie
 const FILES_TO_CACHE = [

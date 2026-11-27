@@ -190,10 +190,10 @@
         chips.push(`Hoeveel lood nodig op ${doelM} meter`, "Op 10 meter", "Op 15 meter", isIr ? "Sterkste Se-75" : "Sterkste Ir-192");
       }
       return (
-        `Dosistempo op <strong>${doelM} meter</strong> afstand bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${afschermTxt}:<br>` +
-        `• In de open bundel: <strong>${dtOpen.toFixed(1)} μSv/uur</strong> (${(dtOpen / 1000).toFixed(2)} mSv/uur).<br>` +
-        `• Achter een standaard collimator: <strong>${dtCollimator.toFixed(1)} μSv/uur</strong>.<br>` +
-        `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>${hvlHint}).</small>`
+        `<div class="rt-ai-calc">• Dosistempo op <strong>${doelM} meter</strong> bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${afschermTxt}:<br>` +
+        `• In de open bundel: <span class="rt-ai-result">${dtOpen.toFixed(1)} μSv/uur</span> (${(dtOpen / 1000).toFixed(2)} mSv/uur).<br>` +
+        `• Achter een standaard collimator: <span class="rt-ai-result">${dtCollimator.toFixed(1)} μSv/uur</span>.<br>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>${hvlHint}).</small></div>`
       );
     }
 
@@ -237,19 +237,19 @@
       if (fe > 0) hvlExtra.push(`HVL staal = ${hvlFe} mm`);
       const hvlInfo = hvlExtra.length > 0 ? `, ${hvlExtra.join(", ")}` : "";
 
-      let loodResp = `Om bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${bestaandLabel} op een afzettingsafstand van <strong>${doelM} meter</strong> (bij ${dosis} μSv/h) uit te komen (HVL lood = ${hvlPb} mm${hvlInfo}):<br>`;
+      let loodResp = `<div class="rt-ai-calc">• Doelafstand: <strong>${doelM} meter</strong> bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${bestaandLabel} (${dosis} μSv/h, HVL lood = ${hvlPb} mm${hvlInfo}):<br>`;
       if (pbOpenCeil <= 0) {
         const redenOpen = bestaandDelen.length > 0 ? `met ${bestaandDelen.join(" en ")} ` : "";
-        loodResp += `• <strong>In de open bundel:</strong> <strong>0 mm extra lood</strong> nodig (${redenOpen}is de afzettingsafstand al <strong>${openAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
+        loodResp += `• In de open bundel: <span class="rt-ai-result">0 mm extra lood</span> nodig (${redenOpen}is de afzettingsafstand al <strong>${openAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
       } else {
-        loodResp += `• <strong>In de open bundel (richting van de bundel):</strong> <strong>${pbOpenCeil} mm lood</strong> nodig (reduceert van ${openAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+        loodResp += `• In de open bundel (richting van de bundel): <span class="rt-ai-result">${pbOpenCeil} mm lood</span> nodig (reduceert van ${openAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
       }
       if (pbCollCeil <= 0) {
-        loodResp += `• <strong>Achter een standaard collimator:</strong> <strong>0 mm extra lood</strong> nodig (de afzettingsafstand achter de collimator is al <strong>${collAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
+        loodResp += `• Achter een standaard collimator: <span class="rt-ai-result">0 mm extra lood</span> nodig (de afzettingsafstand achter de collimator is al <strong>${collAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
       } else {
-        loodResp += `• <strong>Achter een standaard collimator:</strong> nog <strong>${pbCollCeil} mm extra lood</strong> nodig (reduceert van ${collAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+        loodResp += `• Achter een standaard collimator: nog <span class="rt-ai-result">${pbCollCeil} mm extra lood</span> nodig (reduceert van ${collAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
       }
-      loodResp += `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>).</small>`;
+      loodResp += `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>).</small></div>`;
       return loodResp;
     }
 
@@ -334,31 +334,31 @@
     let resp = "";
     if (hasAfscherming) {
       const exclLabel = (beton > 0 || baksteen > 0 || fe > 0) && pb === 0 ? "afscherming" : "loodafscherming";
-      resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam}${afschermingInfo} bij norm ${dosis} μSv/h:<br><br>` +
+      resp = `<div class="rt-ai-calc">• Bron: <strong>${bronType}</strong> (${ci.toFixed(1)} Curie${bronNaam})${afschermingInfo}, norm ${dosis} μSv/h<br><br>` +
              `• <strong>In de open bundel:</strong><br>` +
              `&nbsp;&nbsp;– Excl. ${exclLabel}: <strong>${afzettingOpenPuur.toFixed(1)} meter</strong><br>` +
-             `&nbsp;&nbsp;– Incl. ${afschermKortLabel}: <strong>${afzettingOpenMetAfscherming.toFixed(1)} meter</strong> afzetting.<br><br>` +
+             `&nbsp;&nbsp;– Incl. ${afschermKortLabel}: <span class="rt-ai-result">${afzettingOpenMetAfscherming.toFixed(1)} meter</span> afzetting.<br><br>` +
              `• <strong>Achter standaard collimator:</strong><br>` +
              `&nbsp;&nbsp;– Alleen collimator (excl. ${exclLabel}): <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong><br>` +
-             `&nbsp;&nbsp;– Collimator + ${afschermKortLabel}: <strong>${collimatorAfstandMetAfscherming.toFixed(1)} meter</strong> afzetting.<br>`;
+             `&nbsp;&nbsp;– Collimator + ${afschermKortLabel}: <span class="rt-ai-result">${collimatorAfstandMetAfscherming.toFixed(1)} meter</span> afzetting.<br>`;
 
       if (doorstraaldStaal > 0) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : (isDwsiTechniek ? " DWSI" : "");
         resp += `<br>• <strong>In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}):</strong><br>` +
                 `&nbsp;&nbsp;– Zonder loodafscherming: <strong>${afzettingPijpPuur.toFixed(1)} meter</strong><br>` +
-                `&nbsp;&nbsp;– Met ${afschermKortLabel}: <strong>${afzettingPijpMetAfscherming.toFixed(1)} meter</strong> afzetting.<br>`;
+                `&nbsp;&nbsp;– Met ${afschermKortLabel}: <span class="rt-ai-result">${afzettingPijpMetAfscherming.toFixed(1)} meter</span> afzetting.<br>`;
       } else if (isLeidingContext && !params.wanddikte) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : " (DWSI)";
         resp += `<br>• <strong>In de bundel achter de pijp${detailLabel}:</strong> geef de wanddikte op om ook direct de gereduceerde afzetting met de doorstraalde leidingdikte als afscherming te berekenen.<br>`;
       }
     } else {
-      resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam} bij norm ${dosis} μSv/h:<br>` +
-             `• In de open bundel (zonder collimator / afscherming): <strong>${afzettingOpenPuur.toFixed(1)} meter</strong> afzetting.<br>` +
-             `• Achter een standaard collimator: <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong>.<br>`;
+      resp = `<div class="rt-ai-calc">• Bron: <strong>${bronType}</strong> (${ci.toFixed(1)} Curie${bronNaam}), norm ${dosis} μSv/h<br>` +
+             `• In de open bundel (zonder collimator / afscherming): <span class="rt-ai-result">${afzettingOpenPuur.toFixed(1)} meter</span> afzetting.<br>` +
+             `• Achter een standaard collimator: <span class="rt-ai-result">${collimatorAfstandPuur.toFixed(1)} meter</span>.<br>`;
 
       if (doorstraaldStaal > 0) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : (isDwsiTechniek ? " DWSI" : "");
-        resp += `• In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}): <strong>${afzettingPijpPuur.toFixed(1)} meter</strong> afzetting.<br>`;
+        resp += `• In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}): <span class="rt-ai-result">${afzettingPijpPuur.toFixed(1)} meter</span> afzetting.<br>`;
       } else if (isLeidingContext && !params.wanddikte) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : " (DWSI)";
         resp += `• In de bundel achter de pijp${detailLabel}: geef de wanddikte op om ook direct de gereduceerde afzetting met de doorstraalde leidingdikte als afscherming te berekenen.<br>`;
@@ -380,7 +380,7 @@
               `</div>`;
     }
 
-    resp += `<small style="opacity: 0.85;">(Berekend volgens <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a> met collimatorfactor ${collimatorFactor === 0.05 ? "1/20" : "1/85"}).</small>`;
+    resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a> met collimatorfactor ${collimatorFactor === 0.05 ? "1/20" : "1/85"}).</small></div>`;
 
     return resp;
   }
@@ -1425,41 +1425,41 @@
       ? `${formatMmNaarDuimLabel(params.diameter)} (${tech === "DWDI" ? "dubbelwand DWDI 2×t" : "dubbelwand DWSI 2×t"}: ${doorstr.toFixed(1)} mm${compLabel})`
       : `doorstraalde dikte: ${doorstr.toFixed(1)} mm${compLabel}`;
 
-    let resp = `Stralingstijd voor <strong>${opstellingUitleg}</strong> (${bronNaam} van ${ci.toFixed(1)} Curie, ${ffdLabel})${gevuldExtra}${matExtra}:<br>`;
+    let resp = `<div class="rt-ai-calc">• Stralingstijd voor <strong>${opstellingUitleg}</strong><br>• Bron &amp; afstand: <strong>${bronNaam}</strong> (${ci.toFixed(1)} Curie), ${ffdLabel}${gevuldExtra}${matExtra}`;
 
     let ttsTijden = [];
     if (explicieteFilm === "D4") {
-      resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong></div>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`);
     } else if (explicieteFilm === "D5") {
-      resp += `• D5: <strong>${formatTijd(time_d5)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D5: <strong>${formatTijd(time_d5)}</strong></div>`;
       ttsTijden.push(`D5: ${formatTijd(time_d5)}`);
     } else if (explicieteFilm === "D7") {
-      resp += `• D7: <strong>${formatTijd(time_d7)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
       ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
       if (isKlasseB) {
-        resp += `<small style="color:#ffb4b4;">⚠️ Let op: D7 is niet toegestaan volgens EN ISO 17636-1 Klasse B (D4: ${formatTijd(time_d4)}, D5: ${formatTijd(time_d5)}).</small><br>`;
+        resp += `<small style="color:#ffb4b4; display:block; margin-top:4px;">⚠️ Let op: D7 is niet toegestaan volgens EN ISO 17636-1 Klasse B (D4: ${formatTijd(time_d4)}, D5: ${formatTijd(time_d5)}).</small>`;
       }
     } else {
-      resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>` +
-              `• D5: <strong>${formatTijd(time_d5)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong><br>` +
+              `• D5: <strong>${formatTijd(time_d5)}</strong>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`, `D5: ${formatTijd(time_d5)}`);
       if (!isKlasseB) {
-        resp += `• D7: <strong>${formatTijd(time_d7)}</strong><br>`;
+        resp += `<br>• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
         ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
       } else {
-        resp += `<small style="opacity: 0.85;">(D7 is weggelaten: niet toegestaan volgens EN ISO 17636-1 Klasse B).</small><br>`;
+        resp += `</div><small style="opacity: 0.85; display:block; margin-top:4px;">(D7 is weggelaten: niet toegestaan volgens EN ISO 17636-1 Klasse B).</small>`;
       }
     }
     resp += `<span class="rt-tts-summary" style="display:none">${ttsTijden.join(". ")}</span>`;
     if (isVoorgesteldeFFDGebruikt) {
-      resp += `<small style="color:#F5DF4D;">ℹ️ <em>Let op: berekend op basis van de <strong>voorgestelde FFD (${sfd} mm)</strong> voor een gammabron op de buis. Geef gerust een andere FFD op indien gewenst.</em></small><br>`;
+      resp += `<small style="color:#F5DF4D; display:block; margin-top:4px;">ℹ️ <em>Let op: berekend op basis van de <strong>voorgestelde FFD (${sfd} mm)</strong> voor een gammabron op de buis. Geef gerust een andere FFD op indien gewenst.</em></small>`;
     }
 
     if (heeftAfwijkendMateriaal) {
-      resp += `<small style="opacity: 0.85;">(Tijd is gecorrigeerd met materiaalfactor <strong>${matFactor.toFixed(2)}</strong> voor ${matNaam || "afwijkend materiaal"} bij ${isoLabel} volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small><br>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Tijd is gecorrigeerd met materiaalfactor <strong>${matFactor.toFixed(2)}</strong> voor ${matNaam || "afwijkend materiaal"} bij ${isoLabel} volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small>`;
     } else {
-      resp += `<small style="opacity: 0.85;">(Berekend volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small>`;
     }
 
     if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
@@ -1489,7 +1489,7 @@
       }
     }
 
-    return resp;
+    return resp + `</div>`;
   }
 
   // 5. Geometrisch Aantal Opnames (EN ISO 17636-1 / ASME Section V)
@@ -1774,20 +1774,22 @@
     }
 
     const opstellingTekst = params.opstelling || (techniek === "SWSI" && params.optie === "2" ? "SWSI excentrisch (opstelling 8/B)" : (techniek === "SWSI" ? "SWSI (opstelling 2/C)" : "DWSI"));
-    let resp = `Voor ${diaLabel} van ${t} mm dik volgens ${proc} (${opstellingTekst}, ${sfdInfo}):<br>` +
-               `• Minimaal aantal opnames: <strong>${gekozenExp} opnames</strong>.<br>` +
-               `• Effectieve filmlengte: <strong>${effFilmCm} cm</strong> (omtrek: ${omtrekCm} cm).`;
+    let resp = `<div class="rt-ai-calc">` +
+               `• Leiding: <strong>${diaLabel}</strong> (${t} mm dik, ${proc})<br>` +
+               `• Opstelling: <strong>${opstellingTekst}</strong> (${sfdInfo})<br>` +
+               `• Omtrek: <strong>${omtrekCm} cm</strong>` +
+               `<div class="rt-ai-result">Minimaal aantal opnames: <strong>${gekozenExp} opnames</strong> (Effectieve filmlengte: <strong>${effFilmCm} cm</strong>)</div>`;
 
     if (proc === "EN-B" && expA !== expB) {
       const effFilmACm = (omtrek / expA / 10).toFixed(1);
-      resp += `<br><small style="opacity: 0.85;">(Volgens Klasse A of ASME: minimaal ${expA} opnames, effectieve filmlengte ${effFilmACm} cm, vanwege ruimere 20% diktetolerantie t.o.v. 10% bij Klasse B).</small>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:4px;">(Volgens Klasse A of ASME: minimaal ${expA} opnames, effectieve filmlengte ${effFilmACm} cm).</small>`;
     }
 
     const berekendeMinFFD = (params.brongrootte || params.bronTekst) ? bepaalNumeriekeMinFFD(params, vraagTekst) : null;
     if (berekendeMinFFD && sfd < berekendeMinFFD) {
       const expMin = calculateMinimumExposures(De, t, berekendeMinFFD, techniek, proc, params.optie || "");
       const effFilmMinCm = (omtrek / expMin / 10).toFixed(1);
-      resp += `<br><small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD/10).toFixed(1)} cm):</em> minimaal <strong>${expMin} opnames</strong> (effectieve filmlengte ${effFilmMinCm} cm).</small>`;
+      resp += `<small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD/10).toFixed(1)} cm):</em> minimaal <strong>${expMin} opnames</strong> (effectieve filmlengte ${effFilmMinCm} cm).</small>`;
     }
 
     let ttsOpnames = `Minimaal ${gekozenExp} ${gekozenExp === 1 ? "opname" : "opnames"}, effectieve filmlengte ${effFilmCm} centimeter`;
@@ -1795,7 +1797,7 @@
       ttsOpnames = `Let op, minimale FFD onderschreden. ${ttsOpnames}`;
     }
     resp += `<span class="rt-tts-summary" style="display:none">${ttsOpnames}</span>`;
-    resp += `<br><small style="opacity: 0.85;">(Berekend volgens <a href="opnamesklasseb.html" class="ai-link" target="_blank">opnamesklasseb.html</a> conform EN ISO 17636-1 / ASME). Opmerking: 1 opname rondom is alleen mogelijk bij een <em>centrale/panoramische</em> opstelling van binnenuit.</small>`;
+    resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="opnamesklasseb.html" class="ai-link" target="_blank">opnamesklasseb.html</a> conform EN ISO 17636-1 / ASME).</small></div>`;
 
     return resp;
   }
@@ -1813,10 +1815,11 @@
     if (chips) {
       chips.push("Verdelen van de opnames", "Aantal opnames", "Minimale FFD");
     }
-    return `De omtrek van <strong>${diaLabel}</strong> (OD ${De} mm) is:<br>` +
-           `• <strong>${omtrekCm} cm</strong> (${omtrekMm.toFixed(1)} mm / ${omtrekM} m)` +
+    return `<div class="rt-ai-calc">` +
+           `• Leiding: <strong>${diaLabel}</strong> (OD ${De} mm)<br>` +
+           `<div class="rt-ai-result">Omtrek: <strong>${omtrekCm} cm</strong> (${omtrekMm.toFixed(1)} mm / ${omtrekM} m)</div>` +
            `<span class="rt-tts-summary" style="display:none">De omtrek van ${diaLabel} is ${omtrekCm} centimeter</span>` +
-           `<br><small style="opacity: 0.85;">(Formule: &pi; &times; ${De} mm = ${omtrekMm.toFixed(1)} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small>`;
+           `<small style="opacity: 0.85; display:block; margin-top:6px;">(Formule: &pi; &times; ${De} mm = ${omtrekMm.toFixed(1)} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small></div>`;
   }
 
   function berekenOpnameVerdeling(params, vraagTekst, chips = []) {
@@ -1865,15 +1868,16 @@
     let locaties = "";
     let huidigeLocatie = 0;
     for (let i = 1; i <= nOpn; i++) {
-      locaties += `Film ${i} = <strong>${(huidigeLocatie / 10).toFixed(1)} cm</strong><br>`;
+      locaties += `• Film ${i} = <strong>${(huidigeLocatie / 10).toFixed(1)} cm</strong><br>`;
       huidigeLocatie += afstand;
     }
 
-    return `Verdeling voor <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) in <strong>${nOpn} opnames</strong>:<br>` +
-           `Effectieve filmlengte: <strong>${effFilmCm} cm</strong><br><br>` +
-           `${locaties}` +
+    return `<div class="rt-ai-calc">` +
+           `• Leiding: <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) in <strong>${nOpn} opnames</strong>` +
+           `<div class="rt-ai-result">Effectieve filmlengte: <strong>${effFilmCm} cm</strong></div>` +
+           `<div style="margin-top:6px;">${locaties}</div>` +
            `<span class="rt-tts-summary" style="display:none">Verdeling voor ${diaLabel} in ${nOpn} opnames: effectieve filmlengte ${effFilmCm} centimeter</span>` +
-           `<small style="opacity: 0.85;">(Berekend volgens <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small>`;
+           `<small style="opacity: 0.85; display:block; margin-top:4px;">(Berekend volgens <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small></div>`;
   }
 
   // 6. "Mag ik..." verificatievragen (bijv. Voorbeeld 7: centraal schieten, ovaaltjes, excentrisch)
@@ -2162,10 +2166,10 @@
       return `De opgegeven FFD (${sfd} mm) moet groter zijn dan de object-tot-filmafstand <i>d</i> (${d} mm).`;
     }
     const ug = (F * d) / D;
-    return `<strong>Geometrische onscherpte (<i>U</i><sub>g</sub>) bij focus <i>F</i> = ${F} mm, <i>d</i> = ${d} mm en FFD = ${sfd} mm:</strong><br>` +
-           `• Bron-tot-objectafstand <span class="rt-math-inline"><i>D</i> = FFD &minus; <i>d</i> = ${sfd} &minus; ${d} = <strong>${D} mm</strong></span><br>` +
-           `• <span class="rt-math-inline"><i>U</i><sub>g</sub> = <span class="rt-math-frac"><span class="rt-math-num"><i>F</i> &times; <i>d</i></span><span class="rt-math-den"><i>D</i></span></span> = <span class="rt-math-frac"><span class="rt-math-num">${F} &times; ${d}</span><span class="rt-math-den">${D}</span></span> = <strong>${ug.toFixed(3)} mm</strong></span> (circa <strong>${ug.toFixed(2)} mm</strong>).<br>` +
-           `<small style="opacity:0.85;">(Volgens ASME Sec. V Art. 2 T-285 is voor <i>t</i> &lt; 50 mm maximaal <i>U</i><sub>g</sub> = 0.51 mm toegestaan; zie <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small>`;
+    return `<div class="rt-ai-calc">• Gegevens: focus <i>F</i> = <strong>${F} mm</strong>, <i>d</i> = <strong>${d} mm</strong>, FFD = <strong>${sfd} mm</strong><br>` +
+           `• Bron-tot-objectafstand <span class="rt-math-inline"><i>D</i> = FFD &minus; <i>d</i> = ${sfd} &minus; ${d} = <strong>${D} mm</strong></span>` +
+           `<div class="rt-ai-result">Geometrische onscherpte (<i>U</i><sub>g</sub>): <strong>${ug.toFixed(3)} mm</strong> (circa ${ug.toFixed(2)} mm)</div>` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Volgens ASME Sec. V Art. 2 T-285 is voor <i>t</i> &lt; 50 mm maximaal <i>U</i><sub>g</sub> = 0.51 mm toegestaan; zie <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small></div>`;
   }
 
   function berekenMinFFD(params, vraagTekst, chips = []) {
@@ -2280,17 +2284,20 @@
     }
 
     const minFfdCm = (minFfd / 10).toFixed(1);
-    let res = `${prefix}Minimale Film-Focus Afstand (FFD) volgens ${proc} (${opstellingNaam}) voor ${detailInfo} en brongrootte ${b} mm${fallbackFocusLabel}:<br>• <strong>Minimaal ${minFfdCm} cm</strong> (${minFfd} mm).`;
+    let res = `<div class="rt-ai-calc">${prefix}` +
+              `• Norm &amp; opstelling: <strong>${proc}</strong> (${opstellingNaam})<br>` +
+              `• Gegevens: ${detailInfo}, brongrootte <strong>${b} mm</strong>${fallbackFocusLabel}` +
+              `<div class="rt-ai-result">Minimale FFD: <strong>Minimaal ${minFfdCm} cm</strong> (${minFfd} mm)</div>`;
 
     if (voorgesteldeFFD) {
       if (voorgesteldeFFD > minFfd) {
-        res += `<br>• Voorgestelde FFD voor opstelling: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).`;
+        res += `<div style="margin-top:4px;">• Voorgestelde FFD voor opstelling: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</div>`;
         if (chips) chips.push(`${voorgesteldeFFD} mm FFD`);
       } else if (voorgesteldeFFD < minFfd) {
         const isXrayBron = params.bronType === "X-ray" || params.bronType === "Rontgen" || (params.bronTekst && /x[-\s]?ray|rontgen|röntgen|buis|balteau|ceram|yxlon|smart|evo|rondstraler/i.test(params.bronTekst));
         const contactLabel = isCentraal ? "halve diameter, centraal" : (isXrayBron ? "diameter + 150 mm, X-ray" : "diameter + 15 mm");
         const ffdSoort = isCentraal ? "centrale FFD" : "contact-FFD";
-        res += `<br>• Voorgestelde ${ffdSoort}: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, ${contactLabel}, let op: &lt; min. FFD).`;
+        res += `<div style="margin-top:4px;">• Voorgestelde ${ffdSoort}: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, ${contactLabel}, let op: &lt; min. FFD).</div>`;
         if (chips) chips.push(`${voorgesteldeFFD} mm FFD`, `${minFfd} mm FFD (min. ffd)`);
       }
     }
@@ -2309,14 +2316,14 @@
     if (isCentraal && De) {
       const werkelijk = Number((De / 2).toFixed(1));
       if (werkelijk >= minFfd) {
-        res += `<br>✅ <em>Centraal is toegestaan! Beschikbare afstand is ${werkelijk} mm (&ge; ${minFfd} mm).</em>`;
+        res += `<div style="margin-top:4px;">✅ <em>Centraal is toegestaan! Beschikbare afstand is ${werkelijk} mm (&ge; ${minFfd} mm).</em></div>`;
       } else {
-        res += `<br>❌ <em>Centraal is NIET toegestaan! Beschikbare afstand is slechts ${werkelijk} mm (&lt; ${minFfd} mm).</em>`;
+        res += `<div style="margin-top:4px;">❌ <em>Centraal is NIET toegestaan! Beschikbare afstand is slechts ${werkelijk} mm (&lt; ${minFfd} mm).</em></div>`;
       }
     }
 
     res += `<span class="rt-tts-summary" style="display:none">${ttsKern}</span>`;
-    res += `<br><small style="opacity: 0.85;">(Berekend volgens <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small>`;
+    res += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small></div>`;
     return res;
   }
 
@@ -2368,11 +2375,11 @@
 
     if (chips) chips.push("Wis langsnaad", "2000 mm", "3000 mm");
 
-    let out = `Voor een langsnaad van <strong>${totaleLengte} mm</strong> (${meterStr} m):<br>`;
-    out += `• <strong>${totaalAantalFilms} x 10/48 films</strong><br>`;
-    out += `• <strong>${uiteindeLengte} mm</strong> aan het begin en einde (2 x ${uiteindeLengte} mm)<br>`;
-    out += `• Tussenafstand tussen de verdeelstrepen: <strong>${stukLengteStr} mm</strong> (${aantalStukken} stukken van ${stukLengteStr} mm).<br>`;
-    out += `<small style="opacity: 0.85;">(Berekend volgens <a href="LW_Verdeler.html" class="ai-link" target="_blank">LW_Verdeler.html</a> met 10x48 films, max. ${maxLengte} mm effectieve filmlengte en ${uiteindeLengte} mm uiteindes).</small>`;
+    let out = `<div class="rt-ai-calc">• Langsnaad: <strong>${totaleLengte} mm</strong> (${meterStr} m)<br>`;
+    out += `• Uiteinden: <strong>${uiteindeLengte} mm</strong> aan begin en einde (2 x ${uiteindeLengte} mm)<br>`;
+    out += `• Tussenafstand verdeelstrepen: <strong>${stukLengteStr} mm</strong> (${aantalStukken} stukken van ${stukLengteStr} mm)`;
+    out += `<div class="rt-ai-result">Benodigd: <strong>${totaalAantalFilms} x 10/48 films</strong></div>`;
+    out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="LW_Verdeler.html" class="ai-link" target="_blank">LW_Verdeler.html</a> met 10x48 films, max. ${maxLengte} mm effectief en ${uiteindeLengte} mm uiteindes).</small></div>`;
 
     return out;
   }

@@ -78,6 +78,7 @@
   function htmlNaarPlatteTekst(html) {
     return String(html || "")
       .replace(/<div class="rt-ai-chips-row">[\s\S]*?<\/div>/gi, "")
+      .replace(/<span class="rt-tts-summary"[^>]*>[\s\S]*?<\/span>/gi, "")
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
       .replace(/<[^>]+>/g, "")
@@ -570,6 +571,12 @@
       items.push({
         key: "mamin",
         label: `${actiefGespreksGeheugen.maminVal} mA*min @ ${actiefGespreksGeheugen.maVal} mA`,
+        title: "mA*min",
+      });
+    } else if (actiefGespreksGeheugen.maminVal) {
+      items.push({
+        key: "mamin",
+        label: `${actiefGespreksGeheugen.maminVal} mA*min`,
         title: "mA*min",
       });
     }
@@ -2020,7 +2027,7 @@
                 `<div style="font-size:1.05rem; font-weight:700; color:#F5DF4D; margin-bottom:8px;">⏱️ Praktijkschatting stralingstijd voor zwarting van ${dOud} naar ${dNieuw}:</div>` +
                 `Op basis van de lineaire verhouding tussen stralingsdosis en optische zwarting geldt de omrekenfactor <span class="rt-math-inline"><span class="rt-math-frac"><span class="rt-math-num">${dNieuw}</span><span class="rt-math-den">${dOud}</span></span> = <strong>${factor.toFixed(2)}x</strong> (${diffLabel})</span>:<br><br>` +
                 `• <strong>Begintijd bij zwarting ${dOud}:</strong> <strong>${formatSecondenKort(tOudSec)}</strong> (${formatSecondenVoluit(tOudSec)})<br>` +
-                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <strong>${formatSecondenVoluit(tNieuwSec)}</strong> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).<br><br>` +
+                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <span class="rt-ai-result">${formatSecondenVoluit(tNieuwSec)}</span> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).<br><br>` +
                 `<div style="background:#14171f; border:1px solid rgba(245,223,77,0.3); border-radius:6px; padding:8px 12px; margin:6px 0; font-size:0.85rem; color:#ccc;">` +
                 `📐 <em>Formule:</em> <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; (<span class="rt-math-frac"><span class="rt-math-num"><i>D</i><sub>2</sub></span><span class="rt-math-den"><i>D</i><sub>1</sub></span></span>) = ${tOudSec}s &times; (${dNieuw} / ${dOud}) = <strong>${tNieuwSec}s</strong></span><br>` +
                 `⚠️ <em>Let op:</em> Dit is een betrouwbare praktijkschatting (in werkelijkheid speelt ook de sluierzwarting <i>D</i><sub>0</sub> &approx; 0.20 en het ontwikkelproces mee).` +
@@ -2038,11 +2045,11 @@
           }
 
           if (/asme/i.test(gefilterdeTekst) || params.procedure === "ASME") {
-            antwoorden.push("Volgens <strong>ASME Section V</strong>:<br>• <strong>Röntgenbuis (X-ray):</strong> minimale zwarting <strong>1.8</strong>.<br>• <strong>Gammabronnen (Se-75 / Ir-192 / Co-60):</strong> minimale zwarting <strong>2.0</strong>.<br>• <strong>Maximum:</strong> <strong>4.0</strong> (single-film).");
+            antwoorden.push("Volgens <strong>ASME Section V</strong>:<br>• <strong>Röntgenbuis (X-ray):</strong> minimale zwarting <span class=\"rt-ai-result\">1.8</span>.<br>• <strong>Gammabronnen (Se-75 / Ir-192 / Co-60):</strong> minimale zwarting <span class=\"rt-ai-result\">2.0</span>.<br>• <strong>Maximum:</strong> <span class=\"rt-ai-result\">4.0</span> (single-film).");
           } else if (/klasse\s*a/i.test(gefilterdeTekst) || params.procedure === "EN-A") {
-            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse A</strong>:<br>• <strong>Minimale zwarting:</strong> <strong>2.0</strong> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <strong>4.0</strong>.");
+            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse A</strong>:<br>• <strong>Minimale zwarting:</strong> <span class=\"rt-ai-result\">2.0</span> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <span class=\"rt-ai-result\">4.0</span>.");
           } else if (params.procedure === "EN-B" || /klasse\s*b/i.test(gefilterdeTekst)) {
-            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse B</strong>:<br>• <strong>Minimale zwarting:</strong> <strong>2.3</strong> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <strong>4.0</strong>.<br><small style='display:block; margin-top:5px; opacity:0.9;'><em>Let op bij draadvereiste (Se-75):</em> D5 is toegestaan, maar D4 wordt aanbevolen. Wordt het vereiste draadje op D5 niet gehaald? Dan moet <strong>D4</strong> worden gebruikt met een minimale zwarting van <strong>&ge; 3.0</strong> om het contrast te verhogen.</small>");
+            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse B</strong>:<br>• <strong>Minimale zwarting:</strong> <span class=\"rt-ai-result\">2.3</span> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <span class=\"rt-ai-result\">4.0</span>.<br><small style='display:block; margin-top:5px; opacity:0.9;'><em>Let op bij draadvereiste (Se-75):</em> D5 is toegestaan, maar D4 wordt aanbevolen. Wordt het vereiste draadje op D5 niet gehaald? Dan moet <strong>D4</strong> worden gebruikt met een minimale zwarting van <strong>&ge; 3.0</strong> om het contrast te verhogen.</small>");
           } else {
             chips.push("Klasse B", "Klasse A", "ASME");
             antwoorden.push("Volgens welke norm (EN Klasse A, EN Klasse B of ASME) wil je de vereiste zwarting weten?");
@@ -2248,7 +2255,7 @@
             const sfd = params.sfd;
             const A = sfd - De;
             const vz = 1.5 * lb * (A / De);
-            antwoorden.push(`Het benodigde verzet voor ovaaltje (${formatMmNaarDuimLabel(De)}, lasbreedte ${lb} mm op ${sfd} mm FFD conform Opstelling 11/F) is: <strong>${vz.toFixed(1)} mm</strong> (2 opnames onder 90°).`);
+            antwoorden.push(`Het benodigde verzet voor ovaaltje (${formatMmNaarDuimLabel(De)}, lasbreedte ${lb} mm op ${sfd} mm FFD conform Opstelling 11/F) is: <span class="rt-ai-result">${vz.toFixed(1)} mm</span> (2 opnames onder 90°).`);
           }
         } else if (antwoorden.length === 0) {
           antwoorden.push(`Vraag ontvangen over RT. Stel gerust een specifieke vraag over afzetting (bijv. 25 Ci Se-75), onstream (bijv. 6 duim 6 dik), draadjes, opnames of FFD.`);

@@ -349,25 +349,28 @@
       }
       .rt-ai-response-box strong,
       .rt-ai-response-box b {
-        color: #F5DF4D !important;
-        font-size: 1.18em !important;
-        font-weight: 800 !important;
-        letter-spacing: 0.2px !important;
-      }
-      .rt-ai-response-box .rt-ai-focus-calc strong,
-      .rt-ai-response-box .rt-ai-focus-calc b {
         color: #f0f0f0 !important;
         font-size: 1em !important;
         font-weight: 700 !important;
         letter-spacing: normal !important;
       }
-      .rt-ai-response-box .rt-ai-focus-calc .rt-ai-final-time,
-      .rt-ai-response-box .rt-ai-focus-calc .rt-ai-final-time strong,
-      .rt-ai-response-box .rt-ai-focus-calc .rt-ai-final-time b {
+      .rt-ai-response-box .rt-ai-focus-calc,
+      .rt-ai-response-box .rt-ai-calc {
+        line-height: 1.6;
+      }
+      .rt-ai-response-box .rt-ai-final-time,
+      .rt-ai-response-box .rt-ai-final-time strong,
+      .rt-ai-response-box .rt-ai-final-time b,
+      .rt-ai-response-box .rt-ai-result,
+      .rt-ai-response-box .rt-ai-result strong,
+      .rt-ai-response-box .rt-ai-result b {
         color: #F5DF4D !important;
-        font-size: 1.15em !important;
+        font-size: 1.12em !important;
         font-weight: 800 !important;
         letter-spacing: 0.2px !important;
+      }
+      .rt-ai-response-box div.rt-ai-result {
+        margin-top: 8px;
       }
       .rt-ai-history-entry {
         padding-bottom: 8px;

@@ -685,7 +685,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   };
 
   // ==========================================================================
-  // MODULE: 02-spraak-herstel.js (1327 regels)
+  // MODULE: 02-spraak-herstel.js (1340 regels)
   // ==========================================================================
   // --- Levenshtein & Fuzzy Woordenboek ---
   function levenshteinAfstand(a, b) {
@@ -1092,17 +1092,20 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     );
 
     // 1. mA*min varianten (minuten deel is VERPLICHT zodat pure milliampere stroom niet verward wordt!)
-    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]re|amp)|mamp|ma)\s*(?:[\*x\s-]|per\s+)?(?:minuuten|minuten|minuut|min\b)\b/gi, "mA*min");
+    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]res?|amps?)|mamp|m\s*a|ma)\s*(?:[\*x\s-]|per\s+|keer\s+)?(?:minuuten|minuten|minuut|min\b)\b/gi, "mA*min");
 
     // Herstel per ongeluk aaneengeplakt mA*mingebruiken / mA*mingebruik
     s = s.replace(/\bmA\*min(?:gebruik(?:en)?)\b/gi, "mA gebruiken");
 
     // 2. Pure mA (buisstroom in milliampere): strictly without minutes
-    s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:mill?i[-\s]?(?:amp[eè]re|amp))\b/gi, "$1 mA");
-    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]re|amp))\s*(\d+(?:[.,]\d+)?)\b/gi, "$1 mA");
-    s = s.replace(/\bmill?i[-\s]?(?:amp[eè]re|amp)\b/gi, "mA");
+    s = s.replace(/\b(\d+(?:[.,]\d+)?)\s*(?:mill?i[-\s]?(?:amp[eè]res?|amps?)|m\.a\.|m\s+a)\b/gi, "$1 mA");
+    s = s.replace(/\b(?:mill?i[-\s]?(?:amp[eè]res?|amps?))\s*(\d+(?:[.,]\d+)?)\b/gi, "$1 mA");
+    s = s.replace(/\bmill?i[-\s]?(?:amp[eè]res?|amps?)\b/gi, "mA");
 
-    // 3. Film lookalikes in spraak (bijv. "op de 4" -> "op D4", "op de 5" -> "op D5", "en D5", "op de vier" -> "op D4")
+    // Focus spraaklookalikes (fokus / vocus / fokkers / volkus)
+    s = s.replace(/\b(fokus|vocus|fokkers|volkus)\b/gi, "focus");
+
+    // 3. Film lookalikes in spraak (bijv. "op de 4" -> "op D4", "op T5" -> "op D5", "op B5" -> "op D5", "op de vier" -> "op D4")
     s = s.replace(/\b(?:op|naar|met|film|wissel\s+naar)\s+(?:de\s+|d\s+)?([234578])\b(?!\s*[.,]\d)(?!\s*(?:mm|cm|meter|m\b|inch|duim|dik|bar|sec|seconden|min|minuut|minuten|uur|opname|opnames|ma\b|kv\b|ci\b|curie\b|lood|pb|loodplaat|loodplaten|plaat|platen|scherm|schermen))/gi, (match, d) => {
       const prefix = match.split(/\s+(?:de\s+|d\s+)?\d/i)[0];
       return `${prefix} D${d}`;
@@ -1114,6 +1117,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     });
     s = s.replace(/\b(?:en|als|of)\s+de\s*([234578])\b(?!\s*[.,]\d)(?!\s*(?:mm|cm|meter|m\b|inch|duim|dik|bar|sec|seconden|min|minuut|minuten|uur|opname|opnames|ma\b|kv\b|ci\b|curie\b|lood|pb|loodplaat|loodplaten|plaat|platen|scherm|schermen))/gi, "en D$1");
     s = s.replace(/\b(?:en|als|of)\s+d\s*([234578])\b(?!\s*(?:ma\b|kv\b|ci\b|curie\b))/gi, "en D$1");
+    s = s.replace(/\b(?:op|naar|met|van|film|agfa|wissel\s+naar|en|of)\s+(?:t|b|p|g|v|tee|thee|day|the)[-\s]*([234578])\b(?!\s*[.,]\d)(?!\s*(?:mm|cm|meter|m\b|inch|duim|dik|bar|sec|seconden|min|minuut|minuten|uur|opname|opnames|ma\b|kv\b|ci\b|curie\b))/gi, (match, d) => {
+      const prefix = match.replace(/\s+(?:t|b|p|g|v|tee|thee|day|the)[-\s]*[234578]$/i, "");
+      return `${prefix} D${d}`;
+    });
+    s = s.replace(/\b(?:op|naar|met|van|film|agfa|wissel\s+naar|en|of)\s+(?:t|b|p|g|v|tee|thee|day|the)\s+(twee|drie|vier|vijf|zeven|acht)\b/gi, (match, w) => {
+      const map = { twee: "2", drie: "3", vier: "4", vijf: "5", zeven: "7", acht: "8" };
+      const prefix = match.replace(/\s+(?:t|b|p|g|v|tee|thee|day|the)\s+(?:twee|drie|vier|vijf|zeven|acht)$/i, "");
+      return `${prefix} D${map[w.toLowerCase()] || w}`;
+    });
+    s = s.replace(/\bt[-\s]?([234578])\b(?!\s*(?:mm|cm|meter|m\b|duim|inch|dik|ma\b|kv\b|ci\b|curie\b))/gi, "D$1");
 
     // Dek / deck / dak / dijk / diks / dikke na een getal of getalwoord -> dik
     s = s.replace(
@@ -1856,12 +1869,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       // Schedules
       [/\b(schetsjoel|schetjoel|skejoel|sketsjoel|sjedjoel|shedoel|skedjoel|skedule|schedul|shedoel|skedoel|skedool|scheduel)\b/gi, "schedule"],
       // Filmtypen & D-nummers
-      [/\b(d\s*4|dee\s*vier|dee\s*4|d\s*vier|de\s*vier|de\s*4|d-4|b\s*4|dier)\b/gi, "D4"],
-      [/\b(d\s*5|dee\s*vijf|dee\s*5|d\s*vijf|de\s*vijf|de\s*5|d-5|b\s*5)\b/gi, "D5"],
-      [/\b(d\s*7|dee\s*zeven|dee\s*7|d\s*zeven|de\s*zeven|de\s*7|d-7|b\s*7)\b/gi, "D7"],
-      [/\b(d\s*2|dee\s*twee|dee\s*2|d\s*twee|de\s*2|d-2)\b/gi, "D2"],
-      [/\b(d\s*3|dee\s*drie|dee\s*3|d\s*drie|de\s*3|d-3)\b/gi, "D3"],
-      [/\b(d\s*8|dee\s*acht|dee\s*8|d\s*acht|de\s*8|d-8)\b/gi, "D8"],
+      [/\b(d\s*4|dee\s*vier|dee\s*4|d\s*vier|de\s*vier|de\s*4|d-4|b\s*4|t\s*4|t-4|tee\s*4|thee\s*4|t\s*vier|dier)\b/gi, "D4"],
+      [/\b(d\s*5|dee\s*vijf|dee\s*5|d\s*vijf|de\s*vijf|de\s*5|d-5|b\s*5|t\s*5|t-5|tee\s*5|thee\s*5|t\s*vijf)\b/gi, "D5"],
+      [/\b(d\s*7|dee\s*zeven|dee\s*7|d\s*zeven|de\s*zeven|de\s*7|d-7|b\s*7|t\s*7|t-7|tee\s*7|thee\s*7|t\s*zeven)\b/gi, "D7"],
+      [/\b(d\s*2|dee\s*twee|dee\s*2|d\s*twee|de\s*2|d-2|b\s*2|t\s*2|t-2|tee\s*2|thee\s*2|t\s*twee)\b/gi, "D2"],
+      [/\b(d\s*3|dee\s*drie|dee\s*3|d\s*drie|de\s*3|d-3|b\s*3|t\s*3|t-3|tee\s*3|thee\s*3|t\s*drie)\b/gi, "D3"],
+      [/\b(d\s*8|dee\s*acht|dee\s*8|d\s*acht|de\s*8|d-8|b\s*8|t\s*8|t-8|tee\s*8|thee\s*8|t\s*acht)\b/gi, "D8"],
       [/\b(film\s*type|film\s*klasse|film\s*soort|film\s*kwaliteit)\b/gi, "filmkwaliteit"],
       // Lasfouten
       [/\b(undercut|rand\s*inkarteling|inkarteling)\b/gi, "randinkarteling"],
@@ -2281,10 +2294,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       typeof actiefGespreksGeheugen !== "undefined" &&
       actiefGespreksGeheugen &&
       actiefGespreksGeheugen.laatsteIntentie === "focusverandering" &&
-      Boolean(actiefGespreksGeheugen.focusBegintijdSec) &&
+      Boolean(actiefGespreksGeheugen.focusBegintijdSec || actiefGespreksGeheugen.maminVal) &&
       !/\b(se-?75|ir-?192|selenium|iridium|duim|duimer|schedule|sch\b|plaat|dik|wanddikte|diameter|afzetting|draadje|opnames?|onstream)\b/i.test(lower) &&
       (
-        (Boolean(actiefGespreksGeheugen.oudeMa) && /\b(?:met|op|bij|naar|en)\s*\d+(?:[.,]\d+)?(?:\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b))?\b/i.test(lower)) ||
+        (Boolean(actiefGespreksGeheugen.oudeMa || actiefGespreksGeheugen.maminVal) && /\b(?:met|op|bij|naar|en)?\s*\d+(?:[.,]\d+)?\s*(?:ma\b|mill?i[-\s]?(?:amp[eè]re|amp)\b)|\b(?:met|op|bij|naar|en)\s*\d+(?:[.,]\d+)?\b/i.test(lower)) ||
         (Boolean(actiefGespreksGeheugen.oudeFocus) && /\b(?:met|op|bij|naar|en)\s*(?:\d+\s*(?:m|meter)\s*\d{1,2}|\d+(?:[.,]\d+)?\s*(?:cm|mm|meter|m\b))\b/i.test(lower)) ||
         (Boolean(actiefGespreksGeheugen.oudeCi) && /\b\d+(?:[.,]\d+)?\s*(?:ci|curie)\b/i.test(lower)) ||
         (Boolean(actiefGespreksGeheugen.oudeFilmType) && /\bd[234578]\b/i.test(lower))
@@ -3885,7 +3898,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 04-calc-opnames-tijd-afzetting.js (2953 regels)
+  // MODULE: 04-calc-opnames-tijd-afzetting.js (2960 regels)
   // ==========================================================================
   // --- Rekenmodules ---
 
@@ -4079,10 +4092,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         chips.push(`Hoeveel lood nodig op ${doelM} meter`, "Op 10 meter", "Op 15 meter", isIr ? "Sterkste Se-75" : "Sterkste Ir-192");
       }
       return (
-        `Dosistempo op <strong>${doelM} meter</strong> afstand bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${afschermTxt}:<br>` +
-        `• In de open bundel: <strong>${dtOpen.toFixed(1)} μSv/uur</strong> (${(dtOpen / 1000).toFixed(2)} mSv/uur).<br>` +
-        `• Achter een standaard collimator: <strong>${dtCollimator.toFixed(1)} μSv/uur</strong>.<br>` +
-        `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>${hvlHint}).</small>`
+        `<div class="rt-ai-calc">• Dosistempo op <strong>${doelM} meter</strong> bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${afschermTxt}:<br>` +
+        `• In de open bundel: <span class="rt-ai-result">${dtOpen.toFixed(1)} μSv/uur</span> (${(dtOpen / 1000).toFixed(2)} mSv/uur).<br>` +
+        `• Achter een standaard collimator: <span class="rt-ai-result">${dtCollimator.toFixed(1)} μSv/uur</span>.<br>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>: <span class="rt-math-inline"><i>D</i> = <span class="rt-math-frac"><span class="rt-math-num">Ci &times; 37000 &times; <i>k</i></span><span class="rt-math-den"><i>R</i><sup>2</sup></span></span></span>${hvlHint}).</small></div>`
       );
     }
 
@@ -4126,19 +4139,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       if (fe > 0) hvlExtra.push(`HVL staal = ${hvlFe} mm`);
       const hvlInfo = hvlExtra.length > 0 ? `, ${hvlExtra.join(", ")}` : "";
 
-      let loodResp = `Om bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${bestaandLabel} op een afzettingsafstand van <strong>${doelM} meter</strong> (bij ${dosis} μSv/h) uit te komen (HVL lood = ${hvlPb} mm${hvlInfo}):<br>`;
+      let loodResp = `<div class="rt-ai-calc">• Doelafstand: <strong>${doelM} meter</strong> bij <strong>${ci.toFixed(1)} Curie ${bronType}</strong>${bronNaam}${bestaandLabel} (${dosis} μSv/h, HVL lood = ${hvlPb} mm${hvlInfo}):<br>`;
       if (pbOpenCeil <= 0) {
         const redenOpen = bestaandDelen.length > 0 ? `met ${bestaandDelen.join(" en ")} ` : "";
-        loodResp += `• <strong>In de open bundel:</strong> <strong>0 mm extra lood</strong> nodig (${redenOpen}is de afzettingsafstand al <strong>${openAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
+        loodResp += `• In de open bundel: <span class="rt-ai-result">0 mm extra lood</span> nodig (${redenOpen}is de afzettingsafstand al <strong>${openAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
       } else {
-        loodResp += `• <strong>In de open bundel (richting van de bundel):</strong> <strong>${pbOpenCeil} mm lood</strong> nodig (reduceert van ${openAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+        loodResp += `• In de open bundel (richting van de bundel): <span class="rt-ai-result">${pbOpenCeil} mm lood</span> nodig (reduceert van ${openAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
       }
       if (pbCollCeil <= 0) {
-        loodResp += `• <strong>Achter een standaard collimator:</strong> <strong>0 mm extra lood</strong> nodig (de afzettingsafstand achter de collimator is al <strong>${collAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
+        loodResp += `• Achter een standaard collimator: <span class="rt-ai-result">0 mm extra lood</span> nodig (de afzettingsafstand achter de collimator is al <strong>${collAfstVoorLood.toFixed(1)} meter</strong> &le; ${doelM} m).<br>`;
       } else {
-        loodResp += `• <strong>Achter een standaard collimator:</strong> nog <strong>${pbCollCeil} mm extra lood</strong> nodig (reduceert van ${collAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
+        loodResp += `• Achter een standaard collimator: nog <span class="rt-ai-result">${pbCollCeil} mm extra lood</span> nodig (reduceert van ${collAfstVoorLood.toFixed(1)} m naar &le; ${doelM} m).<br>`;
       }
-      loodResp += `<small style="opacity:0.85;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>).</small>`;
+      loodResp += `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend met de omgevormde formule uit <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a>).</small></div>`;
       return loodResp;
     }
 
@@ -4223,31 +4236,31 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     let resp = "";
     if (hasAfscherming) {
       const exclLabel = (beton > 0 || baksteen > 0 || fe > 0) && pb === 0 ? "afscherming" : "loodafscherming";
-      resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam}${afschermingInfo} bij norm ${dosis} μSv/h:<br><br>` +
+      resp = `<div class="rt-ai-calc">• Bron: <strong>${bronType}</strong> (${ci.toFixed(1)} Curie${bronNaam})${afschermingInfo}, norm ${dosis} μSv/h<br><br>` +
              `• <strong>In de open bundel:</strong><br>` +
              `&nbsp;&nbsp;– Excl. ${exclLabel}: <strong>${afzettingOpenPuur.toFixed(1)} meter</strong><br>` +
-             `&nbsp;&nbsp;– Incl. ${afschermKortLabel}: <strong>${afzettingOpenMetAfscherming.toFixed(1)} meter</strong> afzetting.<br><br>` +
+             `&nbsp;&nbsp;– Incl. ${afschermKortLabel}: <span class="rt-ai-result">${afzettingOpenMetAfscherming.toFixed(1)} meter</span> afzetting.<br><br>` +
              `• <strong>Achter standaard collimator:</strong><br>` +
              `&nbsp;&nbsp;– Alleen collimator (excl. ${exclLabel}): <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong><br>` +
-             `&nbsp;&nbsp;– Collimator + ${afschermKortLabel}: <strong>${collimatorAfstandMetAfscherming.toFixed(1)} meter</strong> afzetting.<br>`;
+             `&nbsp;&nbsp;– Collimator + ${afschermKortLabel}: <span class="rt-ai-result">${collimatorAfstandMetAfscherming.toFixed(1)} meter</span> afzetting.<br>`;
 
       if (doorstraaldStaal > 0) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : (isDwsiTechniek ? " DWSI" : "");
         resp += `<br>• <strong>In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}):</strong><br>` +
                 `&nbsp;&nbsp;– Zonder loodafscherming: <strong>${afzettingPijpPuur.toFixed(1)} meter</strong><br>` +
-                `&nbsp;&nbsp;– Met ${afschermKortLabel}: <strong>${afzettingPijpMetAfscherming.toFixed(1)} meter</strong> afzetting.<br>`;
+                `&nbsp;&nbsp;– Met ${afschermKortLabel}: <span class="rt-ai-result">${afzettingPijpMetAfscherming.toFixed(1)} meter</span> afzetting.<br>`;
       } else if (isLeidingContext && !params.wanddikte) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : " (DWSI)";
         resp += `<br>• <strong>In de bundel achter de pijp${detailLabel}:</strong> geef de wanddikte op om ook direct de gereduceerde afzetting met de doorstraalde leidingdikte als afscherming te berekenen.<br>`;
       }
     } else {
-      resp = `Voor een ${bronType} bron van ${ci.toFixed(1)} Curie${bronNaam} bij norm ${dosis} μSv/h:<br>` +
-             `• In de open bundel (zonder collimator / afscherming): <strong>${afzettingOpenPuur.toFixed(1)} meter</strong> afzetting.<br>` +
-             `• Achter een standaard collimator: <strong>${collimatorAfstandPuur.toFixed(1)} meter</strong>.<br>`;
+      resp = `<div class="rt-ai-calc">• Bron: <strong>${bronType}</strong> (${ci.toFixed(1)} Curie${bronNaam}), norm ${dosis} μSv/h<br>` +
+             `• In de open bundel (zonder collimator / afscherming): <span class="rt-ai-result">${afzettingOpenPuur.toFixed(1)} meter</span> afzetting.<br>` +
+             `• Achter een standaard collimator: <span class="rt-ai-result">${collimatorAfstandPuur.toFixed(1)} meter</span>.<br>`;
 
       if (doorstraaldStaal > 0) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : (isDwsiTechniek ? " DWSI" : "");
-        resp += `• In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}): <strong>${afzettingPijpPuur.toFixed(1)} meter</strong> afzetting.<br>`;
+        resp += `• In de bundel achter de pijp (doorstraalde dikte: ${doorstraaldStaal.toFixed(1)} mm staal${detailLabel}): <span class="rt-ai-result">${afzettingPijpPuur.toFixed(1)} meter</span> afzetting.<br>`;
       } else if (isLeidingContext && !params.wanddikte) {
         const detailLabel = diaLabel ? ` op ${diaLabel}` : " (DWSI)";
         resp += `• In de bundel achter de pijp${detailLabel}: geef de wanddikte op om ook direct de gereduceerde afzetting met de doorstraalde leidingdikte als afscherming te berekenen.<br>`;
@@ -4269,7 +4282,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
               `</div>`;
     }
 
-    resp += `<small style="opacity: 0.85;">(Berekend volgens <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a> met collimatorfactor ${collimatorFactor === 0.05 ? "1/20" : "1/85"}).</small>`;
+    resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="afzettinggamma.html" class="ai-link" target="_blank">afzettinggamma.html</a> met collimatorfactor ${collimatorFactor === 0.05 ? "1/20" : "1/85"}).</small></div>`;
 
     return resp;
   }
@@ -5314,41 +5327,41 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       ? `${formatMmNaarDuimLabel(params.diameter)} (${tech === "DWDI" ? "dubbelwand DWDI 2×t" : "dubbelwand DWSI 2×t"}: ${doorstr.toFixed(1)} mm${compLabel})`
       : `doorstraalde dikte: ${doorstr.toFixed(1)} mm${compLabel}`;
 
-    let resp = `Stralingstijd voor <strong>${opstellingUitleg}</strong> (${bronNaam} van ${ci.toFixed(1)} Curie, ${ffdLabel})${gevuldExtra}${matExtra}:<br>`;
+    let resp = `<div class="rt-ai-calc">• Stralingstijd voor <strong>${opstellingUitleg}</strong><br>• Bron &amp; afstand: <strong>${bronNaam}</strong> (${ci.toFixed(1)} Curie), ${ffdLabel}${gevuldExtra}${matExtra}`;
 
     let ttsTijden = [];
     if (explicieteFilm === "D4") {
-      resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong></div>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`);
     } else if (explicieteFilm === "D5") {
-      resp += `• D5: <strong>${formatTijd(time_d5)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D5: <strong>${formatTijd(time_d5)}</strong></div>`;
       ttsTijden.push(`D5: ${formatTijd(time_d5)}`);
     } else if (explicieteFilm === "D7") {
-      resp += `• D7: <strong>${formatTijd(time_d7)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
       ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
       if (isKlasseB) {
-        resp += `<small style="color:#ffb4b4;">⚠️ Let op: D7 is niet toegestaan volgens EN ISO 17636-1 Klasse B (D4: ${formatTijd(time_d4)}, D5: ${formatTijd(time_d5)}).</small><br>`;
+        resp += `<small style="color:#ffb4b4; display:block; margin-top:4px;">⚠️ Let op: D7 is niet toegestaan volgens EN ISO 17636-1 Klasse B (D4: ${formatTijd(time_d4)}, D5: ${formatTijd(time_d5)}).</small>`;
       }
     } else {
-      resp += `• D4: <strong>${formatTijd(time_d4)}</strong><br>` +
-              `• D5: <strong>${formatTijd(time_d5)}</strong><br>`;
+      resp += `<div class="rt-ai-result">• D4: <strong>${formatTijd(time_d4)}</strong><br>` +
+              `• D5: <strong>${formatTijd(time_d5)}</strong>`;
       ttsTijden.push(`D4: ${formatTijd(time_d4)}`, `D5: ${formatTijd(time_d5)}`);
       if (!isKlasseB) {
-        resp += `• D7: <strong>${formatTijd(time_d7)}</strong><br>`;
+        resp += `<br>• D7: <strong>${formatTijd(time_d7)}</strong></div>`;
         ttsTijden.push(`D7: ${formatTijd(time_d7)}`);
       } else {
-        resp += `<small style="opacity: 0.85;">(D7 is weggelaten: niet toegestaan volgens EN ISO 17636-1 Klasse B).</small><br>`;
+        resp += `</div><small style="opacity: 0.85; display:block; margin-top:4px;">(D7 is weggelaten: niet toegestaan volgens EN ISO 17636-1 Klasse B).</small>`;
       }
     }
     resp += `<span class="rt-tts-summary" style="display:none">${ttsTijden.join(". ")}</span>`;
     if (isVoorgesteldeFFDGebruikt) {
-      resp += `<small style="color:#F5DF4D;">ℹ️ <em>Let op: berekend op basis van de <strong>voorgestelde FFD (${sfd} mm)</strong> voor een gammabron op de buis. Geef gerust een andere FFD op indien gewenst.</em></small><br>`;
+      resp += `<small style="color:#F5DF4D; display:block; margin-top:4px;">ℹ️ <em>Let op: berekend op basis van de <strong>voorgestelde FFD (${sfd} mm)</strong> voor een gammabron op de buis. Geef gerust een andere FFD op indien gewenst.</em></small>`;
     }
 
     if (heeftAfwijkendMateriaal) {
-      resp += `<small style="opacity: 0.85;">(Tijd is gecorrigeerd met materiaalfactor <strong>${matFactor.toFixed(2)}</strong> voor ${matNaam || "afwijkend materiaal"} bij ${isoLabel} volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small><br>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Tijd is gecorrigeerd met materiaalfactor <strong>${matFactor.toFixed(2)}</strong> voor ${matNaam || "afwijkend materiaal"} bij ${isoLabel} volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small>`;
     } else {
-      resp += `<small style="opacity: 0.85;">(Berekend volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="stralingstijd.html" class="ai-link" target="_blank">stralingstijd.html</a>).</small>`;
     }
 
     if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
@@ -5378,7 +5391,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
-    return resp;
+    return resp + `</div>`;
   }
 
   // 5. Geometrisch Aantal Opnames (EN ISO 17636-1 / ASME Section V)
@@ -5663,20 +5676,22 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     const opstellingTekst = params.opstelling || (techniek === "SWSI" && params.optie === "2" ? "SWSI excentrisch (opstelling 8/B)" : (techniek === "SWSI" ? "SWSI (opstelling 2/C)" : "DWSI"));
-    let resp = `Voor ${diaLabel} van ${t} mm dik volgens ${proc} (${opstellingTekst}, ${sfdInfo}):<br>` +
-               `• Minimaal aantal opnames: <strong>${gekozenExp} opnames</strong>.<br>` +
-               `• Effectieve filmlengte: <strong>${effFilmCm} cm</strong> (omtrek: ${omtrekCm} cm).`;
+    let resp = `<div class="rt-ai-calc">` +
+               `• Leiding: <strong>${diaLabel}</strong> (${t} mm dik, ${proc})<br>` +
+               `• Opstelling: <strong>${opstellingTekst}</strong> (${sfdInfo})<br>` +
+               `• Omtrek: <strong>${omtrekCm} cm</strong>` +
+               `<div class="rt-ai-result">Minimaal aantal opnames: <strong>${gekozenExp} opnames</strong> (Effectieve filmlengte: <strong>${effFilmCm} cm</strong>)</div>`;
 
     if (proc === "EN-B" && expA !== expB) {
       const effFilmACm = (omtrek / expA / 10).toFixed(1);
-      resp += `<br><small style="opacity: 0.85;">(Volgens Klasse A of ASME: minimaal ${expA} opnames, effectieve filmlengte ${effFilmACm} cm, vanwege ruimere 20% diktetolerantie t.o.v. 10% bij Klasse B).</small>`;
+      resp += `<small style="opacity: 0.85; display:block; margin-top:4px;">(Volgens Klasse A of ASME: minimaal ${expA} opnames, effectieve filmlengte ${effFilmACm} cm).</small>`;
     }
 
     const berekendeMinFFD = (params.brongrootte || params.bronTekst) ? bepaalNumeriekeMinFFD(params, vraagTekst) : null;
     if (berekendeMinFFD && sfd < berekendeMinFFD) {
       const expMin = calculateMinimumExposures(De, t, berekendeMinFFD, techniek, proc, params.optie || "");
       const effFilmMinCm = (omtrek / expMin / 10).toFixed(1);
-      resp += `<br><small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD/10).toFixed(1)} cm):</em> minimaal <strong>${expMin} opnames</strong> (effectieve filmlengte ${effFilmMinCm} cm).</small>`;
+      resp += `<small style="color: #ffb4b4; display: block; margin-top: 6px;"><em>Ter vergelijking bij normatieve min. FFD van ${berekendeMinFFD} mm (${(berekendeMinFFD/10).toFixed(1)} cm):</em> minimaal <strong>${expMin} opnames</strong> (effectieve filmlengte ${effFilmMinCm} cm).</small>`;
     }
 
     let ttsOpnames = `Minimaal ${gekozenExp} ${gekozenExp === 1 ? "opname" : "opnames"}, effectieve filmlengte ${effFilmCm} centimeter`;
@@ -5684,7 +5699,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       ttsOpnames = `Let op, minimale FFD onderschreden. ${ttsOpnames}`;
     }
     resp += `<span class="rt-tts-summary" style="display:none">${ttsOpnames}</span>`;
-    resp += `<br><small style="opacity: 0.85;">(Berekend volgens <a href="opnamesklasseb.html" class="ai-link" target="_blank">opnamesklasseb.html</a> conform EN ISO 17636-1 / ASME). Opmerking: 1 opname rondom is alleen mogelijk bij een <em>centrale/panoramische</em> opstelling van binnenuit.</small>`;
+    resp += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="opnamesklasseb.html" class="ai-link" target="_blank">opnamesklasseb.html</a> conform EN ISO 17636-1 / ASME).</small></div>`;
 
     return resp;
   }
@@ -5702,10 +5717,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (chips) {
       chips.push("Verdelen van de opnames", "Aantal opnames", "Minimale FFD");
     }
-    return `De omtrek van <strong>${diaLabel}</strong> (OD ${De} mm) is:<br>` +
-           `• <strong>${omtrekCm} cm</strong> (${omtrekMm.toFixed(1)} mm / ${omtrekM} m)` +
+    return `<div class="rt-ai-calc">` +
+           `• Leiding: <strong>${diaLabel}</strong> (OD ${De} mm)<br>` +
+           `<div class="rt-ai-result">Omtrek: <strong>${omtrekCm} cm</strong> (${omtrekMm.toFixed(1)} mm / ${omtrekM} m)</div>` +
            `<span class="rt-tts-summary" style="display:none">De omtrek van ${diaLabel} is ${omtrekCm} centimeter</span>` +
-           `<br><small style="opacity: 0.85;">(Formule: &pi; &times; ${De} mm = ${omtrekMm.toFixed(1)} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small>`;
+           `<small style="opacity: 0.85; display:block; margin-top:6px;">(Formule: &pi; &times; ${De} mm = ${omtrekMm.toFixed(1)} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small></div>`;
   }
 
   function berekenOpnameVerdeling(params, vraagTekst, chips = []) {
@@ -5754,15 +5770,16 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     let locaties = "";
     let huidigeLocatie = 0;
     for (let i = 1; i <= nOpn; i++) {
-      locaties += `Film ${i} = <strong>${(huidigeLocatie / 10).toFixed(1)} cm</strong><br>`;
+      locaties += `• Film ${i} = <strong>${(huidigeLocatie / 10).toFixed(1)} cm</strong><br>`;
       huidigeLocatie += afstand;
     }
 
-    return `Verdeling voor <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) in <strong>${nOpn} opnames</strong>:<br>` +
-           `Effectieve filmlengte: <strong>${effFilmCm} cm</strong><br><br>` +
-           `${locaties}` +
+    return `<div class="rt-ai-calc">` +
+           `• Leiding: <strong>${diaLabel}</strong> (omtrek ${omtrekCm} cm) in <strong>${nOpn} opnames</strong>` +
+           `<div class="rt-ai-result">Effectieve filmlengte: <strong>${effFilmCm} cm</strong></div>` +
+           `<div style="margin-top:6px;">${locaties}</div>` +
            `<span class="rt-tts-summary" style="display:none">Verdeling voor ${diaLabel} in ${nOpn} opnames: effectieve filmlengte ${effFilmCm} centimeter</span>` +
-           `<small style="opacity: 0.85;">(Berekend volgens <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small>`;
+           `<small style="opacity: 0.85; display:block; margin-top:4px;">(Berekend volgens <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</small></div>`;
   }
 
   // 6. "Mag ik..." verificatievragen (bijv. Voorbeeld 7: centraal schieten, ovaaltjes, excentrisch)
@@ -6051,10 +6068,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       return `De opgegeven FFD (${sfd} mm) moet groter zijn dan de object-tot-filmafstand <i>d</i> (${d} mm).`;
     }
     const ug = (F * d) / D;
-    return `<strong>Geometrische onscherpte (<i>U</i><sub>g</sub>) bij focus <i>F</i> = ${F} mm, <i>d</i> = ${d} mm en FFD = ${sfd} mm:</strong><br>` +
-           `• Bron-tot-objectafstand <span class="rt-math-inline"><i>D</i> = FFD &minus; <i>d</i> = ${sfd} &minus; ${d} = <strong>${D} mm</strong></span><br>` +
-           `• <span class="rt-math-inline"><i>U</i><sub>g</sub> = <span class="rt-math-frac"><span class="rt-math-num"><i>F</i> &times; <i>d</i></span><span class="rt-math-den"><i>D</i></span></span> = <span class="rt-math-frac"><span class="rt-math-num">${F} &times; ${d}</span><span class="rt-math-den">${D}</span></span> = <strong>${ug.toFixed(3)} mm</strong></span> (circa <strong>${ug.toFixed(2)} mm</strong>).<br>` +
-           `<small style="opacity:0.85;">(Volgens ASME Sec. V Art. 2 T-285 is voor <i>t</i> &lt; 50 mm maximaal <i>U</i><sub>g</sub> = 0.51 mm toegestaan; zie <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small>`;
+    return `<div class="rt-ai-calc">• Gegevens: focus <i>F</i> = <strong>${F} mm</strong>, <i>d</i> = <strong>${d} mm</strong>, FFD = <strong>${sfd} mm</strong><br>` +
+           `• Bron-tot-objectafstand <span class="rt-math-inline"><i>D</i> = FFD &minus; <i>d</i> = ${sfd} &minus; ${d} = <strong>${D} mm</strong></span>` +
+           `<div class="rt-ai-result">Geometrische onscherpte (<i>U</i><sub>g</sub>): <strong>${ug.toFixed(3)} mm</strong> (circa ${ug.toFixed(2)} mm)</div>` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Volgens ASME Sec. V Art. 2 T-285 is voor <i>t</i> &lt; 50 mm maximaal <i>U</i><sub>g</sub> = 0.51 mm toegestaan; zie <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small></div>`;
   }
 
   function berekenMinFFD(params, vraagTekst, chips = []) {
@@ -6169,17 +6186,20 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     const minFfdCm = (minFfd / 10).toFixed(1);
-    let res = `${prefix}Minimale Film-Focus Afstand (FFD) volgens ${proc} (${opstellingNaam}) voor ${detailInfo} en brongrootte ${b} mm${fallbackFocusLabel}:<br>• <strong>Minimaal ${minFfdCm} cm</strong> (${minFfd} mm).`;
+    let res = `<div class="rt-ai-calc">${prefix}` +
+              `• Norm &amp; opstelling: <strong>${proc}</strong> (${opstellingNaam})<br>` +
+              `• Gegevens: ${detailInfo}, brongrootte <strong>${b} mm</strong>${fallbackFocusLabel}` +
+              `<div class="rt-ai-result">Minimale FFD: <strong>Minimaal ${minFfdCm} cm</strong> (${minFfd} mm)</div>`;
 
     if (voorgesteldeFFD) {
       if (voorgesteldeFFD > minFfd) {
-        res += `<br>• Voorgestelde FFD voor opstelling: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).`;
+        res += `<div style="margin-top:4px;">• Voorgestelde FFD voor opstelling: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, conform <a href="pruts.html" class="ai-link" target="_blank">pruts.html</a>).</div>`;
         if (chips) chips.push(`${voorgesteldeFFD} mm FFD`);
       } else if (voorgesteldeFFD < minFfd) {
         const isXrayBron = params.bronType === "X-ray" || params.bronType === "Rontgen" || (params.bronTekst && /x[-\s]?ray|rontgen|röntgen|buis|balteau|ceram|yxlon|smart|evo|rondstraler/i.test(params.bronTekst));
         const contactLabel = isCentraal ? "halve diameter, centraal" : (isXrayBron ? "diameter + 150 mm, X-ray" : "diameter + 15 mm");
         const ffdSoort = isCentraal ? "centrale FFD" : "contact-FFD";
-        res += `<br>• Voorgestelde ${ffdSoort}: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, ${contactLabel}, let op: &lt; min. FFD).`;
+        res += `<div style="margin-top:4px;">• Voorgestelde ${ffdSoort}: <strong>${(voorgesteldeFFD / 10).toFixed(1)} cm</strong> (${voorgesteldeFFD} mm, ${contactLabel}, let op: &lt; min. FFD).</div>`;
         if (chips) chips.push(`${voorgesteldeFFD} mm FFD`, `${minFfd} mm FFD (min. ffd)`);
       }
     }
@@ -6198,14 +6218,14 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     if (isCentraal && De) {
       const werkelijk = Number((De / 2).toFixed(1));
       if (werkelijk >= minFfd) {
-        res += `<br>✅ <em>Centraal is toegestaan! Beschikbare afstand is ${werkelijk} mm (&ge; ${minFfd} mm).</em>`;
+        res += `<div style="margin-top:4px;">✅ <em>Centraal is toegestaan! Beschikbare afstand is ${werkelijk} mm (&ge; ${minFfd} mm).</em></div>`;
       } else {
-        res += `<br>❌ <em>Centraal is NIET toegestaan! Beschikbare afstand is slechts ${werkelijk} mm (&lt; ${minFfd} mm).</em>`;
+        res += `<div style="margin-top:4px;">❌ <em>Centraal is NIET toegestaan! Beschikbare afstand is slechts ${werkelijk} mm (&lt; ${minFfd} mm).</em></div>`;
       }
     }
 
     res += `<span class="rt-tts-summary" style="display:none">${ttsKern}</span>`;
-    res += `<br><small style="opacity: 0.85;">(Berekend volgens <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small>`;
+    res += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="MinFFD.html" class="ai-link" target="_blank">MinFFD.html</a>).</small></div>`;
     return res;
   }
 
@@ -6257,11 +6277,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     if (chips) chips.push("Wis langsnaad", "2000 mm", "3000 mm");
 
-    let out = `Voor een langsnaad van <strong>${totaleLengte} mm</strong> (${meterStr} m):<br>`;
-    out += `• <strong>${totaalAantalFilms} x 10/48 films</strong><br>`;
-    out += `• <strong>${uiteindeLengte} mm</strong> aan het begin en einde (2 x ${uiteindeLengte} mm)<br>`;
-    out += `• Tussenafstand tussen de verdeelstrepen: <strong>${stukLengteStr} mm</strong> (${aantalStukken} stukken van ${stukLengteStr} mm).<br>`;
-    out += `<small style="opacity: 0.85;">(Berekend volgens <a href="LW_Verdeler.html" class="ai-link" target="_blank">LW_Verdeler.html</a> met 10x48 films, max. ${maxLengte} mm effectieve filmlengte en ${uiteindeLengte} mm uiteindes).</small>`;
+    let out = `<div class="rt-ai-calc">• Langsnaad: <strong>${totaleLengte} mm</strong> (${meterStr} m)<br>`;
+    out += `• Uiteinden: <strong>${uiteindeLengte} mm</strong> aan begin en einde (2 x ${uiteindeLengte} mm)<br>`;
+    out += `• Tussenafstand verdeelstrepen: <strong>${stukLengteStr} mm</strong> (${aantalStukken} stukken van ${stukLengteStr} mm)`;
+    out += `<div class="rt-ai-result">Benodigd: <strong>${totaalAantalFilms} x 10/48 films</strong></div>`;
+    out += `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="LW_Verdeler.html" class="ai-link" target="_blank">LW_Verdeler.html</a> met 10x48 films, max. ${maxLengte} mm effectief en ${uiteindeLengte} mm uiteindes).</small></div>`;
 
     return out;
   }
@@ -6842,7 +6862,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 05-calc-normen-iqi-kaart.js (2618 regels)
+  // MODULE: 05-calc-normen-iqi-kaart.js (2686 regels)
   // ==========================================================================
   // 9. Focus & Filmtype Calculator / Kwadratenwet (focusverandering.html)
   function convertFilmTime(seconds, fromFilm, toFilm) {
@@ -6977,6 +6997,59 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     // Als er nog geen begintijd bekend is
     if (!begintijdSec) {
+      // Speciaal geval: wél mA*min opgegeven (bijv. "8 mA*min op 80 focus op D4, hoelang op 145 focus op D5"), maar nog geen mA (buisstroom)
+      if (params.maminVal && params.maminVal > 0 && !params.maVal) {
+        let huidigMaMin = params.maminVal;
+        let stappenHtml = `• Beginwaarde: <strong>${params.maminVal} mA&middot;min</strong>${fOud ? ` (op ${fOud} cm FFD${params.oudeFilmType ? `, ${params.oudeFilmType.toUpperCase()}` : ""})` : ""}<br>`;
+
+        if (heeftFocus) {
+          const focusFactor = Math.pow(fNieuw / fOud, 2);
+          huidigMaMin *= focusFactor;
+          stappenHtml += `• Focusverandering van <strong>${fOud} naar ${fNieuw} cm FFD</strong>: factor <strong>${focusFactor.toFixed(2)}x</strong> &rarr; <strong>${huidigMaMin.toFixed(2)} mA&middot;min</strong><br>`;
+        }
+
+        if (heeftMateriaal && !toonAlleMateriaalOpties) {
+          let matFactor = params.materiaalFactor || 1.0;
+          if (params.materiaalObj && matFactor === 1.0) {
+            if (params.kv === 150) matFactor = params.materiaalObj.f150;
+            else if (params.kv === 200) matFactor = params.materiaalObj.f200;
+            else if (params.kv === 250) matFactor = params.materiaalObj.f250;
+            else if (params.kv === 300) matFactor = params.materiaalObj.f300;
+          }
+          if (matFactor !== 1.0) {
+            huidigMaMin *= matFactor;
+            stappenHtml += `• Materiaalfactor <strong>${matFactor}x</strong>: &rarr; <strong>${huidigMaMin.toFixed(2)} mA&middot;min</strong><br>`;
+          }
+        }
+
+        const baseFilmMa = (params.oudeFilmType || "D7").toUpperCase();
+        if (params.nieuweFilmType && params.nieuweFilmType.toUpperCase() !== baseFilmMa) {
+          const targetFilmMa = params.nieuweFilmType.toUpperCase();
+          const filmFactorMa = convertFilmTime(1000, baseFilmMa, targetFilmMa) / 1000;
+          huidigMaMin *= filmFactorMa;
+          stappenHtml += `• Filmsoortwissel van <strong>${baseFilmMa} naar ${targetFilmMa}</strong>: factor <strong>${filmFactorMa.toFixed(2)}x</strong> &rarr; <strong>${huidigMaMin.toFixed(2)} mA&middot;min</strong><br>`;
+        }
+
+        const eindMaMinStr = huidigMaMin.toFixed(2).replace(/\.00$/, "");
+        const overzichtMa = [2, 3, 4, 5].map((ma) => {
+          const sec = (huidigMaMin / ma) * 60;
+          return `&nbsp;&nbsp;&bull; Bij <strong>${ma} mA</strong>: <strong>${formatSecondenKort(sec)}</strong>`;
+        }).join("<br>");
+
+        if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
+          actiefGespreksGeheugen.verwachtParameter = "maVal";
+        }
+        if (chips) chips.push("2 mA", "3 mA", "4 mA", "5 mA");
+
+        return `<div class="rt-ai-focus-calc" style="line-height:1.6;">` +
+               stappenHtml +
+               `<div class="rt-ai-final-time" style="margin-top:8px; font-size:1.1rem; color:#F5DF4D; font-weight:800;">Nieuwe belichting: <strong>${eindMaMinStr} mA&middot;min</strong></div>` +
+               `<div style="margin-top:6px;">Omdat er geen <strong>buisstroom (mA)</strong> is opgegeven, hier de stralingstijd per mA:<br>${overzichtMa}</div>` +
+               `<div style="margin-top:8px;">Met hoeveel <strong>mA</strong> straal je?</div>` +
+               `<span class="rt-tts-summary" style="display:none">Nieuwe belichting is ${eindMaMinStr} milliampère minuten. Met hoeveel milliampère straal je?</span>` +
+               `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="focusverandering.html" class="ai-link" target="_blank">focusverandering.html</a> &amp; <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>).</small></div>`;
+      }
+
       if (params.oudeFilmType && params.nieuweFilmType && !heeftFocus) {
         const fVan = params.oudeFilmType.toUpperCase();
         const fNaar = params.nieuweFilmType.toUpperCase();
@@ -7083,8 +7156,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     let out = `<div class="rt-ai-focus-calc" style="line-height:1.6;">`;
-    if (maminMsg) out += maminMsg;
-    out += `• Begintijd: <strong>${formatSecondenKort(oorspronkelijkeBegintijdSec || begintijdSec)}</strong><br>`;
+    if (maminMsg) {
+      out += maminMsg;
+    } else {
+      out += `• Begintijd: <strong>${formatSecondenKort(oorspronkelijkeBegintijdSec || begintijdSec)}</strong><br>`;
+    }
     if (ciMsg) out += ciMsg;
     if (maMsg) out += maMsg;
     if (focusTxt) out += focusTxt;
@@ -8207,8 +8283,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       maminToelichting = `<br><small style="opacity:0.9;">💡 <em>Opmerking over mA&middot;minuten / belichtingstijd:</em> R.A.D.I. kan voor een röntgenbuis geen directe stralingstijd of mA&middot;min waarde geven omdat elke röntgenbuis een beetje anders is. Lees het vereiste aantal mA&middot;min af op de buistabel van de betreffende buis en reken deze via <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a> om naar belichtingstijd.</small>`;
     }
 
-    const maxTekst = extraMax > 0 ? `, maximaal <strong>${kv + extraMax} kV</strong> conform EN ISO 17636-1` : "";
-    return `Voor <strong>${materiaal}</strong> bij ${uitlegDikte}: <strong>${kv} kV</strong> volgens de KV-regel${maxTekst}.${enkelwandAlt}${maminToelichting} <small style="opacity:0.85;">(zie <a href="kvregel.html" class="ai-link" target="_blank">kvregel.html</a>)</small>`;
+    const maxTekst = extraMax > 0 ? `<br>• Maximaal toegestaan (EN ISO 17636-1): <strong>${kv + extraMax} kV</strong>` : "";
+    return `<div class="rt-ai-calc">` +
+           `• Materiaal &amp; dikte: <strong>${materiaal}</strong> bij ${uitlegDikte}${maxTekst}` +
+           `<div class="rt-ai-result">Aanbevolen volgens de KV-regel: <strong>${kv} kV</strong></div>` +
+           `${enkelwandAlt}${maminToelichting}` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend volgens <a href="kvregel.html" class="ai-link" target="_blank">kvregel.html</a>).</small></div>`;
   }
 
   // 11b. Buistabel / mA*min omrekenen naar belichtingstijd (buistabel.html)
@@ -8303,9 +8383,10 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       alternatives.slice(0, 3).forEach((a) => chips.push(`${a} mA`));
     }
 
-    return `Voor ${mamin} mA*min bij een buisstroom van ${ma} mA:<br>` +
-           `• Belichtingstijd: <strong>${tijdTekst}</strong> (${totalMinutes.toFixed(2)} min).<br>` +
-           `<small style="opacity: 0.85;">(Berekend volgens <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>: ${mamin} &divide; ${ma} = ${totalMinutes.toFixed(2)} minuten).</small>`;
+    return `<div class="rt-ai-calc">` +
+           `• Gegevens: <strong>${mamin} mA&middot;min</strong> bij <strong>${ma} mA</strong> (${totalMinutes.toFixed(2)} min)<br>` +
+           `<div class="rt-ai-result">Belichtingstijd: <strong>${tijdTekst}</strong></div>` +
+           `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>: ${mamin} &divide; ${ma} = ${totalMinutes.toFixed(2)} minuten).</small></div>`;
   }
 
   // 12. Gevulde Leiding Calculator (gevuldeleiding.html)
@@ -8396,11 +8477,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     }
 
     return (
-      `Gevulde leiding <strong>${formatMmNaarDuimLabel(D)}</strong> (${t} mm wanddikte) gevuld met <strong>${mediumNaam}</strong> (&rho; = ${rho} kg/m³):<br>` +
+      `<div class="rt-ai-calc">` +
+      `• Leiding: <strong>${formatMmNaarDuimLabel(D)}</strong> (${t} mm wanddikte), gevuld met <strong>${mediumNaam}</strong> (&rho; = ${rho} kg/m³)<br>` +
       `• Vloeistofkolom inwendig: <strong>${binnenDia.toFixed(1)} mm</strong><br>` +
       `• Staalequivalent inhoud: <strong>${staalEquivalent.toFixed(2)} mm</strong> staal<br>` +
-      `• <strong>Totale doorstraalde dikte: ${totDikteRond} mm</strong> (2t + staalequivalent).<br>` +
-      `<small style="opacity: 0.85;">(zie <a href="gevuldeleiding.html" class="ai-link" target="_blank">gevuldeleiding.html</a>)</small>`
+      `<div class="rt-ai-result">Totale doorstraalde dikte: <strong>${totDikteRond} mm</strong></div>` +
+      `<small style="opacity: 0.85; display:block; margin-top:6px;">(2t + staalequivalent, zie <a href="gevuldeleiding.html" class="ai-link" target="_blank">gevuldeleiding.html</a>).</small></div>`
     );
   }
 
@@ -8505,23 +8587,23 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       if (doelDateObj) {
         const ciDoel = berekenHuidigeActiviteit(specifiekeBron.initialActivity, specifiekeBron.type, specifiekeBron.date, doelDateObj);
         const dStr = `${String(doelDateObj.getDate()).padStart(2, "0")}-${String(doelDateObj.getMonth() + 1).padStart(2, "0")}-${doelDateObj.getFullYear()}`;
-        return `Bron <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, <i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} d, nu ${actVandaag.toFixed(2)} Ci):<br>` +
-               `• Activiteit op <strong>${dStr}</strong>: <strong>${ciDoel.toFixed(2)} Ci</strong>.<br>` +
-               `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+        return `<div class="rt-ai-calc">• Bron: <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, <i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} d, nu ${actVandaag.toFixed(2)} Ci)` +
+               `<div class="rt-ai-result">Activiteit op ${dStr}: <strong>${ciDoel.toFixed(2)} Ci</strong></div>` +
+               `<small style="opacity:0.85; display:block; margin-top:6px;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
       } else if (params.vervalInVerleden) {
         const verledenDatum = new Date(today.getTime() - daysDiff * 24 * 3600 * 1000);
         const ciVerleden = actVandaag * Math.pow(2, daysDiff / halfwaardetijd);
         const dStr = `${String(verledenDatum.getDate()).padStart(2, "0")}-${String(verledenDatum.getMonth() + 1).padStart(2, "0")}-${verledenDatum.getFullYear()}`;
-        return `Bron <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci):<br>` +
-               `• <strong>${Math.round(daysDiff)} dagen geleden</strong> (${dStr}): <strong>${ciVerleden.toFixed(2)} Ci</strong>.<br>` +
-               `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+        return `<div class="rt-ai-calc">• Bron: <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci)` +
+               `<div class="rt-ai-result">${Math.round(daysDiff)} dagen geleden (${dStr}): <strong>${ciVerleden.toFixed(2)} Ci</strong></div>` +
+               `<small style="opacity:0.85; display:block; margin-top:6px;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
       } else {
         const doelDatum = new Date(today.getTime() + daysDiff * 24 * 3600 * 1000);
         const ciDoel = actVandaag / Math.pow(2, daysDiff / halfwaardetijd);
         const dStr = `${String(doelDatum.getDate()).padStart(2, "0")}-${String(doelDatum.getMonth() + 1).padStart(2, "0")}-${doelDatum.getFullYear()}`;
-        return `Bron <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci):<br>` +
-               `• Over <strong>${Math.round(daysDiff)} dagen</strong> (${dStr}): nog <strong>${ciDoel.toFixed(2)} Ci</strong> (vervalfactor ${(ciDoel / actVandaag * 100).toFixed(1)}%).<br>` +
-               `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+        return `<div class="rt-ai-calc">• Bron: <strong>${specifiekeBron.name}</strong> (${specifiekeBron.typeLabel || specifiekeBron.type}, nu ${actVandaag.toFixed(2)} Ci)` +
+               `<div class="rt-ai-result">Over ${Math.round(daysDiff)} dagen (${dStr}): <strong>${ciDoel.toFixed(2)} Ci</strong></div>` +
+               `<small style="opacity:0.85; display:block; margin-top:6px;">(Vervalfactor ${(ciDoel / actVandaag * 100).toFixed(1)}%, zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
       }
     } else {
       let ciDoel = 0;
@@ -8541,29 +8623,27 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
       const isoLabel = isotoop === "Ir192" ? "Ir-192" : (isotoop === "Co60" ? "Co-60" : "Se-75");
       if (params.vervalInVerleden && !doelDateObj) {
-        // "wat was een 50 Ci Ir-192 bron 30 dagen geleden?" -> terugrekenen (grotere activiteit!)
-        // "30 dagen geleden was hij 50 Ci, hoeveel is hij nu?" -> vooruit vervallen naar nu!
         const vraagtWatHijNuHeeft =
           /\b(nu|vandaag|heden|nog|over\s+is|resterend)\b/i.test(lower) &&
           !/\bwat\s+was\b/i.test(lower);
         if (vraagtWatHijNuHeeft) {
-          return `Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen):<br>` +
-                 `• Activiteit <strong>${Math.round(daysDiff)} dagen geleden</strong>: ${initAct.toFixed(1)} Ci<br>` +
-                 `• Huidige activiteit <strong>nu (na ${Math.round(daysDiff)} dagen verval)</strong>: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong> (resterend: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%).<br>` +
-                 `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+          return `<div class="rt-ai-calc">• Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen)<br>` +
+                 `• Activiteit ${Math.round(daysDiff)} dagen geleden: <strong>${initAct.toFixed(1)} Ci</strong>` +
+                 `<div class="rt-ai-result">Huidige activiteit nu: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong></div>` +
+                 `<small style="opacity:0.85; display:block; margin-top:6px;">(Resterend na ${Math.round(daysDiff)} dagen: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%, zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
         } else {
           const verledenDatum = new Date(today.getTime() - daysDiff * 24 * 3600 * 1000);
           const ciVerleden = initAct * Math.pow(2, daysDiff / halfwaardetijd);
           const dStrVerleden = `${String(verledenDatum.getDate()).padStart(2, "0")}-${String(verledenDatum.getMonth() + 1).padStart(2, "0")}-${verledenDatum.getFullYear()}`;
-          return `Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen, nu ${initAct.toFixed(1)} Ci):<br>` +
-                 `• Activiteit <strong>${Math.round(daysDiff)} dagen geleden</strong> (${dStrVerleden}): <strong>${ciVerleden.toFixed(2)} Ci</strong>.<br>` +
-                 `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+          return `<div class="rt-ai-calc">• Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen, nu ${initAct.toFixed(1)} Ci)` +
+                 `<div class="rt-ai-result">Activiteit ${Math.round(daysDiff)} dagen geleden (${dStrVerleden}): <strong>${ciVerleden.toFixed(2)} Ci</strong></div>` +
+                 `<small style="opacity:0.85; display:block; margin-top:6px;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
         }
       }
-      return `Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen):<br>` +
-             `• Beginactiviteit: ${initAct.toFixed(1)} Ci<br>` +
-             `• Activiteit ${tijdUitleg}: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong> (resterend: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%).<br>` +
-             `<small style="opacity:0.85;">(zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small>`;
+      return `<div class="rt-ai-calc">• Bronverval <strong>${isoLabel}</strong> (<i>T</i><sub>&frac12;</sub> = ${halfwaardetijd} dagen)<br>` +
+             `• Beginactiviteit: <strong>${initAct.toFixed(1)} Ci</strong>` +
+             `<div class="rt-ai-result">Activiteit ${tijdUitleg}: <strong>${Math.max(0, ciDoel).toFixed(2)} Ci</strong></div>` +
+             `<small style="opacity:0.85; display:block; margin-top:6px;">(Resterend: ${(Math.max(0, ciDoel) / initAct * 100).toFixed(1)}%, zie <a href="verval2.html" class="ai-link" target="_blank">verval2.html</a>)</small></div>`;
     }
   }
 
@@ -8899,7 +8979,13 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
 
     const bronMelding = bron !== "X-ray" ? ` met ${bronLabel}` : "";
     const ttsDraad = params.materiaalNaam && bkiInfo ? `Vereist draadje: ${wire}, op houder ${geefBkiSetsVoorDraad(wireNum, bkiInfo.isoGroup)}` : `Vereist draadje: ${wire}`;
-    return `Vereist draadje: <strong>${wire}</strong> (${bkiPos}, doorstraalde dikte: ${doorstraaldeDikte.toFixed(1)} mm bij ${tech} volgens ${proc}${bronMelding}).${asmeOverdikteInfo}${verminderingTekst}${altGammaInfo}${bkiExtra}${asmeOverdiktePrompt}<span class="rt-tts-summary" style="display:none">${ttsDraad}</span><br><small style="opacity:0.85;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small>`;
+    return `<div class="rt-ai-calc">` +
+           `• Opstelling: <strong>${tech}</strong> volgens <strong>${proc}</strong>${bronMelding} (${bkiPos})<br>` +
+           `• Doorstraalde dikte: <strong>${doorstraaldeDikte.toFixed(1)} mm</strong>` +
+           `<div class="rt-ai-result">Vereist draadje: <strong>${wire}</strong></div>` +
+           `${asmeOverdikteInfo}${verminderingTekst}${altGammaInfo}${bkiExtra}${asmeOverdiktePrompt}` +
+           `<span class="rt-tts-summary" style="display:none">${ttsDraad}</span>` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Berekend volgens <a href="Draadjesv2.html" class="ai-link" target="_blank">Draadjesv2.html</a> conform EN ISO 17636-1 / ASME Sec V).</small></div>`;
   }
 
   // 15. Pipe Schedule Wanddiktes (ASME B36.10M / ASME B36.19M)
@@ -8977,11 +9063,12 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       chips.push(`${info.wt} mm`, "Min FFD", "Aantal opnames", "Stralingstijd");
     }
 
-    return `Volgens <strong>ASME B36.10M / B36.19M</strong> voor <strong>${info.nps}" duimer (OD ${info.od} mm / DN ${info.dn})</strong>:<br>` +
-           `• Schedule: <strong>Schedule ${info.schedule}</strong><br>` +
-           `• Enkele wanddikte (t): <strong>${info.wt} mm</strong><br>` +
+    return `<div class="rt-ai-calc">` +
+           `• Leiding: <strong>${info.nps}" duimer</strong> (OD ${info.od} mm / DN ${info.dn}) — <strong>Schedule ${info.schedule}</strong><br>` +
            `• Binnendiameter (ID): <strong>${info.id} mm</strong><br>` +
-           `• Doorstraalde dubbele wand (2t): <strong>${info.doubleWall} mm</strong>`;
+           `• Doorstraalde dubbele wand (2t): <strong>${info.doubleWall} mm</strong>` +
+           `<div class="rt-ai-result">Wanddikte (t): <strong>${info.wt} mm</strong></div>` +
+           `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform ASME B36.10M / B36.19M).</small></div>`;
   }
 
   // 16. ASME (ASTM E747) vs EN (ISO 19232-1) IQI Draadjes Vergelijking & Toegestaanheid
@@ -9165,9 +9252,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
         const t283 = ASME_TABLE_T283_EQUIVALENTS[plateNum];
         res += `📋 <strong>Toegestane alternatieve Hole-Type IQI's (ASME Sec V Artikel 2 Tabel T-283):</strong><br>` +
                `Als de onderzoeker Plaatje ${plateNum} niet beschikbaar heeft in het veld, mag volgens Tabel T-283 een gelijkwaardig 2-2T kwaliteitsniveau worden behaald met:<br>` +
-               `• <strong>Plaatje ${t283.alt1t} met 1T gat</strong> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt1t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt1t].h1tMm} mm</strong>)<br>`;
+               `• <span class="rt-ai-result">Plaatje ${t283.alt1t} met 1T gat</span> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt1t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt1t].h1tMm} mm</strong>)<br>`;
         if (t283.alt4t && ASME_HOLE_TYPE_DATA[t283.alt4t]) {
-          res += `• <strong>Plaatje ${t283.alt4t} met 4T gat</strong> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt4t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt4t].h4tMm} mm</strong>)<br>`;
+          res += `• <span class="rt-ai-result">Plaatje ${t283.alt4t} met 4T gat</span> (plaatdikte ${ASME_HOLE_TYPE_DATA[t283.alt4t].tMm} mm, gatdiameter <strong>${ASME_HOLE_TYPE_DATA[t283.alt4t].h4tMm} mm</strong>)<br>`;
         }
         res += `<br><small style="color:#F5DF4D;">ℹ️ Hiermee wordt voldaan aan hetzelfde equivalente kwaliteitsniveau conform ASME Section V (Equivalent Hole-Type IQI Sensitivity).</small>`;
       } else {
@@ -9195,10 +9282,11 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       const srcP = ASME_HOLE_TYPE_DATA[matchRow.srcPlate];
       const filmP = ASME_HOLE_TYPE_DATA[matchRow.filmPlate];
 
-      let res = `<strong>Vereist ASME Hole-Type IQI (Plaatje) en gat voor wanddikte ${t} mm (ASME Sec. V Art. 2 Tabel T-276):</strong><br><br>` +
-                `• <strong>Bronzijde (Source Side):</strong> <strong>ASME plaatje No. ${matchRow.srcPlate}</strong> met zichtbaar <strong>2T gat</strong> (&empty; ${srcP.h2tMm} mm)<br>` +
-                `• <strong>Filmzijde (Film Side):</strong> <strong>ASME plaatje No. ${matchRow.filmPlate}</strong> met zichtbaar <strong>2T gat</strong> (&empty; ${filmP.h2tMm} mm)<br>` +
-                `<small style="opacity:0.85;">(Het vereiste gat bij ASME Hole-Type IQI's is standaard altijd het <strong>2T gat</strong>).</small>`;
+      let res = `<div class="rt-ai-calc">` +
+                `• Wanddikte: <strong>${t} mm</strong> (ASME Sec. V Art. 2 Tabel T-276)<br>` +
+                `• Bronzijde (Source Side): <span class="rt-ai-result">ASME plaatje No. ${matchRow.srcPlate} — 2T gat</span> (&empty; ${srcP.h2tMm} mm)<br>` +
+                `• Filmzijde (Film Side): <span class="rt-ai-result">ASME plaatje No. ${matchRow.filmPlate} — 2T gat</span> (&empty; ${filmP.h2tMm} mm)` +
+                `<small style="opacity:0.85; display:block; margin-top:6px;">(Bij ASME Hole-Type IQI's is standaard het 2T gat vereist).</small></div>`;
 
       if (chips) {
         chips.push(`2T van ${matchRow.srcPlate}`, `2T van ${matchRow.filmPlate}`, "ASME draadje vergelijken");
@@ -9464,7 +9552,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 06-geheugen-en-vraagrouter.js (2307 regels)
+  // MODULE: 06-geheugen-en-vraagrouter.js (2314 regels)
   // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
@@ -9546,6 +9634,7 @@ ${stralingstijdPlat}========================================`;
   function htmlNaarPlatteTekst(html) {
     return String(html || "")
       .replace(/<div class="rt-ai-chips-row">[\s\S]*?<\/div>/gi, "")
+      .replace(/<span class="rt-tts-summary"[^>]*>[\s\S]*?<\/span>/gi, "")
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
       .replace(/<[^>]+>/g, "")
@@ -10038,6 +10127,12 @@ ${stralingstijdPlat}========================================`;
       items.push({
         key: "mamin",
         label: `${actiefGespreksGeheugen.maminVal} mA*min @ ${actiefGespreksGeheugen.maVal} mA`,
+        title: "mA*min",
+      });
+    } else if (actiefGespreksGeheugen.maminVal) {
+      items.push({
+        key: "mamin",
+        label: `${actiefGespreksGeheugen.maminVal} mA*min`,
         title: "mA*min",
       });
     }
@@ -11488,7 +11583,7 @@ ${stralingstijdPlat}========================================`;
                 `<div style="font-size:1.05rem; font-weight:700; color:#F5DF4D; margin-bottom:8px;">⏱️ Praktijkschatting stralingstijd voor zwarting van ${dOud} naar ${dNieuw}:</div>` +
                 `Op basis van de lineaire verhouding tussen stralingsdosis en optische zwarting geldt de omrekenfactor <span class="rt-math-inline"><span class="rt-math-frac"><span class="rt-math-num">${dNieuw}</span><span class="rt-math-den">${dOud}</span></span> = <strong>${factor.toFixed(2)}x</strong> (${diffLabel})</span>:<br><br>` +
                 `• <strong>Begintijd bij zwarting ${dOud}:</strong> <strong>${formatSecondenKort(tOudSec)}</strong> (${formatSecondenVoluit(tOudSec)})<br>` +
-                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <strong>${formatSecondenVoluit(tNieuwSec)}</strong> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).<br><br>` +
+                `• <strong>Nieuwe stralingstijd voor zwarting ${dNieuw}:</strong> <span class="rt-ai-result">${formatSecondenVoluit(tNieuwSec)}</span> (circa <strong>${formatSecondenKort(diffSec)} ${factor >= 1 ? "langer" : "korter"}</strong> stralen).<br><br>` +
                 `<div style="background:#14171f; border:1px solid rgba(245,223,77,0.3); border-radius:6px; padding:8px 12px; margin:6px 0; font-size:0.85rem; color:#ccc;">` +
                 `📐 <em>Formule:</em> <span class="rt-math-inline"><i>t</i><sub>2</sub> = <i>t</i><sub>1</sub> &times; (<span class="rt-math-frac"><span class="rt-math-num"><i>D</i><sub>2</sub></span><span class="rt-math-den"><i>D</i><sub>1</sub></span></span>) = ${tOudSec}s &times; (${dNieuw} / ${dOud}) = <strong>${tNieuwSec}s</strong></span><br>` +
                 `⚠️ <em>Let op:</em> Dit is een betrouwbare praktijkschatting (in werkelijkheid speelt ook de sluierzwarting <i>D</i><sub>0</sub> &approx; 0.20 en het ontwikkelproces mee).` +
@@ -11506,11 +11601,11 @@ ${stralingstijdPlat}========================================`;
           }
 
           if (/asme/i.test(gefilterdeTekst) || params.procedure === "ASME") {
-            antwoorden.push("Volgens <strong>ASME Section V</strong>:<br>• <strong>Röntgenbuis (X-ray):</strong> minimale zwarting <strong>1.8</strong>.<br>• <strong>Gammabronnen (Se-75 / Ir-192 / Co-60):</strong> minimale zwarting <strong>2.0</strong>.<br>• <strong>Maximum:</strong> <strong>4.0</strong> (single-film).");
+            antwoorden.push("Volgens <strong>ASME Section V</strong>:<br>• <strong>Röntgenbuis (X-ray):</strong> minimale zwarting <span class=\"rt-ai-result\">1.8</span>.<br>• <strong>Gammabronnen (Se-75 / Ir-192 / Co-60):</strong> minimale zwarting <span class=\"rt-ai-result\">2.0</span>.<br>• <strong>Maximum:</strong> <span class=\"rt-ai-result\">4.0</span> (single-film).");
           } else if (/klasse\s*a/i.test(gefilterdeTekst) || params.procedure === "EN-A") {
-            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse A</strong>:<br>• <strong>Minimale zwarting:</strong> <strong>2.0</strong> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <strong>4.0</strong>.");
+            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse A</strong>:<br>• <strong>Minimale zwarting:</strong> <span class=\"rt-ai-result\">2.0</span> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <span class=\"rt-ai-result\">4.0</span>.");
           } else if (params.procedure === "EN-B" || /klasse\s*b/i.test(gefilterdeTekst)) {
-            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse B</strong>:<br>• <strong>Minimale zwarting:</strong> <strong>2.3</strong> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <strong>4.0</strong>.<br><small style='display:block; margin-top:5px; opacity:0.9;'><em>Let op bij draadvereiste (Se-75):</em> D5 is toegestaan, maar D4 wordt aanbevolen. Wordt het vereiste draadje op D5 niet gehaald? Dan moet <strong>D4</strong> worden gebruikt met een minimale zwarting van <strong>&ge; 3.0</strong> om het contrast te verhogen.</small>");
+            antwoorden.push("Volgens <strong>EN ISO 17636-1 Klasse B</strong>:<br>• <strong>Minimale zwarting:</strong> <span class=\"rt-ai-result\">2.3</span> (voor zowel röntgen als gammastraling).<br>• <strong>Maximum:</strong> <span class=\"rt-ai-result\">4.0</span>.<br><small style='display:block; margin-top:5px; opacity:0.9;'><em>Let op bij draadvereiste (Se-75):</em> D5 is toegestaan, maar D4 wordt aanbevolen. Wordt het vereiste draadje op D5 niet gehaald? Dan moet <strong>D4</strong> worden gebruikt met een minimale zwarting van <strong>&ge; 3.0</strong> om het contrast te verhogen.</small>");
           } else {
             chips.push("Klasse B", "Klasse A", "ASME");
             antwoorden.push("Volgens welke norm (EN Klasse A, EN Klasse B of ASME) wil je de vereiste zwarting weten?");
@@ -11716,7 +11811,7 @@ ${stralingstijdPlat}========================================`;
             const sfd = params.sfd;
             const A = sfd - De;
             const vz = 1.5 * lb * (A / De);
-            antwoorden.push(`Het benodigde verzet voor ovaaltje (${formatMmNaarDuimLabel(De)}, lasbreedte ${lb} mm op ${sfd} mm FFD conform Opstelling 11/F) is: <strong>${vz.toFixed(1)} mm</strong> (2 opnames onder 90°).`);
+            antwoorden.push(`Het benodigde verzet voor ovaaltje (${formatMmNaarDuimLabel(De)}, lasbreedte ${lb} mm op ${sfd} mm FFD conform Opstelling 11/F) is: <span class="rt-ai-result">${vz.toFixed(1)} mm</span> (2 opnames onder 90°).`);
           }
         } else if (antwoorden.length === 0) {
           antwoorden.push(`Vraag ontvangen over RT. Stel gerust een specifieke vraag over afzetting (bijv. 25 Ci Se-75), onstream (bijv. 6 duim 6 dik), draadjes, opnames of FFD.`);
@@ -11775,7 +11870,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 07-ui-modal-styles.js (1433 regels)
+  // MODULE: 07-ui-modal-styles.js (1436 regels)
   // ==========================================================================
   // --- UI Controller (Universeel op elke pagina) ---
   let assistantModal = null;
@@ -12128,25 +12223,28 @@ ${stralingstijdPlat}========================================`;
       }
       .rt-ai-response-box strong,
       .rt-ai-response-box b {
-        color: #F5DF4D !important;
-        font-size: 1.18em !important;
-        font-weight: 800 !important;
-        letter-spacing: 0.2px !important;
-      }
-      .rt-ai-response-box .rt-ai-focus-calc strong,
-      .rt-ai-response-box .rt-ai-focus-calc b {
         color: #f0f0f0 !important;
         font-size: 1em !important;
         font-weight: 700 !important;
         letter-spacing: normal !important;
       }
-      .rt-ai-response-box .rt-ai-focus-calc .rt-ai-final-time,
-      .rt-ai-response-box .rt-ai-focus-calc .rt-ai-final-time strong,
-      .rt-ai-response-box .rt-ai-focus-calc .rt-ai-final-time b {
+      .rt-ai-response-box .rt-ai-focus-calc,
+      .rt-ai-response-box .rt-ai-calc {
+        line-height: 1.6;
+      }
+      .rt-ai-response-box .rt-ai-final-time,
+      .rt-ai-response-box .rt-ai-final-time strong,
+      .rt-ai-response-box .rt-ai-final-time b,
+      .rt-ai-response-box .rt-ai-result,
+      .rt-ai-response-box .rt-ai-result strong,
+      .rt-ai-response-box .rt-ai-result b {
         color: #F5DF4D !important;
-        font-size: 1.15em !important;
+        font-size: 1.12em !important;
         font-weight: 800 !important;
         letter-spacing: 0.2px !important;
+      }
+      .rt-ai-response-box div.rt-ai-result {
+        margin-top: 8px;
       }
       .rt-ai-history-entry {
         padding-bottom: 8px;
