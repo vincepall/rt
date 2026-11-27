@@ -1492,10 +1492,17 @@
   function updateRadiTimerUI() {
     const clockEl = document.getElementById("rt-ai-timer-clock");
     const toggleBtn = document.getElementById("rt-ai-timer-toggle");
-    if (clockEl) clockEl.textContent = formatRadiClock(radiTimerRemSec);
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    const timeStr = formatRadiClock(radiTimerRemSec);
+    if (clockEl) clockEl.textContent = timeStr;
     if (toggleBtn) {
       toggleBtn.textContent = radiTimerRunning ? "⏸ Pauze" : "▶ Start";
       toggleBtn.className = radiTimerRunning ? "rt-ai-timer-pause" : "rt-ai-timer-start";
+    }
+    if (miniEl) {
+      miniEl.textContent = `⏱️ ${timeStr}`;
+      miniEl.classList.toggle("is-paused", !radiTimerRunning && !radiTimerAlarmInterval);
+      miniEl.classList.toggle("is-alarm", Boolean(radiTimerAlarmInterval));
     }
   }
 
@@ -1515,13 +1522,17 @@
         radiTimerInterval = null;
         radiTimerRunning = false;
         releaseRadiTimerWakeLock();
-        updateRadiTimerUI();
+        const ov = document.getElementById("rt-ai-timer-overlay");
+        const miniEl = document.getElementById("rt-ai-timer-mini");
+        if (ov) ov.classList.add("open");
+        if (miniEl) miniEl.classList.remove("visible");
         const card = document.getElementById("rt-ai-timer-card");
         const stopBtn = document.getElementById("rt-ai-timer-stop-alarm");
         if (card) card.classList.add("is-alarm");
         if (stopBtn) stopBtn.style.display = "block";
         speelRadiAlarmPiep();
         radiTimerAlarmInterval = setInterval(speelRadiAlarmPiep, 1800);
+        updateRadiTimerUI();
       }
     }, 200);
     updateRadiTimerUI();
@@ -1537,15 +1548,45 @@
     updateRadiTimerUI();
   }
 
+  function minimaliseerTimer() {
+    const ov = document.getElementById("rt-ai-timer-overlay");
+    if (ov) ov.classList.remove("open");
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl && (radiTimerRunning || radiTimerRemSec > 0 || radiTimerAlarmInterval)) {
+      miniEl.classList.add("visible");
+      updateRadiTimerUI();
+    }
+  }
+
+  function heropenTimer() {
+    const ov = maakRadiTimerOverlay();
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl) miniEl.classList.remove("visible");
+    if (ov) ov.classList.add("open");
+    updateRadiTimerUI();
+  }
+
   function sluitTimer() {
     pauzeerRadiTimer();
     stopRadiTimerAlarm();
     const ov = document.getElementById("rt-ai-timer-overlay");
     if (ov) ov.classList.remove("open");
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl) miniEl.classList.remove("visible");
   }
 
   function maakRadiTimerOverlay() {
     if (typeof document === "undefined" || !document.body) return null;
+    let miniEl = document.getElementById("rt-ai-timer-mini");
+    if (!miniEl) {
+      miniEl = document.createElement("button");
+      miniEl.type = "button";
+      miniEl.id = "rt-ai-timer-mini";
+      miniEl.title = "Tik om timer te openen";
+      miniEl.textContent = "⏱️ 00:00";
+      miniEl.addEventListener("click", heropenTimer);
+      document.body.appendChild(miniEl);
+    }
     let ov = document.getElementById("rt-ai-timer-overlay");
     if (ov) return ov;
     ov = document.createElement("div");
@@ -1559,19 +1600,24 @@
           <button type="button" class="rt-ai-timer-start" id="rt-ai-timer-toggle">▶ Start</button>
           <button type="button" class="rt-ai-timer-reset" id="rt-ai-timer-reset">↺ Reset</button>
         </div>
-        <button type="button" class="rt-ai-timer-close" id="rt-ai-timer-close">Sluiten</button>
+        <div class="rt-ai-timer-footer">
+          <button type="button" class="rt-ai-timer-min" id="rt-ai-timer-min">Op achtergrond</button>
+          <button type="button" class="rt-ai-timer-close" id="rt-ai-timer-close">Stoppen</button>
+        </div>
       </div>
     `;
     document.body.appendChild(ov);
     const toggleBtn = document.getElementById("rt-ai-timer-toggle");
     const resetBtn = document.getElementById("rt-ai-timer-reset");
     const stopAlarmBtn = document.getElementById("rt-ai-timer-stop-alarm");
+    const minBtn = document.getElementById("rt-ai-timer-min");
     const closeBtn = document.getElementById("rt-ai-timer-close");
     if (toggleBtn) toggleBtn.addEventListener("click", () => (radiTimerRunning ? pauzeerRadiTimer() : startRadiTimerLoop()));
     if (resetBtn) resetBtn.addEventListener("click", () => { pauzeerRadiTimer(); stopRadiTimerAlarm(); radiTimerRemSec = radiTimerInitSec; updateRadiTimerUI(); });
     if (stopAlarmBtn) stopAlarmBtn.addEventListener("click", stopRadiTimerAlarm);
+    if (minBtn) minBtn.addEventListener("click", minimaliseerTimer);
     if (closeBtn) closeBtn.addEventListener("click", sluitTimer);
-    ov.addEventListener("click", (e) => { if (e.target === ov) sluitTimer(); });
+    ov.addEventListener("click", (e) => { if (e.target === ov) minimaliseerTimer(); });
     return ov;
   }
 
@@ -1581,6 +1627,8 @@
     if (!ov) return false;
     pauzeerRadiTimer();
     stopRadiTimerAlarm();
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl) miniEl.classList.remove("visible");
     radiTimerInitSec = sec;
     radiTimerRemSec = sec;
     const titleEl = document.getElementById("rt-ai-timer-title");
@@ -1593,6 +1641,7 @@
   // Expose API
   const RtAssistant = {
     openTimer,
+    minimaliseerTimer,
     sluitTimer,
     NDO_SPRAAK_WOORDENBOEK,
     corrigeerSpraakTekst,

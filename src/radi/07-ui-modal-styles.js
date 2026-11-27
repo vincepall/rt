@@ -384,6 +384,7 @@
         border: 1px solid rgba(245, 223, 77, 0.55);
         border-radius: 999px;
         padding: 5px 11px;
+        font-family: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 0.82rem;
         font-weight: 700;
         cursor: pointer;
@@ -423,6 +424,11 @@
         color: #f4f4f4;
         text-align: center;
         box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
+        font-family: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        text-shadow: none;
+      }
+      .rt-ai-timer-card button {
+        font-family: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
       .rt-ai-timer-card.is-alarm {
         border-color: #ef4444;
@@ -468,8 +474,35 @@
       .rt-ai-timer-pause { background: #f59e0b; color: #14161b; }
       .rt-ai-timer-reset { background: #374151; color: #f4f4f4; }
       .rt-ai-timer-stop-alarm { background: #ef4444; color: #fff; width: 100%; margin-bottom: 8px; padding: 11px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; }
-      .rt-ai-timer-close { background: transparent; color: #9ca3af; border: 1px solid #3c4252 !important; margin-top: 10px; width: 100%; padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-      .rt-ai-timer-close:hover { color: #fff; border-color: #6b7280 !important; }
+      .rt-ai-timer-footer { display: flex; gap: 8px; margin-top: 10px; }
+      .rt-ai-timer-min,
+      .rt-ai-timer-close { flex: 1; background: transparent; color: #cbd5e1; border: 1px solid #3c4252 !important; padding: 8px 6px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+      .rt-ai-timer-min:hover { color: #F5DF4D; border-color: rgba(245, 223, 77, 0.55) !important; }
+      .rt-ai-timer-close { color: #9ca3af; }
+      .rt-ai-timer-close:hover { color: #f87171; border-color: rgba(248, 113, 113, 0.55) !important; }
+      #rt-ai-timer-mini {
+        position: fixed;
+        bottom: max(76px, calc(env(safe-area-inset-bottom) + 74px));
+        right: 14px;
+        z-index: 100004;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        background: #181a20;
+        color: #F5DF4D;
+        border: 1.5px solid rgba(245, 223, 77, 0.75);
+        border-radius: 999px;
+        padding: 7px 13px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.95rem;
+        font-weight: 800;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
+        cursor: pointer;
+        user-select: none;
+      }
+      #rt-ai-timer-mini.visible { display: inline-flex; }
+      #rt-ai-timer-mini.is-paused { opacity: 0.8; border-color: rgba(255, 255, 255, 0.25); color: #e2e8f0; }
+      #rt-ai-timer-mini.is-alarm { border-color: #ef4444; background: #7f1d1d; color: #fff; animation: rtAiTimerFlash 0.55s infinite alternate; }
       .rt-ai-history-entry {
         padding-bottom: 8px;
       }

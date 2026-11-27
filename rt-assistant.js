@@ -11997,7 +11997,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 07-ui-modal-styles.js (1587 regels)
+  // MODULE: 07-ui-modal-styles.js (1620 regels)
   // ==========================================================================
   // --- UI Controller (Universeel op elke pagina) ---
   let assistantModal = null;
@@ -12385,6 +12385,7 @@ ${stralingstijdPlat}========================================`;
         border: 1px solid rgba(245, 223, 77, 0.55);
         border-radius: 999px;
         padding: 5px 11px;
+        font-family: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 0.82rem;
         font-weight: 700;
         cursor: pointer;
@@ -12424,6 +12425,11 @@ ${stralingstijdPlat}========================================`;
         color: #f4f4f4;
         text-align: center;
         box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
+        font-family: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        text-shadow: none;
+      }
+      .rt-ai-timer-card button {
+        font-family: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
       .rt-ai-timer-card.is-alarm {
         border-color: #ef4444;
@@ -12469,8 +12475,35 @@ ${stralingstijdPlat}========================================`;
       .rt-ai-timer-pause { background: #f59e0b; color: #14161b; }
       .rt-ai-timer-reset { background: #374151; color: #f4f4f4; }
       .rt-ai-timer-stop-alarm { background: #ef4444; color: #fff; width: 100%; margin-bottom: 8px; padding: 11px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; }
-      .rt-ai-timer-close { background: transparent; color: #9ca3af; border: 1px solid #3c4252 !important; margin-top: 10px; width: 100%; padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-      .rt-ai-timer-close:hover { color: #fff; border-color: #6b7280 !important; }
+      .rt-ai-timer-footer { display: flex; gap: 8px; margin-top: 10px; }
+      .rt-ai-timer-min,
+      .rt-ai-timer-close { flex: 1; background: transparent; color: #cbd5e1; border: 1px solid #3c4252 !important; padding: 8px 6px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+      .rt-ai-timer-min:hover { color: #F5DF4D; border-color: rgba(245, 223, 77, 0.55) !important; }
+      .rt-ai-timer-close { color: #9ca3af; }
+      .rt-ai-timer-close:hover { color: #f87171; border-color: rgba(248, 113, 113, 0.55) !important; }
+      #rt-ai-timer-mini {
+        position: fixed;
+        bottom: max(76px, calc(env(safe-area-inset-bottom) + 74px));
+        right: 14px;
+        z-index: 100004;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        background: #181a20;
+        color: #F5DF4D;
+        border: 1.5px solid rgba(245, 223, 77, 0.75);
+        border-radius: 999px;
+        padding: 7px 13px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.95rem;
+        font-weight: 800;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
+        cursor: pointer;
+        user-select: none;
+      }
+      #rt-ai-timer-mini.visible { display: inline-flex; }
+      #rt-ai-timer-mini.is-paused { opacity: 0.8; border-color: rgba(255, 255, 255, 0.25); color: #e2e8f0; }
+      #rt-ai-timer-mini.is-alarm { border-color: #ef4444; background: #7f1d1d; color: #fff; animation: rtAiTimerFlash 0.55s infinite alternate; }
       .rt-ai-history-entry {
         padding-bottom: 8px;
       }
@@ -13588,7 +13621,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 08-ui-speech-tts-init.js (1683 regels)
+  // MODULE: 08-ui-speech-tts-init.js (1732 regels)
   // ==========================================================================
   let isPushing = false;
   let isFinishingPTT = false;
@@ -15084,10 +15117,17 @@ ${stralingstijdPlat}========================================`;
   function updateRadiTimerUI() {
     const clockEl = document.getElementById("rt-ai-timer-clock");
     const toggleBtn = document.getElementById("rt-ai-timer-toggle");
-    if (clockEl) clockEl.textContent = formatRadiClock(radiTimerRemSec);
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    const timeStr = formatRadiClock(radiTimerRemSec);
+    if (clockEl) clockEl.textContent = timeStr;
     if (toggleBtn) {
       toggleBtn.textContent = radiTimerRunning ? "⏸ Pauze" : "▶ Start";
       toggleBtn.className = radiTimerRunning ? "rt-ai-timer-pause" : "rt-ai-timer-start";
+    }
+    if (miniEl) {
+      miniEl.textContent = `⏱️ ${timeStr}`;
+      miniEl.classList.toggle("is-paused", !radiTimerRunning && !radiTimerAlarmInterval);
+      miniEl.classList.toggle("is-alarm", Boolean(radiTimerAlarmInterval));
     }
   }
 
@@ -15107,13 +15147,17 @@ ${stralingstijdPlat}========================================`;
         radiTimerInterval = null;
         radiTimerRunning = false;
         releaseRadiTimerWakeLock();
-        updateRadiTimerUI();
+        const ov = document.getElementById("rt-ai-timer-overlay");
+        const miniEl = document.getElementById("rt-ai-timer-mini");
+        if (ov) ov.classList.add("open");
+        if (miniEl) miniEl.classList.remove("visible");
         const card = document.getElementById("rt-ai-timer-card");
         const stopBtn = document.getElementById("rt-ai-timer-stop-alarm");
         if (card) card.classList.add("is-alarm");
         if (stopBtn) stopBtn.style.display = "block";
         speelRadiAlarmPiep();
         radiTimerAlarmInterval = setInterval(speelRadiAlarmPiep, 1800);
+        updateRadiTimerUI();
       }
     }, 200);
     updateRadiTimerUI();
@@ -15129,15 +15173,45 @@ ${stralingstijdPlat}========================================`;
     updateRadiTimerUI();
   }
 
+  function minimaliseerTimer() {
+    const ov = document.getElementById("rt-ai-timer-overlay");
+    if (ov) ov.classList.remove("open");
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl && (radiTimerRunning || radiTimerRemSec > 0 || radiTimerAlarmInterval)) {
+      miniEl.classList.add("visible");
+      updateRadiTimerUI();
+    }
+  }
+
+  function heropenTimer() {
+    const ov = maakRadiTimerOverlay();
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl) miniEl.classList.remove("visible");
+    if (ov) ov.classList.add("open");
+    updateRadiTimerUI();
+  }
+
   function sluitTimer() {
     pauzeerRadiTimer();
     stopRadiTimerAlarm();
     const ov = document.getElementById("rt-ai-timer-overlay");
     if (ov) ov.classList.remove("open");
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl) miniEl.classList.remove("visible");
   }
 
   function maakRadiTimerOverlay() {
     if (typeof document === "undefined" || !document.body) return null;
+    let miniEl = document.getElementById("rt-ai-timer-mini");
+    if (!miniEl) {
+      miniEl = document.createElement("button");
+      miniEl.type = "button";
+      miniEl.id = "rt-ai-timer-mini";
+      miniEl.title = "Tik om timer te openen";
+      miniEl.textContent = "⏱️ 00:00";
+      miniEl.addEventListener("click", heropenTimer);
+      document.body.appendChild(miniEl);
+    }
     let ov = document.getElementById("rt-ai-timer-overlay");
     if (ov) return ov;
     ov = document.createElement("div");
@@ -15151,19 +15225,24 @@ ${stralingstijdPlat}========================================`;
           <button type="button" class="rt-ai-timer-start" id="rt-ai-timer-toggle">▶ Start</button>
           <button type="button" class="rt-ai-timer-reset" id="rt-ai-timer-reset">↺ Reset</button>
         </div>
-        <button type="button" class="rt-ai-timer-close" id="rt-ai-timer-close">Sluiten</button>
+        <div class="rt-ai-timer-footer">
+          <button type="button" class="rt-ai-timer-min" id="rt-ai-timer-min">Op achtergrond</button>
+          <button type="button" class="rt-ai-timer-close" id="rt-ai-timer-close">Stoppen</button>
+        </div>
       </div>
     `;
     document.body.appendChild(ov);
     const toggleBtn = document.getElementById("rt-ai-timer-toggle");
     const resetBtn = document.getElementById("rt-ai-timer-reset");
     const stopAlarmBtn = document.getElementById("rt-ai-timer-stop-alarm");
+    const minBtn = document.getElementById("rt-ai-timer-min");
     const closeBtn = document.getElementById("rt-ai-timer-close");
     if (toggleBtn) toggleBtn.addEventListener("click", () => (radiTimerRunning ? pauzeerRadiTimer() : startRadiTimerLoop()));
     if (resetBtn) resetBtn.addEventListener("click", () => { pauzeerRadiTimer(); stopRadiTimerAlarm(); radiTimerRemSec = radiTimerInitSec; updateRadiTimerUI(); });
     if (stopAlarmBtn) stopAlarmBtn.addEventListener("click", stopRadiTimerAlarm);
+    if (minBtn) minBtn.addEventListener("click", minimaliseerTimer);
     if (closeBtn) closeBtn.addEventListener("click", sluitTimer);
-    ov.addEventListener("click", (e) => { if (e.target === ov) sluitTimer(); });
+    ov.addEventListener("click", (e) => { if (e.target === ov) minimaliseerTimer(); });
     return ov;
   }
 
@@ -15173,6 +15252,8 @@ ${stralingstijdPlat}========================================`;
     if (!ov) return false;
     pauzeerRadiTimer();
     stopRadiTimerAlarm();
+    const miniEl = document.getElementById("rt-ai-timer-mini");
+    if (miniEl) miniEl.classList.remove("visible");
     radiTimerInitSec = sec;
     radiTimerRemSec = sec;
     const titleEl = document.getElementById("rt-ai-timer-title");
@@ -15185,6 +15266,7 @@ ${stralingstijdPlat}========================================`;
   // Expose API
   const RtAssistant = {
     openTimer,
+    minimaliseerTimer,
     sluitTimer,
     NDO_SPRAAK_WOORDENBOEK,
     corrigeerSpraakTekst,

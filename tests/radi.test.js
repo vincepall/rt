@@ -762,8 +762,8 @@ function laadRtAssistant() {
 
     // Timer-knop + ingebouwde timer API + mini-SVG bij verdelen van opnames
     assert(
-      "Timer API: openTimer en sluitTimer zijn beschikbaar op RtAssistant",
-      typeof RT.openTimer === "function" && typeof RT.sluitTimer === "function",
+      "Timer API: openTimer, minimaliseerTimer en sluitTimer zijn beschikbaar op RtAssistant",
+      typeof RT.openTimer === "function" && typeof RT.minimaliseerTimer === "function" && typeof RT.sluitTimer === "function",
       typeof RT.openTimer
     );
     assert(
