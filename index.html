@@ -170,11 +170,25 @@
       }
 
       if ("serviceWorker" in navigator) {
+        const hadController = Boolean(navigator.serviceWorker.controller);
+        let reloadingForSwUpdate = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (hadController && !reloadingForSwUpdate) {
+            reloadingForSwUpdate = true;
+            window.location.reload();
+          }
+        });
         window.addEventListener("load", () => {
           navigator.serviceWorker
-            .register("/rt/service-worker.js")
+            .register("/rt/service-worker.js", { updateViaCache: "none" })
             .then((registration) => {
               console.log("Service Worker geregistreerd met scope:", registration.scope);
+              registration.update().catch(() => {});
+              document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible") {
+                  registration.update().catch(() => {});
+                }
+              });
             })
             .catch((error) => {
               console.log("Service Worker registratie mislukt:", error);

@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v80";
+const CACHE_NAME = "pwa-cache-v81";
 
 // Lijst van bestanden om te cachen bij installatie
 const FILES_TO_CACHE = [
@@ -25,7 +25,6 @@ const FILES_TO_CACHE = [
   "/rt/cw2.html",
   "/rt/filmsoortverandering.html",
   "/rt/focusverandering.html",
-  "/rt/service-worker.js",
   "/rt/verval2.html",
   "/rt/opnamesklasseb.html",
   "/rt/klasseb1.png",
@@ -76,13 +75,18 @@ const FILES_TO_CACHE = [
   "/rt/filmvoorraad.html",
 ];
 
-// Installeer de service worker en cache de essentiële bestanden
+// Installeer de service worker en cache de essentiële bestanden (robuust per bestand)
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("Bestanden worden gecachet tijdens installatie");
-      return cache.addAll(FILES_TO_CACHE);
-    }),
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(
+        FILES_TO_CACHE.map((url) =>
+          cache.add(new Request(url, { cache: "reload" })).catch((err) => {
+            console.warn("Kon bestand niet cachen bij installatie:", url, err);
+          }),
+        ),
+      ),
+    ),
   );
   self.skipWaiting(); // Activeer direct de nieuwe service worker
 });
@@ -90,42 +94,69 @@ self.addEventListener("install", (event) => {
 // Activeer de service worker en verwijder oude caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log("Verwijder oude cache:", cacheName);
-            return caches.delete(cacheName);
-          }
-        }),
-      );
-    }),
+    caches
+      .keys()
+      .then((cacheNames) =>
+        Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== CACHE_NAME) {
+              console.log("Verwijder oude cache:", cacheName);
+              return caches.delete(cacheName);
+            }
+          }),
+        ),
+      )
+      .then(() => self.clients.claim()),
   );
-  self.clients.claim();
 });
 
-// Fetch event met Stale-While-Revalidate strategie zonder offline fallback
+// Network-First voor code/data (altijd direct de nieuwste versie bij internet, offline uit cache)
+// Cache-First voor grote statische media (afbeeldingen/audio)
 self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  if (req.method !== "GET") return;
+
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith("/service-worker.js")) return;
+
+  const isCodeOrData =
+    req.mode === "navigate" ||
+    /\.(?:html|js|css|json|csv)$/i.test(url.pathname) ||
+    url.pathname.endsWith("/");
+
+  if (isCodeOrData) {
+    event.respondWith(
+      fetch(req, { cache: "no-cache" })
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() =>
+          caches
+            .open(CACHE_NAME)
+            .then((cache) => cache.match(req, { ignoreSearch: true })),
+        ),
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((cachedResponse) => {
-        // Start een netwerkverzoek in de achtergrond
-        const fetchPromise = fetch(event.request)
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(req, { ignoreSearch: true }).then((cachedResponse) => {
+        const fetchPromise = fetch(req)
           .then((networkResponse) => {
-            // Controleer of de netwerkrespons geldig is voordat we de cache bijwerken
             if (networkResponse && networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
+              cache.put(req, networkResponse.clone());
             }
             return networkResponse;
           })
-          .catch(() => {
-            // Als het netwerk faalt, gebruik dan de gecachete versie
-            return cachedResponse;
-          });
-
-        // Geef de gecachete versie onmiddellijk terug, of wacht op de netwerkversie
+          .catch(() => cachedResponse);
         return cachedResponse || fetchPromise;
-      });
-    }),
+      }),
+    ),
   );
 });
