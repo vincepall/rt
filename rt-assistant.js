@@ -13003,9 +13003,9 @@ ${stralingstijdPlat}========================================`;
         }
         .rt-ai-response-box strong,
         .rt-ai-response-box b {
-          color: #F5DF4D !important;
-          font-size: 1.15em !important;
-          font-weight: 800 !important;
+          color: #f0f0f0 !important;
+          font-size: 1em !important;
+          font-weight: 700 !important;
         }
         .rt-ai-chips-row {
           grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
