@@ -767,9 +767,16 @@ function laadRtAssistant() {
       typeof RT.openTimer
     );
     assert(
-      "Timer-knop aanwezig in focusverandering-antwoord (openTimer(237, ...))",
-      /openTimer\(237,/.test(rMaMinMet4Ma && rMaMinMet4Ma.text),
+      "Geen timer-knop bij X-ray / mA / mA*min vragen (röntgenbuizen hebben ingebouwde timer)",
+      !/openTimer\(/.test(rMaMinMet4Ma && rMaMinMet4Ma.text),
       rMaMinMet4Ma && rMaMinMet4Ma.text
+    );
+    RT.resetGespreksGeheugen();
+    const rGammaTimer = await RT.verwerkUniverseleVraag("Hoelang moet ik stralen met een selenium van 30 curie op een 10 duimer van 8 dik?");
+    assert(
+      "Wel timer-knop bij gammabron stralingstijd (openTimer)",
+      /openTimer\(/.test(rGammaTimer && rGammaTimer.text),
+      rGammaTimer && rGammaTimer.text
     );
     assert(
       "Mini-SVG rondnaadschets aanwezig bij verdelen van opnames",

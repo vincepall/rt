@@ -6928,7 +6928,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 05-calc-normen-iqi-kaart.js (2688 regels)
+  // MODULE: 05-calc-normen-iqi-kaart.js (2699 regels)
   // ==========================================================================
   // 9. Focus & Filmtype Calculator / Kwadratenwet (focusverandering.html)
   function convertFilmTime(seconds, fromFilm, toFilm) {
@@ -7253,7 +7253,19 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       out += `<div class="rt-ai-final-time" style="margin-top:8px; font-size:1.15rem; color:#F5DF4D; font-weight:800;">`;
       out += `Uiteindelijke stralingstijd: ${formatSecondenVoluit(eindTijdSec)}`;
       out += `</div>`;
-      out += maakTimerKnopHtml(Math.round(eindTijdSec), "Stralingstijd");
+      const isXrayOfMa = Boolean(
+        params.maminVal ||
+        params.maVal ||
+        params.oudeMa ||
+        params.nieuweMa ||
+        params.kv ||
+        params.bronType === "X-ray" ||
+        params.bronType === "Rontgen" ||
+        /\b(mamin|ma\s*\*?\s*min|ma\b|mill?i[-\s]?amp|kv\b|x[-\s]?ray|rontgen|röntgen|balteau|yxlon|smart\s*evo)\b/i.test(vraagTekst || "")
+      );
+      if (!isXrayOfMa) {
+        out += maakTimerKnopHtml(Math.round(eindTijdSec), "Stralingstijd");
+      }
     }
 
     if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen && !isNaN(eindTijdSec) && eindTijdSec > 0) {
@@ -8453,7 +8465,6 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     return `<div class="rt-ai-calc">` +
            `• Gegevens: <strong>${mamin} mA&middot;min</strong> bij <strong>${ma} mA</strong> (${totalMinutes.toFixed(2)} min)<br>` +
            `<div class="rt-ai-result">Belichtingstijd: <strong>${tijdTekst}</strong></div>` +
-           maakTimerKnopHtml(totalSec, `Buistabel ${ma} mA`) +
            `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="buistabel.html" class="ai-link" target="_blank">buistabel.html</a>: ${mamin} &divide; ${ma} = ${totalMinutes.toFixed(2)} minuten).</small></div>`;
   }
 
