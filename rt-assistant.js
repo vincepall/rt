@@ -685,7 +685,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   };
 
   // ==========================================================================
-  // MODULE: 02-spraak-herstel.js (1343 regels)
+  // MODULE: 02-spraak-herstel.js (1345 regels)
   // ==========================================================================
   // --- Levenshtein & Fuzzy Woordenboek ---
   function levenshteinAfstand(a, b) {
@@ -746,6 +746,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
     "1 FE EN", "6 FE EN", "10 FE EN", "13 FE EN", "Set A", "Set B", "Set C", "Set D", "Set 1A", "Set 2A",
     "hole-type", "hole type", "shim", "plaatje", "plaatjes", "1T", "2T", "4T", "2T-gat", "2T gat", "loodletter", "loodletter B", "terugverstrooiing", "backscatter",
     "bronzijde", "filmzijde", "geometrische onscherpte", "Ug",
+    "SNR", "SNR_N", "verzadiging", "saturation", "digitale radiografie", "DDA", "fosforplaat", "flat panel", "centerlijn",
 
     // Normen & Kwaliteitsklassen
     "ASME", "Section V", "Artikel 2", "EN", "ISO", "EN ISO", "ISO 17636", "ISO 17636-1", "ISO 17636-2",
@@ -1842,6 +1843,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       [/\b(optische\s+dichtheid|opties\s+dichtheid|optische\s+dikheid|optische\s+dikte|filmzwarting)\b/gi, "zwarting"],
       [/\b(bron\s*zijde|bron\s*kant|source\s*side|sourceside)\b/gi, "bronzijde"],
       [/\b(film\s*zijde|film\s*kant|film\s*side|filmside)\b/gi, "filmzijde"],
+      [/\b(es\s+en\s+er|s\s+n\s+r|s\.n\.r\.?)\b/gi, "SNR"],
       // BKI, IQI, Opstelling-afkortingen en Draadjes fonetisch
       [/\b(b\s*k\s*i|bee\s*kaa\s*ie|beekaaie|bekaie|b\.k\.i\.|beka\s*ie|bkaie|bekai)\b/gi, "BKI"],
       [/\b(i\s*q\s*i|ie\s*kju\s*ie|iekjuie|iki|i\.q\.i\.)\b/gi, "IQI"],
@@ -2032,7 +2034,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 03-intentie-parser.js (1888 regels)
+  // MODULE: 03-intentie-parser.js (1921 regels)
   // ==========================================================================
   // --- Intentie Bepaling ---
   function bepaalVraagIntenties(tekst) {
@@ -2140,7 +2142,9 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       (/\b(haz|warmtebe[iï]nvloede\s*zone|buiten\s+de\s+las|naast\s+de\s+las)\b/i.test(lower) && /\b(beoordel|mm|hoeveel|grondmateriaal|film)\b/i.test(lower)) ||
       /\b(wanddiktesprong|diktesprong|grote\s+dikteverschil|verschillende\s+wanddiktes?\s+in\s+(?:een|1)\s+opname)\b/i.test(lower) ||
       /\b(opwarmen|opwarmprocedure|warm[-\s]?up|inbranden)\b/i.test(lower) ||
-      (/\b(vastzit|vast\s+zit|niet\s+terug|klem\s+zit|blijft\s+hangen|noodprocedure)\b/i.test(lower) && /\b(bron|gammabron|container|indraaien|kabel|geleidebuis)\b/i.test(lower));
+      (/\b(vastzit|vast\s+zit|niet\s+terug|klem\s+zit|blijft\s+hangen|noodprocedure)\b/i.test(lower) && /\b(bron|gammabron|container|indraaien|kabel|geleidebuis)\b/i.test(lower)) ||
+      /\b(snr|snr[_\s-]?n|signaal[-\s]*ruis|signal[-\s]*to[-\s]*noise|verzadiging|saturation|maximale?\s+verzadiging)\b/i.test(lower) ||
+      (/\b(digitale?\s+radiografie|digitaal\s+stralen|dda|flat\s*panel|fosforplaat|iso\s*17636-2)\b/i.test(lower) && /\b(eis|eisen|vereist|vereisten|norm|minimum|minimaal|maximaal|grens|grenzen|waarde|waarden|procent|%)\b/i.test(lower));
 
     if (isRTKennisVraag) {
       intenties.push("rt_kennis");
@@ -2377,7 +2381,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       !isStralingstijdVraag &&
       !isFocusVeranderingVraag &&
       !/\b(opnames?|draadje|bki|iqi|ffd|sfd|focus|onstream|wmax|lasfout|schedule|langsnaad|verzet|bundel|kv|zwarting)\b/i.test(lower) &&
-      (/\b(\d+(?:[.,]\d+)?\s*(?:meter|m\b|cm|mm|ci|curie)|lood|loden|pb|staal|fe|beton(?:nen)?|betonmuur|bakste(?:en|nen)|baksteenmuur|metselwerk|muur|afscherming|collimator|open\s+bundel|sterkste|zwakste|iridium|selenium|seleen|se-?75|ir-?192|zonder\s+(?:lood|afscherming|muur|beton|baksteen)|geen\s+(?:lood|afscherming|muur|beton|baksteen))\b/i.test(lower));
+      (/\b(\d+(?:[.,]\d+)?\s*(?:meter|m\b|cm|mm|ci|curie)|lood|loodplaat|loodplaten|loden|pb|staal|fe|beton(?:nen)?|betonmuur|bakste(?:en|nen)|baksteenmuur|metselwerk|muur|afscherming|collimator|open\s+bundel|sterkste|zwakste|iridium|selenium|seleen|se-?75|ir-?192|(?:zonder|geen)\s+(?:(?:de|het|een|extra)\s+)?(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen|lood|pb|afscherming|staal|muur|beton|baksteen|metselwerk))\b/i.test(lower));
 
     if (isAfzettingDirect || isAfzettingVervolg) {
       intenties.push("afzetting");
@@ -2821,55 +2825,86 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       }
     }
 
-    // Aantal loodplaten (bedrijfsstandaard: 1 loodplaat = 6 mm Pb, 2 loodplaten = 12 mm Pb, etc.)
-    const matchAantalPlaten =
-      lower.match(/\b(\d+|een|één|twee|drie|vier|vijf|zes|dubbel|dubbele|drievoudig|drievoudige)\s+(?:stuks?\s+)?(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\b/i) ||
-      lower.match(/\b(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\s*(?:van|x|\*|aantal|:\s*)?\s*(\d+)\b/i);
+    // Negatie-detectie per afschermingsmateriaal ("zonder de loodplaat", "geen betonmuur", "zonder afscherming", etc.)
+    const lidwoordOpt = "(?:(?:de|het|een|extra|die|dat|alle|enige)\\s+)*";
+    const wisAlleAfscherming = new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}afscherming\\b`, "i").test(lower);
+    const wisPb =
+      wisAlleAfscherming ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:loodplaten|loodplaat|loden\\s*platen|loden\\s*plaat|lood\\s*platen|lood\\s*plaat|loodafscherming|lood|pb)\\b`, "i").test(lower) ||
+      /\b0\s*(?:mm\s*)?(?:lood|pb|loodplaten|loodplaat)\b/i.test(lower);
+    const wisFe =
+      wisAlleAfscherming ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:staalplaat|staalplaten|staal|fe|ijzer)\\b`, "i").test(lower) ||
+      /\b0\s*mm\s*(?:staal|fe|ijzer)\b/i.test(lower);
+    const wisMuur = new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:tussenmuur|scheidingsmuur|muur|wand)\\b`, "i").test(lower);
+    const wisBeton =
+      wisAlleAfscherming ||
+      wisMuur ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:beton(?:nen)?(?:\\s*(?:muur|wand))?|betonmuur|betonwand)\\b`, "i").test(lower) ||
+      /\b0\s*(?:mm|cm)\s*beton\b/i.test(lower);
+    const wisBaksteen =
+      wisAlleAfscherming ||
+      wisMuur ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:bakste(?:en|nen)(?:\\s*(?:muur|wand))?|baksteenmuur|stenen\\s*(?:muur|wand)|metselwerk)\\b`, "i").test(lower) ||
+      /\b0\s*(?:mm|cm)\s*(?:baksteen|metselwerk)\b/i.test(lower);
 
+    res.wisAlleAfscherming = wisAlleAfscherming;
+    res.wisPb = wisPb;
+    res.wisFe = wisFe;
+    res.wisBeton = wisBeton;
+    res.wisBaksteen = wisBaksteen;
+
+    // Aantal loodplaten (bedrijfsstandaard: 1 loodplaat = 6 mm Pb, 2 loodplaten = 12 mm Pb, etc.)
     let platenAantal = null;
-    if (matchAantalPlaten) {
-      const gStr = matchAantalPlaten[1].toLowerCase();
-      const wMap = {
-        een: 1, één: 1,
-        twee: 2, dubbel: 2, dubbele: 2,
-        drie: 3, drievoudig: 3, drievoudige: 3,
-        vier: 4,
-        vijf: 5,
-        zes: 6,
-      };
-      platenAantal = wMap[gStr] !== undefined ? wMap[gStr] : parseInt(gStr, 10);
-    } else if (/\b(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen)\b/i.test(lower)) {
-      platenAantal = 1;
+    if (!wisPb) {
+      const matchAantalPlaten =
+        lower.match(/\b(\d+|een|één|twee|drie|vier|vijf|zes|dubbel|dubbele|drievoudig|drievoudige)\s+(?:stuks?\s+)?(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\b/i) ||
+        lower.match(/\b(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\s*(?:van|x|\*|aantal|:\s*)?\s*(\d+)\b/i);
+
+      if (matchAantalPlaten) {
+        const gStr = matchAantalPlaten[1].toLowerCase();
+        const wMap = {
+          een: 1, één: 1,
+          twee: 2, dubbel: 2, dubbele: 2,
+          drie: 3, drievoudig: 3, drievoudige: 3,
+          vier: 4,
+          vijf: 5,
+          zes: 6,
+        };
+        platenAantal = wMap[gStr] !== undefined ? wMap[gStr] : parseInt(gStr, 10);
+      } else if (/\b(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen)\b/i.test(lower)) {
+        platenAantal = 1;
+      }
     }
 
     // Afzetting parameters
-    let matchPb = tekst.match(/(?:lood|pb)\s*(?:afscherming\s*)?(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
-    if (!matchPb) {
+    let matchPb = !wisPb ? tekst.match(/(?:lood|pb)\s*(?:afscherming\s*)?(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i) : null;
+    if (!wisPb && !matchPb) {
       matchPb = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:lood|pb)(?!\s*platen|\s*plaat)(?:\s*afscherming)?\b/i);
     }
-    if (matchPb && !platenAantal) {
+    if (!wisPb && matchPb && !platenAantal) {
       res.pbMm = parseFloat(matchPb[1].replace(",", "."));
-    } else if (platenAantal && platenAantal > 0) {
+    } else if (!wisPb && platenAantal && platenAantal > 0) {
       res.aantalLoodplaten = platenAantal;
       res.pbMm = platenAantal * 6;
       matchPb = [`${platenAantal} loodplaten`, `${res.pbMm}`];
     }
-    if (/\b(zonder\s+(?:lood|pb|afscherming)|geen\s+(?:lood|pb|afscherming)|0\s*mm\s*(?:lood|pb))\b/i.test(lower)) {
+    if (wisPb) {
       res.pbMm = 0;
+      res.aantalLoodplaten = null;
+    }
+    if (wisFe) {
       res.feMm = 0;
-      res.betonMm = 0;
-      res.baksteenMm = 0;
-      res.muurOnbekendMm = 0;
-      res.verzetZonderAfscherming = true;
     }
-    if (/\b(zonder|geen)\s+(?:beton(?:nen)?|betonmuur|muur)\b/i.test(lower)) {
+    if (wisBeton) {
       res.betonMm = 0;
       res.muurOnbekendMm = 0;
-      res.verzetZonderAfscherming = true;
     }
-    if (/\b(zonder|geen)\s+(?:bakste(?:en|nen)|baksteenmuur|metselwerk|muur)\b/i.test(lower)) {
+    if (wisBaksteen) {
       res.baksteenMm = 0;
       res.muurOnbekendMm = 0;
+    }
+    if (wisAlleAfscherming || wisPb || wisFe || wisBeton || wisBaksteen) {
       res.verzetZonderAfscherming = true;
     }
 
@@ -4070,7 +4105,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       beton === 0 &&
       baksteen === 0 &&
       !(params.muurOnbekendMm && params.muurOnbekendMm > 0) &&
-      !/\b(zonder|geen)\s+(?:beton(?:nen)?|bakste(?:en|nen)|muur|tussenmuur|afscherming)\b/i.test(lower) &&
+      !/\b(zonder|geen)\s+(?:(?:de|het|een|die|dat|extra)\s+)*(?:beton(?:nen)?(?:\s*muur)?|betonmuur|bakste(?:en|nen)(?:\s*muur)?|baksteenmuur|metselwerk|muur|tussenmuur|scheidingsmuur|afscherming)\b/i.test(lower) &&
       /\b(muur|betonmuur|betonnen\s*muur|baksteenmuur|bakstenen\s*muur|tussenmuur|scheidingsmuur|metselwerk)\b/i.test(lower);
     if (noemtMuurZonderDikte) {
       const isBetonGenoemd = /\b(beton|betonnen|betonmuur)\b/i.test(lower);
@@ -7015,7 +7050,7 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
   }
 
   // ==========================================================================
-  // MODULE: 05-calc-normen-iqi-kaart.js (2925 regels)
+  // MODULE: 05-calc-normen-iqi-kaart.js (2947 regels)
   // ==========================================================================
   // 9. Focus & Filmtype Calculator / Kwadratenwet (focusverandering.html)
   function convertFilmTime(seconds, fromFilm, toFilm) {
@@ -8576,6 +8611,28 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       );
     }
 
+    // 37. SNR-vereisten & maximale verzadiging voor digitale onstream radiografie (snr.html)
+    if (
+      /\b(snr|snr[_\s-]?n|signaal[-\s]*ruis|signal[-\s]*to[-\s]*noise|verzadiging|saturation|maximale?\s+verzadiging)\b/i.test(lower) ||
+      (/\b(digitale?\s+radiografie|digitaal\s+stralen|dda|flat\s*panel|fosforplaat|iso\s*17636-2)\b/i.test(lower) && /\b(eis|eisen|vereist|vereisten|norm|minimum|minimaal|maximaal|grens|grenzen|waarde|waarden|procent|%)\b/i.test(lower))
+    ) {
+      if (chips) chips.push("snr.html", "Onstream FFD", "Verschil scherpte en contrast");
+      return (
+        `<div class="rt-ai-calc">` +
+        `<strong>SNR-vereisten &amp; Maximale Verzadiging (Digitaal Onstream):</strong><br><br>` +
+        `• <strong>Maximale verzadiging (Punt V, naast de pijp):</strong> moet <strong>onder de 90%</strong> blijven (&lt; 90%).<br><br>` +
+        `• <strong>Minimale SNR in de centerlijn van de pijp (Punt A):</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TA:</strong> minimaal <strong>50</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TB:</strong> minimaal <strong>80</strong><br><br>` +
+        `• <strong>Minimale SNR naast de pijp (Punt B):</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TA:</strong> minimaal <strong>70</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TB:</strong> minimaal <strong>100</strong><br><br>` +
+        `• <strong>Meetregel:</strong> meet de SNR op <strong>4 punten</strong> (binnen de vastgestelde kaders) en rapporteer het <strong>gemiddelde</strong>.` +
+        `<div class="rt-ai-result">Verzadiging <strong>&lt; 90%</strong> &nbsp;|&nbsp; Centerlijn (A): <strong>TA &ge; 50, TB &ge; 80</strong> &nbsp;|&nbsp; Naast pijp (B): <strong>TA &ge; 70, TB &ge; 100</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Zie <a href="snr.html" class="ai-link" target="_blank">snr.html</a> voor het schema met meetpunten A, B, V en de gemiddelde-calculator).</small></div>`
+      );
+    }
+
     // Default / fallback
     return geefOpstellingEnGroeperingInfo(params, vraagTekst, chips);
   }
@@ -9944,7 +10001,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 06-geheugen-en-vraagrouter.js (2449 regels)
+  // MODULE: 06-geheugen-en-vraagrouter.js (2461 regels)
   // ==========================================================================
   // Gespreksgeheugen voor vervolgvragen
   const actiefGespreksGeheugen = {
@@ -11552,9 +11609,21 @@ ${stralingstijdPlat}========================================`;
           if (actiefGespreksGeheugen.verwachtParameter === "isolatieMm") {
             actiefGespreksGeheugen.verwachtParameter = null;
           }
+        } else if (k === "wisAlleAfscherming" || k === "wisPb" || k === "wisFe" || k === "wisBeton" || k === "wisBaksteen") {
+          // Alleen per-beurt wistekens; worden hieronder per afschermingsmateriaal toegepast
         } else if (typeof nieuwParsed[k] === "number" && (k === "pbMm" || k === "feMm" || k === "betonMm" || k === "baksteenMm" || k === "muurOnbekendMm")) {
-          if (nieuwParsed[k] > 0 || nieuwParsed.verzetZonderAfscherming || /\b(lood|pb|staal|fe|beton|baksteen|metselwerk|muur|zonder|geen)\b/i.test(gefilterdeTekst)) {
+          const moetWissen =
+            Boolean(nieuwParsed.wisAlleAfscherming) ||
+            (k === "pbMm" && Boolean(nieuwParsed.wisPb)) ||
+            (k === "feMm" && Boolean(nieuwParsed.wisFe)) ||
+            (k === "betonMm" && Boolean(nieuwParsed.wisBeton)) ||
+            (k === "baksteenMm" && Boolean(nieuwParsed.wisBaksteen)) ||
+            (k === "muurOnbekendMm" && Boolean(nieuwParsed.wisBeton || nieuwParsed.wisBaksteen));
+          if (nieuwParsed[k] > 0 || moetWissen) {
             actiefGespreksGeheugen[k] = nieuwParsed[k];
+            if (k === "pbMm" && moetWissen && nieuwParsed[k] === 0) {
+              actiefGespreksGeheugen.aantalLoodplaten = null;
+            }
             if ((k === "betonMm" || k === "baksteenMm") && nieuwParsed[k] > 0) {
               actiefGespreksGeheugen.muurOnbekendMm = null;
               if (actiefGespreksGeheugen.verwachtParameter === "muurMateriaal") {
@@ -12397,7 +12466,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 07-ui-modal-styles.js (1620 regels)
+  // MODULE: 07-ui-modal-styles.js (1641 regels)
   // ==========================================================================
   // --- UI Controller (Universeel op elke pagina) ---
   let assistantModal = null;
@@ -12526,16 +12595,17 @@ ${stralingstijdPlat}========================================`;
         touch-action: none;
       }
       .rt-ai-modal {
-        background: #2a2a2a;
-        color: #f4f4f4;
-        border: 3px solid #F5DF4D;
-        border-radius: 20px;
+        background: #181a20;
+        color: #e5e7eb;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 2px solid rgba(245, 223, 77, 0.7);
+        border-radius: 16px;
         width: min(920px, 94vw);
         height: min(880px, 90vh);
         min-height: min(560px, 85vh);
-        padding: 20px 24px;
+        padding: 18px 22px;
         box-sizing: border-box;
-        box-shadow: 0 18px 52px rgba(0,0,0,0.75), 0 0 0 1px rgba(245,223,77,0.25);
+        box-shadow: 0 20px 56px rgba(0, 0, 0, 0.78);
         font-family: 'Roboto Condensed', sans-serif;
         text-align: left;
         display: flex;
@@ -12547,8 +12617,8 @@ ${stralingstijdPlat}========================================`;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 14px;
-        border-bottom: 1px solid #444;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         padding-bottom: 8px;
         flex-shrink: 0;
         touch-action: none !important;
@@ -12556,11 +12626,11 @@ ${stralingstijdPlat}========================================`;
       .rt-ai-modal-header h3 {
         margin: 0;
         color: #F5DF4D;
-        font-size: 1.4rem;
+        font-size: 1.32rem;
         font-family: 'Roboto Condensed', sans-serif;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 9px;
       }
       .rt-ai-modal-title-group {
         display: flex;
@@ -12569,7 +12639,7 @@ ${stralingstijdPlat}========================================`;
       }
       .rt-ai-modal-subtitle {
         font-size: 0.75rem;
-        color: #bbb;
+        color: #94a3b8;
         margin-top: 2px;
         font-family: 'Roboto Condensed', sans-serif;
         line-height: 1.2;
@@ -12607,8 +12677,9 @@ ${stralingstijdPlat}========================================`;
         left: 0;
         right: 0;
         bottom: 0;
-        background: #1f1f1f;
-        border: 2px solid #F5DF4D;
+        background: #181a20;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 2px solid rgba(245, 223, 77, 0.7);
         border-radius: 15px;
         z-index: 70;
         padding: 16px 18px;
@@ -12676,23 +12747,24 @@ ${stralingstijdPlat}========================================`;
         transform: scale(1.02);
       }
       .rt-ai-transcript {
-        font-size: 0.95rem;
-        color: #bbb;
+        font-size: 0.84rem;
+        color: #94a3b8;
         margin-bottom: 8px;
         font-family: 'Roboto Condensed', sans-serif;
         flex-shrink: 0;
-        min-height: 20px;
+        min-height: 18px;
         touch-action: none !important;
       }
       .rt-ai-response-box {
         position: relative;
-        background: #1e1e1e;
-        border-left: 4px solid #F5DF4D;
-        padding: 14px;
-        border-radius: 8px;
-        margin-bottom: 14px;
+        background: #1f222a;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 16px 18px;
+        border-radius: 12px;
+        margin-bottom: 10px;
         line-height: 1.6;
-        font-size: 1.05rem;
+        font-size: 1rem;
+        color: #e5e7eb;
         font-family: 'Roboto Condensed', sans-serif;
         flex: 1 1 auto;
         min-height: 0;
@@ -12937,9 +13009,9 @@ ${stralingstijdPlat}========================================`;
         width: 100% !important;
       }
       .rt-ai-chip-btn {
-        background: #222 !important;
-        border: 1px solid #f5df4d !important;
-        color: #f5df4d !important;
+        background: #262a34 !important;
+        border: 1px solid rgba(255, 255, 255, 0.13) !important;
+        color: #e2e8f0 !important;
         padding: 7px 10px !important;
         border-radius: 10px !important;
         font-size: 0.85rem !important;
@@ -12956,16 +13028,18 @@ ${stralingstijdPlat}========================================`;
         white-space: normal !important;
         word-break: break-word !important;
         box-sizing: border-box !important;
-        transition: background 0.15s ease, transform 0.1s ease !important;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease !important;
       }
       .rt-ai-chip-btn:hover {
         background: rgba(245, 223, 77, 0.15) !important;
+        border-color: rgba(245, 223, 77, 0.55) !important;
+        color: #F5DF4D !important;
       }
       .rt-ai-memory-bar {
-        background: #161616 !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        border-radius: 8px !important;
-        padding: 6px 10px !important;
+        background: #14161c !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        padding: 7px 9px !important;
         margin-bottom: 10px !important;
         flex-shrink: 0 !important;
         max-height: 182px !important;
@@ -12995,21 +13069,21 @@ ${stralingstijdPlat}========================================`;
         display: inline-flex;
         align-items: center;
         justify-content: space-between;
-        background: #181818;
-        border: 1px solid rgba(245, 223, 77, 0.45);
-        border-radius: 10px;
-        padding: 3px 8px;
+        background: #20232c;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 4px 8px;
         font-size: 0.78rem;
-        color: #f0f0f0;
+        color: #cbd5e1;
         gap: 4px;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        box-shadow: none;
       }
       .rt-ai-param-badge-edit {
-        border-color: #f5df4d;
-        color: #f5df4d;
+        border-color: rgba(245, 223, 77, 0.45);
+        color: #f3e58d;
         cursor: pointer;
       }
       .rt-ai-param-badge-edit .rt-ai-badge-text {
@@ -13025,11 +13099,11 @@ ${stralingstijdPlat}========================================`;
       .rt-ai-badge-del {
         background: none;
         border: none;
-        color: #ff6b6b;
+        color: rgba(255, 255, 255, 0.45);
         cursor: pointer;
         padding: 2px 3px;
         margin: 0;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         line-height: 1;
         font-weight: bold;
         display: inline-flex;
@@ -13038,9 +13112,10 @@ ${stralingstijdPlat}========================================`;
         min-width: 18px;
         min-height: 22px;
         flex-shrink: 0;
+        transition: color 0.15s ease;
       }
       .rt-ai-badge-del:hover {
-        color: #ff3333;
+        color: #f87171;
       }
       .rt-ai-memory-controls {
         display: flex;
@@ -13054,6 +13129,16 @@ ${stralingstijdPlat}========================================`;
         min-width: 0 !important;
         justify-content: space-between !important;
         box-sizing: border-box !important;
+        background: #20232c !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+        padding: 3px 9px !important;
+        min-height: 32px !important;
+      }
+      .rt-ai-memory-controls .rt-ai-bron-pill.active,
+      .rt-ai-memory-controls .rt-ai-norm-pill.active {
+        border-color: rgba(245, 223, 77, 0.5) !important;
       }
       .rt-ai-memory-controls .rt-ai-bron-select,
       .rt-ai-memory-controls .rt-ai-norm-select {
@@ -13067,22 +13152,23 @@ ${stralingstijdPlat}========================================`;
         align-items: center;
         justify-content: center;
         gap: 5px;
-        background: rgba(255, 77, 77, 0.12);
-        border: 1px solid rgba(255, 107, 107, 0.5);
-        border-radius: 10px;
-        padding: 3px 9px;
-        font-size: 0.78rem;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
         font-weight: 600;
-        color: #ffb4b4;
+        color: #cbd5e1;
         cursor: pointer;
         flex-shrink: 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        min-height: 32px;
+        box-shadow: none;
         transition: all 0.15s ease;
       }
       .rt-ai-clear-mem-btn:hover {
-        background: rgba(255, 77, 77, 0.28);
-        color: #ffffff;
-        border-color: #ff4d4d;
+        background: rgba(245, 223, 77, 0.15);
+        color: #F5DF4D;
+        border-color: rgba(245, 223, 77, 0.55);
       }
       .rt-ai-input-bar {
         display: flex !important;
@@ -13102,40 +13188,40 @@ ${stralingstijdPlat}========================================`;
         min-height: 42px !important;
         max-height: 112px !important;
         padding: 9px 14px !important;
-        border-radius: 1.05em !important;
-        border: 3px solid #F5DF4D !important;
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        font-size: 1.05rem !important;
+        border-radius: 20px !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+        background-color: #20232c !important;
+        color: #f3f4f6 !important;
+        font-size: 1rem !important;
         line-height: 1.35 !important;
         font-family: 'Roboto Condensed', sans-serif !important;
         text-align: left !important;
         max-width: none !important;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+        box-shadow: none !important;
         box-sizing: border-box !important;
         resize: none !important;
-        overflow-y: auto !important;
+        overflow-y: hidden;
         touch-action: pan-y !important;
       }
       .rt-ai-text-input:focus {
         outline: none !important;
-        border-color: #051aff !important;
-        background-color: #ffffff !important;
-        color: #000000 !important;
+        border-color: rgba(245, 223, 77, 0.7) !important;
+        background-color: #242833 !important;
+        color: #ffffff !important;
       }
       .rt-ai-text-input::placeholder {
-        color: #666666 !important;
+        color: #94a3b8 !important;
         font-family: 'Roboto Condensed', sans-serif !important;
       }
       .rt-ai-send-btn {
         background: #F5DF4D !important;
-        color: #000000 !important;
-        border: 2px solid #000000 !important;
+        color: #14161b !important;
+        border: none !important;
         border-radius: 50% !important;
         width: 42px !important;
         height: 42px !important;
         padding: 0 !important;
-        font-size: 1.1rem !important;
+        font-size: 1.05rem !important;
         cursor: pointer !important;
         transition: transform 0.15s, background-color 0.15s !important;
         flex-shrink: 0 !important;
@@ -13193,14 +13279,14 @@ ${stralingstijdPlat}========================================`;
         font-weight: 600;
       }
       .rt-ai-examples-btn {
-        background: rgba(245, 223, 77, 0.12);
-        border: 1px solid rgba(245, 223, 77, 0.35);
-        border-radius: 6px;
-        color: #F5DF4D;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 8px;
+        color: #cbd5e1;
         font-size: 13px;
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
-        padding: 4px 9px;
+        padding: 4px 10px;
         display: inline-flex;
         align-items: center;
         gap: 5px;
@@ -13208,22 +13294,23 @@ ${stralingstijdPlat}========================================`;
         font-family: 'Roboto Condensed', sans-serif;
       }
       .rt-ai-examples-btn:hover {
-        background: rgba(245, 223, 77, 0.25);
-        border-color: #F5DF4D;
+        background: rgba(245, 223, 77, 0.15);
+        border-color: rgba(245, 223, 77, 0.55);
+        color: #F5DF4D;
       }
       .rt-ai-examples-btn.active {
-        background: #F5DF4D;
-        color: #111;
-        border-color: #F5DF4D;
+        background: rgba(245, 223, 77, 0.2);
+        color: #F5DF4D;
+        border-color: rgba(245, 223, 77, 0.65);
       }
       .rt-ai-ex-toolbar {
         position: sticky;
-        top: -14px;
-        background: #1e1e1e;
+        top: -16px;
+        background: #1f222a;
         padding: 10px 0 8px 0;
         margin-top: -6px;
         margin-bottom: 10px;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         z-index: 5;
       }
       .rt-ai-ex-search {
@@ -13231,9 +13318,9 @@ ${stralingstijdPlat}========================================`;
         box-sizing: border-box;
         padding: 8px 12px;
         border-radius: 8px;
-        border: 1px solid #444;
-        background: #141414;
-        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: #14161c;
+        color: #f3f4f6;
         font-size: 0.92rem;
         font-family: 'Roboto Condensed', sans-serif;
         margin-bottom: 8px;
@@ -13989,8 +14076,11 @@ ${stralingstijdPlat}========================================`;
     const txtInp = document.getElementById("rt-ai-input");
     if (txtInp) {
       const autoResizeInput = () => {
+        const maxH = (typeof window !== "undefined" && window.innerWidth <= 768) ? 96 : 112;
         txtInp.style.height = "auto";
-        txtInp.style.height = `${Math.min(txtInp.scrollHeight, 112)}px`;
+        const needed = txtInp.scrollHeight + 4;
+        txtInp.style.height = `${Math.min(needed, maxH)}px`;
+        txtInp.style.overflowY = needed > maxH ? "auto" : "hidden";
       };
       txtInp.addEventListener("input", autoResizeInput);
       txtInp.addEventListener("keydown", (e) => {
@@ -14021,7 +14111,7 @@ ${stralingstijdPlat}========================================`;
   }
 
   // ==========================================================================
-  // MODULE: 08-ui-speech-tts-init.js (1733 regels)
+  // MODULE: 08-ui-speech-tts-init.js (1739 regels)
   // ==========================================================================
   let isPushing = false;
   let isFinishingPTT = false;
@@ -14841,6 +14931,7 @@ ${stralingstijdPlat}========================================`;
     if (inp) {
       inp.value = "";
       inp.style.height = "auto";
+      inp.style.overflowY = "hidden";
       const isTouch = (typeof window !== "undefined") && (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
       if (isTouch) {
         inp.blur(); // Zorgt dat het mobiele toetsenbord NOOIT ongewenst openklapt bij klikken op een chip
@@ -14858,6 +14949,7 @@ ${stralingstijdPlat}========================================`;
     const q = inp.value.trim();
     inp.value = "";
     inp.style.height = "auto";
+    inp.style.overflowY = "hidden";
     const isTouch = (typeof window !== "undefined") && (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
     if (isTouch) {
       inp.blur(); // Sluit mobiel toetsenbord na verzenden zodat antwoord direct goed leesbaar is
@@ -14928,6 +15020,7 @@ ${stralingstijdPlat}========================================`;
     { categorie: "Theorie & Kennis", type: "Agfa filmklasse koppeling (C1 t/m C6)", voorbeeld: "Welk type Agfa film komt overeen met C3, C4 en C5?", toelichting: "Verklaart de indeling van Agfa Structurix films volgens ISO 11699-1 en ASTM E1815 (C1=D2, C2=D3, C3=D4, C4=D5, C5=D7)." },
     { categorie: "Theorie & Kennis", type: "Kwadratenwet in de radiografie", voorbeeld: "Wat is de kwadratenwet en hoe werkt deze?", toelichting: "Legt de omgekeerde kwadratenwet uit voor belichtingstijd en stralingsafzetting/dosistempo." },
     { categorie: "Theorie & Kennis", type: "Verschil tussen scherpte en contrast", voorbeeld: "Wat is het verschil tussen scherpte en contrast?", toelichting: "Legt het verschil uit tussen zwartingsverschil (contrast) en randafbeelding (scherpte/definitie) op een röntgenfilm." },
+    { categorie: "Theorie & Kennis", type: "SNR & verzadiging (digitaal onstream)", voorbeeld: "Wat zijn de SNR-eisen en maximale verzadiging voor digitale radiografie?", toelichting: "Geeft de minimale SNR-waarden voor digitaal onstream onderzoek (TA/TB, centerlijn en naast de pijp) en de maximale verzadiging (< 90%)." },
     { categorie: "Theorie & Kennis", type: "Wettelijke dosislimiet stralingswerker", voorbeeld: "Wat is de wettelijke dosislimiet voor een radiograaf?", toelichting: "Geeft de limieten voor stralingswerkers (20 mSv/jaar) en toezichts-/gecontroleerde zones (10 μSv/u norm)." },
     { categorie: "Theorie & Kennis", type: "Loodletter B & Terugverstrooiing", voorbeeld: "Waarom leggen we een loodletter B achterop de cassette?", toelichting: "Verklaart de controle op secundaire achterwaartse straling (backscatter) volgens ASME en EN ISO 17636-1." },
     { categorie: "Theorie & Kennis", type: "kV-regel (Keverregel) & Buisspanning", voorbeeld: "Wat is de keverregel en waarom beperken we de buisspanning?", toelichting: "Verklaart het foto-elektrisch effect vs Compton-effect en de maximale kV formule uit EN ISO 17636-1." }
@@ -14981,7 +15074,10 @@ ${stralingstijdPlat}========================================`;
     if (inp) {
       inp.value = vraagTekst;
       inp.style.height = "auto";
-      inp.style.height = `${Math.min(inp.scrollHeight || 44, 112)}px`;
+      const maxH = (typeof window !== "undefined" && window.innerWidth <= 768) ? 96 : 112;
+      const needed = (inp.scrollHeight || 42) + 4;
+      inp.style.height = `${Math.min(needed, maxH)}px`;
+      inp.style.overflowY = needed > maxH ? "auto" : "hidden";
       inp.focus();
       if (typeof inp.setSelectionRange === "function") {
         const len = inp.value.length;

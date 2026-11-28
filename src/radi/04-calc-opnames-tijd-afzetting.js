@@ -142,7 +142,7 @@
       beton === 0 &&
       baksteen === 0 &&
       !(params.muurOnbekendMm && params.muurOnbekendMm > 0) &&
-      !/\b(zonder|geen)\s+(?:beton(?:nen)?|bakste(?:en|nen)|muur|tussenmuur|afscherming)\b/i.test(lower) &&
+      !/\b(zonder|geen)\s+(?:(?:de|het|een|die|dat|extra)\s+)*(?:beton(?:nen)?(?:\s*muur)?|betonmuur|bakste(?:en|nen)(?:\s*muur)?|baksteenmuur|metselwerk|muur|tussenmuur|scheidingsmuur|afscherming)\b/i.test(lower) &&
       /\b(muur|betonmuur|betonnen\s*muur|baksteenmuur|bakstenen\s*muur|tussenmuur|scheidingsmuur|metselwerk)\b/i.test(lower);
     if (noemtMuurZonderDikte) {
       const isBetonGenoemd = /\b(beton|betonnen|betonmuur)\b/i.test(lower);

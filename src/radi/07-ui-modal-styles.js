@@ -125,16 +125,17 @@
         touch-action: none;
       }
       .rt-ai-modal {
-        background: #2a2a2a;
-        color: #f4f4f4;
-        border: 3px solid #F5DF4D;
-        border-radius: 20px;
+        background: #181a20;
+        color: #e5e7eb;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 2px solid rgba(245, 223, 77, 0.7);
+        border-radius: 16px;
         width: min(920px, 94vw);
         height: min(880px, 90vh);
         min-height: min(560px, 85vh);
-        padding: 20px 24px;
+        padding: 18px 22px;
         box-sizing: border-box;
-        box-shadow: 0 18px 52px rgba(0,0,0,0.75), 0 0 0 1px rgba(245,223,77,0.25);
+        box-shadow: 0 20px 56px rgba(0, 0, 0, 0.78);
         font-family: 'Roboto Condensed', sans-serif;
         text-align: left;
         display: flex;
@@ -146,8 +147,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 14px;
-        border-bottom: 1px solid #444;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         padding-bottom: 8px;
         flex-shrink: 0;
         touch-action: none !important;
@@ -155,11 +156,11 @@
       .rt-ai-modal-header h3 {
         margin: 0;
         color: #F5DF4D;
-        font-size: 1.4rem;
+        font-size: 1.32rem;
         font-family: 'Roboto Condensed', sans-serif;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 9px;
       }
       .rt-ai-modal-title-group {
         display: flex;
@@ -168,7 +169,7 @@
       }
       .rt-ai-modal-subtitle {
         font-size: 0.75rem;
-        color: #bbb;
+        color: #94a3b8;
         margin-top: 2px;
         font-family: 'Roboto Condensed', sans-serif;
         line-height: 1.2;
@@ -206,8 +207,9 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: #1f1f1f;
-        border: 2px solid #F5DF4D;
+        background: #181a20;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 2px solid rgba(245, 223, 77, 0.7);
         border-radius: 15px;
         z-index: 70;
         padding: 16px 18px;
@@ -275,23 +277,24 @@
         transform: scale(1.02);
       }
       .rt-ai-transcript {
-        font-size: 0.95rem;
-        color: #bbb;
+        font-size: 0.84rem;
+        color: #94a3b8;
         margin-bottom: 8px;
         font-family: 'Roboto Condensed', sans-serif;
         flex-shrink: 0;
-        min-height: 20px;
+        min-height: 18px;
         touch-action: none !important;
       }
       .rt-ai-response-box {
         position: relative;
-        background: #1e1e1e;
-        border-left: 4px solid #F5DF4D;
-        padding: 14px;
-        border-radius: 8px;
-        margin-bottom: 14px;
+        background: #1f222a;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 16px 18px;
+        border-radius: 12px;
+        margin-bottom: 10px;
         line-height: 1.6;
-        font-size: 1.05rem;
+        font-size: 1rem;
+        color: #e5e7eb;
         font-family: 'Roboto Condensed', sans-serif;
         flex: 1 1 auto;
         min-height: 0;
@@ -536,9 +539,9 @@
         width: 100% !important;
       }
       .rt-ai-chip-btn {
-        background: #222 !important;
-        border: 1px solid #f5df4d !important;
-        color: #f5df4d !important;
+        background: #262a34 !important;
+        border: 1px solid rgba(255, 255, 255, 0.13) !important;
+        color: #e2e8f0 !important;
         padding: 7px 10px !important;
         border-radius: 10px !important;
         font-size: 0.85rem !important;
@@ -555,16 +558,18 @@
         white-space: normal !important;
         word-break: break-word !important;
         box-sizing: border-box !important;
-        transition: background 0.15s ease, transform 0.1s ease !important;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease !important;
       }
       .rt-ai-chip-btn:hover {
         background: rgba(245, 223, 77, 0.15) !important;
+        border-color: rgba(245, 223, 77, 0.55) !important;
+        color: #F5DF4D !important;
       }
       .rt-ai-memory-bar {
-        background: #161616 !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        border-radius: 8px !important;
-        padding: 6px 10px !important;
+        background: #14161c !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        padding: 7px 9px !important;
         margin-bottom: 10px !important;
         flex-shrink: 0 !important;
         max-height: 182px !important;
@@ -594,21 +599,21 @@
         display: inline-flex;
         align-items: center;
         justify-content: space-between;
-        background: #181818;
-        border: 1px solid rgba(245, 223, 77, 0.45);
-        border-radius: 10px;
-        padding: 3px 8px;
+        background: #20232c;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 4px 8px;
         font-size: 0.78rem;
-        color: #f0f0f0;
+        color: #cbd5e1;
         gap: 4px;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        box-shadow: none;
       }
       .rt-ai-param-badge-edit {
-        border-color: #f5df4d;
-        color: #f5df4d;
+        border-color: rgba(245, 223, 77, 0.45);
+        color: #f3e58d;
         cursor: pointer;
       }
       .rt-ai-param-badge-edit .rt-ai-badge-text {
@@ -624,11 +629,11 @@
       .rt-ai-badge-del {
         background: none;
         border: none;
-        color: #ff6b6b;
+        color: rgba(255, 255, 255, 0.45);
         cursor: pointer;
         padding: 2px 3px;
         margin: 0;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         line-height: 1;
         font-weight: bold;
         display: inline-flex;
@@ -637,9 +642,10 @@
         min-width: 18px;
         min-height: 22px;
         flex-shrink: 0;
+        transition: color 0.15s ease;
       }
       .rt-ai-badge-del:hover {
-        color: #ff3333;
+        color: #f87171;
       }
       .rt-ai-memory-controls {
         display: flex;
@@ -653,6 +659,16 @@
         min-width: 0 !important;
         justify-content: space-between !important;
         box-sizing: border-box !important;
+        background: #20232c !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+        padding: 3px 9px !important;
+        min-height: 32px !important;
+      }
+      .rt-ai-memory-controls .rt-ai-bron-pill.active,
+      .rt-ai-memory-controls .rt-ai-norm-pill.active {
+        border-color: rgba(245, 223, 77, 0.5) !important;
       }
       .rt-ai-memory-controls .rt-ai-bron-select,
       .rt-ai-memory-controls .rt-ai-norm-select {
@@ -666,22 +682,23 @@
         align-items: center;
         justify-content: center;
         gap: 5px;
-        background: rgba(255, 77, 77, 0.12);
-        border: 1px solid rgba(255, 107, 107, 0.5);
-        border-radius: 10px;
-        padding: 3px 9px;
-        font-size: 0.78rem;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
         font-weight: 600;
-        color: #ffb4b4;
+        color: #cbd5e1;
         cursor: pointer;
         flex-shrink: 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        min-height: 32px;
+        box-shadow: none;
         transition: all 0.15s ease;
       }
       .rt-ai-clear-mem-btn:hover {
-        background: rgba(255, 77, 77, 0.28);
-        color: #ffffff;
-        border-color: #ff4d4d;
+        background: rgba(245, 223, 77, 0.15);
+        color: #F5DF4D;
+        border-color: rgba(245, 223, 77, 0.55);
       }
       .rt-ai-input-bar {
         display: flex !important;
@@ -701,40 +718,40 @@
         min-height: 42px !important;
         max-height: 112px !important;
         padding: 9px 14px !important;
-        border-radius: 1.05em !important;
-        border: 3px solid #F5DF4D !important;
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        font-size: 1.05rem !important;
+        border-radius: 20px !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+        background-color: #20232c !important;
+        color: #f3f4f6 !important;
+        font-size: 1rem !important;
         line-height: 1.35 !important;
         font-family: 'Roboto Condensed', sans-serif !important;
         text-align: left !important;
         max-width: none !important;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+        box-shadow: none !important;
         box-sizing: border-box !important;
         resize: none !important;
-        overflow-y: auto !important;
+        overflow-y: hidden;
         touch-action: pan-y !important;
       }
       .rt-ai-text-input:focus {
         outline: none !important;
-        border-color: #051aff !important;
-        background-color: #ffffff !important;
-        color: #000000 !important;
+        border-color: rgba(245, 223, 77, 0.7) !important;
+        background-color: #242833 !important;
+        color: #ffffff !important;
       }
       .rt-ai-text-input::placeholder {
-        color: #666666 !important;
+        color: #94a3b8 !important;
         font-family: 'Roboto Condensed', sans-serif !important;
       }
       .rt-ai-send-btn {
         background: #F5DF4D !important;
-        color: #000000 !important;
-        border: 2px solid #000000 !important;
+        color: #14161b !important;
+        border: none !important;
         border-radius: 50% !important;
         width: 42px !important;
         height: 42px !important;
         padding: 0 !important;
-        font-size: 1.1rem !important;
+        font-size: 1.05rem !important;
         cursor: pointer !important;
         transition: transform 0.15s, background-color 0.15s !important;
         flex-shrink: 0 !important;
@@ -792,14 +809,14 @@
         font-weight: 600;
       }
       .rt-ai-examples-btn {
-        background: rgba(245, 223, 77, 0.12);
-        border: 1px solid rgba(245, 223, 77, 0.35);
-        border-radius: 6px;
-        color: #F5DF4D;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 8px;
+        color: #cbd5e1;
         font-size: 13px;
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
-        padding: 4px 9px;
+        padding: 4px 10px;
         display: inline-flex;
         align-items: center;
         gap: 5px;
@@ -807,22 +824,23 @@
         font-family: 'Roboto Condensed', sans-serif;
       }
       .rt-ai-examples-btn:hover {
-        background: rgba(245, 223, 77, 0.25);
-        border-color: #F5DF4D;
+        background: rgba(245, 223, 77, 0.15);
+        border-color: rgba(245, 223, 77, 0.55);
+        color: #F5DF4D;
       }
       .rt-ai-examples-btn.active {
-        background: #F5DF4D;
-        color: #111;
-        border-color: #F5DF4D;
+        background: rgba(245, 223, 77, 0.2);
+        color: #F5DF4D;
+        border-color: rgba(245, 223, 77, 0.65);
       }
       .rt-ai-ex-toolbar {
         position: sticky;
-        top: -14px;
-        background: #1e1e1e;
+        top: -16px;
+        background: #1f222a;
         padding: 10px 0 8px 0;
         margin-top: -6px;
         margin-bottom: 10px;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         z-index: 5;
       }
       .rt-ai-ex-search {
@@ -830,9 +848,9 @@
         box-sizing: border-box;
         padding: 8px 12px;
         border-radius: 8px;
-        border: 1px solid #444;
-        background: #141414;
-        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: #14161c;
+        color: #f3f4f6;
         font-size: 0.92rem;
         font-family: 'Roboto Condensed', sans-serif;
         margin-bottom: 8px;
@@ -1588,8 +1606,11 @@
     const txtInp = document.getElementById("rt-ai-input");
     if (txtInp) {
       const autoResizeInput = () => {
+        const maxH = (typeof window !== "undefined" && window.innerWidth <= 768) ? 96 : 112;
         txtInp.style.height = "auto";
-        txtInp.style.height = `${Math.min(txtInp.scrollHeight, 112)}px`;
+        const needed = txtInp.scrollHeight + 4;
+        txtInp.style.height = `${Math.min(needed, maxH)}px`;
+        txtInp.style.overflowY = needed > maxH ? "auto" : "hidden";
       };
       txtInp.addEventListener("input", autoResizeInput);
       txtInp.addEventListener("keydown", (e) => {

@@ -1557,6 +1557,28 @@
       );
     }
 
+    // 37. SNR-vereisten & maximale verzadiging voor digitale onstream radiografie (snr.html)
+    if (
+      /\b(snr|snr[_\s-]?n|signaal[-\s]*ruis|signal[-\s]*to[-\s]*noise|verzadiging|saturation|maximale?\s+verzadiging)\b/i.test(lower) ||
+      (/\b(digitale?\s+radiografie|digitaal\s+stralen|dda|flat\s*panel|fosforplaat|iso\s*17636-2)\b/i.test(lower) && /\b(eis|eisen|vereist|vereisten|norm|minimum|minimaal|maximaal|grens|grenzen|waarde|waarden|procent|%)\b/i.test(lower))
+    ) {
+      if (chips) chips.push("snr.html", "Onstream FFD", "Verschil scherpte en contrast");
+      return (
+        `<div class="rt-ai-calc">` +
+        `<strong>SNR-vereisten &amp; Maximale Verzadiging (Digitaal Onstream):</strong><br><br>` +
+        `• <strong>Maximale verzadiging (Punt V, naast de pijp):</strong> moet <strong>onder de 90%</strong> blijven (&lt; 90%).<br><br>` +
+        `• <strong>Minimale SNR in de centerlijn van de pijp (Punt A):</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TA:</strong> minimaal <strong>50</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TB:</strong> minimaal <strong>80</strong><br><br>` +
+        `• <strong>Minimale SNR naast de pijp (Punt B):</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TA:</strong> minimaal <strong>70</strong><br>` +
+        `&nbsp;&nbsp;&bull; <strong>Klasse TB:</strong> minimaal <strong>100</strong><br><br>` +
+        `• <strong>Meetregel:</strong> meet de SNR op <strong>4 punten</strong> (binnen de vastgestelde kaders) en rapporteer het <strong>gemiddelde</strong>.` +
+        `<div class="rt-ai-result">Verzadiging <strong>&lt; 90%</strong> &nbsp;|&nbsp; Centerlijn (A): <strong>TA &ge; 50, TB &ge; 80</strong> &nbsp;|&nbsp; Naast pijp (B): <strong>TA &ge; 70, TB &ge; 100</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Zie <a href="snr.html" class="ai-link" target="_blank">snr.html</a> voor het schema met meetpunten A, B, V en de gemiddelde-calculator).</small></div>`
+      );
+    }
+
     // Default / fallback
     return geefOpstellingEnGroeperingInfo(params, vraagTekst, chips);
   }

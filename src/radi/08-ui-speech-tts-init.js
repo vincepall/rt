@@ -816,6 +816,7 @@
     if (inp) {
       inp.value = "";
       inp.style.height = "auto";
+      inp.style.overflowY = "hidden";
       const isTouch = (typeof window !== "undefined") && (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
       if (isTouch) {
         inp.blur(); // Zorgt dat het mobiele toetsenbord NOOIT ongewenst openklapt bij klikken op een chip
@@ -833,6 +834,7 @@
     const q = inp.value.trim();
     inp.value = "";
     inp.style.height = "auto";
+    inp.style.overflowY = "hidden";
     const isTouch = (typeof window !== "undefined") && (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
     if (isTouch) {
       inp.blur(); // Sluit mobiel toetsenbord na verzenden zodat antwoord direct goed leesbaar is
@@ -903,6 +905,7 @@
     { categorie: "Theorie & Kennis", type: "Agfa filmklasse koppeling (C1 t/m C6)", voorbeeld: "Welk type Agfa film komt overeen met C3, C4 en C5?", toelichting: "Verklaart de indeling van Agfa Structurix films volgens ISO 11699-1 en ASTM E1815 (C1=D2, C2=D3, C3=D4, C4=D5, C5=D7)." },
     { categorie: "Theorie & Kennis", type: "Kwadratenwet in de radiografie", voorbeeld: "Wat is de kwadratenwet en hoe werkt deze?", toelichting: "Legt de omgekeerde kwadratenwet uit voor belichtingstijd en stralingsafzetting/dosistempo." },
     { categorie: "Theorie & Kennis", type: "Verschil tussen scherpte en contrast", voorbeeld: "Wat is het verschil tussen scherpte en contrast?", toelichting: "Legt het verschil uit tussen zwartingsverschil (contrast) en randafbeelding (scherpte/definitie) op een röntgenfilm." },
+    { categorie: "Theorie & Kennis", type: "SNR & verzadiging (digitaal onstream)", voorbeeld: "Wat zijn de SNR-eisen en maximale verzadiging voor digitale radiografie?", toelichting: "Geeft de minimale SNR-waarden voor digitaal onstream onderzoek (TA/TB, centerlijn en naast de pijp) en de maximale verzadiging (< 90%)." },
     { categorie: "Theorie & Kennis", type: "Wettelijke dosislimiet stralingswerker", voorbeeld: "Wat is de wettelijke dosislimiet voor een radiograaf?", toelichting: "Geeft de limieten voor stralingswerkers (20 mSv/jaar) en toezichts-/gecontroleerde zones (10 μSv/u norm)." },
     { categorie: "Theorie & Kennis", type: "Loodletter B & Terugverstrooiing", voorbeeld: "Waarom leggen we een loodletter B achterop de cassette?", toelichting: "Verklaart de controle op secundaire achterwaartse straling (backscatter) volgens ASME en EN ISO 17636-1." },
     { categorie: "Theorie & Kennis", type: "kV-regel (Keverregel) & Buisspanning", voorbeeld: "Wat is de keverregel en waarom beperken we de buisspanning?", toelichting: "Verklaart het foto-elektrisch effect vs Compton-effect en de maximale kV formule uit EN ISO 17636-1." }
@@ -956,7 +959,10 @@
     if (inp) {
       inp.value = vraagTekst;
       inp.style.height = "auto";
-      inp.style.height = `${Math.min(inp.scrollHeight || 44, 112)}px`;
+      const maxH = (typeof window !== "undefined" && window.innerWidth <= 768) ? 96 : 112;
+      const needed = (inp.scrollHeight || 42) + 4;
+      inp.style.height = `${Math.min(needed, maxH)}px`;
+      inp.style.overflowY = needed > maxH ? "auto" : "hidden";
       inp.focus();
       if (typeof inp.setSelectionRange === "function") {
         const len = inp.value.length;

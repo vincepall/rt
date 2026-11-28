@@ -57,6 +57,7 @@
     "1 FE EN", "6 FE EN", "10 FE EN", "13 FE EN", "Set A", "Set B", "Set C", "Set D", "Set 1A", "Set 2A",
     "hole-type", "hole type", "shim", "plaatje", "plaatjes", "1T", "2T", "4T", "2T-gat", "2T gat", "loodletter", "loodletter B", "terugverstrooiing", "backscatter",
     "bronzijde", "filmzijde", "geometrische onscherpte", "Ug",
+    "SNR", "SNR_N", "verzadiging", "saturation", "digitale radiografie", "DDA", "fosforplaat", "flat panel", "centerlijn",
 
     // Normen & Kwaliteitsklassen
     "ASME", "Section V", "Artikel 2", "EN", "ISO", "EN ISO", "ISO 17636", "ISO 17636-1", "ISO 17636-2",
@@ -1153,6 +1154,7 @@
       [/\b(optische\s+dichtheid|opties\s+dichtheid|optische\s+dikheid|optische\s+dikte|filmzwarting)\b/gi, "zwarting"],
       [/\b(bron\s*zijde|bron\s*kant|source\s*side|sourceside)\b/gi, "bronzijde"],
       [/\b(film\s*zijde|film\s*kant|film\s*side|filmside)\b/gi, "filmzijde"],
+      [/\b(es\s+en\s+er|s\s+n\s+r|s\.n\.r\.?)\b/gi, "SNR"],
       // BKI, IQI, Opstelling-afkortingen en Draadjes fonetisch
       [/\b(b\s*k\s*i|bee\s*kaa\s*ie|beekaaie|bekaie|b\.k\.i\.|beka\s*ie|bkaie|bekai)\b/gi, "BKI"],
       [/\b(i\s*q\s*i|ie\s*kju\s*ie|iekjuie|iki|i\.q\.i\.)\b/gi, "IQI"],

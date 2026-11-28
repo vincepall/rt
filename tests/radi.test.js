@@ -943,6 +943,44 @@ function laadRtAssistant() {
         /value="balteau_ceram35p" selected/.test(dd35P),
       tBund35P + " | d=" + RT.actiefGespreksGeheugen.brongrootte
     );
+
+    // Digitale radiografie: SNR vereisten & maximale verzadiging
+    RT.resetGespreksGeheugen();
+    const rSnr = await RT.verwerkUniverseleVraag("Wat zijn de SNR vereisten en maximale verzadiging voor digitale radiografie?");
+    const tSnr = stripTags(rSnr && rSnr.text);
+    assert(
+      "Digitale radiografie SNR & verzadiging: toont < 90%, Onstream TA (50/70) & TB (80/100) en link naar snr.html",
+      /90%/.test(tSnr) && /50/.test(tSnr) && /80/.test(tSnr) && /70/.test(tSnr) && /100/.test(tSnr) && /4 punten/.test(tSnr) && /snr\.html/.test(rSnr.text) && !/17636-2/.test(tSnr),
+      tSnr
+    );
+    const rVerz = await RT.verwerkUniverseleVraag("hoeveel procent verzadiging mag ik hebben bij digitaal stralen?");
+    const tVerz = stripTags(rVerz && rVerz.text);
+    assert(
+      "Vraag over maximale verzadiging geeft < 90% terug",
+      /90%/.test(tVerz) && /verzadiging/i.test(tVerz),
+      tVerz
+    );
+
+    // Afzetting vervolgvraag: "en zonder de loodplaat" wist ALLEEN lood en behoudt baksteenmuur!
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("Wat is het dosistempo als ik een afzetting heb van 90 meter met een extra loodplaat als afscherming en er zit een muur tussen van 25 cm baksteen. Ik heb een iridium van 60 curie");
+    const rZonderLood = await RT.verwerkUniverseleVraag("en zonder de loodplaat");
+    const tZonderLood = stripTags(rZonderLood && rZonderLood.text);
+    assert(
+      "Vervolgvraag 'en zonder de loodplaat' wist lood (0 mm) maar behoudt 25 cm baksteen",
+      /25 cm \(250 mm\) baksteen/.test(tZonderLood) &&
+        !/6 mm lood/.test(tZonderLood) &&
+        RT.actiefGespreksGeheugen.pbMm === 0 &&
+        RT.actiefGespreksGeheugen.baksteenMm === 250,
+      tZonderLood + " | pb=" + RT.actiefGespreksGeheugen.pbMm + " bak=" + RT.actiefGespreksGeheugen.baksteenMm
+    );
+    const rZonderMuur = await RT.verwerkUniverseleVraag("en zonder de muur");
+    const tZonderMuur = stripTags(rZonderMuur && rZonderMuur.text);
+    assert(
+      "Vervolgvraag 'en zonder de muur' wist baksteen (0 mm)",
+      !/baksteen/i.test(tZonderMuur) && RT.actiefGespreksGeheugen.baksteenMm === 0,
+      tZonderMuur
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

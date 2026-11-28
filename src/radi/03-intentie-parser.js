@@ -104,7 +104,9 @@
       (/\b(haz|warmtebe[iï]nvloede\s*zone|buiten\s+de\s+las|naast\s+de\s+las)\b/i.test(lower) && /\b(beoordel|mm|hoeveel|grondmateriaal|film)\b/i.test(lower)) ||
       /\b(wanddiktesprong|diktesprong|grote\s+dikteverschil|verschillende\s+wanddiktes?\s+in\s+(?:een|1)\s+opname)\b/i.test(lower) ||
       /\b(opwarmen|opwarmprocedure|warm[-\s]?up|inbranden)\b/i.test(lower) ||
-      (/\b(vastzit|vast\s+zit|niet\s+terug|klem\s+zit|blijft\s+hangen|noodprocedure)\b/i.test(lower) && /\b(bron|gammabron|container|indraaien|kabel|geleidebuis)\b/i.test(lower));
+      (/\b(vastzit|vast\s+zit|niet\s+terug|klem\s+zit|blijft\s+hangen|noodprocedure)\b/i.test(lower) && /\b(bron|gammabron|container|indraaien|kabel|geleidebuis)\b/i.test(lower)) ||
+      /\b(snr|snr[_\s-]?n|signaal[-\s]*ruis|signal[-\s]*to[-\s]*noise|verzadiging|saturation|maximale?\s+verzadiging)\b/i.test(lower) ||
+      (/\b(digitale?\s+radiografie|digitaal\s+stralen|dda|flat\s*panel|fosforplaat|iso\s*17636-2)\b/i.test(lower) && /\b(eis|eisen|vereist|vereisten|norm|minimum|minimaal|maximaal|grens|grenzen|waarde|waarden|procent|%)\b/i.test(lower));
 
     if (isRTKennisVraag) {
       intenties.push("rt_kennis");
@@ -341,7 +343,7 @@
       !isStralingstijdVraag &&
       !isFocusVeranderingVraag &&
       !/\b(opnames?|draadje|bki|iqi|ffd|sfd|focus|onstream|wmax|lasfout|schedule|langsnaad|verzet|bundel|kv|zwarting)\b/i.test(lower) &&
-      (/\b(\d+(?:[.,]\d+)?\s*(?:meter|m\b|cm|mm|ci|curie)|lood|loden|pb|staal|fe|beton(?:nen)?|betonmuur|bakste(?:en|nen)|baksteenmuur|metselwerk|muur|afscherming|collimator|open\s+bundel|sterkste|zwakste|iridium|selenium|seleen|se-?75|ir-?192|zonder\s+(?:lood|afscherming|muur|beton|baksteen)|geen\s+(?:lood|afscherming|muur|beton|baksteen))\b/i.test(lower));
+      (/\b(\d+(?:[.,]\d+)?\s*(?:meter|m\b|cm|mm|ci|curie)|lood|loodplaat|loodplaten|loden|pb|staal|fe|beton(?:nen)?|betonmuur|bakste(?:en|nen)|baksteenmuur|metselwerk|muur|afscherming|collimator|open\s+bundel|sterkste|zwakste|iridium|selenium|seleen|se-?75|ir-?192|(?:zonder|geen)\s+(?:(?:de|het|een|extra)\s+)?(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen|lood|pb|afscherming|staal|muur|beton|baksteen|metselwerk))\b/i.test(lower));
 
     if (isAfzettingDirect || isAfzettingVervolg) {
       intenties.push("afzetting");
@@ -785,55 +787,86 @@
       }
     }
 
-    // Aantal loodplaten (bedrijfsstandaard: 1 loodplaat = 6 mm Pb, 2 loodplaten = 12 mm Pb, etc.)
-    const matchAantalPlaten =
-      lower.match(/\b(\d+|een|één|twee|drie|vier|vijf|zes|dubbel|dubbele|drievoudig|drievoudige)\s+(?:stuks?\s+)?(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\b/i) ||
-      lower.match(/\b(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\s*(?:van|x|\*|aantal|:\s*)?\s*(\d+)\b/i);
+    // Negatie-detectie per afschermingsmateriaal ("zonder de loodplaat", "geen betonmuur", "zonder afscherming", etc.)
+    const lidwoordOpt = "(?:(?:de|het|een|extra|die|dat|alle|enige)\\s+)*";
+    const wisAlleAfscherming = new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}afscherming\\b`, "i").test(lower);
+    const wisPb =
+      wisAlleAfscherming ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:loodplaten|loodplaat|loden\\s*platen|loden\\s*plaat|lood\\s*platen|lood\\s*plaat|loodafscherming|lood|pb)\\b`, "i").test(lower) ||
+      /\b0\s*(?:mm\s*)?(?:lood|pb|loodplaten|loodplaat)\b/i.test(lower);
+    const wisFe =
+      wisAlleAfscherming ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:staalplaat|staalplaten|staal|fe|ijzer)\\b`, "i").test(lower) ||
+      /\b0\s*mm\s*(?:staal|fe|ijzer)\b/i.test(lower);
+    const wisMuur = new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:tussenmuur|scheidingsmuur|muur|wand)\\b`, "i").test(lower);
+    const wisBeton =
+      wisAlleAfscherming ||
+      wisMuur ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:beton(?:nen)?(?:\\s*(?:muur|wand))?|betonmuur|betonwand)\\b`, "i").test(lower) ||
+      /\b0\s*(?:mm|cm)\s*beton\b/i.test(lower);
+    const wisBaksteen =
+      wisAlleAfscherming ||
+      wisMuur ||
+      new RegExp(`\\b(?:zonder|geen)\\s+${lidwoordOpt}(?:bakste(?:en|nen)(?:\\s*(?:muur|wand))?|baksteenmuur|stenen\\s*(?:muur|wand)|metselwerk)\\b`, "i").test(lower) ||
+      /\b0\s*(?:mm|cm)\s*(?:baksteen|metselwerk)\b/i.test(lower);
 
+    res.wisAlleAfscherming = wisAlleAfscherming;
+    res.wisPb = wisPb;
+    res.wisFe = wisFe;
+    res.wisBeton = wisBeton;
+    res.wisBaksteen = wisBaksteen;
+
+    // Aantal loodplaten (bedrijfsstandaard: 1 loodplaat = 6 mm Pb, 2 loodplaten = 12 mm Pb, etc.)
     let platenAantal = null;
-    if (matchAantalPlaten) {
-      const gStr = matchAantalPlaten[1].toLowerCase();
-      const wMap = {
-        een: 1, één: 1,
-        twee: 2, dubbel: 2, dubbele: 2,
-        drie: 3, drievoudig: 3, drievoudige: 3,
-        vier: 4,
-        vijf: 5,
-        zes: 6,
-      };
-      platenAantal = wMap[gStr] !== undefined ? wMap[gStr] : parseInt(gStr, 10);
-    } else if (/\b(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen)\b/i.test(lower)) {
-      platenAantal = 1;
+    if (!wisPb) {
+      const matchAantalPlaten =
+        lower.match(/\b(\d+|een|één|twee|drie|vier|vijf|zes|dubbel|dubbele|drievoudig|drievoudige)\s+(?:stuks?\s+)?(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\b/i) ||
+        lower.match(/\b(?:loodplaten|loodplaat|loden\s*platen|loden\s*plaat|lood\s*platen|lood\s*plaat)\s*(?:van|x|\*|aantal|:\s*)?\s*(\d+)\b/i);
+
+      if (matchAantalPlaten) {
+        const gStr = matchAantalPlaten[1].toLowerCase();
+        const wMap = {
+          een: 1, één: 1,
+          twee: 2, dubbel: 2, dubbele: 2,
+          drie: 3, drievoudig: 3, drievoudige: 3,
+          vier: 4,
+          vijf: 5,
+          zes: 6,
+        };
+        platenAantal = wMap[gStr] !== undefined ? wMap[gStr] : parseInt(gStr, 10);
+      } else if (/\b(?:loodplaat|loodplaten|loden\s*plaat|loden\s*platen|lood\s*plaat|lood\s*platen)\b/i.test(lower)) {
+        platenAantal = 1;
+      }
     }
 
     // Afzetting parameters
-    let matchPb = tekst.match(/(?:lood|pb)\s*(?:afscherming\s*)?(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i);
-    if (!matchPb) {
+    let matchPb = !wisPb ? tekst.match(/(?:lood|pb)\s*(?:afscherming\s*)?(?:van|is|op|:)?\s*(\d+(?:[.,]\d+)?)\s*(?:mm)?/i) : null;
+    if (!wisPb && !matchPb) {
       matchPb = tekst.match(/(\d+(?:[.,]\d+)?)\s*(?:mm)?\s*(?:lood|pb)(?!\s*platen|\s*plaat)(?:\s*afscherming)?\b/i);
     }
-    if (matchPb && !platenAantal) {
+    if (!wisPb && matchPb && !platenAantal) {
       res.pbMm = parseFloat(matchPb[1].replace(",", "."));
-    } else if (platenAantal && platenAantal > 0) {
+    } else if (!wisPb && platenAantal && platenAantal > 0) {
       res.aantalLoodplaten = platenAantal;
       res.pbMm = platenAantal * 6;
       matchPb = [`${platenAantal} loodplaten`, `${res.pbMm}`];
     }
-    if (/\b(zonder\s+(?:lood|pb|afscherming)|geen\s+(?:lood|pb|afscherming)|0\s*mm\s*(?:lood|pb))\b/i.test(lower)) {
+    if (wisPb) {
       res.pbMm = 0;
+      res.aantalLoodplaten = null;
+    }
+    if (wisFe) {
       res.feMm = 0;
-      res.betonMm = 0;
-      res.baksteenMm = 0;
-      res.muurOnbekendMm = 0;
-      res.verzetZonderAfscherming = true;
     }
-    if (/\b(zonder|geen)\s+(?:beton(?:nen)?|betonmuur|muur)\b/i.test(lower)) {
+    if (wisBeton) {
       res.betonMm = 0;
       res.muurOnbekendMm = 0;
-      res.verzetZonderAfscherming = true;
     }
-    if (/\b(zonder|geen)\s+(?:bakste(?:en|nen)|baksteenmuur|metselwerk|muur)\b/i.test(lower)) {
+    if (wisBaksteen) {
       res.baksteenMm = 0;
       res.muurOnbekendMm = 0;
+    }
+    if (wisAlleAfscherming || wisPb || wisFe || wisBeton || wisBaksteen) {
       res.verzetZonderAfscherming = true;
     }
 

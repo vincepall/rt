@@ -1604,9 +1604,21 @@
           if (actiefGespreksGeheugen.verwachtParameter === "isolatieMm") {
             actiefGespreksGeheugen.verwachtParameter = null;
           }
+        } else if (k === "wisAlleAfscherming" || k === "wisPb" || k === "wisFe" || k === "wisBeton" || k === "wisBaksteen") {
+          // Alleen per-beurt wistekens; worden hieronder per afschermingsmateriaal toegepast
         } else if (typeof nieuwParsed[k] === "number" && (k === "pbMm" || k === "feMm" || k === "betonMm" || k === "baksteenMm" || k === "muurOnbekendMm")) {
-          if (nieuwParsed[k] > 0 || nieuwParsed.verzetZonderAfscherming || /\b(lood|pb|staal|fe|beton|baksteen|metselwerk|muur|zonder|geen)\b/i.test(gefilterdeTekst)) {
+          const moetWissen =
+            Boolean(nieuwParsed.wisAlleAfscherming) ||
+            (k === "pbMm" && Boolean(nieuwParsed.wisPb)) ||
+            (k === "feMm" && Boolean(nieuwParsed.wisFe)) ||
+            (k === "betonMm" && Boolean(nieuwParsed.wisBeton)) ||
+            (k === "baksteenMm" && Boolean(nieuwParsed.wisBaksteen)) ||
+            (k === "muurOnbekendMm" && Boolean(nieuwParsed.wisBeton || nieuwParsed.wisBaksteen));
+          if (nieuwParsed[k] > 0 || moetWissen) {
             actiefGespreksGeheugen[k] = nieuwParsed[k];
+            if (k === "pbMm" && moetWissen && nieuwParsed[k] === 0) {
+              actiefGespreksGeheugen.aantalLoodplaten = null;
+            }
             if ((k === "betonMm" || k === "baksteenMm") && nieuwParsed[k] > 0) {
               actiefGespreksGeheugen.muurOnbekendMm = null;
               if (actiefGespreksGeheugen.verwachtParameter === "muurMateriaal") {
