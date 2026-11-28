@@ -33,7 +33,7 @@
 
     // Bronnen, Isotopen & Röntgen
     "Iridium", "Iridium-192", "Ir-192", "Selenium", "Selenium-75", "Se-75", "Kobalt", "Kobalt-60", "Co-60",
-    "Balteau", "Balteau Ceram", "Balteau Ceram 300", "Balteau Rondstraler", "directional", "Ceram",
+    "Balteau", "Balteau Ceram", "Balteau Ceram 300", "Balteau Ceram35P", "Ceram35P", "Balteau Rondstraler", "directional", "Ceram",
     "Yxlon", "Yxlon 300", "Smart EVO", "Smart EVO 300DS", "Smart 300",
     "röntgen", "röntgenbuis", "X-ray", "rondstraler", "collimator", "brongrootte", "focusgrootte", "bronkeuze", "focus",
     "focusafstand", "film focus afstand", "bron film afstand", "object film afstand", "focusverandering", "focuswissel", "openingshoek", "bundelhoek", "graden",
@@ -133,6 +133,7 @@
   // Normale Nederlandse woorden die nooit door de fuzzy-matcher veranderd mogen worden
   const NORMALE_NL_STOPWOORDEN = new Set([
     "aantal", "aantallen", "verdelen", "verdeling", "verdeel", "minimale", "veilige", "posities", "opname", "opnames",
+    "plaats", "plaatsen", "geplaatst", "leggen", "gelegd", "plakken", "geplakt", "rekening", "letten", "verplicht", "verplichte", "gegevens", "voorkeur", "scherpte", "contrast",
     "straal", "straalt", "stralen", "stalen", "minuut", "minuten", "seconde", "seconden", "bereken", "berekent", "berekenen", "hoeveel", "wanneer",
     "waarom", "waarmee", "waarbij", "waarop", "waarin", "waarvan", "hoelang", "hoever", "hoezo",
     "binnen", "buiten", "tussen", "zonder", "achter", "achteraan", "achteraf", "achtergrond", "achterkant",
@@ -1135,11 +1136,12 @@
       [/\b(\d+(?:[.,]\d+)?)\s*(?:juli|julie|jury|joelie)\b(?!\s*20\d\d)/gi, "$1 Curie"],
       [/\b(activiteid|aktieviteit|activitijd|bronsterkte|bron\s*sterkte)\b/gi, "activiteit"],
       // Röntgenbuizen & Merken fonetisch
-      [/\b(smart\s*evo|evo\s*300|smart\s*1\s*mm)\b(?!\s*\()/gi, "Smart EVO (1 mm)"],
+      [/\b(yxlon\s*smart(?:\s*evo)?|smart\s*evo|evo\s*300|smart\s*1\s*mm)\b(?!\s*\()/gi, "Smart EVO (1 mm)"],
       [/\b(yxlon\s*300|ikslon\s*300|ypsilon\s*300|smart\s*3\s*mm)\b(?!\s*\()/gi, "Yxlon 300 (3 mm)"],
       [/\b(ikslon|ixlon|x[\s-]*lon|xlon|epsilon|ypsilon|ijssel|ijslon|eikslon|ykslon|iks\s*lon|yks\s*lon|yxlon)\b(?!\s*300\b|\s*\()/gi, "Yxlon 300 (3 mm)"],
+      [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*)?(?:ceram|seram|keram|ceran)\s*35\s*p(?:\s*\(?rond\s*straler\)?)?\b(?!\s*\(rondstraler,\s*4\s*mm\))/gi, "Balteau Ceram35P (rondstraler, 4 mm)"],
       [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:rond\s*straler|panoramisch)|rond\s*straler|rondstralen)\b/gi, "Balteau Rondstraler (5 mm)"],
-      [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:ceram|seram|keram|ceran|directional)|(?:ceram|seram|keram|ceran)\s*300)\b/gi, "Balteau Ceram (2.5 mm)"],
+      [/\b((?:balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bauto|bal\s*touw|baltouw)\s*(?:ceram(?!\s*35\s*p)|seram(?!\s*35\s*p)|keram(?!\s*35\s*p)|ceran(?!\s*35\s*p)|directional)|(?:ceram|seram|keram|ceran)\s*300)\b/gi, "Balteau Ceram (2.5 mm)"],
       [/\b(balteau|balto|baltoo|ball\s*toe|bal\s*toe|ball?\s*to|baltoe|baltho|baltau|bal\s*touw|baltouw|bauto)\b(?!\s*\(|\s*rond\s*straler|\s*ceram|\s*seram)/gi, "Balteau (2.5 mm)"],
       // Begrippen
       [/\b(straling\s*tijd|stralings\s*tijd|belichting\s*tijd|belichtings\s*tijd|betalingstijd|vertalingstijd|herhalingstijd|belastingstijd|bestralingstijd|belichtingstijd|schiettijd|schiet\s*tijd|schietteid)\b/gi, "stralingstijd"],

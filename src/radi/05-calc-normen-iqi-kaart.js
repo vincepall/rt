@@ -285,7 +285,7 @@
       if (toonAlleMateriaalOpties) {
         chips.push("Bij 200 kV", "Met Se-75", "Met Ir-192", "Naar D4", "Naar D5");
       } else {
-        chips.push("Wis focusverandering", "Van 80 naar 100 cm", "Naar D4", "Naar D5");
+        chips.push("Van 80 naar 100 cm", "Naar D4", "Naar D5");
       }
     }
 
@@ -613,7 +613,7 @@
       const diaTekst = De ? ` op een <strong>${diaLabel}</strong>` : " op een pijp/buis";
       return `<strong>SWSI (Single Wall Single Image / Enkelwand Enkelbeeld)${diaTekst}:</strong><br><br>` +
              `Afhankelijk van waar de bron en de film worden geplaatst, kent EN ISO 17636-1 / ASME drie SWSI-opstellingen voor buizen:<br>` +
-             `• <strong>Opstelling 2 / C:</strong> Bron aan de buitenzijde, film aan de binnenzijde op de las.<br>` +
+             `• <strong>Opstelling 2 / C:</strong> Bron op afstand aan de buitenzijde, film aan de binnenzijde van het vat of de buis.<br>` +
              `• <strong>Opstelling 5 / A (Centraal / Panoramisch):</strong> Bron exact in het midden binnenin de buis, films buitenom (1 opname 360°).<br>` +
              `• <strong>Opstelling 8 / B (Excentrisch):</strong> Bron binnenin tegen de overliggende buiswand, film aan de buitenzijde.`;
     }
@@ -724,7 +724,7 @@
       return (
         "<strong>Groepering SWSI (Single Wall Single Image / EWEB):</strong><br>" +
         "• <strong>Opstelling 1:</strong> Vlakke plaat / plaatlassen.<br>" +
-        "• <strong>Opstelling 2 / C:</strong> Buisverbindingen (contact SWSI: bron buiten, film binnenin).<br>" +
+        "• <strong>Opstelling 2 / C:</strong> Bron op afstand aan de buitenzijde, film aan de binnenzijde van het vat of de buis (SWSI).<br>" +
         "• <strong>Opstelling 5 / A:</strong> Centraal / Centrale opstelling (panoramisch, 1 opname 360° van binnenuit).<br>" +
         "• <strong>Opstelling 8 / B:</strong> Excentrisch / Excentrische opstelling (bron binnenin tegen de wand, film buiten).<br>" +
         "<small style='opacity:0.85;'>Synoniemen: SWSI, Single Wall Single Image, EWEB, Enkel Wand Enkel Beeld.</small>"
@@ -803,7 +803,7 @@
     return (
       "<strong>Overzicht NDO Groeperingen & Opstellingen (EN ISO 17636-1 / ASME):</strong><br>" +
       "• <strong>Groepering DWDI:</strong> Opstelling 11 / F (ovaaltje, verzet) en Opstelling 12 / G (superpositie).<br>" +
-      "• <strong>Groepering SWSI:</strong> Opstelling 1 (plaat), Opstelling 2 / C (buis contact), Opstelling 5 / A (centraal), Opstelling 8 / B (excentrisch).<br>" +
+      "• <strong>Groepering SWSI:</strong> Opstelling 1 (plaat), Opstelling 2 / C (bron buiten op afstand, film binnenin), Opstelling 5 / A (centraal), Opstelling 8 / B (excentrisch).<br>" +
       "• <strong>Groepering DWSI:</strong> Opstelling 13 / E (X-ray), Opstelling 14 / E (gamma), Opstelling 15 (meervoudig).<br><br>" +
       "<strong>Synoniemen:</strong> CW = Rondnaad, LW = Langsnaad, DWEB = DWSI, EWEB = SWSI, DWDB = DWDI."
     );
@@ -819,7 +819,7 @@
       return (
         "<strong>Verschil tussen SWSI, DWSI en DWDI (EN ISO 17636-1 / ASME):</strong><br><br>" +
         "• <strong>SWSI (Single Wall Single Image / Enkelwand Enkelbeeld):</strong><br>" +
-        "De stralingsbundel passeert <strong>slechts één wand</strong> en beeldt deze direct af op de film (bijv. vlakke plaat opstelling 1, of leiding van binnenuit met centrale panoramische bron opstelling 5 / A of contact opstelling 2 / C). Biedt de <em>hoogste beeldkwaliteit en scherpte</em>.<br><br>" +
+        "De stralingsbundel passeert <strong>slechts één wand</strong> en beeldt deze direct af op de film (bijv. vlakke plaat opstelling 1, bron buiten op afstand met film binnenin opstelling 2 / C, of centrale panoramische bron opstelling 5 / A). Biedt de <em>hoogste beeldkwaliteit en scherpte</em>.<br><br>" +
         "• <strong>DWSI (Double Wall Single Image / Dubbelwand Enkelbeeld):</strong><br>" +
         "De straling gaat door <strong>twee wanden</strong> van de buis, maar alleen de <strong>wand aan de filmzijde</strong> wordt beoordeeld (bron buiten, film aan de overzijde, opstelling 13 / 14). Wordt standaard voorgeschreven voor leidingen met buitendiameter <strong>&gt; 100 mm</strong>.<br><br>" +
         "• <strong>DWDI (Double Wall Double Image / Dubbelwand Dubbelbeeld):</strong><br>" +
@@ -1328,6 +1328,232 @@
         "3. <strong>Fixeren (Fixer):</strong> Lost alle <strong>onbelichte</strong> zilverzouten op zodat de film lichtbestendig en blijvend transparant wordt op de niet-belichte delen. <em>(Vuistregel: 2&times; de ophelderingstijd).</em><br>" +
         "4. <strong>Spoelen (Washing):</strong> Spoelt alle achtergebleven fixeerchemicaliën weg met stromend water. Slecht spoelen veroorzaakt na verloop van tijd bruine/gele vlekken en aantasting van het archiefbeeld.<br>" +
         "5. <strong>Drogen (Drying):</strong> Droogt de film stofvrij in de droogkast zonder waterdruppels (vaak met een beetje netmiddel / wetting agent)."
+      );
+    }
+
+    // 19. BKI bronzijde vs filmzijde (voorkeur & waar op letten bij filmzijde)
+    if (/\b(voorkeur|liever|beter|waarom|rekening\s+mee\s+houden|waar\s+op\s+letten|op\s+letten|nodig|verplicht)\b/i.test(lower) && /\b(bki|iqi|draadje)\b/i.test(lower) && /\b(bronzijde|filmzijde)\b/i.test(lower)) {
+      if (chips) chips.push("Wanneer letter F?", "Hoe moet ik de BKI plaatsen?", "Hoeveel mm draad zichtbaar?");
+      const focusOpFilmzijde = /\bfilmzijde\b/i.test(lower) && !/\bbronzijde\b/i.test(lower);
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Regel (EN ISO 17636-1 &amp; ASME Sec. V T-277): de BKI moet altijd aan de <strong>bronzijde</strong> waar mogelijk.<br>` +
+        `• Ligt de BKI aan de <strong>filmzijde</strong> (bijv. bij DWSI waar binnenkant niet toegankelijk is): plaats verplicht een loden letter <strong>F</strong> naast de BKI (en let op eventueel andere draadkeuze / tabel voor filmzijde bij ASME).` +
+        `<div class="rt-ai-result">${focusOpFilmzijde ? "Bij BKI aan filmzijde: verplicht loden letter <strong>F</strong> plaatsen naast de BKI" : "Voorkeur: <strong>Altijd aan de bronzijde</strong> (filmzijde alleen indien niet toegankelijk, + letter <strong>F</strong>)"}</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 &amp; ASME Section V Art. 2 T-277).</small></div>`
+      );
+    }
+
+    // 20. Loden letter F
+    if (/\b(loodletter\s*f|loden\s*letter\s*f|letter\s*f\b)\b/i.test(lower)) {
+      if (chips) chips.push("Voorkeur bronzijde of filmzijde?", "Loodletter B", "Verplichte filmmarkeringen");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Betekenis: <strong>F = Film Side</strong> (BKI aan de filmzijde).<br>` +
+        `• Plaatsing: direct naast of bij de BKI op de filmzijde, duidelijk zichtbaar op de opname.` +
+        `<div class="rt-ai-result">Verplicht zodra de BKI aan de <strong>filmzijde</strong> wordt geplaatst</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 &amp; ASME Section V T-277.1).</small></div>`
+      );
+    }
+
+    // 21. Positie van de BKI op de las
+    if (/\b(waar\s+op\s+de\s+las|hoe\s+(?:moet|kan|mag)?\s*(?:ik|je|men)?\s*(?:de\s+|een\s+)?(?:bki|iqi)\s*(?:plaatsen|leggen|plakken|neerleggen|ori[eë]nteren)|hoe\s+(?:leg|plaats|plak)\s+(?:ik|je)\s+(?:de\s+|een\s+)?(?:bki|iqi)|positie\s+van\s+(?:de\s+)?(?:bki|iqi)|dunste\s+draad)\b/i.test(lower)) {
+      if (chips) chips.push("Hoeveel mm draad zichtbaar?", "Aantal BKI's bij panoramisch?", "Voorkeur bronzijde of filmzijde?");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Plaats: aan het <strong>einde van het te beoordelen lasgedeelte</strong> (waar de stralingshoek het ongunstigst is).<br>` +
+        `• Draad-BKI: <strong>dwars over de las</strong> leggen, zodat de draden loodrecht op de lasrichting liggen.<br>` +
+        `• Oriëntatie: met de <strong>dunste draden naar de buitenkant</strong> van de film gericht.` +
+        `<div class="rt-ai-result">Dwars over de las, aan het uiteinde, <strong>dunste draad naar buiten</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 &amp; ASME Section V T-277).</small></div>`
+      );
+    }
+
+    // 22. Aantal BKI's bij panoramische (360°) opname
+    if (/\b(hoeveel|aantal)\s*(?:bki'?s?|iqi'?s?)\b/i.test(lower) && /\b(panoram|centraal|360|rondom)\b/i.test(lower)) {
+      if (chips) chips.push("Waar op de las ligt de BKI?", "Minimale filmoverlap", "Verplichte filmmarkeringen");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Verdeling: gelijkmatig verdeeld rondom de omtrek op <strong>120°</strong> van elkaar (bijv. op 0°, 120° en 240°).<br>` +
+        `• Let op (ASME T-277.2): bij meer dan 4 films of variërende dikte kunnen extra BKI's nodig zijn (min. 1 per 4 films of per diktegebied).` +
+        `<div class="rt-ai-result">Minimaal <strong>3 BKI's</strong> gelijkmatig verdeeld op <strong>120°</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 &amp; ASME Section V T-277.2).</small></div>`
+      );
+    }
+
+    // 23. Zichtbare lengte van een BKI-draadje
+    if (/\b(hoeveel\s+mm|minimale?\s+lengte|zichtbare?\s+lengte|aaneengesloten)\b/i.test(lower) && /\b(draad|draadje|bki|iqi)\b/i.test(lower)) {
+      if (chips) chips.push("Waar op de las ligt de BKI?", "Hoeveel draadjes heeft een EN BKI?");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Beoordeling: het vereiste draadje moet duidelijk en ononderbroken zichtbaar zijn in een gebied met uniforme zwarting (las of aangrenzend grondmateriaal).` +
+        `<div class="rt-ai-result">Minimaal <strong>10 mm</strong> aaneengesloten zichtbaar</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 / EN ISO 19232-1).</small></div>`
+      );
+    }
+
+    // 24. Maximale grondsluier (base + fog)
+    if (/\b(grondsluier|sluierzwarting|base\s*\+?\s*fog|maximale\s+sluier|hoeveel\s+sluier)\b/i.test(lower)) {
+      if (chips) chips.push("Minimale zwarting Klasse B", "Dubbelfilm zwarting", "Donkere kamer stappen");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Definitie: de optische dichtheid van een onbelichte maar wel ontwikkelde film (filmbasis + emulsiesluier).<br>` +
+        `• Hoge grondsluier wijst op te oude film, te warme opslag, lichtlek of uitgeputte/te warme ontwikkelaar.` +
+        `<div class="rt-ai-result">Maximale grondsluier (base + fog): <strong>&le; 0.30</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 11699-1 / EN ISO 17636-1).</small></div>`
+      );
+    }
+
+    // 25. Dubbelfilm-techniek (multi-film) minimale zwarting
+    if (/\b(dubbelfilm|dubbel[-\s]?film|multi[-\s]?film|twee\s+films?\s+op\s+elkaar)\b/i.test(lower)) {
+      if (chips) chips.push("Minimale zwarting ASME", "Maximale grondsluier");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Toepassing: wanneer een werkstuk grote dikteverschillen heeft of om bij dubbele film op elkaar (composite viewing) te beoordelen.<br>` +
+        `• Samengelegd moeten beide films samen binnen de normale zwartingsnorm vallen (1.8/2.0 tot 4.0).` +
+        `<div class="rt-ai-result">Per afzonderlijke film minimaal <strong>1.3</strong> (samengelegd binnen <strong>1.8/2.0 &ndash; 4.0</strong>)</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform ASME Section V Art. 2 T-282.1).</small></div>`
+      );
+    }
+
+    // 26. Minimale filmoverlap
+    if (/\b(filmoverlap|minimale?\s+overlap|hoeveel\s+overlap)\b/i.test(lower)) {
+      if (chips) chips.push("Verplichte filmmarkeringen", "Aantal BKI's bij panoramisch?");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Doel: garanderen dat 100% van de laslengte binnen het bruikbare, onvertekende filmgebied valt.<br>` +
+        `• Plaats altijd overlap-loodmarkeringen (locatienummers/streepjes) zodat op beide aansluitende films exact te controleren is waar ze overlappen.` +
+        `<div class="rt-ai-result">Praktijk &amp; norm: minimaal <strong>25 &ndash; 30 mm</strong> overlap (loodmarkering zichtbaar op beide films)</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 &amp; ASME Section V T-275).</small></div>`
+      );
+    }
+
+    // 27. Verplichte filmmarkeringen & loodcijfers
+    if (/\b(filmmarkering|filmmarkeringen|loodcijfers?|verplichte?\s+markering|wat\s+moet\s+er\s+(?:allemaal\s+)?op\s+(?:de\s+|een\s+)?film\s+staan|welke\s+gegevens\s+.*op\s+(?:de\s+|een\s+)?film|reparatielas|r1\s*(?:en|of)?\s*r2)\b/i.test(lower)) {
+      if (chips) chips.push("Wanneer letter F?", "Loodletter B", "Minimale filmoverlap");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• <strong>Project- / lasnummer</strong> (unieke traceerbaarheid naar tekening/isometrie)<br>` +
+        `• <strong>Film- / positienummer</strong> &amp; <strong>overlapmarkeringen</strong> (bijv. 0, 1, 2…)<br>` +
+        `• <strong>Datum van de opname</strong> (bij <strong>ASME</strong> verplicht op de film)<br>` +
+        `• <strong>BKI / IQI</strong> (en letter <strong>F</strong> indien aan filmzijde)<br>` +
+        `• <strong>Loodletter B</strong> achterop de cassette (controle op terugverstrooiing)<br>` +
+        `• <strong>Reparatie-aanduiding</strong> indien van toepassing: <strong>R1</strong>, <strong>R2</strong>, enz.` +
+        `<div class="rt-ai-result">Elke film moet <strong>100% uniek en blijvend herleidbaar</strong> zijn (bij ASME incl. <strong>datum</strong>)</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 &amp; ASME Section V Art. 2 T-275).</small></div>`
+      );
+    }
+
+    // 28. Diktetolerantie Klasse A (20%) vs Klasse B (10%)
+    if (/\b(diktetolerantie|diktetoename|dikteverhouding)\b/i.test(lower) && /\b(klasse\s*[ab]|10%|20%|verschil)\b/i.test(lower)) {
+      if (chips) chips.push("Aantal opnames", "Minimale FFD formule", "Verschil SWSI en DWSI");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Naar de randen van de film gaat de straling schuiner door de buiswand, waardoor de doorstraalde dikte toeneemt.<br>` +
+        `• <strong>EN Klasse A (en ASME):</strong> max. <strong>20%</strong> diktetoename (&Delta;w/w &le; 1.2) &rarr; minder opnames nodig.<br>` +
+        `• <strong>EN Klasse B:</strong> max. <strong>10%</strong> diktetoename (&Delta;w/w &le; 1.1) &rarr; strenger, dus vaker meer opnames nodig.` +
+        `<div class="rt-ai-result">Klasse A: max. <strong>20%</strong> (1.2&times;) &nbsp;|&nbsp; Klasse B: max. <strong>10%</strong> (1.1&times;)</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1).</small></div>`
+      );
+    }
+
+    // 29. Verplichte stralingsmeters voor een radiograaf
+    if (/\b(stralingsmeters?|verplichte?\s+(?:meters?|meetapparatuur)|welke\s+meters?\s+.*radiograaf|tld\s*badge|beosl)\b/i.test(lower)) {
+      if (chips) chips.push("Broncontrole na indraaien", "ALARA principe", "Dosislimiet medewerker");
+      return (
+        `<div class="rt-ai-calc">` +
+        `1. <strong>Persoonsdosismeter (TLD / BeOSL / filmbadge):</strong> registreert de officiële cumulatieve jaardosis.<br>` +
+        `2. <strong>Elektronische alarmerende dosismeter (EPD):</strong> directe uitlezing + akoestisch alarm bij hoge dosis/dosistempo.<br>` +
+        `3. <strong>Gekalibreerde dosistempometer (Geiger-Müller / survey meter):</strong> om afzettingen uit te meten en na elke opname te controleren of de bron veilig terug in de container zit.` +
+        `<div class="rt-ai-result">Altijd <strong>3 meters</strong>: TLD/BeOSL-badge + alarmerende EPD + gekalibreerde dosistempometer</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform wettelijke stralingsbeschermingsregels &amp; VCA/NDO-voorschriften).</small></div>`
+      );
+    }
+
+    // 30. Broncontrole na indraaien
+    if (/\b(broncontrole|veilig\s+(?:terug\s+)?in\s+de\s+container|controleren\s+.*container|na\s+het\s+indraaien)\b/i.test(lower)) {
+      if (chips) chips.push("Verplichte stralingsmeters", "Bron zit vast", "ALARA principe");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Vertrouw <strong>nooit</strong> alleen op het telwerk, de eindschakelaar of de groene indicator op de container.<br>` +
+        `• Loop na het indraaien altijd met een <strong>ingeschakelde dosistempometer</strong> langs de geleidebuis helemaal naar de container en meet rondom de uitgang.` +
+        `<div class="rt-ai-result">Altijd fysiek <strong>nameten met de dosistempometer</strong> langs de hele geleidebuis tot op de container</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Cruciale veiligheidsregel ter voorkoming van bron-incidenten / achtergebleven bron).</small></div>`
+      );
+    }
+
+    // 31. Verschil tussen contrast en scherpte (definitie)
+    if (/\bcontrast\b/i.test(lower) && /\b(scherpte|definitie|onscherpte)\b/i.test(lower)) {
+      if (chips) chips.push("Geometrische onscherpte", "Film D4 vs D7", "KV-regel uitleg");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• <strong>Contrast:</strong> het <strong>zwartingsverschil</strong> tussen aangrenzende gebieden op de film (bijv. een gaspit t.o.v. het omliggende staal). Wordt beter bij lagere kV, fijnkorrelige film (D4) en hogere zwarting.<br>` +
+        `• <strong>Scherpte (definitie):</strong> hoe <strong>strak de rand</strong> van een detail of fout is afgetekend (weinig onscherpte <i>U</i><sub>g</sub>). Wordt beter bij kleine brongrootte, grote FFD, kleine OFA en goed film-schermcontact.` +
+        `<div class="rt-ai-result">Contrast = <strong>zwartingsverschil</strong> &nbsp;|&nbsp; Scherpte = <strong>strakke randafbeelding</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Beide samen bepalen de uiteindelijke beeldkwaliteit / gevoeligheid op de film).</small></div>`
+      );
+    }
+
+    // 32. Shim onder ASME Hole-Type IQI
+    if (/\bshim\b/i.test(lower) && /\b(onder|wanneer|waarom|overdikte|lasoverdikte|gebruik)\b/i.test(lower)) {
+      if (chips) chips.push("Verschil ASME en EN BKI", "Hole-Type IQI uitleg", "Hoe moet ik de BKI plaatsen?");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Regel (ASME Sec. V T-277.1): een Hole-Type plaatjes-IQI mag naast de las op het grondmateriaal liggen, maar de las is door de <strong>lasoverdikte</strong> dikker.<br>` +
+        `• Leg daarom een <strong>shim</strong> (onderlegplaatje) van radiografisch gelijkwaardig materiaal onder het plaatje zodat de totale dikte onder de IQI gelijk is aan de <strong>totale lasdikte</strong> (wanddikte + overdikte).<br>` +
+        `• De shim moet aan minimaal 3 zijden van het IQI-plaatje uitsteken (zichtbaar op de film).` +
+        `<div class="rt-ai-result">Shim gebruiken wanneer een <strong>ASME Hole-Type IQI</strong> op het grondmateriaal naast een las met overdikte ligt</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform ASME Section V Art. 2 T-277.1; bij draad-BKI's dwars over de las is geen shim nodig).</small></div>`
+      );
+    }
+
+    // 33. Beoordelingsgebied buiten de las (HAZ)
+    if (/\b(haz|warmtebe[iï]nvloede\s*zone|buiten\s+de\s+las|naast\s+de\s+las)\b/i.test(lower) && /\b(beoordel|mm|hoeveel|grondmateriaal|film)\b/i.test(lower)) {
+      if (chips) chips.push("Minimale filmoverlap", "Verplichte filmmarkeringen");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Naast de las zelf moet ook de <strong>warmtebeïnvloede zone (HAZ)</strong> en het aangrenzende grondmateriaal op de film zichtbaar en beoordeelbaar zijn.<br>` +
+        `• Kies daarom de filmbreedte (bijv. 6 cm of 10 cm) ruim genoeg zodat de las gecentreerd ligt.` +
+        `<div class="rt-ai-result">Las + minimaal <strong>10 mm</strong> (in de praktijk vaak 15&ndash;25 mm) grondmateriaal aan <strong>beide zijden</strong> van de las</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1).</small></div>`
+      );
+    }
+
+    // 34. Grote wanddiktesprong in één opname
+    if (/\b(wanddiktesprong|diktesprong|grote\s+dikteverschil|verschillende\s+wanddiktes?\s+in\s+(?:een|1)\s+opname)\b/i.test(lower)) {
+      if (chips) chips.push("Dubbelfilm zwarting", "Minimale zwarting Klasse B", "Film D4 vs D7");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• Eén opname is alleen toegestaan zolang de <strong>zwarting</strong> over het volledige te beoordelen gebied binnen de normgrenzen blijft (en het juiste BKI-draadje zichtbaar is).<br>` +
+        `• Bij te grote diktesprong (dun deel te zwart, dik deel te licht): gebruik de <strong>dubbelfilm-techniek</strong> (bijv. D4 + D7 in één cassette) óf maak <strong>aparte opnames</strong> per wanddikte.` +
+        `<div class="rt-ai-result">Alleen in 1 opname als de <strong>zwarting overal binnen de norm</strong> blijft &mdash; anders <strong>dubbelfilm</strong> of <strong>2 losse opnames</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Conform EN ISO 17636-1 &amp; ASME Section V).</small></div>`
+      );
+    }
+
+    // 35. Opwarmprocedure (warm-up) van een röntgenbuis
+    if (/\b(opwarmen|opwarmprocedure|warm[-\s]?up|inbranden)\b/i.test(lower)) {
+      if (chips) chips.push("KV-regel uitleg", "Buistabel berekenen");
+      return (
+        `<div class="rt-ai-calc">` +
+        `• <strong>Waarom:</strong> na stilstand (nacht, weekend of weken) kunnen restgassen of micro-onregelmatigheden op de elektroden in de vacuümbuis elektrische <strong>doorslag (arcing)</strong> veroorzaken, wat de buis permanent beschadigt.<br>` +
+        `• <strong>Hoe:</strong> volg het automatische warm-up programma van de bedieningskast (stapsgewijs kV opvoeren bij lage mA tot max. werkspanning). Hoe langer de buis heeft stilgestaan, hoe langer de opwarmtijd.` +
+        `<div class="rt-ai-result">Altijd <strong>stapsgewijs opwarmen</strong> na stilstand om doorslag (arcing) en buisschade te voorkomen</div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Volg altijd de specifieke warm-up tabel van de fabrikant, bijv. Balteau / Yxlon / Smart EVO).</small></div>`
+      );
+    }
+
+    // 36. Noodprocedure: gammabron zit vast
+    if (/\b(vastzit|vast\s+zit|niet\s+terug|klem\s+zit|blijft\s+hangen|noodprocedure)\b/i.test(lower) && /\b(bron|gammabron|container|indraaien|kabel|geleidebuis)\b/i.test(lower)) {
+      if (chips) chips.push("Broncontrole na indraaien", "Verplichte stralingsmeters", "ALARA principe");
+      return (
+        `<div class="rt-ai-calc">` +
+        `1. <strong>Kalm blijven &amp; direct afstand nemen</strong> — forceer het slingermechanisme of de geleidebuis <strong>niet</strong> en raak de bron nooit aan.<br>` +
+        `2. <strong>Ruim afzetten &amp; bewaken:</strong> vergroot de afzetting tot ruim onder 10 &mu;Sv/h en laat niemand de zone betreden.<br>` +
+        `3. <strong>Direct melden:</strong> waarschuw onmiddellijk <strong>HSQE</strong> / leidinggevende en volg zijn/haar instructies op.<br>` +
+        `4. <strong>Blijf op veilige afstand toezicht houden</strong> en noteer je eigen dosismeterstand.` +
+        `<div class="rt-ai-result">NOOIT forceren of aanraken &mdash; direct <strong>afstand nemen, ruim afzetten en HSQE alarmeren</strong></div>` +
+        `<small style="opacity:0.85; display:block; margin-top:6px;">(Volg altijd het bedrijfsnoodplan voor stralingsincidenten).</small></div>`
       );
     }
 
@@ -2207,7 +2433,7 @@
     }
 
     if (chips) {
-      chips.push(`${info.wt} mm`, "Min FFD", "Aantal opnames", "Stralingstijd");
+      chips.push("Aantal opnames", "Minimale FFD", "BKI draadje", "Stralingstijd");
     }
 
     return `<div class="rt-ai-calc">` +

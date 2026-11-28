@@ -261,7 +261,8 @@
     "Wat betekent R.A.D.I?",
     "Wat is de minimale focus voor een 3 duimer volgens klasse B?",
     "Ik heb 20 mA*min op 80 op D4, hoelang moet ik stralen op 56 op D5 met 4 mA?",
-    "Verdeel een 6 duimer in 6 opnames."
+    "Verdeel een 6 duimer in 6 opnames.",
+    "Wat is het verschil tussen scherpte en contrast?"
   ];
 
   let geladenStartschermVragen = null;
@@ -747,6 +748,82 @@
     renderGeheugenBalk();
   }
 
+  function geefSlimmeFallback(vraagTekst, chips = []) {
+    const tekst = String(vraagTekst || "").trim();
+    const stop = new Set([
+      "wat", "hoe", "wie", "waar", "wanneer", "waarom", "welk", "welke", "een", "het", "van", "voor",
+      "met", "mijn", "jouw", "kan", "mag", "moet", "zijn", "heb", "hebt", "heeft", "wil", "deze",
+      "dit", "dat", "naar", "over", "bij", "als", "dan", "nog", "ook", "niet", "geen", "ergens",
+      "iets", "alles", "maar", "of", "en", "in", "op", "te", "aan", "uit", "om", "er", "ik", "je",
+    ]);
+    const tokens = tekst
+      .toLowerCase()
+      .replace(/[^a-z0-9äëïöüéèêáàóòúù\-\s]/gi, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 3 && !stop.has(w));
+
+    const bronLijst = (typeof STANDAARD_VOORBEELDVRAGEN !== "undefined" && Array.isArray(STANDAARD_VOORBEELDVRAGEN))
+      ? STANDAARD_VOORBEELDVRAGEN
+      : [];
+
+    const gescoord = [];
+    if (tokens.length > 0 && bronLijst.length > 0) {
+      for (const item of bronLijst) {
+        const hay = `${item.categorie || ""} ${item.type || ""} ${item.voorbeeld || ""} ${item.toelichting || ""}`.toLowerCase();
+        let score = 0;
+        for (const tok of tokens) {
+          if (hay.includes(tok)) {
+            score += (item.type && item.type.toLowerCase().includes(tok)) ? 3 : 2;
+          } else if (tok.length >= 5 && hay.includes(tok.slice(0, 4))) {
+            score += 1;
+          }
+        }
+        if (score > 0 && item.voorbeeld) {
+          gescoord.push({ score, voorbeeld: item.voorbeeld, type: item.type });
+        }
+      }
+      gescoord.sort((a, b) => b.score - a.score);
+    }
+
+    const topSuggesties = gescoord.slice(0, 3);
+    let extraHtml = "";
+    if (topSuggesties.length > 0) {
+      const lijstItems = topSuggesties
+        .map((s) => {
+          const safeJs = s.voorbeeld.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+          return `<div style="margin-top:4px;">• <a href="#" class="ai-link" onclick="event.preventDefault(); window.RtAssistant && window.RtAssistant.verstuurSuggestie('${safeJs}')">${escapeHtmlTekst(s.voorbeeld)}</a></div>`;
+        })
+        .join("");
+      extraHtml = `<div style="margin-top:8px;"><strong>Bedoelde je misschien:</strong>${lijstItems}</div>`;
+    } else if (
+      typeof actiefGespreksGeheugen !== "undefined" &&
+      actiefGespreksGeheugen &&
+      actiefGespreksGeheugen.diameter
+    ) {
+      const diaLbl = formatMmNaarDuimLabel(actiefGespreksGeheugen.diameter);
+      const wtLbl = actiefGespreksGeheugen.wanddikte ? ` (${actiefGespreksGeheugen.wanddikte} mm dik)` : "";
+      extraHtml = `<div style="margin-top:6px;">Ik heb nog <strong>${diaLbl}${wtLbl}</strong> in mijn geheugen &mdash; kies hieronder wat je wilt berekenen.</div>`;
+      if (chips) chips.push("Aantal opnames", "Minimale FFD", "BKI draadje", "Stralingstijd", "Veilige afzetting");
+    } else if (chips && chips.length === 0) {
+      chips.push("Stralingstijd berekenen", "Aantal opnames", "Minimale FFD", "Veilige afzetting");
+    }
+
+    const actieKnoppen =
+      `<div class="rt-ai-timer-row" style="margin-top:10px;">` +
+      `<button type="button" class="rt-ai-timer-btn" onclick="window.RtAssistant && window.RtAssistant.meldFoutViaMail()">✉️ Vraag insturen</button>` +
+      `<button type="button" class="rt-ai-timer-btn" onclick="window.RtAssistant && window.RtAssistant.toggleVoorbeeldVragen()">📋 Alle voorbeelden</button>` +
+      `</div>`;
+
+    return (
+      `<div class="rt-ai-calc">` +
+      `Deze vraag herken ik nog niet helemaal (of ik heb een woord verkeerd verstaan).` +
+      `${extraHtml}` +
+      `${actieKnoppen}` +
+      `<small style="opacity:0.8; display:block; margin-top:6px;">Mist er een onderwerp of vraag? Tik op <strong>Vraag insturen</strong> zodat hij toegevoegd kan worden.</small>` +
+      `</div>`
+    );
+  }
+
   function renderGeheugenBalk() {
     if (typeof document === "undefined") return;
     const bar = document.getElementById("rt-ai-memory-bar");
@@ -782,16 +859,17 @@
         .join("");
     }
 
-    const isSmart = (curTekst.includes("smart evo") || curTekst === "smart") && curSize === 1;
-    const isYxlon = curTekst.includes("yxlon") || (curTekst.includes("300") && curSize === 3);
-    const isCeram = curTekst.includes("ceram") || (curTekst.includes("balteau") && curSize === 2.5);
-    const isRondstraler = curTekst.includes("rondstraler") || (curTekst.includes("balteau") && curSize === 5);
+    const isSmart = curTekst.includes("smart evo") || curTekst === "smart";
+    const isYxlon = !isSmart && (curTekst.includes("yxlon") || (curTekst.includes("300") && curSize === 3));
+    const isCeram35P = curTekst.includes("ceram35p") || curTekst.includes("ceram 35p") || (curTekst.includes("rondstraler") && curSize === 4);
+    const isCeram = !isCeram35P && (curTekst.includes("ceram") || (curTekst.includes("balteau") && curSize === 2.5));
+    const isRondstraler = !isCeram35P && (curTekst.includes("rondstraler") || (curTekst.includes("balteau") && curSize === 5));
     const hasKnownName = (bronnenData || []).some(
       (b) => curTekst === b.name.toLowerCase() || curTekst.startsWith(b.name.toLowerCase() + " ")
     );
-    const isGenSe = !isSmart && !isYxlon && !isCeram && !isRondstraler && !hasKnownName && (curType === "se75" || curTekst.includes("se-75") || curTekst.includes("selenium"));
-    const isGenIr = !isSmart && !isYxlon && !isCeram && !isRondstraler && !hasKnownName && (curType === "ir192" || curTekst.includes("ir-192") || curTekst.includes("iridium"));
-    const isGenCo = !isSmart && !isYxlon && !isCeram && !isRondstraler && !hasKnownName && (curType === "co60" || curTekst.includes("co-60") || curTekst.includes("kobalt"));
+    const isGenSe = !isSmart && !isYxlon && !isCeram && !isCeram35P && !isRondstraler && !hasKnownName && (curType === "se75" || curTekst.includes("se-75") || curTekst.includes("selenium"));
+    const isGenIr = !isSmart && !isYxlon && !isCeram && !isCeram35P && !isRondstraler && !hasKnownName && (curType === "ir192" || curTekst.includes("ir-192") || curTekst.includes("iridium"));
+    const isGenCo = !isSmart && !isYxlon && !isCeram && !isCeram35P && !isRondstraler && !hasKnownName && (curType === "co60" || curTekst.includes("co-60") || curTekst.includes("kobalt"));
 
     const isAnySelected = Boolean(
       actiefGespreksGeheugen.bronTekst ||
@@ -810,6 +888,7 @@
           <option value="smart" ${isSmart ? "selected" : ""} style="background:#222; color:#fff;">Smart EVO (1.0 mm focus)</option>
           <option value="yxlon_300" ${isYxlon ? "selected" : ""} style="background:#222; color:#fff;">Yxlon 300 (3.0 mm focus)</option>
           <option value="balteau_ceram" ${isCeram ? "selected" : ""} style="background:#222; color:#fff;">Balteau Ceram (2.5 mm focus)</option>
+          <option value="balteau_ceram35p" ${isCeram35P ? "selected" : ""} style="background:#222; color:#fff;">Balteau Ceram35P (rondstraler, 4.0 mm)</option>
           <option value="balteau_rondstraler" ${isRondstraler ? "selected" : ""} style="background:#222; color:#fff;">Balteau Rondstraler (5.0 mm focus)</option>
         </optgroup>
         <optgroup label="Generieke Isotopen" style="background:#222; color:#ccc;">
@@ -828,8 +907,8 @@
       wisGeheugenParameter("bron");
       return;
     }
-    const wasRondstraler = Boolean(actiefGespreksGeheugen.bronTekst && /rondstraler/i.test(actiefGespreksGeheugen.bronTekst));
-    if (wasRondstraler && val !== "balteau_rondstraler") {
+    const wasRondstraler = Boolean(actiefGespreksGeheugen.bronTekst && /rondstraler|ceram\s*35\s*p/i.test(actiefGespreksGeheugen.bronTekst));
+    if (wasRondstraler && val !== "balteau_rondstraler" && val !== "balteau_ceram35p") {
       if (actiefGespreksGeheugen.optie === "1") actiefGespreksGeheugen.optie = null;
       if (actiefGespreksGeheugen.opstelling === "Opstelling 5/A (centraal)") actiefGespreksGeheugen.opstelling = null;
       if (actiefGespreksGeheugen.technique === "SWSI") actiefGespreksGeheugen.technique = null;
@@ -863,6 +942,17 @@
       actiefGespreksGeheugen.bronType = "Rontgen";
       actiefGespreksGeheugen.brongrootte = 2.5;
       actiefGespreksGeheugen.activiteit = null;
+    } else if (val === "balteau_ceram35p") {
+      actiefGespreksGeheugen.bronTekst = "Balteau Ceram35P (rondstraler, 4.0 mm)";
+      actiefGespreksGeheugen.bronType = "Rontgen";
+      actiefGespreksGeheugen.brongrootte = 4.0;
+      actiefGespreksGeheugen.activiteit = null;
+      actiefGespreksGeheugen.optie = "1";
+      actiefGespreksGeheugen.technique = "SWSI";
+      actiefGespreksGeheugen.opstelling = "Opstelling 5/A (centraal)";
+      if (actiefGespreksGeheugen.diameter && actiefGespreksGeheugen.diameter > 0) {
+        actiefGespreksGeheugen.sfd = Math.round(actiefGespreksGeheugen.diameter / 2);
+      }
     } else if (val === "balteau_rondstraler") {
       actiefGespreksGeheugen.bronTekst = "Balteau Rondstraler (5.0 mm)";
       actiefGespreksGeheugen.bronType = "Rontgen";
@@ -1554,7 +1644,7 @@
     }
 
     // Als de gebruiker vraagt: "En wat als ik het centraal / met de rondstraler doe?"
-    if (/\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(gefilterdeTekst)) {
+    if (/\b(centraal|panoram|panoramisch|rondstraler|rondstralen|ceram\s*35\s*p)\b/i.test(gefilterdeTekst) && actiefGespreksGeheugen.laatsteIntentie !== "bundel") {
       actiefGespreksGeheugen.optie = "1";
       actiefGespreksGeheugen.technique = "SWSI";
       actiefGespreksGeheugen.opstelling = "Opstelling 5/A (SWSI centraal)";
@@ -1690,7 +1780,8 @@
       (intenties.length === 1 && (
         intenties[0] === "overzicht" ||
         (!isVraagZin && intenties[0] === "min_ffd" && nieuwParsed.sfd !== null && !/\b(wat|welk|welke|bereken|hoeveel)\b/i.test(gefilterdeTekst)) ||
-        (!isVraagZin && intenties[0] === "activiteit" && (nieuwParsed.activiteit !== null || nieuwParsed.bronTekst !== null))
+        (!isVraagZin && intenties[0] === "activiteit" && (nieuwParsed.activiteit !== null || nieuwParsed.bronTekst !== null)) ||
+        (!isVraagZin && intenties[0] === "opnames" && actiefGespreksGeheugen.laatsteIntentie === "bundel" && nieuwParsed.bronTekst !== null && nieuwParsed.diameter === null && !/\b(opname|opnames|hoeveel|aantal)\b/i.test(gefilterdeTekst))
       ));
 
     const isAanvullendeData =
@@ -1740,15 +1831,11 @@
           intenties = ["afzetting"];
         } else if (!heeftNieuweParameter && !isVraagZin && !context.isChip) {
           renderGeheugenBalk();
+          const fbChips = [];
+          const fbText = geefSlimmeFallback(gefilterdeTekst, fbChips);
           return {
-            text: `Ik beantwoord graag je RT-vraag. Stel gerust een specifieke vraag over stralingstijd, opnames, FFD, afzetting of onstream.`,
-            chips: [
-              "Stralingstijd berekenen",
-              "Aantal opnames",
-              "Minimale FFD",
-              "Veilige afzetting",
-              "Onstream opname",
-            ],
+            text: fbText,
+            chips: fbChips,
           };
         }
       }
@@ -2178,7 +2265,7 @@
         if (!uitgevoerdeHandlers.has("overzicht")) {
           uitgevoerdeHandlers.add("overzicht");
           if (!params.diameter) {
-            antwoorden.push("Stel gerust een specifieke vraag over afzetting (bijv. 25 Ci Se-75), onstream (bijv. 6 duim 6 dik), draadjes, opnames of FFD.");
+            antwoorden.push(geefSlimmeFallback(gefilterdeTekst, chips));
           } else if (!params.wanddikte && !(params.diameter < 100)) {
             chips.push("4 mm dik", "6 mm dik", "8 mm dik", "Schedule 40", "Schedule 80");
             antwoorden.push(`Om de volledige inspectiegegevens voor ${formatMmNaarDuimLabel(params.diameter)} te berekenen heb ik de <strong>wanddikte</strong> of het <strong>schedule</strong> nodig. Wat is de wanddikte?`);
@@ -2259,7 +2346,7 @@
             antwoorden.push(`Het benodigde verzet voor ovaaltje (${formatMmNaarDuimLabel(De)}, lasbreedte ${lb} mm op ${sfd} mm FFD conform Opstelling 11/F) is: <span class="rt-ai-result">${vz.toFixed(1)} mm</span> (2 opnames onder 90°).`);
           }
         } else if (antwoorden.length === 0) {
-          antwoorden.push(`Vraag ontvangen over RT. Stel gerust een specifieke vraag over afzetting (bijv. 25 Ci Se-75), onstream (bijv. 6 duim 6 dik), draadjes, opnames of FFD.`);
+          antwoorden.push(geefSlimmeFallback(gefilterdeTekst, chips));
         }
       }
     }

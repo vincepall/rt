@@ -86,7 +86,7 @@ RR3999,Se75,70.54,03-09-2026,3`;
 
     // Bij een centrale / panoramische opstelling altijd Rondstraler als eerste suggestie
     if (isCentraal) {
-      chips.push("Balteau Rondstraler (5 mm)");
+      chips.push("Balteau Ceram35P (rondstraler, 4 mm)", "Balteau Rondstraler (5 mm)");
     }
 
     if (Array.isArray(bronnenData) && bronnenData.length > 0) {
@@ -103,7 +103,7 @@ RR3999,Se75,70.54,03-09-2026,3`;
     if (!isSe && !isIr) {
       chips.push("Smart EVO (1 mm)", "Yxlon 300 (3 mm)", "Balteau (2.5 mm)");
       if (!isCentraal) {
-        chips.push("Balteau Rondstraler (5 mm)");
+        chips.push("Balteau Ceram35P (rondstraler, 4 mm)", "Balteau Rondstraler (5 mm)");
       }
     }
     return chips;
@@ -579,8 +579,8 @@ Magnesium Zuiver,AZ31 / Zuiver Mg,Exotisch & Speciaal,0.05,0.08,0.10,0.12,1.74,U
       optie: "",
       isPlaat: false,
       synoniemen: ["opstelling 2", "opstelling c", "opstelling 2/c", "opstelling 2 / c"],
-      titel: "Opstelling 2 / C (SWSI buis)",
-      beschrijving: "Enkelwandige doorstraling van buizen (Single Wall Single Image / EWEB). Bron aan buitenzijde, film aan binnenzijde (contact SWSI).",
+      titel: "Opstelling 2 / C (SWSI bron buiten op afstand, film binnenin)",
+      beschrijving: "Enkelwandige doorstraling van een vat of buis (Single Wall Single Image / EWEB). De bron staat op afstand aan de buitenzijde en de film zit aan de binnenzijde van het vat of de buis.",
     },
     "5": {
       code: "5/A",

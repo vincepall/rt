@@ -85,7 +85,26 @@
       /\b(loodscherm|loodschermen|loodschermpje|loodschermpjes|versterkingsscherm|versterkingsschermen|versterkingsfolie|lood\s*folies?|lead\s*screens?|waarom\s+lood\s+in\s+(?:de\s+)?cassette)\b/i.test(lower) ||
       (/\b(formule\s+(?:voor|van)\s+(?:het\s+)?(?:radioactief\s+)?verval|hoe\s+bereken\s+(?:je|ik|men)\s+(?:het\s+)?(?:radioactief\s+)?verval|vervalformule|verval\s+formule)\b/i.test(lower) && !/\b\d+(?:[.,]\d+)?\s*(?:ci|curie|dagen|weken|maanden|jaar)\b/i.test(lower)) ||
       (/\b(wat\s+is\s+(?:een\s+)?equivalentiefactor|uitleg\s+equivalentiefactor|hoe\s+werkt\s+(?:een\s+)?equivalentiefactor|wat\s+is\s+staalequivalent)\b/i.test(lower)) ||
-      /\b(donkere\s+kamer|film\s+ontwikkelen|stappen\s+(?:van\s+)?(?:film\s*)?ontwikkelen|ontwikkelproces|waarom\s+fixeren|functie\s+(?:van\s+)?(?:het\s+)?(?:stopbad|fixeerbad|ontwikkelbad))\b/i.test(lower);
+      /\b(donkere\s+kamer|film\s+ontwikkelen|stappen\s+(?:van\s+)?(?:film\s*)?ontwikkelen|ontwikkelproces|waarom\s+fixeren|functie\s+(?:van\s+)?(?:het\s+)?(?:stopbad|fixeerbad|ontwikkelbad))\b/i.test(lower) ||
+      // Nieuwe normvragen (EN ISO 17636-1 / EN ISO 11699-1 / ASME Sec. V)
+      (/\b(voorkeur|liever|beter|waarom|rekening\s+mee\s+houden|waar\s+op\s+letten|op\s+letten|nodig|verplicht)\b/i.test(lower) && /\b(bki|iqi|draadje)\b/i.test(lower) && /\b(bronzijde|filmzijde)\b/i.test(lower)) ||
+      /\b(loodletter\s*f|loden\s*letter\s*f|letter\s*f\b)\b/i.test(lower) ||
+      (/\b(waar\s+op\s+de\s+las|hoe\s+(?:moet|kan|mag)?\s*(?:ik|je|men)?\s*(?:de\s+|een\s+)?(?:bki|iqi)\s*(?:plaatsen|leggen|plakken|neerleggen|ori[eë]nteren)|hoe\s+(?:leg|plaats|plak)\s+(?:ik|je)\s+(?:de\s+|een\s+)?(?:bki|iqi)|positie\s+van\s+(?:de\s+)?(?:bki|iqi)|dunste\s+draad)\b/i.test(lower)) ||
+      (/\b(hoeveel|aantal)\s*(?:bki'?s?|iqi'?s?)\b/i.test(lower) && /\b(panoram|centraal|360|rondom)\b/i.test(lower)) ||
+      (/\b(hoeveel\s+mm|minimale?\s+lengte|zichtbare?\s+lengte|aaneengesloten)\b/i.test(lower) && /\b(draad|draadje|bki|iqi)\b/i.test(lower)) ||
+      /\b(grondsluier|sluierzwarting|base\s*\+?\s*fog|maximale\s+sluier|hoeveel\s+sluier)\b/i.test(lower) ||
+      /\b(dubbelfilm|dubbel[-\s]?film|multi[-\s]?film|twee\s+films?\s+op\s+elkaar)\b/i.test(lower) ||
+      /\b(filmoverlap|minimale?\s+overlap|hoeveel\s+overlap)\b/i.test(lower) ||
+      /\b(filmmarkering|filmmarkeringen|loodcijfers?|verplichte?\s+markering|wat\s+moet\s+er\s+(?:allemaal\s+)?op\s+(?:de\s+|een\s+)?film\s+staan|welke\s+gegevens\s+.*op\s+(?:de\s+|een\s+)?film|reparatielas|r1\s*(?:en|of)?\s*r2)\b/i.test(lower) ||
+      (/\b(diktetolerantie|diktetoename|dikteverhouding)\b/i.test(lower) && /\b(klasse\s*[ab]|10%|20%|verschil)\b/i.test(lower)) ||
+      /\b(stralingsmeters?|verplichte?\s+(?:meters?|meetapparatuur)|welke\s+meters?\s+.*radiograaf|tld\s*badge|beosl)\b/i.test(lower) ||
+      /\b(broncontrole|veilig\s+(?:terug\s+)?in\s+de\s+container|controleren\s+.*container|na\s+het\s+indraaien)\b/i.test(lower) ||
+      (/\bcontrast\b/i.test(lower) && /\b(scherpte|definitie|onscherpte)\b/i.test(lower)) ||
+      (/\bshim\b/i.test(lower) && /\b(onder|wanneer|waarom|overdikte|lasoverdikte|gebruik)\b/i.test(lower)) ||
+      (/\b(haz|warmtebe[iï]nvloede\s*zone|buiten\s+de\s+las|naast\s+de\s+las)\b/i.test(lower) && /\b(beoordel|mm|hoeveel|grondmateriaal|film)\b/i.test(lower)) ||
+      /\b(wanddiktesprong|diktesprong|grote\s+dikteverschil|verschillende\s+wanddiktes?\s+in\s+(?:een|1)\s+opname)\b/i.test(lower) ||
+      /\b(opwarmen|opwarmprocedure|warm[-\s]?up|inbranden)\b/i.test(lower) ||
+      (/\b(vastzit|vast\s+zit|niet\s+terug|klem\s+zit|blijft\s+hangen|noodprocedure)\b/i.test(lower) && /\b(bron|gammabron|container|indraaien|kabel|geleidebuis)\b/i.test(lower));
 
     if (isRTKennisVraag) {
       intenties.push("rt_kennis");
@@ -562,7 +581,7 @@
     if (/\b(centraal|panoram|panoramisch|rondstraler|rondstralen)\b/i.test(lower)) {
       if (/\b(mag|toegestaan|kan\s*ik|geschikt|toelaatbaar)\b/i.test(lower)) {
         if (!intenties.includes("mag_ik")) intenties.push("mag_ik");
-      } else if (!isStralingstijdVraag && !intenties.includes("draadje") && !intenties.includes("min_ffd") && !intenties.includes("opstelling_info")) {
+      } else if (!isStralingstijdVraag && !intenties.includes("draadje") && !intenties.includes("min_ffd") && !intenties.includes("opstelling_info") && !intenties.includes("bundel")) {
         if (!intenties.includes("opnames")) intenties.push("opnames");
       }
     }
@@ -977,7 +996,7 @@
       res.ovaaltje = "Nee";
       res.opstelling = "Opstelling 12/G (DWDI superpositie)";
     }
-    // 2. SWSI: 5/A (centraal / rondstraler), 8/B (excentrisch), 2/C (buis contact), 1 (plaat)
+    // 2. SWSI: 5/A (centraal / rondstraler), 8/B (excentrisch), 2/C (bron buiten op afstand, film binnenin), 1 (plaat)
     else if (/\b(opstelling\s*(?:5\s*[\/-]?\s*a|5\b|a\b)|centraal|centrale\s+opstelling|panoram|panoramisch|rondstraler|rondstralen|rondstralend)\b/i.test(lower)) {
       res.technique = "SWSI";
       res.optie = "1";
@@ -1754,6 +1773,10 @@
         res.bronTekst = "Smart EVO (1 mm)";
         res.brongrootte = 1;
         res.bronType = "X-ray";
+      } else if (/ceram\s*35\s*p/i.test(tekst)) {
+        res.bronTekst = "Balteau Ceram35P (rondstraler, 4 mm)";
+        res.brongrootte = 4;
+        res.bronType = "X-ray";
       } else if (/\brondstraler\b/i.test(tekst) || /balteau\s*rondstraler/i.test(tekst)) {
         res.bronTekst = "Balteau Rondstraler (5 mm)";
         res.brongrootte = 5;
@@ -1786,7 +1809,7 @@
       let tZonder = tekst
         .replace(/\b(?:schedule|sch|sched)[-\s]*([0-9]{1,3}[a-z]?|std|xs|xxs)\b/gi, "")
         .replace(/\b([0-9]{1,3}[a-z]?)\s*(?:schedule|sch|sched)\b/gi, "")
-        .replace(/\b(se-75|se75|ir-192|ir192|co-60|selenium|iridium|balteau|yxlon|smart|rondstraler|rr\d+|\d{5}[a-z]?|d[234578])\b/gi, "")
+        .replace(/\b(se-75|se75|ir-192|ir192|co-60|selenium|iridium|balteau|ceram\s*35\s*p|yxlon|smart|rondstraler|rr\d+|\d{5}[a-z]?|d[234578])\b/gi, "")
         .replace(/\bdn\s*[-]?\s*\d+\b/gi, "")
         .replace(/\b\d+(?:[.,]\d+)?\s*(?:mm\s*|cm\s*)?(?:ci|curie|gbq|tbq|usv|µsv|microsievert|pb|fe|lood|staal|beton|baksteen|metselwerk|isolatie|ma\*min|mamin|ma|milliamp|miliamp)\b/gi, "")
         .replace(/(?:lood|pb|staal|fe|beton(?:nen)?(?:\s*muur)?|bakste(?:en|nen)(?:\s*muur)?|metselwerk|isolatie)\s*(?:tussen\s*)?(?:van|is|op|:)?\s*\d+(?:[.,]\d+)?\s*(?:mm|cm|m\b)?/gi, "");

@@ -806,6 +806,143 @@ function laadRtAssistant() {
       !/Stralingstijd voor/i.test(tChipOpn) && /opnames|klasse|norm/i.test(tChipOpn),
       tChipOpn
     );
+
+    // Opstelling 2/C correctie + nieuwe normvragen in RT-kennisbank
+    RT.resetGespreksGeheugen();
+    const rOpst2c = await RT.verwerkUniverseleVraag("Wat is opstelling 2/C?");
+    const tOpst2c = stripTags(rOpst2c && rOpst2c.text);
+    assert(
+      "Opstelling 2/C beschrijft 'bron op afstand aan de buitenzijde, film aan de binnenzijde' (geen 'buis contact')",
+      /buitenzijde/i.test(tOpst2c) && /binnenzijde/i.test(tOpst2c) && !/buis contact|contact swsi/i.test(tOpst2c),
+      tOpst2c
+    );
+    const rBkiVoorkeur = await RT.verwerkUniverseleVraag("Wat heeft de voorkeur, de BKI aan filmzijde of bronzijde?");
+    const tBkiVoorkeur = stripTags(rBkiVoorkeur && rBkiVoorkeur.text);
+    assert(
+      "Normvraag: BKI voorkeur bronzijde vs filmzijde",
+      /bronzijde/i.test(tBkiVoorkeur) && /letter F/i.test(tBkiVoorkeur),
+      tBkiVoorkeur
+    );
+    const rSluier = await RT.verwerkUniverseleVraag("Wat is de maximale grondsluier van een film?");
+    const tSluier = stripTags(rSluier && rSluier.text);
+    assert(
+      "Normvraag: maximale grondsluier <= 0.30",
+      /0\.30/.test(tSluier),
+      tSluier
+    );
+    const rPanoBki = await RT.verwerkUniverseleVraag("Hoeveel BKI's moeten er bij een panoramische opname geplaatst worden?");
+    const tPanoBki = stripTags(rPanoBki && rPanoBki.text);
+    assert(
+      "Normvraag: panoramisch 3 BKI's op 120 graden",
+      /3 BKI/i.test(tPanoBki) && /120°/.test(tPanoBki),
+      tPanoBki
+    );
+    const rMeters = await RT.verwerkUniverseleVraag("Welke stralingsmeters moet een radiograaf verplicht bij zich hebben?");
+    const tMeters = stripTags(rMeters && rMeters.text);
+    assert(
+      "Normvraag: 3 verplichte stralingsmeters (TLD/BeOSL, EPD, dosistempometer)",
+      /TLD/i.test(tMeters) && /BeOSL/i.test(tMeters) && /dosistempometer/i.test(tMeters),
+      tMeters
+    );
+    const rFilmzijde = await RT.verwerkUniverseleVraag("moet ik ergens rekening mee houden als ik de bki aan filmzijde heb?");
+    const tFilmzijde = stripTags(rFilmzijde && rFilmzijde.text);
+    assert(
+      "Normvraag: rekening houden met BKI aan filmzijde -> loden letter F",
+      /letter F/i.test(tFilmzijde) && /filmzijde/i.test(tFilmzijde),
+      tFilmzijde
+    );
+    const rBkiPlaats = await RT.verwerkUniverseleVraag("hoe moet ik de bki plaatsen?");
+    const tBkiPlaats = stripTags(rBkiPlaats && rBkiPlaats.text);
+    assert(
+      "Normvraag: hoe moet ik de BKI plaatsen -> dwars over de las, dunste draad naar buiten",
+      /dwars over de las/i.test(tBkiPlaats) && /dunste draad/i.test(tBkiPlaats),
+      tBkiPlaats
+    );
+    const rMarkering = await RT.verwerkUniverseleVraag("Wat moet er allemaal op een film staan?");
+    const tMarkering = stripTags(rMarkering && rMarkering.text);
+    assert(
+      "Normvraag: filmmarkeringen bevatten ASME datum",
+      /datum/i.test(tMarkering) && /ASME/i.test(tMarkering),
+      tMarkering
+    );
+    const rContr = await RT.verwerkUniverseleVraag("Wat is het verschil tussen contrast en scherpte op een film?");
+    assert("Normvraag #4: contrast vs scherpte", /zwartingsverschil/i.test(stripTags(rContr.text)) && /randafbeelding/i.test(stripTags(rContr.text)), stripTags(rContr.text));
+    const rShim = await RT.verwerkUniverseleVraag("Wanneer moet ik een shim onder een ASME plaatje leggen?");
+    assert("Normvraag #5: shim onder ASME Hole-Type IQI", /overdikte/i.test(stripTags(rShim.text)) && /T-277\.1/.test(stripTags(rShim.text)), stripTags(rShim.text));
+    const rHaz = await RT.verwerkUniverseleVraag("Hoeveel mm buiten de las moet er op de film beoordeeld worden?");
+    assert("Normvraag #6: HAZ / buiten de las min 10 mm", /10 mm/.test(stripTags(rHaz.text)) && /warmtebe/i.test(stripTags(rHaz.text)), stripTags(rHaz.text));
+    const rSprong = await RT.verwerkUniverseleVraag("Mag ik een las met een grote wanddiktesprong in 1 opname schieten?");
+    assert("Normvraag #7: wanddiktesprong -> dubbelfilm of aparte opnames", /dubbelfilm/i.test(stripTags(rSprong.text)), stripTags(rSprong.text));
+    const rWarm = await RT.verwerkUniverseleVraag("Wat is de opwarmprocedure van een röntgenbuis?");
+    assert("Normvraag #8: warm-up röntgenbuis tegen doorslag/arcing", /arcing|doorslag/i.test(stripTags(rWarm.text)), stripTags(rWarm.text));
+    const rVast = await RT.verwerkUniverseleVraag("Wat moet ik doen als de gammabron vastzit en niet terug in de container draait?");
+    assert("Normvraag #9: noodprocedure vastzittende gammabron -> HSQE alarmeren", /HSQE/i.test(stripTags(rVast.text)) && /afzetten/i.test(stripTags(rVast.text)) && /instructies/i.test(stripTags(rVast.text)), stripTags(rVast.text));
+
+    // Slimme fallback bij onbekende vraag
+    RT.resetGespreksGeheugen();
+    const rFallback = await RT.verwerkUniverseleVraag("Hoe werkt de koffiemachine op de plant?");
+    assert(
+      "Slimme fallback toont eerlijke melding + Vraag insturen & Alle voorbeelden knoppen",
+      /herken ik nog niet helemaal/i.test(stripTags(rFallback.text)) &&
+        /meldFoutViaMail/.test(rFallback.text) &&
+        /toggleVoorbeeldVragen/.test(rFallback.text),
+      rFallback.text
+    );
+
+    // Yxlon smart -> Smart EVO 300DS ook synchroon in bron-dropdown (niet Yxlon 300)
+    RT.resetGespreksGeheugen();
+    await RT.verwerkUniverseleVraag("Hoe breed is mijn stralingsbundel op 500 mm afstand met een Yxlon smart");
+    const ddHtml = RT.geefBronDropdownHtml();
+    assert(
+      "Dropdown synchroon met 'Yxlon smart': selecteert Smart EVO (1.0 mm) i.p.v. Yxlon 300",
+      /value="smart" selected/.test(ddHtml) && !/value="yxlon_300" selected/.test(ddHtml),
+      ddHtml
+    );
+
+    // Bundelbreedte zonder bron: toont aparte Se-75 60° & 90° collimatoren + alle 6 bron-chips
+    RT.resetGespreksGeheugen();
+    const rBund95 = await RT.verwerkUniverseleVraag("hoe breed is mijn bundel op 95 cm");
+    const tBund95 = stripTags(rBund95 && rBund95.text);
+    assert(
+      "Bundelbreedte 95 cm: toont aparte Se-75 60°/90° collimatoren + alle 6 bron-chips",
+      /Se-75 smalle collimator \(60° rondom\)/.test(tBund95) &&
+        /Se-75 brede collimator \(90° rondom\)/.test(tBund95) &&
+        Array.isArray(rBund95.chips) &&
+        rBund95.chips.includes("Yxlon 300") &&
+        rBund95.chips.includes("Yxlon Smart") &&
+        rBund95.chips.includes("Balteau Directional") &&
+        rBund95.chips.includes("Rondstraler") &&
+        rBund95.chips.includes("Se-75 smalle collimator") &&
+        rBund95.chips.includes("Se-75 brede collimator"),
+      tBund95 + " | chips: " + JSON.stringify(rBund95.chips)
+    );
+    const rBundSmal = await RT.verwerkUniverseleVraag("Se-75 smalle collimator", { isChip: true });
+    const tBundSmal = stripTags(rBundSmal && rBundSmal.text);
+    assert(
+      "Bundelbreedte chip 'Se-75 smalle collimator' berekent 60° rondom (1097 mm op 950 mm)",
+      /60° rondom/.test(tBundSmal) && /1097 mm/.test(tBundSmal),
+      tBundSmal
+    );
+    const rBundRond = await RT.verwerkUniverseleVraag("Rondstraler", { isChip: true });
+    const tBundRond = stripTags(rBundRond && rBundRond.text);
+    assert(
+      "Bundelbreedte chip 'Rondstraler' blijft in bundelbreedte en toont 360° x 40° (692 mm op 950 mm)",
+      /Rondstraler/i.test(tBundRond) && /692 mm/.test(tBundRond),
+      tBundRond
+    );
+    const rBund35P = await RT.verwerkUniverseleVraag("Balteau Ceram35P (rondstraler)", { isChip: true });
+    const tBund35P = stripTags(rBund35P && rBund35P.text);
+    const dd35P = RT.geefBronDropdownHtml();
+    assert(
+      "Balteau Ceram35P (rondstraler): 4 mm focus, 360° x 30° (509 mm op 950 mm) & dropdown synchroon",
+      /Ceram35P/i.test(tBund35P) &&
+        /30°/.test(tBund35P) &&
+        /509 mm/.test(tBund35P) &&
+        /360° panoramisch/i.test(tBund35P) &&
+        RT.actiefGespreksGeheugen.brongrootte === 4 &&
+        /value="balteau_ceram35p" selected/.test(dd35P),
+      tBund35P + " | d=" + RT.actiefGespreksGeheugen.brongrootte
+    );
   }
 
   // 4. Multi-Turn Geheugen, Bron-Dropdown & Chip-Flows

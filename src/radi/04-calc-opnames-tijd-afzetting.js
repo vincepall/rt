@@ -843,8 +843,8 @@
   function isRondstralerBron(params, vraagTekst = "") {
     const lower = (vraagTekst || "").toLowerCase();
     return Boolean(
-      (params && params.bronTekst && /rondstraler/i.test(params.bronTekst)) ||
-      /\b(rondstraler|rondstralen)\b/i.test(lower)
+      (params && params.bronTekst && /rondstraler|ceram\s*35\s*p/i.test(params.bronTekst)) ||
+      /\b(rondstraler|rondstralen|ceram\s*35\s*p)\b/i.test(lower)
     );
   }
 
@@ -2423,7 +2423,7 @@
     }
 
     if (totaleLengte <= maxLengte) {
-      if (chips) chips.push("Wis langsnaad", "2850 mm", "3000 mm");
+      if (chips) chips.push("2850 mm", "3000 mm");
       return `Voor een langsnaad van <strong>${totaleLengte} mm</strong> volstaat <strong>1 x 10/48 film</strong> (dekt tot ${maxLengte} mm naadlengte inclusief overlap).<br><small style="opacity: 0.85;">(Berekend volgens <a href="LW_Verdeler.html" class="ai-link" target="_blank">LW_Verdeler.html</a> met 10x48 cm films).</small>`;
     }
 
@@ -2438,7 +2438,7 @@
     const stukLengteStr = Number.isInteger(stukLengte) ? String(stukLengte) : stukLengte.toFixed(1);
     const meterStr = (totaleLengte / 1000).toFixed(2).replace(/\.?0+$/, "");
 
-    if (chips) chips.push("Wis langsnaad", "2000 mm", "3000 mm");
+    if (chips) chips.push("2000 mm", "3000 mm");
 
     let out = `<div class="rt-ai-calc">• Langsnaad: <strong>${totaleLengte} mm</strong> (${meterStr} m)<br>`;
     out += `• Uiteinden: <strong>${uiteindeLengte} mm</strong> aan begin en einde (2 x ${uiteindeLengte} mm)<br>`;
@@ -2475,10 +2475,31 @@
       axes: { small: 40, large: 55 },
       term: "bundel"
     },
+    balteauCeram35P: {
+      id: "balteauCeram35P",
+      name: "Balteau Ceram35P (rondstraler, 4 mm)",
+      axes: { small: 30, large: 360 },
+      term: "bundel"
+    },
+    Se75Smal: {
+      id: "Se75Smal",
+      name: "Se-75 smalle collimator (60°)",
+      axes: { small: 60, large: 60 },
+      symmetric: true,
+      term: "collimator"
+    },
+    Se75Breed: {
+      id: "Se75Breed",
+      name: "Se-75 brede collimator (90°)",
+      axes: { small: 90, large: 90 },
+      symmetric: true,
+      term: "collimator"
+    },
     Se75: {
       id: "Se75",
-      name: "Selenium-75",
+      name: "Se-75 collimatoren (60° & 90°)",
       axes: { small: 60, large: 90 },
+      isDualCollimator: true,
       term: "collimator"
     }
   };
@@ -2489,25 +2510,50 @@
     // 1. Bron / Buis detectie (eerst huidige tekst, daarna geheugen)
     let tube = null;
     const bronCheckTekst = (lower + " " + (params.bronTekst || "")).toLowerCase();
-    if (/\b(balteau\s*rondstraler|rondstraler|rondstralen)\b/i.test(lower)) {
+    if (/ceram\s*35\s*p/i.test(lower)) {
+      tube = TUBE_BUNDEL_DB.balteauCeram35P;
+    } else if (/\b(balteau\s*rondstraler|rondstraler|rondstralen)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.balteauRondstraler;
     } else if (/\b(smart\s*evo|evo\s*300|smart|yxlon\s*smart)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.smartEvo300;
     } else if (/\b(yxlon|yxlon\s*300)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.yxlon300;
+    } else if (/\b(smalle\s+collimator|60\s*(?:graden|°)\s*collimator)\b/i.test(lower) || (/\b(se-?75|selenium|seleen|collimator)\b/i.test(lower) && /\b(smal|smalle|60)\b/i.test(lower))) {
+      tube = TUBE_BUNDEL_DB.Se75Smal;
+    } else if (/\b(brede\s+collimator|90\s*(?:graden|°)\s*collimator)\b/i.test(lower) || (/\b(se-?75|selenium|seleen|collimator)\b/i.test(lower) && /\b(breed|brede|90)\b/i.test(lower))) {
+      tube = TUBE_BUNDEL_DB.Se75Breed;
     } else if (/\b(se-75|se75|selenium|seleen|ir-192|ir192|iridium)\b/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.Se75;
     } else if (/\b(balteau\s*(?:ceram|directional)|ceram\s*300|directional)\b/i.test(lower) || /balteau/i.test(lower)) {
       tube = TUBE_BUNDEL_DB.balteauCeram300;
     } else if (params.bronTekst || params.bronType) {
-      if (/rondstraler/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauRondstraler;
+      if (/ceram\s*35\s*p/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauCeram35P;
+      else if (/rondstraler/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauRondstraler;
       else if (/smart\s*evo|evo\s*300|smart/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.smartEvo300;
       else if (/yxlon/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.yxlon300;
       else if (/balteau|ceram|directional/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.balteauCeram300;
+      else if (/smalle\s+collimator/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.Se75Smal;
+      else if (/brede\s+collimator/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.Se75Breed;
       else if (params.bronType === "Se75" || params.bronType === "Ir192" || /se-?75|ir-?192|selenium|iridium/i.test(bronCheckTekst)) tube = TUBE_BUNDEL_DB.Se75;
     }
     if (tube && typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
       actiefGespreksGeheugen.bronTekst = tube.name;
+      if (tube.id === "smartEvo300") {
+        actiefGespreksGeheugen.brongrootte = 1;
+        actiefGespreksGeheugen.bronType = "X-ray";
+      } else if (tube.id === "yxlon300") {
+        actiefGespreksGeheugen.brongrootte = 3;
+        actiefGespreksGeheugen.bronType = "X-ray";
+      } else if (tube.id === "balteauCeram300") {
+        actiefGespreksGeheugen.brongrootte = 2.5;
+        actiefGespreksGeheugen.bronType = "X-ray";
+      } else if (tube.id === "balteauCeram35P") {
+        actiefGespreksGeheugen.brongrootte = 4;
+        actiefGespreksGeheugen.bronType = "X-ray";
+      } else if (tube.id === "balteauRondstraler") {
+        actiefGespreksGeheugen.brongrootte = 5;
+        actiefGespreksGeheugen.bronType = "X-ray";
+      }
     }
 
     // Custom angle check
@@ -2553,7 +2599,7 @@
     }
 
     if (chips) {
-      chips.push("Balteau Directional", "Smart EVO 300", "Yxlon 300", "Se-75 / Collimator", "2 meter focus", "Film 48 cm");
+      chips.push("Yxlon 300", "Yxlon Smart", "Balteau Directional", "Balteau Ceram35P (rondstraler)", "Rondstraler", "Se-75 smalle collimator", "Se-75 brede collimator");
     }
 
     // Vraag: "hoeveel focus minimaal nodig om een film van X te belichten"
@@ -2569,20 +2615,22 @@
         const minCol90 = Math.ceil((targetFilm / 2) / Math.tan(45 * Math.PI / 180));
         const minBalt40 = Math.ceil((targetFilm / 2) / Math.tan(20 * Math.PI / 180));
         const minBalt50 = Math.ceil((targetFilm / 2) / Math.tan(25 * Math.PI / 180));
-        return `Welke <strong>röntgenbuis of gammabron (collimator)</strong> gebruik je om de film van <strong>${flStr} (${targetFilm} mm)</strong> te belichten? De benodigde FFD hangt namelijk af van de stralingsbundelhoek:<br><br>` +
-               `• <strong>Gamma collimator (60° &times; 90°):</strong> min. <strong>${minCol90} mm</strong> (brede as 90°) of <strong>${minCol60} mm</strong> (smalle as 60°)<br>` +
+        return `<div class="rt-ai-calc">Welke <strong>röntgenbuis of collimator</strong> gebruik je om de film van <strong>${flStr} (${targetFilm} mm)</strong> te belichten?<br><br>` +
+               `• <strong>Se-75 smalle collimator (60° rondom):</strong> min. <strong>${minCol60} mm</strong><br>` +
+               `• <strong>Se-75 brede collimator (90° rondom):</strong> min. <strong>${minCol90} mm</strong><br>` +
                `• <strong>Balteau Ceram 300 (40° &times; 50°):</strong> min. <strong>${minBalt50} mm</strong> (brede as 50°) of <strong>${minBalt40} mm</strong> (smalle as 40°)<br>` +
-               `<small style="opacity: 0.85;">(Geef de gebruikte buis of bron op, of raadpleeg <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a>).</small>`;
+               `<small style="opacity: 0.85; display:block; margin-top:6px;">(Kies hieronder een bron/buis of raadpleeg <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a>).</small></div>`;
       }
       if (ffd) {
         const wCol60 = Math.round(2 * ffd * Math.tan(30 * Math.PI / 180));
         const wCol90 = Math.round(2 * ffd * Math.tan(45 * Math.PI / 180));
         const wBalt40 = Math.round(2 * ffd * Math.tan(20 * Math.PI / 180));
         const wBalt50 = Math.round(2 * ffd * Math.tan(25 * Math.PI / 180));
-        return `Welke <strong>bron (collimator) of röntgenbuis</strong> gebruik je op <strong>${ffd} mm</strong> (${(ffd / 1000).toFixed(2)} m) focusafstand?<br><br>` +
-               `• <strong>Standaard gamma collimator (Se-75 / Ir-192, 60° &times; 90°):</strong> Smalle as (60°): <strong>${wCol60} mm</strong> (${(wCol60 / 1000).toFixed(2)} m) | Brede as (90°): <strong>${wCol90} mm</strong> (${(wCol90 / 1000).toFixed(2)} m)<br>` +
+        return `<div class="rt-ai-calc">Welke <strong>bron (collimator) of röntgenbuis</strong> gebruik je op <strong>${ffd} mm</strong> (${(ffd / 1000).toFixed(2)} m) focusafstand?<br><br>` +
+               `• <strong>Se-75 smalle collimator (60° rondom):</strong> <strong>${wCol60} mm</strong> (${(wCol60 / 1000).toFixed(2)} m)<br>` +
+               `• <strong>Se-75 brede collimator (90° rondom):</strong> <strong>${wCol90} mm</strong> (${(wCol90 / 1000).toFixed(2)} m)<br>` +
                `• <strong>Balteau Ceram 300 (40° &times; 50°):</strong> Smalle as (40°): <strong>${wBalt40} mm</strong> (${(wBalt40 / 1000).toFixed(2)} m) | Brede as (50°): <strong>${wBalt50} mm</strong> (${(wBalt50 / 1000).toFixed(2)} m)<br>` +
-               `<small style="opacity: 0.85;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline"><i>L</i> = 2 &times; FFD &times; tan(<span class="rt-math-frac"><span class="rt-math-num">&theta;</span><span class="rt-math-den">2</span></span>)</span>).</small>`;
+               `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline"><i>L</i> = 2 &times; FFD &times; tan(<span class="rt-math-frac"><span class="rt-math-num">&theta;</span><span class="rt-math-den">2</span></span>)</span>).</small></div>`;
       }
       tube = TUBE_BUNDEL_DB.balteauCeram300;
     } else if (!tube) {
@@ -2599,13 +2647,18 @@
                `<small style="opacity: 0.85; display:block; margin-top:6px;">(Berekend volgens <a href="bundelbreedte.html" class="ai-link" target="_blank">bundelbreedte.html</a> conform <span class="rt-math-inline">FFD = <span class="rt-math-frac"><span class="rt-math-num"><i>L</i> / 2</span><span class="rt-math-den">tan(&alpha; / 2)</span></span></span>).</small></div>`;
       }
       const angleSmallRad = (tube.axes.small / 2) * (Math.PI / 180);
-      const angleLargeVal = tube.axes.large === 360 ? 40 : tube.axes.large;
+      const angleLargeVal = tube.axes.large === 360 ? tube.axes.small : tube.axes.large;
       const angleLargeRad = (angleLargeVal / 2) * (Math.PI / 180);
       const minFfdLarge = Math.ceil((targetFilm / 2) / Math.tan(angleLargeRad));
       const minFfdSmall = Math.ceil((targetFilm / 2) / Math.tan(angleSmallRad));
 
       let resp = `<div class="rt-ai-calc">• Te belichten: <strong>${targetFilm >= 100 ? (targetFilm / 10) + " cm" : targetFilm + " mm"}</strong> (${targetFilm} mm) met <strong>${tube.name}</strong><br>`;
-      if (tube.axes.large === 360) {
+      if (tube.symmetric) {
+        resp += `• Bundel (${tube.axes.small}° rondom): minimaal <span class="rt-ai-result">${minFfdSmall} mm</span> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
+      } else if (tube.isDualCollimator) {
+        resp += `• Smalle collimator (60° rondom): minimaal <span class="rt-ai-result">${minFfdSmall} mm</span> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
+        resp += `• Brede collimator (90° rondom): minimaal <span class="rt-ai-result">${minFfdLarge} mm</span> (${(minFfdLarge / 10).toFixed(1)} cm &approx; ${Math.round(minFfdLarge / 10)} cm) focus.<br>`;
+      } else if (tube.axes.large === 360) {
         resp += `• Brede as (360° panoramisch): <span class="rt-ai-result">Rondom panoramisch</span> (dekt 360° van de buisomtrek).<br>`;
         resp += `• Smalle as (${tube.axes.small}°): minimaal <span class="rt-ai-result">${minFfdSmall} mm</span> (${(minFfdSmall / 10).toFixed(1)} cm &approx; ${Math.round(minFfdSmall / 10)} cm) focus.<br>`;
       } else {
@@ -2620,22 +2673,28 @@
       if (typeof actiefGespreksGeheugen !== "undefined" && actiefGespreksGeheugen) {
         actiefGespreksGeheugen.verwachtParameter = "sfd";
       }
-      return `Voor de <strong>${tube.name}</strong> (openingshoek ${tube.axes.small}° &times; ${tube.axes.large === 360 ? "360°" : tube.axes.large + "°"}): op welke <strong>focusafstand</strong> (bijv. 80 cm, 1 meter of 2 meter) wil je de bundelbreedte berekenen?`;
+      const hoekLabel = tube.symmetric
+        ? `${tube.axes.small}° rondom`
+        : (tube.isDualCollimator ? "60° smal of 90° breed" : `${tube.axes.small}° &times; ${tube.axes.large === 360 ? "360°" : tube.axes.large + "°"}`);
+      return `Voor de <strong>${tube.name}</strong> (openingshoek ${hoekLabel}): op welke <strong>focusafstand</strong> (bijv. 80 cm, 1 meter of 2 meter) wil je de bundelbreedte berekenen?`;
     }
 
     // Bereken bundelbreedte op vlakke plaat (standaard)
     const angleSmallRad = (tube.axes.small / 2) * (Math.PI / 180);
     const wSmall = Math.round(2 * ffd * Math.tan(angleSmallRad));
 
-    let wLarge = 0;
+    let wLarge = wSmall;
     let largeTxt = "";
-    if (tube.axes.large === 360) {
-      wLarge = 360;
-      largeTxt = `• <strong>Brede as (360°):</strong> <span class="rt-ai-result">360° panoramisch</span> (volledig rondom).<br>`;
-    } else {
-      const angleLargeRad = (tube.axes.large / 2) * (Math.PI / 180);
-      wLarge = Math.round(2 * ffd * Math.tan(angleLargeRad));
-      largeTxt = `• <strong>Brede as (${tube.axes.large}°):</strong> <span class="rt-ai-result">${wLarge} mm</span> (${(wLarge / 1000).toFixed(2)} m).<br>`;
+    if (!tube.symmetric) {
+      if (tube.axes.large === 360) {
+        wLarge = 360;
+        largeTxt = `• <strong>Brede as (360°):</strong> <span class="rt-ai-result">360° panoramisch</span> (volledig rondom).<br>`;
+      } else {
+        const angleLargeRad = (tube.axes.large / 2) * (Math.PI / 180);
+        wLarge = Math.round(2 * ffd * Math.tan(angleLargeRad));
+        const largeLbl = tube.isDualCollimator ? `Brede collimator (${tube.axes.large}° rondom)` : `Brede as (${tube.axes.large}°)`;
+        largeTxt = `• <strong>${largeLbl}:</strong> <span class="rt-ai-result">${wLarge} mm</span> (${(wLarge / 1000).toFixed(2)} m).<br>`;
+      }
     }
 
     let customTxt = "";
@@ -2675,7 +2734,10 @@
 
     let out = `<div class="rt-ai-calc">${passHeader}`;
     out += `• Buis &amp; focus: <strong>${tube.name}</strong> op <strong>${ffd} mm</strong> (${(ffd / 1000).toFixed(2)} meter)<br>`;
-    out += `• <strong>Smalle as (${tube.axes.small}°):</strong> <span class="rt-ai-result">${wSmall} mm</span> (${(wSmall / 1000).toFixed(2)} m).<br>`;
+    const smallLbl = tube.symmetric
+      ? `Bundeldiameter (${tube.axes.small}° rondom)`
+      : (tube.isDualCollimator ? `Smalle collimator (${tube.axes.small}° rondom)` : `Smalle as (${tube.axes.small}°)`);
+    out += `• <strong>${smallLbl}:</strong> <span class="rt-ai-result">${wSmall} mm</span> (${(wSmall / 1000).toFixed(2)} m).<br>`;
     out += largeTxt;
     if (customTxt) out += customTxt;
     if (filmVergelijking) out += filmVergelijking;
